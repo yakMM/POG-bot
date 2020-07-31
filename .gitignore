@@ -1,0 +1,10 @@
+__pycache__/
+*/__pycache__/
+permissions.txt
+bot/test.py
+bot/test2.py
+bot/others/
+bot/config_test.cfg
+bot/client_secret_test.json
+bot/secret/
+logo/
