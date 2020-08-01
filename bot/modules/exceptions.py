@@ -18,9 +18,10 @@ class CharInvalidWorld(Exception):
         super().__init__(f"Character in invalid world: {char}")
 
 class CharAlreadyExists(Exception):
-    def __init__(self, char):
+    def __init__(self, char, id):
         self.char = char
-        super().__init__(f"Character already registered: {char}")
+        self.id = id # id of player who already registered the char
+        super().__init__(f"Character {char} is already registered!")
 
 class AccountNotFound(Exception):
     def __init__(self, id):

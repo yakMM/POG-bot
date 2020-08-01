@@ -6,7 +6,7 @@ from modules.display import send
 from modules.exceptions import ElementNotFound
 from modules.tools import isAdmin
 
-from classes.maps import doSelectionProcess
+from classes.maps import MapSelection, getMapSelection
 from matches import clearLobby, getMatch, getAllNamesInLobby
 
 
@@ -71,10 +71,18 @@ class AdminCog(commands.Cog, name='admin'):
         if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
             await send("MATCH_ALREADY_STARTED", ctx, ctx.command.name)
             return
-        mapFound = await doSelectionProcess(channelId, ctx, *args) # Handle the actual map selection
-        if mapFound!=None:
-            match.map = mapFound
-            await send("MATCH_MAP_SELECTED", ctx, mapFound.name)
+        try:
+            sel = getMapSelection(id)
+        except ElementNotFound:
+            if len(args) == 0:
+                await send("MAP_HELP", ctx)
+                return
+            sel = MapSelection(id)
+        await sel.doSelectionProcess(ctx, *args) # Handle the actual map selection
+        if sel.status == SelStatus.IS_SELECTED:
+            sel.confirm()
+            match.map = sel.map
+            await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
 
 
 def setup(client):

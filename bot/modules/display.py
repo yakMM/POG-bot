@@ -221,7 +221,7 @@ def _teamUpdate(arg, match):
     for tm in match.teams:
         value = ""
         name = ""
-        if tm.captain.isTurn and match.status != MatchStatus.IS_WAITING:
+        if tm.captain.isTurn and match.status in (MatchStatus.IS_FACTION, MatchStatus.IS_PICKING):
             value = f"Captain **[pick]**: {tm.captain.mention}\n"
         else:
             value = f"Captain: {tm.captain.mention}\n"
@@ -301,10 +301,10 @@ class _StringEnum(Enum):
     REG_IS_REGISTERED_NOA = _Message("You are already registered without a Jaeger account! If you have your own account, please re-register with your Jaeger characters.")
     REG_HELP = _Message("Registration help:",embed=_registerHelp)
     REG_NO_ACCOUNT = _Message("You successfully registered without a Jaeger account!")
-    REG_INVALID = _Message("Invalid command!",embed=_registerHelp)
+    REG_INVALID = _Message("Invalid registration!",embed=_registerHelp)
     REG_CHAR_NOT_FOUND = _Message("Invalid registration! Character `{}` is not valid!",embed=_registerHelp)
     REG_NOT_JAEGER = _Message("Invalid registration! Character `{}` doesn't belong to Jaeger!",embed=_registerHelp)
-    REG_ALREADY_EXIST = _Message("Invalid registration! Character `{}` is already registered!")
+    REG_ALREADY_EXIST = _Message("Invalid registration! Character `{}` is already registered by <@{}>!")
     REG_MISSING_FACTION = _Message("Invalid registration! Can't find a {} character in your list!",embed=_registerHelp)
     REG_UPDATE_OWN = _Message("You successfully updated your profile with the following Jaeger characters: `{}`, `{}`, `{}`")
     REG_UPDATE_NOA = _Message("You successfully removed your Jaeger characters from your profile.")
@@ -348,6 +348,7 @@ class _StringEnum(Enum):
     PK_FACTION_ALREADY = _Message("Faction already picked by the other team!")
     PK_FACTION_OK_NEXT = _Message("{} chose {}! {} pick a faction!", ping=False)
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
+    PK_WAIT_MAP = _Message("{} {} Pick a map!", ping=False, embed=_teamUpdate)
 
     EXT_NOT_REGISTERED = _Message("You are not registered! Check <#{}>")
     UNKNOWN_ERROR = _Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\nDetails:*{}*")

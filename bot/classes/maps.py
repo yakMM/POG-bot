@@ -11,52 +11,9 @@ _allMapsList = list()
 
 MAX_SELECTED = 15
 
-_mapSelections = dict()
+mapSelectionsDict = dict()
 
 
-def getMapSelection(id):
-    sel = _mapSelections.get(id)
-    if sel == None:
-        raise ElementNotFound(id)
-    return sel
-
-async def doSelectionProcess(id, ctx, *args):
-    try:
-        sel = getMapSelection(id)
-    except ElementNotFound:
-        if len(args) == 0:
-            await send("MAP_HELP", ctx)
-            return
-        sel = MapSelection(id)
-    if len(args) == 0:
-        if sel.status == SelStatus.IS_SELECTION:
-            await send("MAP_DISPLAY_LIST", ctx, sel=sel)
-            return
-        if sel.status == SelStatus.IS_SELECTED:
-            await send("MAP_SELECTED", ctx, sel.map.name)
-            return
-        await send("MAP_HELP", ctx)
-        return
-    if len(args) == 1 and args[0].lower() == "help":
-            await send("MAP_HELP", ctx)
-            return
-    if args[0].isnumeric() and len(args) == 1:
-        res = int(args[0])
-        sel.selectIndex(res)
-    else:
-        req=" ".join(args)
-        sel.doSelection(req)
-    if sel.status == SelStatus.IS_EMPTY:
-        await send("MAP_NOT_FOUND", ctx)
-        return
-    if sel.status == SelStatus.IS_TOO_MUCH:
-        await send("MAP_TOO_MUCH", ctx)
-        return
-    if sel.status == SelStatus.IS_SELECTION:
-        await send("MAP_DISPLAY_LIST", ctx, sel=sel)
-        return
-    if sel.status == SelStatus.IS_SELECTED:
-        return sel.map
 
 class Map():
     def __init__(self,data):
@@ -78,12 +35,12 @@ class Map():
         return name
 
 class MapSelection():
-    def __init__(self, id):
-        self.__id = id
+    def __init__(self, obj):
+        self.__id = obj.id
+        self.__headObject = obj
         self.__selection = list()
         self.__selected = None
         self.__status = SelStatus.IS_EMPTY
-        _mapSelections[id] = self
 
     def selectFromIdList(self, ids):
         self.__selection.clear()
@@ -104,13 +61,20 @@ class MapSelection():
         return result
 
 
-    def doSelection(self, arg):
+    def __doSelection(self, args):
+        if self.__status == SelStatus.IS_SELECTION and len(args) == 1 and args[0].isnumeric():
+            index = int(args[0])
+            if index > 0 and index <= len(self.__selection):
+                self.__selected = self.__selection[index-1]
+                self.__status = SelStatus.IS_SELECTED
+            return
+        arg=" ".join(args)
         self.__selection.clear()
         for map in _allMapsList:
             if len(self.__selection) > MAX_SELECTED:
                 self.__status = SelStatus.IS_TOO_MUCH
                 return
-            if map.name.lower().find(arg.lower()) != -1:
+            if arg.lower() in map.name.lower():
                 self.__selection.append(map)
         if len(self.__selection) == 1:
             self.__selected = self.__selection[0]
@@ -120,13 +84,29 @@ class MapSelection():
             self.__status = SelStatus.IS_EMPTY
             return
         self.__status = SelStatus.IS_SELECTION
-
-    def selectIndex(self, index):
-        if self.__status != SelStatus.IS_SELECTION:
+    
+    async def doSelectionProcess(self, ctx, *args):
+        if len(args) == 0:
+            if self.__status == SelStatus.IS_SELECTION:
+                await send("MAP_DISPLAY_LIST", ctx, sel=self)
+                return
+            if self.__status == SelStatus.IS_SELECTED:
+                await send("MAP_SELECTED", ctx, self.__map.name)
+                return
+            await send("MAP_HELP", ctx)
             return
-        if index > 0 and index <= len(self.__selection):
-            self.__selected = self.__selection[index-1]
-            self.__status = SelStatus.IS_SELECTED
+        if len(args) == 1 and args[0].lower() == "help":
+                await send("MAP_HELP", ctx)
+                return
+        self.__doSelection(args)
+        if self.__status == SelStatus.IS_EMPTY:
+            await send("MAP_NOT_FOUND", ctx)
+            return
+        if self.__status == SelStatus.IS_TOO_MUCH:
+            await send("MAP_TOO_MUCH", ctx)
+            return
+        if self.__status == SelStatus.IS_SELECTION:
+            await send("MAP_DISPLAY_LIST", ctx, sel=self)
             return
 
     @property
@@ -145,3 +125,10 @@ class MapSelection():
     @property
     def status(self):
         return self.__status
+    
+    def confirm(self):
+        if self.__status == SelStatus.IS_SELECTED:
+            self.__status = SelStatus.IS_CONFIRMED
+            self.__headObject.map = self.__selected
+            return True
+        return False

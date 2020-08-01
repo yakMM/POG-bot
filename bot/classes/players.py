@@ -175,8 +175,9 @@ class Player():
                         currId = jdata["character_list"][0]["character_id"]
                         currName = jdata["character_list"][0]["name"]["first"]
                         if currId in _namesChecking[faction-1]:
-                            if _namesChecking[faction-1][currId] != self:
-                                raise CharAlreadyExists(currName)
+                            p = _namesChecking[faction-1][currId]
+                            if p != self:
+                                raise CharAlreadyExists(currName, p.id)
                         newIds[faction-1] = currId
                         updated = updated or newIds[faction-1] != self._igIds[faction-1]
                         newNames[faction-1] = jdata["character_list"][0]["name"]["first"]

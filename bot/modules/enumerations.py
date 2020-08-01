@@ -19,6 +19,7 @@ class SelStatus(Enum):
     IS_SELECTED = 1
     IS_SELECTION = 2
     IS_TOO_MUCH = 3
+    IS_CONFIRMED = 4
 
 class PlayerStatus(Enum):
     IS_NOT_REGISTERED = 0

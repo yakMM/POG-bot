@@ -45,6 +45,9 @@ class registerCog(commands.Cog, name='register'):
     @commands.command(aliases=['r'])
     @commands.guild_only()
     async def register(self, ctx, *args):
+        if len(ctx.message.mentions) != 0: # Don't want a mention here
+            await send("REG_INVALID",ctx)
+            return
         try:
             player = getPlayer(ctx.author.id)
         except ElementNotFound:
@@ -108,7 +111,7 @@ async def _register(player, ctx, args):
             await send("REG_MISSING_FACTION",ctx,e.faction)
             return
         except CharAlreadyExists as e:
-            await send("REG_ALREADY_EXIST",ctx,e.char)
+            await send("REG_ALREADY_EXIST",ctx,e.char, e.id)
             return
         except UnexpectedError:
             await send("UNKNOWN_ERROR",ctx,"Reg error, check logs")

@@ -195,7 +195,7 @@ def main(launchStr=""):
 
     # Add main handlers
     _addMainHandlers(client)
-    #_test(client)
+    _test(client)
 
     # Add all cogs
     client.load_extension('cogs.lobby')

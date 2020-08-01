@@ -7,6 +7,7 @@ from modules.tools import isAlNum
 from modules.exceptions import ElementNotFound
 
 from classes.players import TeamCaptain, ActivePlayer, PlayerStatus, getPlayer
+from classes.maps import MapSelection
 
 from matches import getMatch
 from modules.enumerations import MatchStatus
@@ -47,17 +48,18 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.guild_only()
     @commands.max_concurrency(number=1, wait=True)
     async def pick(self, ctx, *args):
+        match = getMatch(ctx.channel.id)
         if len(args)==1 and args[0].lower()=="help":
             await send("PK_HELP", ctx) # =p help shows the help
-        return
-        player = _testPlayer(ctx)
-        if player == None:
             return
-        match = getMatch(ctx.channel.id)
-        if match.status not in (MatchStatus.IS_PICKING, MatchStatus.IS_FACTION):
-            if match.status != MatchStatus.IS_WAITING:
-                await send("MATCH_NOT_READY", ctx, ctx.command.name) # Edge case, will happen very rarely if not never
-                return
+        player = await _testPlayer(ctx, match)
+        if player == None:
+            print("No player")
+            return
+        if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
+            await send("MATCH_NOT_READY", ctx, ctx.command.name) # Edge case, will happen very rarely if not never
+            return
+        if match.status in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
             await send("PK_OVER", ctx) # Picking process is over
             return
         if player.status == PlayerStatus.IS_MATCHED:
@@ -66,10 +68,17 @@ class MatchesCog(commands.Cog, name='matches'):
         aPlayer = player.active
         if isinstance(aPlayer, TeamCaptain):
             if aPlayer.isTurn:
+                if match.status == MatchStatus.IS_PICKING:
+                    await _pick(ctx, aPlayer, args) # player picking function
+                    return
                 if match.status == MatchStatus.IS_FACTION:
                     await _faction(ctx, aPlayer, args) # faction picking function
                     return
-                await _pick(ctx, aPlayer, args) # player picking function
+                if match.status == MatchStatus.IS_MAPPING:
+                    print("map")
+                    await _map(ctx, match, args) # map picking function
+                    return
+                await send("UNKNOWN_ERROR", ctx, "Unknown match state")
                 return
             await send("PK_NOT_TURN", ctx)
             return
@@ -87,10 +96,10 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.command()
     @commands.guild_only()
     async def ready(self, ctx): # when ready
-        player = _testPlayer(ctx)
+        match = getMatch(ctx.channel.id)
+        player = await _testPlayer(ctx, match)
         if player == None:
             return
-        match = getMatch(ctx.channel.id)
         if match.status != MatchStatus.IS_WAITING:
             await send("MATCH_NOT_READY", ctx, ctx.command.name) # match not ready for this command
         return
@@ -111,7 +120,7 @@ class MatchesCog(commands.Cog, name='matches'):
 def setup(client):
     client.add_cog(MatchesCog(client))
 
-async def _testPlayer(ctx):
+async def _testPlayer(ctx, match):
     """ Test if the player is in position to issue a match command
         Returns the player object if yes, None if not
     """
@@ -180,3 +189,16 @@ async def _faction(ctx, captain, args):
         await send("PK_NOT_VALID_FACTION", ctx)
 
 
+async def _map(ctx, match, args):
+    id = ctx.channel.id
+    try:
+        sel = getMapSelection(id)
+    except ElementNotFound:
+        if len(args) == 0:
+            await send("MAP_HELP", ctx)
+            return
+        sel = MapSelection(id)
+    await sel.doSelectionProcess(ctx.channel.id, ctx, *args) # Handle the actual map selection
+    if mapFound!=None:
+        match.map = mapFound
+        await send("MATCH_MAP_SELECTED", ctx, mapFound.name)

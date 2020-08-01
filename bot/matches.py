@@ -6,7 +6,7 @@ from datetime import datetime as dt
 
 from classes.teams import Team #ok
 from classes.players import TeamCaptain, ActivePlayer #ok
-from classes.maps import MapSelection, getMapSelection #ok
+from classes.maps import MapSelection #ok
 from classes.accounts import AccountHander #ok
 
 from random import choice as randomChoice
@@ -19,7 +19,7 @@ _allMatches = dict()
 
 def getMatch(id):
     if id not in _allMatches:
-        raise UnexpectedError("Unknow match channel!")
+        raise ElementNotFound(id) # should never happen
     return _allMatches[id]
 
 
@@ -103,6 +103,7 @@ class Match():
         self.__status = MatchStatus.IS_FREE
         self.__teams = [None, None]
         self.__map = None
+        self.__mapSelector = None
         self.__number = 0
         _allMatches[id] = self
         self.__accounts = None
@@ -202,18 +203,28 @@ class Match():
 
     @tasks.loop(count=1)
     async def __findMap(self):
-        if False and self.__map == None: # Disabling auto map
-            try:
-                sel = getMapSelection(self.__id)
-            except ElementNotFound:
-                sel = MapSelection(self.__id)
-            sel.selectFromIdList(cfg.PIL_MAPS_IDS)
-            if sel.status not in (SelStatus.IS_SELECTED, SelStatus.IS_SELECTION):
-                await channelSend("UNKNOWN_ERROR", self.__id, "Can't find a map at random!")
-                return
-            self.__map = randomChoice(sel.selection)
+        # Disabling map at random:
+        # if self.__map == None:
+        #     try:
+        #         sel = getMapSelection(self.__id)
+        #     except ElementNotFound:
+        #         sel = MapSelection(self.__id)
+        #     sel.selectFromIdList(cfg.PIL_MAPS_IDS)
+        #     if sel.status not in (SelStatus.IS_SELECTED, SelStatus.IS_SELECTION):
+        #         await channelSend("UNKNOWN_ERROR", self.__id, "Can't find a map at random!")
+        #         return
+        #     self.__map = randomChoice(sel.selection)
         if self.__map != None:
             await channelSend("MATCH_MAP_AUTO", self.__id, self.__map.name)
+            return
+        for tm in self.__teams:
+            tm.captain.isTurn = True
+        captainPings = [tm.captain.mention for tm in self.__teams]
+        self.__status = MatchStatus.IS_MAPPING
+        await channelSend("PK_WAIT_MAP", self.__id, *captainPings, match=self)
+
+    @tasks.loop(count=1)
+    async def __ready(self):
         for tm in self.__teams:
             tm.matchReady()
             tm.captain.isTurn = True
@@ -268,6 +279,7 @@ class Match():
     async def _launch(self):
         await channelSend("MATCH_INIT", self.__id, " ".join(self.playerPings))
         self.__accounts = AccountHander(self)
+        self.__mapSelector = MapSelection(self)
         for i in range(len(self.__teams)):
             self.__teams[i] = Team(i, f"Team {i+1}", self)
             key = randomChoice(list(self.__players))
@@ -279,17 +291,26 @@ class Match():
     async def clear(self):
         """ Clearing match and base player objetcts
         Team and ActivePlayer objetcs should garbage collected, nothing is referencing them anymore"""
+
+        # Updating account sheet with current match
         await self.__accounts.doUpdate()
-        self.__accounts = None
+
+        # Clean players if left in the list
         for p in self.__players.values():
             p.clean()
-        self.__players.clear()
+
+        # Clean players if in teams
         for tm in self.__teams:
             for p in tm.players:
                 p.clean()
+        
+        # Release all objects:
+        self.__accounts = None
+        self.__mapSelector = None
         self.__map = None
         self.__teams = [None, None]
         self.__roundsStamps.clear()
+        self.__players.clear()
         self.__status = MatchStatus.IS_FREE
 
 
@@ -299,7 +320,9 @@ class Match():
 
     @map.setter
     def map(self, map):
-        self.__map = map
+        if self.__status == MatchStatus.IS_MAPPING:
+            self.__map = map
+            self.__ready.start()
 
     # TODO: testing only
     @property
