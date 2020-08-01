@@ -25,6 +25,7 @@ from enum import Enum
 # Custom modules
 import modules.config as cfg
 from modules.enumerations import MatchStatus
+from modules.tools import isAdmin, isAlNum
 
 _client = None
 
@@ -61,33 +62,7 @@ async def edit(stringName, ctx, *args, **kwargs):
     """
     return await _StringEnum[stringName].value.display(ctx, True,  *args, **kwargs)
 
-def isAlNum(string):
-    """ Little utility to check if a string contains only letters and numbers (a-z,A-Z,0-9)
-        Parameters
-        ----------
-        string : str
-            The string to be processed
-
-        Returns
-        -------
-        isAlphaNum : boolean
-            Result
-    """
-    for i in string.lower():
-        cond = ord(i) >= ord('a') and ord(i) <= ord('z')
-        cond = cond or (ord(i) >= ord('0') and ord(i) <= ord('9'))
-        if not cond:
-            return False
-    return True
-
 ## PRIVATE:
-
-# Check if user is admin
-def _isAdmin(user):
-    for role in user.roles:
-        if role.id == cfg.discord_ids["admin_role"]:
-            return True
-    return False
 
 ## Embed functions
 
@@ -119,7 +94,7 @@ def _lobbyHelp(msg):
                           '`=l` - Leave the lobby\n'
                           '`=q` - See the current lobby'
                     , inline=False)
-    if _isAdmin(msg.author):
+    if isAdmin(msg.author):
         embed.add_field(name="Staff Commands",
                         value='`=clear` - Clear the lobby',
                         inline=False)
@@ -165,7 +140,7 @@ def _matchHelp(msg):
                             '`=p VS`/`NC`/`TR` - Pick a faction\n'
                             '`=ready` - To toggle the ready status of your team',
                     inline=False)
-    if _isAdmin(msg.author):
+    if isAdmin(msg.author):
         embed.add_field(name="Staff Commands",
                         value = '`=clear` - Clear the match\n'
                                 '`=map base name` - Select a map',

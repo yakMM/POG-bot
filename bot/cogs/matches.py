@@ -2,7 +2,8 @@ from discord.ext import commands
 import discord
 
 import modules.config as cfg
-from modules.display import send, channelSend, isAlNum
+from modules.display import send, channelSend
+from modules.tools import isAlNum
 from modules.exceptions import ElementNotFound
 
 from classes.players import TeamCaptain, ActivePlayer, PlayerStatus, getPlayer

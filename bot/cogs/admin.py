@@ -4,6 +4,7 @@ import modules.config as cfg
 from modules.enumerations import SelStatus, MatchStatus
 from modules.display import send
 from modules.exceptions import ElementNotFound
+from modules.tools import isAdmin
 
 from classes.maps import doSelectionProcess
 from matches import clearLobby, getMatch, getAllNamesInLobby
@@ -23,10 +24,7 @@ class AdminCog(commands.Cog, name='admin'):
         print('Admin Cog is online')
 
     async def cog_check(self, ctx):
-        for role in ctx.author.roles: # Check if admin
-            if role.id == cfg.discord_ids["admin_role"]:
-                return True
-        return False
+        return isAdmin(ctx.author)
 
     """
     Admin Commands
