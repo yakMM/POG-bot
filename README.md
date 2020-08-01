@@ -6,8 +6,9 @@
 
 ### Notes on the project's structure:
 
-- Master branch is a realase branch, it will stay clean and is synched with the hosting.
-- Developments should be done in side branches and will be then merged in
+- Master branch is a release branch, it will stay clean and is synched with the hosting.
+- So developments should be done on feature branches and will be then merged in.
+- Keep fork repos up to date from upstream as much as possible.
 - `client_secret.json` and `config.cfg` are not available for confidentiality reasons, templates are given instead
 - `cogs` folder contains cogs modules as descibed in discord.py. Each of them regroups a set of commands and their associated checks. The core functionalities/processes are in `classes` folder.
     - These modules are not to be imported in any way (they are only launched through the discord.py client)
