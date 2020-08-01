@@ -17,6 +17,11 @@ class CharInvalidWorld(Exception):
         self.char = char
         super().__init__(f"Character in invalid world: {char}")
 
+class CharAlreadyExists(Exception):
+    def __init__(self, char):
+        self.char = char
+        super().__init__(f"Character already registered: {char}")
+
 class AccountNotFound(Exception):
     def __init__(self, id):
         self.id = id

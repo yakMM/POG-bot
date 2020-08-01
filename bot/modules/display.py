@@ -329,6 +329,7 @@ class _StringEnum(Enum):
     REG_INVALID = _Message("Invalid command!",embed=_registerHelp)
     REG_CHAR_NOT_FOUND = _Message("Invalid registration! Character `{}` is not valid!",embed=_registerHelp)
     REG_NOT_JAEGER = _Message("Invalid registration! Character `{}` doesn't belong to Jaeger!",embed=_registerHelp)
+    REG_ALREADY_EXIST = _Message("Invalid registration! Character `{}` is already registered!")
     REG_MISSING_FACTION = _Message("Invalid registration! Can't find a {} character in your list!",embed=_registerHelp)
     REG_UPDATE_OWN = _Message("You successfully updated your profile with the following Jaeger characters: `{}`, `{}`, `{}`")
     REG_UPDATE_NOA = _Message("You successfully removed your Jaeger characters from your profile.")

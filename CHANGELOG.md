@@ -1,3 +1,6 @@
+# v1.0.3:
+- It is no longer possible to register with a character that is already registered
+
 # v1.0.2:
 - Now properly checking if player have no missing faction when registering with a Jaeger char
 - Lobby size can now be modified from the config file

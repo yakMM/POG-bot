@@ -6,7 +6,7 @@ import enum
 # Custom modules
 import modules.config as cfg
 from modules.asynchttp import request as httpRequest
-from modules.exceptions import UnexpectedError, ElementNotFound, StatusNotAllowed, CharNotFound, CharInvalidWorld, CharMissingFaction
+from modules.exceptions import UnexpectedError, ElementNotFound, StatusNotAllowed, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists
 from modules.enumerations import PlayerStatus
 from discord.ext import tasks
 
@@ -20,6 +20,7 @@ scoring =	{
 }
 
 _allPlayers = dict()
+_namesChecking=[dict(),dict(),dict()] # to store VS, NC and TR names to check for duplicates
 
 def getPlayer(id):
     player = _allPlayers.get(id)
@@ -51,6 +52,8 @@ class Player():
         obj._igNames = data["igNames"]
         obj._igIds = data["igIds"]
         obj._hasOwnAccount = data["hasOwnAccount"]
+        for i in range(len(obj._igIds)):
+            _namesChecking[i][obj._igIds[i]] = obj
         return obj
 
     @property
@@ -169,7 +172,12 @@ class Player():
                         raise CharInvalidWorld(jdata["character_list"][0]["name"]["first"])
                     else:
                         faction = int(jdata["character_list"][0]["faction_id"])
-                        newIds[faction-1] = jdata["character_list"][0]["character_id"]
+                        currId = jdata["character_list"][0]["character_id"]
+                        currName = jdata["character_list"][0]["name"]["first"]
+                        if currId in _namesChecking[faction-1]:
+                            if _namesChecking[faction-1][currId] != self:
+                                raise CharAlreadyExists(currName)
+                        newIds[faction-1] = currId
                         updated = updated or newIds[faction-1] != self._igIds[faction-1]
                         newNames[faction-1] = jdata["character_list"][0]["name"]["first"]
                 except IndexError:
@@ -182,6 +190,8 @@ class Player():
         if updated:
             self._igIds = newIds.copy()
             self._igNames = newNames.copy()
+            for i in range(len(self._igIds)):
+                _namesChecking[i][self._igIds[i]] = self
         return updated
 
     @tasks.loop(minutes=cfg.AFK_TIME, count=2)

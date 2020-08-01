@@ -8,7 +8,7 @@ from classes.players import Player, getPlayer
 import modules.config as cfg
 from modules.enumerations import PlayerStatus
 from modules.display import channelSend, send, isAlNum
-from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction
+from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists
 from modules.database import update as dbUpdate
 
 
@@ -105,6 +105,9 @@ async def _register(player, ctx, args):
             return
         except CharMissingFaction as e:
             await send("REG_MISSING_FACTION",ctx,e.faction)
+            return
+        except CharAlreadyExists as e:
+            await send("REG_ALREADY_EXIST",ctx,e.char)
             return
         except UnexpectedError:
             await send("UNKNOWN_ERROR",ctx,"Reg error, check logs")
