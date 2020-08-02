@@ -64,8 +64,8 @@ class Team:
 
     def addPlayer(self, cls, player):
         active = cls(player, self)
-        active.status = PlayerStatus.IS_PICKED
         self.__players.append(active)
+        active.status = PlayerStatus.IS_PICKED
 
     def matchReady(self):
         for p in self.__players:

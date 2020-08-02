@@ -199,7 +199,8 @@ def main(launchStr=""):
 
     # Add main handlers
     _addMainHandlers(client)
-    _test(client)
+    if launchStr=="_test":
+        _test(client)
 
     # Add all cogs
     client.load_extension('cogs.lobby')
@@ -214,4 +215,5 @@ def main(launchStr=""):
 if __name__ == "__main__":
     # execute only if run as a script
     # Use main() for production
-    main("_test")
+    # main("_test")
+    main()

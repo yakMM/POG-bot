@@ -61,12 +61,12 @@ class Player():
         return self._active
 
     def clean(self):
+        self._status = PlayerStatus.IS_REGISTERED
         self._match = None
         self._active = None
         if not self._hasOwnAccount:
             self._igNames = ["N/A", "N/A", "N/A"]
             self._igIds = [0,0,0]
-        self._status = PlayerStatus.IS_REGISTERED
 
     @property
     def name(self):
