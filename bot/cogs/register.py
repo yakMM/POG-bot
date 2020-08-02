@@ -40,8 +40,6 @@ class registerCog(commands.Cog, name='register'):
         return ctx.channel.id == cfg.discord_ids['register']
 
 
-
-
     @commands.command(aliases=['r'])
     @commands.guild_only()
     async def register(self, ctx, *args):
@@ -56,6 +54,20 @@ class registerCog(commands.Cog, name='register'):
 
         msg = await _register(player, ctx, args)
 
+    @commands.command()
+    @commands.guild_only()
+    async def notify(self, ctx):
+        member = ctx.author
+        notify = member.guild.get_role(cfg.discord_ids["notify_role"])
+        registered = member.guild.get_role(cfg.discord_ids["registered_role"])
+        if notify in member.roles:
+            await member.add_roles(registered)
+            await member.remove_roles(notify)
+            await send("NOTIFY_REMOVED", ctx)
+        else:
+            await member.add_roles(notify)
+            await member.remove_roles(registered)
+            await send("NOTIFY_ADDED", ctx)
 
 def setup(client):
     client.add_cog(registerCog(client))

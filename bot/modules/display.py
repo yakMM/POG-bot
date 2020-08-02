@@ -395,4 +395,7 @@ class _StringEnum(Enum):
     ACC_SENDING = _Message("Loading Jaeger accounts...")
     ACC_OVER = _Message("Match is over, please log out of your Jaeger account!")
 
+    NOTIFY_REMOVED = _Message("You left Notify!")
+    NOTIFY_ADDED = _Message("You joined Notify!")
+
     NOT_CODED = _Message("The rest is not yet coded, work in progress. Clearing match...")
