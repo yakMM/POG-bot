@@ -115,6 +115,8 @@ def _addMainHandlers(client):
                 except ElementNotFound: # if new player
                     Player(payload.member.name, payload.member.id) # create a new profile
                     await channelSend("REG_RULES", cfg.discord_ids["register"], payload.member.mention) # they can now register
+                    role = payload.member.guild.get_role(cfg.discord_ids["registered_role"])
+                    await payload.member.add_roles(role)
 
             await rulesMsg.remove_reaction(payload.emoji, payload.member) # In any case remove the reaction, message is to stay clean
 
@@ -179,7 +181,7 @@ def main(launchStr=""):
     # Remove default help
     client.remove_command('help')
 
-    # Initialise db and get all the registered users and all maps from it
+    # Initialise db and get all t=xhe registered users and all maps from it
     dbInit(cfg.database)
     getAllPlayers()
     getAllMaps()

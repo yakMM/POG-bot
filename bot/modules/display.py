@@ -332,7 +332,7 @@ class _StringEnum(Enum):
     PK_NO_LOBBIED = _Message("You must first queue and wait for a match to begin. Check <#{}>")
     PK_WAIT_FOR_PICK = _Message("You can't pick! Wait for a Team Captain to pick you")
     PK_WRONG_CHANNEL = _Message("You are in the wrong channel! Check <#{}> instead")
-    PK_NOT_TURN = _Message("It's not your turn to pick!")
+    PK_NOT_TURN = _Message("It's not your turn!")
     PK_NOT_CAPTAIN = _Message("You are not Team Captain!")
     PK_SHOW_TEAMS = _Message("Match status:",embed=_teamUpdate)
     PK_HELP = _Message("Picking help:", embed=_matchHelp)
@@ -349,6 +349,7 @@ class _StringEnum(Enum):
     PK_FACTION_OK_NEXT = _Message("{} chose {}! {} pick a faction!", ping=False)
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
     PK_WAIT_MAP = _Message("{} {} Pick a map!", ping=False, embed=_teamUpdate)
+    PK_MAP_OK_CONFIRM = _Message("Picked {}! {} confirm with `=p confirm` if you agree")
 
     EXT_NOT_REGISTERED = _Message("You are not registered! Check <#{}>")
     UNKNOWN_ERROR = _Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\nDetails:*{}*")
@@ -379,6 +380,7 @@ class _StringEnum(Enum):
     MATCH_MAP_SELECTED = _Message("Successfully selected **{}**")
     MATCH_ROUND_OVER = _Message("{}\n{}\nRound {} is over!")
     MATCH_OVER = _Message("The match is over!\nClearing channel...")
+    MATCH_ALREADY = _Message("The match is already started!")
 
     MAP_HELP = _Message("Here is how to choose a map:", embed = _mapHelp)
     MAP_TOO_MUCH = _Message("Too many maps found! Try to be more precise")

@@ -11,9 +11,13 @@ _allMapsList = list()
 
 MAX_SELECTED = 15
 
-mapSelectionsDict = dict()
+_mapSelectionsDict = dict()
 
-
+def getMapSelection(id):
+    sel = _mapSelectionsDict.get(id)
+    if sel == None:
+        raise ElementNotFound(id)
+    return sel
 
 class Map():
     def __init__(self,data):
@@ -35,12 +39,12 @@ class Map():
         return name
 
 class MapSelection():
-    def __init__(self, obj):
-        self.__id = obj.id
-        self.__headObject = obj
+    def __init__(self, id):
+        self.__id = id
         self.__selection = list()
         self.__selected = None
         self.__status = SelStatus.IS_EMPTY
+        _mapSelectionsDict[self.__id] = self
 
     def selectFromIdList(self, ids):
         self.__selection.clear()
@@ -85,7 +89,7 @@ class MapSelection():
             return
         self.__status = SelStatus.IS_SELECTION
     
-    async def doSelectionProcess(self, ctx, *args):
+    async def doSelectionProcess(self, ctx, args):
         if len(args) == 0:
             if self.__status == SelStatus.IS_SELECTION:
                 await send("MAP_DISPLAY_LIST", ctx, sel=self)
@@ -129,6 +133,8 @@ class MapSelection():
     def confirm(self):
         if self.__status == SelStatus.IS_SELECTED:
             self.__status = SelStatus.IS_CONFIRMED
-            self.__headObject.map = self.__selected
             return True
         return False
+
+    def clean(self):
+        del _mapSelectionsDict[self.__id]

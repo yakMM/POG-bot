@@ -102,7 +102,6 @@ class Match():
         self.__players = dict()
         self.__status = MatchStatus.IS_FREE
         self.__teams = [None, None]
-        self.__map = None
         self.__mapSelector = None
         self.__number = 0
         _allMatches[id] = self
@@ -163,6 +162,18 @@ class Match():
             return self.__teams[1].captain
         return other.captain
 
+    def confirmMap(self):
+        self.__mapSelector.confirm()
+        self.__ready.start()
+
+    def pickMap(self, captain):
+        if self.__mapSelector.status == SelStatus.IS_SELECTED:
+            captain.isTurn = False
+            other = self.__teams[captain.team.id-1]
+            other.captain.isTurn = True
+            return other.captain
+        return captain
+
     @tasks.loop(count=1)
     async def __pingLastPlayer(self, team, p):
         await channelSend("PK_LAST", self.__id, f"<@{p.id}>", team.name)
@@ -203,6 +214,7 @@ class Match():
 
     @tasks.loop(count=1)
     async def __findMap(self):
+        # LEGACY CODE
         # Disabling map at random:
         # if self.__map == None:
         #     try:
@@ -214,11 +226,12 @@ class Match():
         #         await channelSend("UNKNOWN_ERROR", self.__id, "Can't find a map at random!")
         #         return
         #     self.__map = randomChoice(sel.selection)
-        if self.__map != None:
-            await channelSend("MATCH_MAP_AUTO", self.__id, self.__map.name)
-            return
         for tm in self.__teams:
             tm.captain.isTurn = True
+        if self.__mapSelector.status == SelStatus.IS_CONFIRMED:
+            await channelSend("MATCH_MAP_AUTO", self.__id, self.__map.name)
+            self.__ready.start()
+            return
         captainPings = [tm.captain.mention for tm in self.__teams]
         self.__status = MatchStatus.IS_MAPPING
         await channelSend("PK_WAIT_MAP", self.__id, *captainPings, match=self)
@@ -290,7 +303,7 @@ class Match():
 
     async def clear(self):
         """ Clearing match and base player objetcts
-        Team and ActivePlayer objetcs should garbage collected, nothing is referencing them anymore"""
+        Team and ActivePlayer objects should get garbage collected, nothing is referencing them anymore"""
 
         # Updating account sheet with current match
         await self.__accounts.doUpdate()
@@ -304,10 +317,12 @@ class Match():
             for p in tm.players:
                 p.clean()
         
+        # Clean mapSelector
+        self.__mapSelector.clean()
+        
         # Release all objects:
         self.__accounts = None
         self.__mapSelector = None
-        self.__map = None
         self.__teams = [None, None]
         self.__roundsStamps.clear()
         self.__players.clear()
@@ -316,13 +331,8 @@ class Match():
 
     @property
     def map(self):
-        return self.__map
-
-    @map.setter
-    def map(self, map):
-        if self.__status == MatchStatus.IS_MAPPING:
-            self.__map = map
-            self.__ready.start()
+        if self.__mapSelector.status == SelStatus.IS_CONFIRMED:
+            return self.__mapSelector.map
 
     # TODO: testing only
     @property
@@ -336,5 +346,9 @@ class Match():
         if self.__status in (MatchStatus.IS_STARTING, MatchStatus.IS_WAITING):
             return len(self.__roundsStamps)+1
         return 0
+    
+    @property
+    def mapSelector(self):
+        return self.__mapSelector
 
 

@@ -10,7 +10,7 @@ from classes.players import TeamCaptain, ActivePlayer, PlayerStatus, getPlayer
 from classes.maps import MapSelection
 
 from matches import getMatch
-from modules.enumerations import MatchStatus
+from modules.enumerations import MatchStatus, SelStatus
 
 globId=0
 
@@ -54,7 +54,6 @@ class MatchesCog(commands.Cog, name='matches'):
             return
         player = await _testPlayer(ctx, match)
         if player == None:
-            print("No player")
             return
         if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
             await send("MATCH_NOT_READY", ctx, ctx.command.name) # Edge case, will happen very rarely if not never
@@ -67,16 +66,15 @@ class MatchesCog(commands.Cog, name='matches'):
             return
         aPlayer = player.active
         if isinstance(aPlayer, TeamCaptain):
+            if match.status == MatchStatus.IS_MAPPING:
+                    await _map(ctx, aPlayer, args) # map picking function
+                    return
             if aPlayer.isTurn:
                 if match.status == MatchStatus.IS_PICKING:
                     await _pick(ctx, aPlayer, args) # player picking function
                     return
                 if match.status == MatchStatus.IS_FACTION:
                     await _faction(ctx, aPlayer, args) # faction picking function
-                    return
-                if match.status == MatchStatus.IS_MAPPING:
-                    print("map")
-                    await _map(ctx, match, args) # map picking function
                     return
                 await send("UNKNOWN_ERROR", ctx, "Unknown match state")
                 return
@@ -100,9 +98,12 @@ class MatchesCog(commands.Cog, name='matches'):
         player = await _testPlayer(ctx, match)
         if player == None:
             return
+        if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
+            await send("MATCH_ALREADY", ctx, ctx.command.name) # match not ready for this command
+            return
         if match.status != MatchStatus.IS_WAITING:
             await send("MATCH_NOT_READY", ctx, ctx.command.name) # match not ready for this command
-        return
+            return
         aPlayer = player.active # Getting the "active" version of the player (version when player is in matched, more data inside)
         if isinstance(aPlayer, TeamCaptain):
             if aPlayer.isTurn:
@@ -189,16 +190,20 @@ async def _faction(ctx, captain, args):
         await send("PK_NOT_VALID_FACTION", ctx)
 
 
-async def _map(ctx, match, args):
-    id = ctx.channel.id
-    try:
-        sel = getMapSelection(id)
-    except ElementNotFound:
-        if len(args) == 0:
-            await send("MAP_HELP", ctx)
+async def _map(ctx, captain, args):
+    sel = captain.match.mapSelector
+    match = captain.match
+    if len(args) == 1 and args[0].lower() == "confirm":
+        if sel.status != SelStatus.IS_SELECTED:
+            await send("PK_NO_MAP", ctx)
             return
-        sel = MapSelection(id)
-    await sel.doSelectionProcess(ctx.channel.id, ctx, *args) # Handle the actual map selection
-    if mapFound!=None:
-        match.map = mapFound
-        await send("MATCH_MAP_SELECTED", ctx, mapFound.name)
+        if not captain.isTurn:
+            await send("PK_NOT_TURN", ctx)
+            return
+        match.confirmMap()
+        await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
+        return
+    await sel.doSelectionProcess(ctx, args) # Handle the actual map selection
+    newPicker = match.pickMap(captain)
+    if newPicker != captain:
+        await send("PK_MAP_OK_CONFIRM", ctx, sel.map.name, newPicker.mention )

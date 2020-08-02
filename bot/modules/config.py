@@ -15,7 +15,10 @@ discord_ids = {
     "results" : 0,
     "rules" : 0,
     "rules_msg" : 0,
-    "admin_role" : 0
+    "admin_role" : 0,
+    "info_role" : 0,
+    "registered_role" : 0,
+    "notify_role" : 0
     }
 
 ## General
