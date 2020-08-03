@@ -9,7 +9,7 @@
 from gspread import service_account
 from numpy import array, vstack
 from datetime import datetime as dt
-from discord.ext import tasks
+from lib import tasks
 from asyncio import get_event_loop
 from concurrent.futures import ThreadPoolExecutor
 

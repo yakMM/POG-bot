@@ -10,7 +10,7 @@ from classes.maps import MapSelection #ok
 from classes.accounts import AccountHander #ok
 
 from random import choice as randomChoice
-from discord.ext import tasks
+from lib import tasks
 from asyncio import sleep
 
 _lobbyList = list()
@@ -63,7 +63,6 @@ async def startMatchFromFullLobby():
 
 def onPlayerInactive(player):
     if player.status == PlayerStatus.IS_LOBBIED:
-        player.onInactive.hasJustBecome = True
         player.onInactive.start(onInactiveConfirmed)
 
 def onPlayerActive(player):
@@ -199,8 +198,13 @@ class Match():
     def onTeamReady(self, team):
         notReady = list()
         for p in team.players:
-            if not p.hasOwnAccount and not p.account.isValidated:
-                notReady.append(p.mention)
+            if p.hasOwnAccount:
+                continue
+            if p.account == None:
+                print(f"Debug: {p.name} has no account")
+            if p.account.isValidated:
+                continue
+            notReady.append(p.mention)
         if len(notReady) != 0:
             return notReady
         team.captain.isTurn = False
@@ -251,16 +255,14 @@ class Match():
         self.__status = MatchStatus.IS_WAITING
         await channelSend("MATCH_CONFIRM", self.__id, *captainPings, match=self)
 
-    @tasks.loop(seconds=10, count=2)
+    @tasks.loop(minutes=cfg.ROUND_LENGHT, delay=1, count=2)
     async def __onMatchOver(self):
-        if self.__onMatchOver.hasJustBecome:
-            self.__onMatchOver.hasJustBecome = False
-            return
         playerPings = [tm.allPings for tm in self.__teams]
         await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
         for tm in self.__teams:
             tm.captain.isTurn = True
         if self.roundNo < 2:
+            await channelSend("MATCH_SWAP", self.__id)
             self.__status = MatchStatus.IS_WAITING
             captainPings = [tm.captain.mention for tm in self.__teams]
             await channelSend("MATCH_CONFIRM", self.__id, *captainPings, match=self)
@@ -281,7 +283,6 @@ class Match():
         await channelSend("MATCH_STARTED", self.__id, *playerPings, self.roundNo)
         self.__roundsStamps.append(int(dt.timestamp(dt.now())))
         self.__status = MatchStatus.IS_PLAYING
-        self.__onMatchOver.hasJustBecome = True
         self.__onMatchOver.start()
         # await channelSend("NOT_CODED", self.__id)
         # await self.clear()

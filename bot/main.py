@@ -160,11 +160,8 @@ def _addMainHandlers(client):
 
 # TODO: testing, to be removed
 def _test(client):
-    from test2 import launch
-    @client.command()
-    @commands.guild_only()
-    async def x(ctx):
-        await launch()
+    from test2 import testHand
+    testHand(client)
 
 
 
@@ -215,5 +212,5 @@ def main(launchStr=""):
 if __name__ == "__main__":
     # execute only if run as a script
     # Use main() for production
-    main("_test")
-    #main()
+    #main("_test")
+    main()

@@ -168,7 +168,7 @@ def _account(msg, account):
     )
     embed.add_field(name = "Logging details",value = desc,inline=False)
     embed.set_thumbnail(
-        url="https://cdn.discordapp.com/attachments/703912354269888572/727931056476389396/PIL_Logo11_Zoomed.png")
+        url="https://media.discordapp.net/attachments/739231714554937455/739522071423614996/logo_png.png")
     embed.set_footer(
         text='Failure to follow account usage rules can result in your suspension from ALL Jaeger events.')
     return embed
@@ -344,7 +344,7 @@ class _StringEnum(Enum):
     PK_LAST = _Message("Assigned {} to {}!")
     PK_OK_FACTION = _Message("Teams are ready! {} pick a faction!",embed=_teamUpdate, ping=False)
     PK_NOT_VALID_FACTION = _Message("Incorrect input! Pick a valid faction!", embed=_matchHelp)
-    PK_FACTION_OK = _Message("{} chose {}! Match ready!", ping=False)
+    PK_FACTION_OK = _Message("{} chose {}!", ping=False)
     PK_FACTION_ALREADY = _Message("Faction already picked by the other team!")
     PK_FACTION_OK_NEXT = _Message("{} chose {}! {} pick a faction!", ping=False)
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
@@ -381,6 +381,7 @@ class _StringEnum(Enum):
     MATCH_ROUND_OVER = _Message("{}\n{}\nRound {} is over!")
     MATCH_OVER = _Message("The match is over!\nClearing channel...")
     MATCH_ALREADY = _Message("The match is already started!")
+    MATCH_SWAP = _Message("Swap sundy placement for the next round!")
 
     MAP_HELP = _Message("Here is how to choose a map:", embed = _mapHelp)
     MAP_TOO_MUCH = _Message("Too many maps found! Try to be more precise")

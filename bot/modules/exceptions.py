@@ -6,6 +6,7 @@
 # Others:
 from logging import error
 from datetime import datetime as dt
+from datetime import timezone as tz
 
 class CharNotFound(Exception):
     def __init__(self, char):
@@ -38,7 +39,7 @@ class UnexpectedError(Exception):
     def __init__(self, msg):
         self.message = "Encountered unexpected error: "+msg
         self.reason = msg
-        date = dt.now()
+        date = dt.now(tz.utc)
         error(date.strftime("%Y-%m-%d %H:%M:%S %z ") + self.message)
         super().__init__(self.message)
 

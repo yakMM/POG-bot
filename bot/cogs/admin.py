@@ -99,7 +99,7 @@ class AdminCog(commands.Cog, name='admin'):
         if player.status == PlayerStatus.IS_REGISTERED:
             await remove(player)
             memb = ctx.author.guild.get_member(player.id)
-            removePlayer(player.id)
+            removePlayer(player)
             notify = memb.guild.get_role(cfg.discord_ids["notify_role"])
             registered = memb.guild.get_role(cfg.discord_ids["registered_role"])
             await memb.remove_roles(notify)

@@ -30,7 +30,8 @@ general = {
     "lobby_size" : 0
     }
 
-AFK_TIME = 15 # minutes
+AFK_TIME = 20 # minutes
+ROUND_LENGHT = 15 # minutes
 
 factions = {
     1 : "VS",
