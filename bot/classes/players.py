@@ -28,6 +28,11 @@ def getPlayer(id):
         raise ElementNotFound(id)
     return player
 
+def removePlayer(id):
+    if id not in _allPlayers:
+        raise ElementNotFound(id)
+    del _allPlayers[id]
+
 class Player():
     """ Basic player class, every registered user matches a Player object contained in the dictionary
     """
@@ -75,6 +80,10 @@ class Player():
     @property
     def id(self):
         return self._id
+    
+    @property
+    def mention(self):
+        return f"<@{self._id}>" 
 
     @property
     def rank(self):
@@ -252,7 +261,7 @@ class ActivePlayer:
 
     @property
     def mention(self):
-        return f"<@{self.__player.id}>"
+        return self.__player.mention
 
     @property
     def faction(self):

@@ -47,6 +47,12 @@ async def update(p):
     loop = get_event_loop()
     await loop.run_in_executor(ThreadPoolExecutor(), _update, p)
 
+async def remove(p):
+    """ Launch the task updating player p in database
+    """
+    loop = get_event_loop()
+    await loop.run_in_executor(ThreadPoolExecutor(), _remove, p)
+
 def init(config):
     """ Init
     """
@@ -66,7 +72,13 @@ def forceBasesUpdate(bases):
 def _update(p):
     """ Update player p into db
     """
-    if (collections["users"].count_documents({ "_id": p.id }) != 0):
+    if collections["users"].count_documents({ "_id": p.id }) != 0:
         collections["users"].update_one({"_id":p.id},{"$set":p.getData()})
     else:
         collections["users"].insert_one(p.getData())
+
+def _remove(p):
+    if collections["users"].count_documents({ "_id": p.id }) != 0:
+        collections["users"].delete_one({"_id":p.id}) 
+    else:
+        raise DatabaseError(f"Player {p.id} not in database")

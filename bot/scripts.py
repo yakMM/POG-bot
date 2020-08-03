@@ -8,7 +8,7 @@ import requests
 import json
 import asyncio
 
-LAUNCHSTR = "_test" # this should be empty if your files are config.cfg and client_secret.json
+LAUNCHSTR = "" # this should be empty if your files are config.cfg and client_secret.json
 
 cfg.getConfig(f"config{LAUNCHSTR}.cfg")
 dbInit(cfg.database)

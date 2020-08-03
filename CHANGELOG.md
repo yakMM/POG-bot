@@ -4,6 +4,7 @@
 - Added =confirm command for Team Captains to agree on a map
 - Added role updates when agreeing with the rules
 - Added notify feature
+- Added =unregister @player to remove a player from the system (including db)
 
 # v1.0.2:
 - Now properly checking if player have no missing faction when registering with a Jaeger char

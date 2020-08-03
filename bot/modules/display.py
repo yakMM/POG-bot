@@ -399,3 +399,9 @@ class _StringEnum(Enum):
     NOTIFY_ADDED = _Message("You joined Notify!")
 
     NOT_CODED = _Message("The rest is not yet coded, work in progress. Clearing match...")
+
+    RM_MENTION_ONE = _Message("Invalid request! Mention one player to be removed!")
+    RM_NOT_IN_DB = _Message("Can't find this player in the database!")
+    RM_OK = _Message("Player successfully removed from the system!")
+    RM_IN_MATCH = _Message("Can't remove a player who is in match!")
+    RM_LOBBY = _Message("{} have been removed by staff!",embed=_lobbyList)
