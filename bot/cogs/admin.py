@@ -6,6 +6,7 @@ from modules.display import send, channelSend
 from modules.exceptions import ElementNotFound
 from modules.tools import isAdmin
 from modules.database import remove
+from modules.loader import lockAll, unlockAll, isAllLocked
 
 from classes.players import removePlayer, getPlayer
 
@@ -50,7 +51,7 @@ class AdminCog(commands.Cog, name='admin'):
             if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
                 await send("MATCH_NO_MATCH", ctx, ctx.command.name)
                 return
-            if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
+            if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_RESULT):
                 await send("MATCH_ALREADY_STARTED", ctx, ctx.command.name)
                 return
             await send("MATCH_CLEAR", ctx)
@@ -107,6 +108,34 @@ class AdminCog(commands.Cog, name='admin'):
             await send("RM_OK", ctx)
             return
         await send("RM_IN_MATCH", ctx)
+
+    @commands.command()
+    @commands.guild_only()
+    async def pog(self, ctx, *args):
+        if len(args) == 0:
+            await send("BOT_VERSION", ctx, cfg.VERSION, isAllLocked())
+            return
+        arg = args[0]
+        if arg=="version":
+            await send("BOT_VERSION", ctx, cfg.VERSION, isAllLocked())
+            return
+        if arg=="lock":
+            if isAllLocked():
+                await send("BOT_ALREADY", ctx, "locked")
+                return
+            lockAll(self.client)
+            await send("BOT_LOCKED", ctx)
+            return
+        if arg=="unlock":
+            if not isAllLocked():
+                await send("BOT_ALREADY", ctx, "unlocked")
+                return
+            unlockAll(self.client)
+            await send("BOT_UNLOCKED", ctx)
+            return
+        await send("WRONG_USAGE", ctx, ctx.command.name)
+        return
+
 
 def setup(client):
     client.add_cog(AdminCog(client))

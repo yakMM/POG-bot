@@ -95,7 +95,7 @@ class MapSelection():
                 await send("MAP_DISPLAY_LIST", ctx, sel=self)
                 return
             if self.__status == SelStatus.IS_SELECTED:
-                await send("MAP_SELECTED", ctx, self.__map.name)
+                await send("MAP_SELECTED", ctx, self.__selected.name)
                 return
             await send("MAP_HELP", ctx)
             return

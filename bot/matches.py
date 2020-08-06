@@ -37,7 +37,7 @@ def getLobbyLen():
     return len(_lobbyList)
 
 def getAllNamesInLobby():
-    names = [f"<@{p.id}>" for p in _lobbyList]
+    names = [p.mention for p in _lobbyList]
     return names
 
 def removeFromLobby(player):
@@ -71,7 +71,7 @@ def onPlayerActive(player):
 
 async def onInactiveConfirmed(player):
     removeFromLobby(player)
-    await channelSend("LB_WENT_INACTIVE", cfg.discord_ids["lobby"], f"<@{player.id}>", namesInLobby=getAllNamesInLobby())
+    await channelSend("LB_WENT_INACTIVE", cfg.discord_ids["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
 
 
 def clearLobby():
@@ -133,7 +133,7 @@ class Match():
 
     @property
     def playerPings(self):
-        pings = [f"<@{p.id}>" for p in self.__players.values()]
+        pings = [p.mention for p in self.__players.values()]
         return pings
 
     def _setPlayerList(self, pList):
@@ -175,7 +175,7 @@ class Match():
 
     @tasks.loop(count=1)
     async def __pingLastPlayer(self, team, p):
-        await channelSend("PK_LAST", self.__id, f"<@{p.id}>", team.name)
+        await channelSend("PK_LAST", self.__id, p.mention, team.name)
 
     @tasks.loop(count=1)
     async def __playerPickOver(self, picker):
@@ -284,9 +284,6 @@ class Match():
         self.__roundsStamps.append(int(dt.timestamp(dt.now())))
         self.__status = MatchStatus.IS_PLAYING
         self.__onMatchOver.start()
-        # await channelSend("NOT_CODED", self.__id)
-        # await self.clear()
-        # await channelSend("MATCH_CLEARED", self.__id)
 
 
     @tasks.loop(count=1)
@@ -305,6 +302,11 @@ class Match():
     async def clear(self):
         """ Clearing match and base player objetcts
         Team and ActivePlayer objects should get garbage collected, nothing is referencing them anymore"""
+
+        if self.status == MatchStatus.IS_PLAYING:
+            self.__onMatchOver.cancel()
+            playerPings = [tm.allPings for tm in self.__teams]
+            await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
 
         # Updating account sheet with current match
         await self.__accounts.doUpdate()

@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 # Custom modules
 import modules.config as cfg
-from modules.display import channelSend, privateSend, edit
+from modules.display import channelSend, privateSend, edit, remReaction
 from modules.exceptions import AccountsNotEnough
 
 X_OFFSET=3
@@ -148,7 +148,10 @@ class AccountHander():
             if acc.message != None:
                 acc.isDestroyed = True
                 await edit("ACC_UPDATE", acc.message, account=acc)
-                await privateSend("ACC_OVER", acc.aPlayer.id)
+                if acc.isValidated:
+                    await privateSend("ACC_OVER", acc.aPlayer.id)
+                else:
+                    await remReaction(acc.message)
 
 
     def __updateSheet(self):

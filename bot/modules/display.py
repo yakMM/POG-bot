@@ -62,6 +62,12 @@ async def edit(stringName, ctx, *args, **kwargs):
     """
     return await _StringEnum[stringName].value.display(ctx, True,  *args, **kwargs)
 
+async def remReaction(message, user=None):
+    if user == None:
+        global _client
+        user = _client.user
+    await message.remove_reaction("✅", user)
+
 ## PRIVATE:
 
 ## Embed functions
@@ -81,6 +87,13 @@ def _registerHelp(msg):
                     value='`=r charName` - If your character names have faction suffixes\n'
                           '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes\n'
                     , inline=False)
+    try:
+        if isAdmin(msg.author):
+            embed.add_field(name="Staff Commands",
+                            value='`=unregister @player` - Permanently remove player profile from the system',
+                            inline=False)
+    except AttributeError:
+        pass # if msg is from bot
     return embed
 
 def _lobbyHelp(msg):
@@ -111,17 +124,19 @@ def _defaultHelp(msg):
                     inline=False)
     return embed
 
-def _mapHelp(msg):
+def _mapHelp(ctx):
     """ Returns map help embed
     """
     embed = Embed(
         colour=Color.blurple()
     )
+    cmd = ctx.command.name
+    if cmd == "pick":
+        cmd = "p"
     embed.add_field(name='Map selection commands',
-                    value='`=map a base` - Display all the map containing *a base* in their name\n'
-                          '`=map 3` - Chooses the map number 3 from the selection\n'
-                          '`=map` - Display the current selection or show the help\n'
-                          '`=map help` - Display this prompt'
+                    value=f'`={cmd} a base` - Display all the maps containing *a base* in their name\n'
+                          f'`={cmd} 3` - Chooses the map number 3 from the selection\n'
+                          f'`={cmd}` - Display the current selection or show the help\n'
                           ,
                     inline=False)
     return embed
@@ -138,7 +153,9 @@ def _matchHelp(msg):
     embed.add_field(name='Team Captain commands',
                     value = '`=p @player` - Pick a player in your team\n'
                             '`=p VS`/`NC`/`TR` - Pick a faction\n'
-                            '`=ready` - To toggle the ready status of your team',
+                            '`=p base name` - Pick the map *base name*\n'
+                            '`=ready` - To toggle the ready status of your team'
+                            ,
                     inline=False)
     if isAdmin(msg.author):
         embed.add_field(name="Staff Commands",
@@ -206,10 +223,10 @@ def _teamUpdate(arg, match):
     """ Returns the current teams
     """
     channel = None
-    if isinstance(arg,TextChannel):
-        channel = arg
-    else:
+    try:
         channel = arg.channel
+    except AttributeError:
+        channel = arg
     #title = ""
     if match.roundNo != 0:
         title = f"Match {match.number} - Round {match.roundNo}"
@@ -253,44 +270,34 @@ class _Message():
 
     async def display(self, ctx, edit, *args, **kwargs):
         # If is Context instead of a Message, get the Message:
-        sender = None
-        author = None
-        fctContext = None
         embed = None
         sendFct = None
         msg = None
 
-        if isinstance(ctx,Context):
-            sender = ctx
+        try:
             author = ctx.author
-            fctContext = ctx.message
-        elif isinstance(ctx,Message):
-            sender = ctx
-            author = ctx.author
-            fctContext = ctx
-        elif isinstance(ctx,TextChannel):
-            sender = ctx
-            fctContext = sender
-        elif isinstance(ctx, User):
-            sender = ctx
-            fctContext = sender
+        except AttributeError:
+            author = None
 
         # Format the string to be sent with added args
-        str = self.__str.format(*args)
+        string = self.__str.format(*args)
         # Send the string
         if self.__embedFct!=None:
-            embed = self.__embedFct(fctContext, **kwargs)
+            embed = self.__embedFct(ctx, **kwargs)
             # Fixes the embed mobile bug but ugly af:
             #embed.set_author(name="_____________________________")
         if edit:
-            sendFct = sender.edit
+            sendFct = ctx.edit
         else:
-            sendFct = sender.send
+            try:
+                sendFct = ctx.send
+            except AttributeError:
+                sendFct = _client.get_channel(ctx.channel.id).send
 
         if self.__ping and not author == None:
-            msg = await sendFct(content=f'{author.mention} {str}', embed=embed)
+            msg = await sendFct(content=f'{author.mention} {string}', embed=embed)
         else:
-            msg = await sendFct(content=str, embed=embed)
+            msg = await sendFct(content=string, embed=embed)
         return msg
 
 class _StringEnum(Enum):
@@ -304,7 +311,7 @@ class _StringEnum(Enum):
     REG_INVALID = _Message("Invalid registration!",embed=_registerHelp)
     REG_CHAR_NOT_FOUND = _Message("Invalid registration! Character `{}` is not valid!",embed=_registerHelp)
     REG_NOT_JAEGER = _Message("Invalid registration! Character `{}` doesn't belong to Jaeger!",embed=_registerHelp)
-    REG_ALREADY_EXIST = _Message("Invalid registration! Character `{}` is already registered by <@{}>!")
+    REG_ALREADY_EXIST = _Message("Invalid registration! Character `{}` is already registered by {}!")
     REG_MISSING_FACTION = _Message("Invalid registration! Can't find a {} character in your list!",embed=_registerHelp)
     REG_UPDATE_OWN = _Message("You successfully updated your profile with the following Jaeger characters: `{}`, `{}`, `{}`")
     REG_UPDATE_NOA = _Message("You successfully removed your Jaeger characters from your profile.")
@@ -350,17 +357,25 @@ class _StringEnum(Enum):
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
     PK_WAIT_MAP = _Message("{} {} Pick a map!", ping=False, embed=_teamUpdate)
     PK_MAP_OK_CONFIRM = _Message("Picked {}! {} confirm with `=p confirm` if you agree")
+    PK_NO_MAP = _Message("No map selected!")
 
     EXT_NOT_REGISTERED = _Message("You are not registered! Check <#{}>")
     UNKNOWN_ERROR = _Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\nDetails:*{}*")
     STOP_SPAM = _Message("Please avoid spamming!")
     HELP = _Message("Available commands:",embed=_autoHelp)
     INVALID_COMMAND = _Message("Invalid command! Type `=help` for the list of available commands.")
+    WRONG_USAGE = _Message("Wrong usage of the command `={}`!")
     WRONG_CHANNEL = _Message("The command `={}` can only be used in {}")
     WRONG_CHANNEL_2 = _Message("The command `={}` can't be used in {}")
     NO_PERMISSION = _Message("The command `={}` can only be used by staff members!")
     CHANNEL_INIT = _Message("`Bot init`: Correctly hooked in channel <#{}>")
     INVALID_STR = _Message("You entered an invalid caracter! `{}`")
+
+    BOT_UNLOCKED = _Message("Unlocked!")
+    BOT_LOCKED = _Message("Locked!")
+    BOT_IS_LOCKED = _Message("Unlock the bot before using this command!")
+    BOT_ALREADY = _Message("Already {}!")
+    BOT_VERSION = _Message("Version `{}`, locked: `{}`")
 
     MATCH_INIT = _Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player",embed=_teamUpdate)
@@ -373,7 +388,7 @@ class _StringEnum(Enum):
     MATCH_STARTING_2 = _Message("Round {} is starting in {} seconds!")
     MATCH_STARTED = _Message("{}\n{}\nRound {} is starting now!")
     MATCH_NO_MATCH = _Message("Can't use command `={}`, no match is happening here!")
-    MATCH_ALREADY_STARTED = _Message("Can't use command `={}`, this match is in progress!")
+    MATCH_ALREADY_STARTED = _Message("Can't use command `={}` now!")
     MATCH_CLEARED = _Message("Successfully cleared!")
     MATCH_PLAYERS_NOT_READY = _Message("Can't get {} ready, {} did not accept their Jaeger accounts", ping=False)
     MATCH_CLEAR = _Message("Clearing match...",ping=False)

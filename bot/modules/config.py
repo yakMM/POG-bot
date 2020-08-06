@@ -32,6 +32,7 @@ general = {
 
 AFK_TIME = 20 # minutes
 ROUND_LENGHT = 15 # minutes
+VERSION = "0"
 
 factions = {
     1 : "VS",
@@ -147,6 +148,13 @@ def getConfig(file):
             database["collections"][key] = config['Collections'][key]
         except KeyError:
             _errorMissing(key, 'Collections', file)
+
+
+    # Version
+    with open('../CHANGELOG.md', 'r', encoding='utf-8') as txt:
+        txt_str=txt.readline()
+    global VERSION
+    VERSION = txt_str[3:-2] # Extracts "X.X.X" from string "# vX.X.X:" in a lazy way
 
 
 def _checkSection(config, section, file):

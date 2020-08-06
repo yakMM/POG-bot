@@ -8,7 +8,7 @@ import requests
 import json
 import asyncio
 
-LAUNCHSTR = "" # this should be empty if your files are config.cfg and client_secret.json
+LAUNCHSTR = "_test" # this should be empty if your files are config.cfg and client_secret.json
 
 cfg.getConfig(f"config{LAUNCHSTR}.cfg")
 dbInit(cfg.database)
@@ -34,7 +34,7 @@ def pushAccounts():
 
 
     for acc in accounts:
-        p = Player(f"_PIL_ACC_{acc}", int(acc))
+        p = Player(f"_POG_ACC_{acc}", int(acc))
         pList.append(p)
         print(acc)
         charList=[f"PSBx{acc}VS", f"PSBx{acc}TR", f"PSBx{acc}NC"]
