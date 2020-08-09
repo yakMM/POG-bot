@@ -57,6 +57,9 @@ def _addMainHandlers(client):
         if isinstance(message.channel, DMChannel): # if dm, print in console and ignore the message
             print(message.author.name + ": " +message.content)
             return
+        if message.channel.id not in (cfg.discord_ids["lobby"], cfg.discord_ids["register"], *cfg.discord_ids["matches"]):
+            print("ignored!")
+            return
         if isAllLocked():
             if not isAdmin(message.author):
                 return
