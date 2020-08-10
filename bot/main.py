@@ -58,7 +58,6 @@ def _addMainHandlers(client):
             print(message.author.name + ": " +message.content)
             return
         if message.channel.id not in (cfg.discord_ids["lobby"], cfg.discord_ids["register"], *cfg.discord_ids["matches"]):
-            print("ignored!")
             return
         if isAllLocked():
             if not isAdmin(message.author):
@@ -224,5 +223,5 @@ def main(launchStr=""):
 if __name__ == "__main__":
     # execute only if run as a script
     # Use main() for production
-    main("_test")
-    #main()
+    #main("_test")
+    main()

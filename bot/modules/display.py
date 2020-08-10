@@ -87,6 +87,10 @@ def _registerHelp(msg):
                     value='`=r charName` - If your character names have faction suffixes\n'
                           '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes\n'
                     , inline=False)
+    embed.add_field(name='Notify feature',
+                    value='`=notify` - To join or leave the Notify feature\n'
+                          f'When suscribed to Notify, you can be mentionned with <@&{cfg.discord_ids["notify_role"]}> by other players\n'
+                    , inline=False)
     try:
         if isAdmin(msg.author):
             embed.add_field(name="Staff Commands",
@@ -259,6 +263,11 @@ def _teamUpdate(arg, match):
         embed.add_field(name=f'Remaining',value="\n".join(match.playerPings) ,inline=False)
     return embed
 
+def _jaegerCalendar(arg):
+    embed = Embed(colour=Color.blue(), title="Jaeger Calendar", url = "https://docs.google.com/spreadsheets/d/1dS8dMz8FhxnSBxPs3gfj_L5PsFzC8mtHHMlUkNYtjEI/",
+    description = "Pick a base currently available in the calendar!")
+    return embed
+
 class _Message():
     """ Class for the enum to use
     """
@@ -355,7 +364,7 @@ class _StringEnum(Enum):
     PK_FACTION_ALREADY = _Message("Faction already picked by the other team!")
     PK_FACTION_OK_NEXT = _Message("{} chose {}! {} pick a faction!", ping=False)
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
-    PK_WAIT_MAP = _Message("{} {} Pick a map!", ping=False, embed=_teamUpdate)
+    PK_WAIT_MAP = _Message("{} {} Pick an available map with `=p base name`!", ping=False, embed=_jaegerCalendar)
     PK_MAP_OK_CONFIRM = _Message("Picked {}! {} confirm with `=p confirm` if you agree")
     PK_NO_MAP = _Message("No map selected!")
 

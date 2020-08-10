@@ -1,6 +1,13 @@
+# v1.0.5:
+- Added =pog command for version checking and locking/unlocking the bot
+- Now ignoring messages posted in wrong channels
+- Added help regarding notify feature
+- Added link to Jaeger Calendar
+
 # v1.0.4:
 - Fixed a bug when several matches are happening at the same time
 - Customized discord.ext.tasks as lib.tasks to have better flexibility on tasks
+- Various fixes
 
 # v1.0.3:
 - It is no longer possible to register with a character that is already registered

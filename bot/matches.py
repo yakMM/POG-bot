@@ -238,7 +238,7 @@ class Match():
             return
         captainPings = [tm.captain.mention for tm in self.__teams]
         self.__status = MatchStatus.IS_MAPPING
-        await channelSend("PK_WAIT_MAP", self.__id, *captainPings, match=self)
+        await channelSend("PK_WAIT_MAP", self.__id, *captainPings)
 
     @tasks.loop(count=1)
     async def __ready(self):
