@@ -3,7 +3,7 @@ from discord.ext import commands
 import modules.config as cfg
 from modules.enumerations import SelStatus, MatchStatus, PlayerStatus
 from modules.display import send, channelSend
-from modules.exceptions import ElementNotFound
+from modules.exceptions import ElementNotFound, DatabaseError
 from modules.tools import isAdmin
 from modules.database import remove
 from modules.loader import lockAll, unlockAll, isAllLocked
@@ -97,8 +97,11 @@ class AdminCog(commands.Cog, name='admin'):
         if player.status == PlayerStatus.IS_LOBBIED:
             removeFromLobby(player)
             await channelSend("RM_LOBBY", cfg.discord_ids["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
-        if player.status == PlayerStatus.IS_REGISTERED:
-            await remove(player)
+        if player.status in (PlayerStatus.IS_REGISTERED, PlayerStatus.IS_NOT_REGISTERED):
+            try:
+                await remove(player)
+            except DatabaseError:
+                pass # ignored if not yet in db
             memb = ctx.author.guild.get_member(player.id)
             removePlayer(player)
             notify = memb.guild.get_role(cfg.discord_ids["notify_role"])

@@ -23,7 +23,7 @@ from modules.exceptions import ElementNotFound
 from modules.database import init as dbInit, getAllPlayers, getAllMaps
 from modules.enumerations import PlayerStatus
 from modules.tools import isAdmin
-from modules.loader import init as cogInit, isAllLocked
+from modules.loader import init as cogInit, isAllLocked, unlockAll
 
 # Modules for the custom classes
 from matches import onPlayerInactive, onPlayerActive, init as matchesInit
@@ -215,6 +215,7 @@ def main(launchStr=""):
 
     # Add all cogs
     cogInit(client)
+    unlockAll(client)
 
     # Run server
     client.run(cfg.general["token"])

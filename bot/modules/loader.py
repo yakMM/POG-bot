@@ -1,6 +1,6 @@
 main_cogs = ["cogs.admin"]
 standard_cogs = ["cogs.register", "cogs.matches", "cogs.lobby"]
-__isGlobalLocked = False # Lock the bot from getting messages
+__isGlobalLocked = True # Lock the bot from getting messages
 
 def init(client):
     for cog in main_cogs:

@@ -31,8 +31,9 @@ def getPlayer(id):
 def removePlayer(p):
     if p.id not in _allPlayers:
         raise ElementNotFound(p.id)
-    for i in range(len(_namesChecking)):
-        del _namesChecking[i][p.igIds[i]]
+    if p.hasOwnAccount:
+        for i in range(len(_namesChecking)):
+            del _namesChecking[i][p.igIds[i]]
     del _allPlayers[p.id]
 
 class Player():
