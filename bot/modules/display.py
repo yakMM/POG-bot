@@ -385,6 +385,8 @@ class _StringEnum(Enum):
     BOT_IS_LOCKED = _Message("Unlock the bot before using this command!")
     BOT_ALREADY = _Message("Already {}!")
     BOT_VERSION = _Message("Version `{}`, locked: `{}`")
+    BOT_FREEZED = _Message("Channel freezed!")
+    BOT_UNFREEZED = _Message("Channel unfreezed!")
 
     MATCH_INIT = _Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player",embed=_teamUpdate)

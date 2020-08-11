@@ -168,7 +168,8 @@ class Match():
 
     def confirmMap(self):
         self.__mapSelector.confirm()
-        self.__ready.start()
+        if self.__status == MatchStatus.IS_MAPPING:
+            self.__ready.start()
 
     def pickMap(self, captain):
         if self.__mapSelector.status == SelStatus.IS_SELECTED:
@@ -238,7 +239,7 @@ class Match():
         for tm in self.__teams:
             tm.captain.isTurn = True
         if self.__mapSelector.status == SelStatus.IS_CONFIRMED:
-            await channelSend("MATCH_MAP_AUTO", self.__id, self.__map.name)
+            await channelSend("MATCH_MAP_AUTO", self.__id, self.__mapSelector.map.name)
             self.__ready.start()
             return
         captainPings = [tm.captain.mention for tm in self.__teams]

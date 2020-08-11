@@ -1,3 +1,8 @@
+# v1.0.7:
+- =map command should now work in all situations
+- Fixed match status message on faction selection
+- Added possibility to freeze and unfreeze channels
+
 # v1.0.6:
 - Fixed critical bug in account distribution (every account could only be used 1 time)
 - Match lenght is now 10 minutes

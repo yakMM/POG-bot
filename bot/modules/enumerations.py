@@ -7,7 +7,7 @@ class MatchStatus(Enum):
     IS_FREE = "No match"
     IS_RUNNING = "Processing..."
     IS_PICKING = "Waiting for captains to pick players"
-    IS_FACTION = "Waiting for factions to pick players"
+    IS_FACTION = "Waiting for captains to pick factions"
     IS_MAPPING = "Waiting for map pick"
     IS_WAITING = "Waiting for teams"
     IS_STARTING = "Match starting"

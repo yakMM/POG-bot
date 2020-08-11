@@ -137,7 +137,29 @@ class AdminCog(commands.Cog, name='admin'):
             await send("BOT_UNLOCKED", ctx)
             return
         await send("WRONG_USAGE", ctx, ctx.command.name)
-        return
+
+    @commands.command()
+    @commands.guild_only()
+    async def channel(self, ctx, *args):
+        if len(args) == 1:
+            arg = args[0]
+            if arg=="freeze":
+                memb = ctx.author
+                notify = memb.guild.get_role(cfg.discord_ids["notify_role"])
+                registered = memb.guild.get_role(cfg.discord_ids["registered_role"])
+                await ctx.channel.set_permissions(notify, send_messages=False)
+                await ctx.channel.set_permissions(registered, send_messages=False)
+                await send("BOT_FREEZED", ctx)
+                return
+            if arg=="unfreeze":
+                memb = ctx.author
+                notify = memb.guild.get_role(cfg.discord_ids["notify_role"])
+                registered = memb.guild.get_role(cfg.discord_ids["registered_role"])
+                await ctx.channel.set_permissions(notify, send_messages=True)
+                await ctx.channel.set_permissions(registered, send_messages=True)
+                await send("BOT_UNFREEZED", ctx)
+                return
+        await send("WRONG_USAGE", ctx, ctx.command.name)
 
 
 def setup(client):
