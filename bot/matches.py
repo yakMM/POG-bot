@@ -46,6 +46,11 @@ def removeFromLobby(player):
     _lobbyStuck = False
     player.status = PlayerStatus.IS_REGISTERED
 
+def _onMatchFree():
+    if len(_lobbyList) == cfg.general["lobby_size"]:
+        startMatchFromFullLobby.start()
+
+
 @tasks.loop(count=1)
 async def startMatchFromFullLobby():
     global _lobbyStuck
@@ -268,8 +273,8 @@ class Match():
             await channelSend("MATCH_CONFIRM", self.__id, *captainPings, match=self)
             return
         await channelSend("MATCH_OVER", self.__id)
+        self.__status = MatchStatus.IS_RUNNING
         await self.clear()
-        await channelSend("MATCH_CLEARED", self.__id)
 
     @tasks.loop(count=1)
     async def __startMatch(self):
@@ -307,6 +312,7 @@ class Match():
             self.__onMatchOver.cancel()
             playerPings = [tm.allPings for tm in self.__teams]
             await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
+            await channelSend("MATCH_OVER", self.__id)
 
         # Updating account sheet with current match
         await self.__accounts.doUpdate()
@@ -329,7 +335,9 @@ class Match():
         self.__teams = [None, None]
         self.__roundsStamps.clear()
         self.__players.clear()
+        await channelSend("MATCH_CLEARED", self.__id)
         self.__status = MatchStatus.IS_FREE
+        _onMatchFree()
 
 
     @property

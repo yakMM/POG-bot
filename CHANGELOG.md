@@ -1,3 +1,11 @@
+# v1.0.6:
+- Fixed critical bug in account distribution (every account could only be used 1 time)
+- Match lenght is now 10 minutes
+- ALL commands are now case insensitive (it was the case of only a few)
+- Fixed a bug when lobby is stuck but a match spot becomes available
+- "Round 2 is over" message is no longer displayed twice
+- Staff can now properly cancel an ongoing match
+
 # v1.0.5:
 - Added =pog command for version checking and locking/unlocking the bot
 - Now ignoring messages posted in wrong channels

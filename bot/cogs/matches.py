@@ -49,7 +49,7 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.max_concurrency(number=1, wait=True)
     async def pick(self, ctx, *args):
         match = getMatch(ctx.channel.id)
-        if len(args)==1 and args[0].lower()=="help":
+        if len(args)==1 and args[0]=="help":
             await send("PK_HELP", ctx) # =p help shows the help
             return
         player = await _testPlayer(ctx, match)
@@ -193,7 +193,7 @@ async def _faction(ctx, captain, args):
 async def _map(ctx, captain, args):
     sel = captain.match.mapSelector
     match = captain.match
-    if len(args) == 1 and args[0].lower() == "confirm":
+    if len(args) == 1 and args[0] == "confirm":
         if sel.status != SelStatus.IS_SELECTED:
             await send("PK_NO_MAP", ctx)
             return

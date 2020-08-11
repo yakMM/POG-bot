@@ -100,7 +100,7 @@ async def _register(player, ctx, args):
         return
     wasPlayerRegistered = player.status != PlayerStatus.IS_NOT_REGISTERED # store previous status
     if len(args) == 1 or len(args) == 3: # if 1 or 3 args
-        if len(args) == 1 and args[0].lower()=="help": # =r help displays hel^p
+        if len(args) == 1 and args[0]=="help": # =r help displays hel^p
             await send("REG_HELP",ctx)
             return
         try:
@@ -129,7 +129,7 @@ async def _register(player, ctx, args):
             await send("UNKNOWN_ERROR",ctx,"Reg error, check logs")
             return
     if len(args) == 2: # if 2 args, it should be "no account", if not, invalid request. Again, check if update and push db if that's the case
-        if args[0].lower()=="no" and args[1].lower()=="account":
+        if args[0]=="no" and args[1]=="account":
             if not await player.register(None):
                 await send("REG_IS_REGISTERED_NOA",ctx)
                 return

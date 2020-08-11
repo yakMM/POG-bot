@@ -65,6 +65,7 @@ def _addMainHandlers(client):
             # Admins can still use bot when locked
         if await isSpam(message):
             return
+        message.content = message.content.lower()
         await client.process_commands(message) # if not spam, process
         await sleep(0.5)
         unlock(message.author.id) # call finished, we can release user
@@ -224,5 +225,5 @@ def main(launchStr=""):
 if __name__ == "__main__":
     # execute only if run as a script
     # Use main() for production
-    #main("_test")
-    main()
+    main("_test")
+    #main()

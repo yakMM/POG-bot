@@ -78,7 +78,7 @@ class MapSelection():
             if len(self.__selection) > MAX_SELECTED:
                 self.__status = SelStatus.IS_TOO_MUCH
                 return
-            if arg.lower() in map.name.lower():
+            if arg in map.name.lower():
                 self.__selection.append(map)
         if len(self.__selection) == 1:
             self.__selected = self.__selection[0]
@@ -99,7 +99,7 @@ class MapSelection():
                 return
             await send("MAP_HELP", ctx)
             return
-        if len(args) == 1 and args[0].lower() == "help":
+        if len(args) == 1 and args[0] == "help":
                 await send("MAP_HELP", ctx)
                 return
         self.__doSelection(args)
