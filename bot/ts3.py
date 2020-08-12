@@ -21,12 +21,6 @@ class Ts3_bot:
             self.instanceId = response[1]["uuid"]
         assert self.instanceId
 
-    def volume(self, value):
-        endpoint = "/volume/set/"
-        response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint + str(value),
-                          headers={"Authorization": "Bearer " + self.auth_token})
-        return response
-
     def get_list(self):
         endpoint = "/files"
         response = requests.get(self.main_url + endpoint, headers={"Authorization": "Bearer " + self.auth_token}).json()
@@ -39,6 +33,12 @@ class Ts3_bot:
         endpoint = "/play/byId/"
         response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint + songId,
                          headers={"Authorization": "Bearer " + self.auth_token})
+        return response
+
+    def volume(self, value):
+        endpoint = "/volume/set/"
+        response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint + str(value),
+                          headers={"Authorization": "Bearer " + self.auth_token})
         return response
 
 
