@@ -1,5 +1,7 @@
 import requests
 
+#audio files use https://www.naturalreaders.com/online/ English (UK) - Amy voice
+
 
 class Ts3_bot:
     def __init__(self, main_url, username="admin", password=""):
