@@ -12,7 +12,7 @@ from modules.exceptions import ElementNotFound
 from classes.players import TeamCaptain, ActivePlayer, PlayerStatus, getPlayer
 from classes.maps import MapSelection
 
-from matches import getMatch
+from matches import getMatch, which_bot, which_team_channels
 from modules.enumerations import MatchStatus, SelStatus
 
 globId = 0
@@ -187,27 +187,28 @@ async def _faction(ctx, captain, args):
         await send("INVALID_STR", ctx, args[0])  # needs to be only alphanum chars
         return
     try:
+        ts3bot = which_bot(ctx.channel.id)
         team = captain.team
         newPicker = captain.match.factionPick(team, args[0].upper())
         if captain.match.status != MatchStatus.IS_FACTION:
             await send("PK_FACTION_OK", ctx, team.name, cfg.factions[team.faction])  # faction picked
             if cfg.factions[team.faction] == "VS":  # Team 1 VS
-                ts3.lobby_bot.enqueue(ts3.AUDIO_ID_TEAM_1_VS)
+                ts3bot.enqueue(ts3.AUDIO_ID_TEAM_1_VS)
             elif cfg.factions[team.faction] == "NC":  # Team 1 NC
-                ts3.lobby_bot.enqueue(ts3.AUDIO_ID_TEAM_1_NC)
+                ts3bot.enqueue(ts3.AUDIO_ID_TEAM_1_NC)
             elif cfg.factions[team.faction] == "TR":  # Team 1 TR
-                ts3.lobby_bot.enqueue(ts3.AUDIO_ID_TEAM_1_TR)
+                ts3bot.enqueue(ts3.AUDIO_ID_TEAM_1_TR)
             return
         if newPicker == captain:
             await send("PK_FACTION_ALREADY", ctx, newPicker.mention)  # faction already picked
             return
         await send("PK_FACTION_OK_NEXT", ctx, team.name, cfg.factions[team.faction], newPicker.mention)
         if cfg.factions[team.faction] == "VS":  # Team 2 VS
-            ts3.lobby_bot.enqueue(ts3.AUDIO_ID_TEAM_2_VS)
+            ts3bot.enqueue(ts3.AUDIO_ID_TEAM_2_VS)
         elif cfg.factions[team.faction] == "NC":  # Team 2 NC
-            ts3.lobby_bot.enqueue(ts3.AUDIO_ID_TEAM_2_NC)
+            ts3bot.enqueue(ts3.AUDIO_ID_TEAM_2_NC)
         elif cfg.factions[team.faction] == "TR":  # Team 2 TR
-            ts3.lobby_bot.enqueue(ts3.AUDIO_ID_TEAM_2_TR)
+            ts3bot.enqueue(ts3.AUDIO_ID_TEAM_2_TR)
     except KeyError:
         await send("PK_NOT_VALID_FACTION", ctx)
 
@@ -224,15 +225,17 @@ async def _map(ctx, captain, args):
             return
         match.confirmMap()
         await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
+        ts3bot = which_bot(ctx.channel.id)
         # ts3: map selected
-        ts3.lobby_bot.enqueue(ts3.AUDIO_ID_MAP_SELECTED)
+        ts3bot.enqueue(ts3.AUDIO_ID_MAP_SELECTED)
         #ts3: players drop to team channels
         await sleep(1)
-        ts3.lobby_bot.enqueue(ts3.AUDIO_ID_PLAYERS_DROP_CHANNEL)
-        # ts3: moves bots to team channels
+        ts3bot.enqueue(ts3.AUDIO_ID_PLAYERS_DROP_CHANNEL)
+        # ts3: move bots to team channels:
         await sleep(4)
-        ts3.lobby_bot.move("284")
-        ts3.team2_bot.move("285")
+        team_channels = which_team_channels(ctx.channel.id)
+        ts3.bot1.move(team_channels[0])
+        ts3.bot2.move(team_channels[1])
         return
     await sel.doSelectionProcess(ctx, args)  # Handle the actual map selection
     newPicker = match.pickMap(captain)

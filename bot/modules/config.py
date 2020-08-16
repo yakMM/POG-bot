@@ -21,6 +21,18 @@ discord_ids = {
     "notify_role": 0
 }
 
+## TeamspeakIds
+teamspeak_ids = {
+    "ts_lobby": "",
+    "ts_afk": "",
+    "ts_match_1_picks": "",
+    "ts_match_1_team_1": "",
+    "ts_match_1_team_2": "",
+    "ts_match_2_picks": "",
+    "ts_match_2_team_1": "",
+    "ts_match_2_team_2": "",
+}
+
 ## General
 
 general = {
@@ -124,6 +136,17 @@ def getConfig(file):
             _errorMissing(key, 'Discord_Ids', file)
         except ValueError:
             _errorIncorrect(key, 'Discord_Ids', file)
+
+    # Teamspeak_Ids section
+    _checkSection(config, "Teamspeak_Ids", file)
+
+    for key in teamspeak_ids:
+        try:
+            teamspeak_ids[key] = config['Teamspeak_Ids'][key]
+        except KeyError:
+            _errorMissing(key, 'Teamspeak_Ids', file)
+        except ValueError:
+            _errorIncorrect(key, 'Teamspeak_Ids', file)
 
     # Database section
     _checkSection(config, "Database", file)

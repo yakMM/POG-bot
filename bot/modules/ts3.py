@@ -99,8 +99,8 @@ class Ts3_bot:
         return response.content
 
 
-lobby_bot = Ts3_bot('http://127.0.0.1:8087/api/v1/bot', "Lobby_and_Team1", username='admin', password='pogbot')
-team2_bot = Ts3_bot('http://127.0.0.1:8087/api/v1/bot', "Team2", username='admin', password='pogbot')
+bot1 = Ts3_bot('http://127.0.0.1:8087/api/v1/bot', "Lobby_and_Team1", username='admin', password='pogbot')
+bot2 = Ts3_bot('http://127.0.0.1:8087/api/v1/bot', "Team2", username='admin', password='pogbot')
 
 # print(lobby_bot.get_list())
 AUDIO_ID_ROUND_OVER = 'a0fbc373-13e7-4f14-81ec-47b40be7ab13'
@@ -126,14 +126,13 @@ AUDIO_ID_PLAYERS_DROP_CHANNEL = 'e67dc6a7-2731-419f-a179-6c4614189ab0'
 
 # bot.move("<CHANNEL ID>")
 # PSB teamspeak channel ids:
-TS_ID_LOBBY = "281"
-TS_ID_AFK = "282"
-TS_ID_MATCH_1 = "283"
-TS_ID_MATCH_1_PICKS = "286"
-TS_ID_MATCH_1_TEAM_1 = "284"
-TS_ID_MATCH_1_TEAM_2 = "285"
-TS_ID_MATCH_2 = "322"
-TS_ID_MATCH_2_PICKS = "323"
-TS_ID_MATCH_2_TEAM_1 = "324"
-TS_ID_MATCH_2_TEAM_2 = "325"
+# ts_lobby = "281"
+# ts_afk = "282"
+# ts_match_1_picks = "286"
+# ts_match_1_team_1 = "284"
+# ts_match_1_team_2 = "285"
+# ts_match_2_picks = "323"
+# ts_match_2_team_1 = "324"
+# ts_match_2_team_2 = "325"
+
 # todo: put these in a config file
