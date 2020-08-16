@@ -31,7 +31,7 @@ general = {
     }
 
 AFK_TIME = 20 # minutes
-ROUND_LENGHT = 10 # minutes
+ROUND_LENGHT = 1 # minutes
 VERSION = "0"
 
 factions = {

@@ -103,7 +103,7 @@ lobby_bot = Ts3_bot('http://127.0.0.1:8087/api/v1/bot', "Lobby_and_Team1", usern
 team2_bot = Ts3_bot('http://127.0.0.1:8087/api/v1/bot', "Team2", username='admin', password='pogbot')
 
 # print(lobby_bot.get_list())
-#   [('5f8671f0-3db3-4e26-a4fd-a0ee1cb63e48', 'round_over_v2'),
+#   [('a0fbc373-13e7-4f14-81ec-47b40be7ab13', 'round_over_v2'),
 #   ('91da596c-2494-4dbc-9c59-71f74f3b68cb', 'select_factions_v2'),
 #   ('21bb87b5-5279-45fd-90a7-7c31b5e5199d', 'select_map_v2'),
 #   ('6eb6f5cc-99bd-4df6-9b59-bc85bd88ba7c', 'select_teams_v2'),
@@ -115,7 +115,7 @@ team2_bot = Ts3_bot('http://127.0.0.1:8087/api/v1/bot', "Team2", username='admin
 #   ('c0dd6cad-a32c-4b2a-b229-2f22eb1da202', 'team_2_TR_v2'),
 #   ('1ad7209e-6329-463e-9d40-6b3e3ab1174e', 'team_2_VS_v2'),
 #   ('23ee2e94-8628-4285-aeee-d07e95a2f2ee', 'type_ready_v2'),
-#   ('3389e501-40e0-4826-89d0-3017753afd47', '5s_v2'),
+#   ('83693496-a410-4602-80dd-9ed74ec0a2fe', '5s_v2'),
 #   ('2b68e6d3-6009-4662-a72e-9d9e2b84d67b', '10s_v2'),
 #   ('ff4d8310-06cd-449f-8d8e-00dda43dc102', '30s_v2'),
 #   ('663c62b8-5083-49d0-bed2-29ead13b749c', 'drop_match_1_picks_v3'),

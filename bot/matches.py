@@ -217,8 +217,6 @@ class Match:
         team.faction = faction
         team.captain.isTurn = False
         if other.faction != 0:
-            # ts3: faction selected
-            ts3.lobby_bot.enqueue("382b91b3-43ff-411e-aa30-e4754a18ba9c")
             self.__status = MatchStatus.IS_MAPPING
             self.__findMap.start()
         else:
@@ -266,7 +264,7 @@ class Match:
         if self.__mapSelector.status == SelStatus.IS_CONFIRMED:
             await channelSend("MATCH_MAP_AUTO", self.__id, self.__map.name)
             # ts3: map selected
-            # ts3: ready up
+            ts3.lobby_bot.enqueue("ecf7b363-68dc-45d4-a69d-25553ce1f776")
             self.__ready.start()
             return
         captainPings = [tm.captain.mention for tm in self.__teams]
@@ -290,6 +288,10 @@ class Match:
             return
         self.__status = MatchStatus.IS_WAITING
         await channelSend("MATCH_CONFIRM", self.__id, *captainPings, match=self)
+        # ts3: type =ready
+        await sleep(10)
+        ts3.lobby_bot.enqueue("23ee2e94-8628-4285-aeee-d07e95a2f2ee")
+        ts3.team2_bot.enqueue("23ee2e94-8628-4285-aeee-d07e95a2f2ee")
 
     @tasks.loop(minutes=cfg.ROUND_LENGHT, delay=1, count=2)
     async def __onMatchOver(self):
@@ -301,9 +303,15 @@ class Match:
         if self.roundNo < 2:
             await channelSend("MATCH_SWAP", self.__id)
             # ts3: swap sundies
+            await sleep(1)
+            ts3.lobby_bot.enqueue("1ae444aa-12db-40da-b341-9ff98962829e")
+            ts3.team2_bot.enqueue("1ae444aa-12db-40da-b341-9ff98962829e")
+            await sleep(1)
             self.__status = MatchStatus.IS_WAITING
             captainPings = [tm.captain.mention for tm in self.__teams]
             await channelSend("MATCH_CONFIRM", self.__id, *captainPings, match=self)
+            ts3.lobby_bot.enqueue("23ee2e94-8628-4285-aeee-d07e95a2f2ee")
+            ts3.team2_bot.enqueue("23ee2e94-8628-4285-aeee-d07e95a2f2ee")
             return
         await channelSend("MATCH_OVER", self.__id)
         self.__status = MatchStatus.IS_RUNNING
@@ -313,19 +321,25 @@ class Match:
     async def __startMatch(self):
         await channelSend("MATCH_STARTING_1", self.__id, self.roundNo, "30")
         # ts3: 30s
+        ts3.lobby_bot.play("ff4d8310-06cd-449f-8d8e-00dda43dc102")
+        ts3.team2_bot.play("ff4d8310-06cd-449f-8d8e-00dda43dc102")
         await sleep(10)
         await channelSend("MATCH_STARTING_2", self.__id, self.roundNo, "20")
-        await sleep(10)
-        await channelSend("MATCH_STARTING_2", self.__id, self.roundNo, "10")
         # ts3: 10s
-        await sleep(5)
+        await sleep(8)
+        ts3.lobby_bot.play("2b68e6d3-6009-4662-a72e-9d9e2b84d67b")
+        ts3.team2_bot.play("2b68e6d3-6009-4662-a72e-9d9e2b84d67b")
+        await sleep(2)
+        await channelSend("MATCH_STARTING_2", self.__id, self.roundNo, "10")
+        await sleep(3.2)
         # ts3: 5s
-        await sleep(5)
+        ts3.lobby_bot.play("83693496-a410-4602-80dd-9ed74ec0a2fe")
+        ts3.team2_bot.play("83693496-a410-4602-80dd-9ed74ec0a2fe")
+        await sleep(6.8)
         playerPings = [tm.allPings for tm in self.__teams]
         await channelSend("MATCH_STARTED", self.__id, *playerPings, self.roundNo)
         self.__roundsStamps.append(int(dt.timestamp(dt.now())))
         self.__status = MatchStatus.IS_PLAYING
-        # ts3: round over
         self.__onMatchOver.start()
 
     @tasks.loop(count=1)
@@ -341,7 +355,7 @@ class Match:
         self.__status = MatchStatus.IS_PICKING
         await channelSend("MATCH_SHOW_PICKS", self.__id, self.__teams[0].captain.mention, match=self)
         # ts3: select teams
-        await sleep(20)
+        await sleep(10)
         ts3.lobby_bot.enqueue("6eb6f5cc-99bd-4df6-9b59-bc85bd88ba7c")
 
     async def clear(self):
@@ -352,6 +366,9 @@ class Match:
             self.__onMatchOver.cancel()
             playerPings = [tm.allPings for tm in self.__teams]
             await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
+            # ts3: round over
+            ts3.lobby_bot.play("a0fbc373-13e7-4f14-81ec-47b40be7ab13")
+            ts3.team2_bot.play("a0fbc373-13e7-4f14-81ec-47b40be7ab13")
             await channelSend("MATCH_OVER", self.__id)
             # ts3: round over
 
