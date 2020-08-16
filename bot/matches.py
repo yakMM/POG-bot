@@ -451,7 +451,7 @@ class Match:
         _onMatchFree()
         await sleep(1)
         ts3.bot1.move(cfg.teamspeak_ids["ts_lobby"])
-        ts3.bot2.move(cfg.teamspeak_ids["afk"])
+        ts3.bot2.move(cfg.teamspeak_ids["ts_afk"])
 
     @property
     def map(self):
