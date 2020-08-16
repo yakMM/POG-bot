@@ -192,22 +192,22 @@ async def _faction(ctx, captain, args):
         if captain.match.status != MatchStatus.IS_FACTION:
             await send("PK_FACTION_OK", ctx, team.name, cfg.factions[team.faction])  # faction picked
             if cfg.factions[team.faction] == "VS":  # Team 1 VS
-                ts3.lobby_bot.enqueue("c8d7202f-fb81-47d5-8785-3512ba0bf233")
+                ts3.lobby_bot.enqueue(ts3.AUDIO_ID_TEAM_1_VS)
             elif cfg.factions[team.faction] == "NC":  # Team 1 NC
-                ts3.lobby_bot.enqueue("f667d6c6-fc9a-4026-9cf7-e32844638450")
+                ts3.lobby_bot.enqueue(ts3.AUDIO_ID_TEAM_1_NC)
             elif cfg.factions[team.faction] == "TR":  # Team 1 TR
-                ts3.lobby_bot.enqueue("6922780b-56bd-47b3-9f38-6c228604f7ae")
+                ts3.lobby_bot.enqueue(ts3.AUDIO_ID_TEAM_1_TR)
             return
         if newPicker == captain:
             await send("PK_FACTION_ALREADY", ctx, newPicker.mention)  # faction already picked
             return
         await send("PK_FACTION_OK_NEXT", ctx, team.name, cfg.factions[team.faction], newPicker.mention)
         if cfg.factions[team.faction] == "VS":  # Team 2 VS
-            ts3.lobby_bot.enqueue("1ad7209e-6329-463e-9d40-6b3e3ab1174e")
+            ts3.lobby_bot.enqueue(ts3.AUDIO_ID_TEAM_2_VS)
         elif cfg.factions[team.faction] == "NC":  # Team 2 NC
-            ts3.lobby_bot.enqueue("228d61e2-f466-4c99-89c5-4b658adf828e")
+            ts3.lobby_bot.enqueue(ts3.AUDIO_ID_TEAM_2_NC)
         elif cfg.factions[team.faction] == "TR":  # Team 2 TR
-            ts3.lobby_bot.enqueue("c0dd6cad-a32c-4b2a-b229-2f22eb1da202")
+            ts3.lobby_bot.enqueue(ts3.AUDIO_ID_TEAM_2_TR)
     except KeyError:
         await send("PK_NOT_VALID_FACTION", ctx)
 
@@ -225,10 +225,10 @@ async def _map(ctx, captain, args):
         match.confirmMap()
         await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
         # ts3: map selected
-        ts3.lobby_bot.enqueue("ecf7b363-68dc-45d4-a69d-25553ce1f776")
+        ts3.lobby_bot.enqueue(ts3.AUDIO_ID_MAP_SELECTED)
         #ts3: players drop to team channels
         await sleep(1)
-        ts3.lobby_bot.enqueue("e67dc6a7-2731-419f-a179-6c4614189ab0")
+        ts3.lobby_bot.enqueue(ts3.AUDIO_ID_PLAYERS_DROP_CHANNEL)
         # ts3: moves bots to team channels
         await sleep(4)
         ts3.lobby_bot.move("284")
