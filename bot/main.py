@@ -195,7 +195,7 @@ def main(launchStr=""):
     # Remove default help
     client.remove_command('help')
 
-    # Initialise db and get all t=xhe registered users and all maps from it
+    # Initialise db and get all the registered users and all maps from it
     dbInit(cfg.database)
     getAllPlayers()
     getAllMaps()

@@ -1,5 +1,9 @@
+from time import sleep
+
 import requests
 import json
+
+
 # audio files use https://www.naturalreaders.com/online/ English (UK) - Amy voice
 
 # because we only have 2 bots that jump around, make sure matches don't start within 10 seconds of each other so the
@@ -29,6 +33,13 @@ class Ts3_bot:
                 self.instanceId = instance["uuid"]
         assert self.instanceId
 
+    def enqueue(self,
+                songId):  # enqueue will wait for the previous audio file to finish playing. must wait >1 second between enqueues due to a sinusbot bug
+        endpoint = "/queue/append/"
+        response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint + songId,
+                                 headers={"Authorization": "Bearer " + self.auth_token})
+        return response
+
     def get_list(self):
         endpoint = "/files"
         response = requests.get(self.main_url + endpoint, headers={"Authorization": "Bearer " + self.auth_token}).json()
@@ -45,7 +56,7 @@ class Ts3_bot:
                                  data=json.dumps({"id": channelId, "password": channelPass}))
         return response
 
-    def play(self, songId):
+    def play(self, songId):  # play will cut off any audio file currently playing
         endpoint = "/play/byId/"
         response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint + songId,
                                  headers={"Authorization": "Bearer " + self.auth_token})
@@ -69,17 +80,29 @@ class Ts3_bot:
                                  headers={"Authorization": "Bearer " + self.auth_token})
         return response
 
+    def stop_song(self):
+        endpoint = "/stop"
+        response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint,
+                                 headers={"Authorization": "Bearer " + self.auth_token})
+        return response
+
     def volume(self, value):
         endpoint = "/volume/set/"
         response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint + str(value),
                                  headers={"Authorization": "Bearer " + self.auth_token})
         return response
 
+    def get_queue(self):
+        endpoint = "/queue"
+        response = requests.get(self.main_url + "/i/" + self.instanceId + endpoint,
+                                headers={"Authorization": "Bearer " + self.auth_token})
+        return response.content
+
 
 lobby_bot = Ts3_bot('http://127.0.0.1:8087/api/v1/bot', "Lobby_and_Team1", username='admin', password='pogbot')
 team2_bot = Ts3_bot('http://127.0.0.1:8087/api/v1/bot', "Team2", username='admin', password='pogbot')
 
-# bot.get_list()
+# print(lobby_bot.get_list())
 #   [('5f8671f0-3db3-4e26-a4fd-a0ee1cb63e48', 'round_over_v2'),
 #   ('91da596c-2494-4dbc-9c59-71f74f3b68cb', 'select_factions_v2'),
 #   ('21bb87b5-5279-45fd-90a7-7c31b5e5199d', 'select_map_v2'),
@@ -95,8 +118,9 @@ team2_bot = Ts3_bot('http://127.0.0.1:8087/api/v1/bot', "Team2", username='admin
 #   ('3389e501-40e0-4826-89d0-3017753afd47', '5s_v2'),
 #   ('2b68e6d3-6009-4662-a72e-9d9e2b84d67b', '10s_v2'),
 #   ('ff4d8310-06cd-449f-8d8e-00dda43dc102', '30s_v2'),
-#   ('27270372-1fb8-4dca-b8b4-c70535469e69', 'drop_match_1_picks_v2'),
-#   ('899b64bf-4499-41b6-be6b-bea7ecba4b9a', 'drop_match_2_picks_v2'),
+#   ('663c62b8-5083-49d0-bed2-29ead13b749c', 'drop_match_1_picks_v3'),
+#   ('540f93a5-9ccb-4cdc-8faf-4f3458625c80', 'drop_match_2_picks_v3'),
+#   ('3d2be134-f85d-4e1b-92ac-eaee37cbbecf', '10s_silence'),
 #   ('382b91b3-43ff-411e-aa30-e4754a18ba9c', 'factions_selected_v2'),
 #   ('1db0bb0d-d82c-41de-ad90-0403c69ad37c', 'gelos_in_prison_v2'),
 #   ('a98da612-8ec5-406b-a16a-693d74923152', 'lobby_full_v2'),
