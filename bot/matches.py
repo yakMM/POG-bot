@@ -298,6 +298,8 @@ class Match:
         playerPings = [tm.allPings for tm in self.__teams]
         await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
         # ts3: round over
+        ts3.lobby_bot.play("a0fbc373-13e7-4f14-81ec-47b40be7ab13")
+        ts3.team2_bot.play("a0fbc373-13e7-4f14-81ec-47b40be7ab13")
         for tm in self.__teams:
             tm.captain.isTurn = True
         if self.roundNo < 2:
