@@ -293,7 +293,7 @@ class Match:
         ts3.lobby_bot.enqueue("23ee2e94-8628-4285-aeee-d07e95a2f2ee")
         ts3.team2_bot.enqueue("23ee2e94-8628-4285-aeee-d07e95a2f2ee")
 
-    @tasks.loop(minutes=cfg.ROUND_LENGHT, delay=1, count=2)
+    @tasks.loop(minutes=cfg.ROUND_LENGTH, delay=1, count=2)
     async def __onMatchOver(self):
         playerPings = [tm.allPings for tm in self.__teams]
         await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
