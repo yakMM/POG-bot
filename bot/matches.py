@@ -73,7 +73,7 @@ async def startMatchFromFullLobby():
     match._launch.start()
     # ts3: lobby full
     if match.id == cfg.discord_ids["matches"][0]:  # if match 1
-        ts3.bot1.move(cfg.teamspeak_ids["ts_lobby"])
+        ts3.bot1.move(cfg.teamspeak_ids["ts_lobby"])  # IF IT HANGS HERE MAKE SURE webapi.js IS ENABLED FOR SINUSBOT
         ts3.bot1.enqueue(ts3.AUDIO_ID_DROP_MATCH_1_PICKS)
         await channelSend("LB_MATCH_STARTING", cfg.discord_ids["lobby"], match.id)
         await sleep(8)
@@ -269,7 +269,6 @@ class Match:
         # If other isTurn, then not ready
         # Else everyone ready
         if not other.captain.isTurn:
-            # ts3: 30s
             self.__status = MatchStatus.IS_STARTING
             self.__startMatch.start()
 
