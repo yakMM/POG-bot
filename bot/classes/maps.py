@@ -138,3 +138,9 @@ class MapSelection():
 
     def clean(self):
         del _mapSelectionsDict[self.__id]
+
+
+class MapPool(MapSelection):
+    def __init__(self, id, mapList):
+        super().__init__(id)
+

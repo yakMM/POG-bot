@@ -6,7 +6,7 @@ import enum
 # Custom modules
 import modules.config as cfg
 from modules.asynchttp import request as httpRequest
-from modules.exceptions import UnexpectedError, ElementNotFound, StatusNotAllowed, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists
+from modules.exceptions import UnexpectedError, ElementNotFound, StatusNotAllowed, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
 from modules.enumerations import PlayerStatus
 from lib import tasks
 
@@ -175,28 +175,30 @@ class Player():
         for iName in charList:
             url = 'http://census.daybreakgames.com/s:'+cfg.general['api_key']+'/get/ps2:v2/character/?name.first_lower='+iName.lower()+'&c:show=character_id,faction_id,name&c:resolve=world'
             jdata = await httpRequest(url)
-            if jdata["returned"]==0:
-                raise CharNotFound(iName)
-            else:
-                try:
-                    world = int(jdata["character_list"][0]["world_id"])
-                    if world != WORLD_ID:
-                        raise CharInvalidWorld(jdata["character_list"][0]["name"]["first"])
-                    else:
-                        faction = int(jdata["character_list"][0]["faction_id"])
-                        currId = jdata["character_list"][0]["character_id"]
-                        currName = jdata["character_list"][0]["name"]["first"]
-                        if currId in _namesChecking[faction-1]:
-                            p = _namesChecking[faction-1][currId]
-                            if p != self:
-                                raise CharAlreadyExists(currName, p.id)
-                        newIds[faction-1] = currId
-                        updated = updated or newIds[faction-1] != self._igIds[faction-1]
-                        newNames[faction-1] = jdata["character_list"][0]["name"]["first"]
-                except IndexError:
-                    raise UnexpectedError("IndexError when setting player name: "+iName) # Should not happen, we checked earlier
-                except KeyError:
-                    raise UnexpectedError("KeyError when setting player name: "+iName) # Don't know when this should happen either
+            try:
+                if jdata["returned"]==0:
+                    raise CharNotFound(iName)
+            except KeyError:
+                raise ApiNotReachable(url)
+            try:
+                world = int(jdata["character_list"][0]["world_id"])
+                if world != WORLD_ID:
+                    raise CharInvalidWorld(jdata["character_list"][0]["name"]["first"])
+                else:
+                    faction = int(jdata["character_list"][0]["faction_id"])
+                    currId = jdata["character_list"][0]["character_id"]
+                    currName = jdata["character_list"][0]["name"]["first"]
+                    if currId in _namesChecking[faction-1]:
+                        p = _namesChecking[faction-1][currId]
+                        if p != self:
+                            raise CharAlreadyExists(currName, p.id)
+                    newIds[faction-1] = currId
+                    updated = updated or newIds[faction-1] != self._igIds[faction-1]
+                    newNames[faction-1] = jdata["character_list"][0]["name"]["first"]
+            except IndexError:
+                raise UnexpectedError("IndexError when setting player name: "+iName) # Should not happen, we checked earlier
+            except KeyError:
+                raise UnexpectedError("KeyError when setting player name: "+iName) # Don't know when this should happen either
         for i in range(len(newIds)):
             if newIds[i] == 0:
                 raise CharMissingFaction(cfg.factions[i+1])

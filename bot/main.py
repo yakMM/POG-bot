@@ -19,7 +19,7 @@ import modules.config as cfg
 from modules.display import send, channelSend, edit
 from modules.display import init as displayInit
 from modules.spam import isSpam, unlock
-from modules.exceptions import ElementNotFound
+from modules.exceptions import ElementNotFound, UnexpectedError
 from modules.database import init as dbInit, getAllPlayers, getAllMaps
 from modules.enumerations import PlayerStatus
 from modules.tools import isAdmin
@@ -100,9 +100,9 @@ def _addMainHandlers(client):
                 channelId = cfg.discord_ids[cogName]
                 channelStr = ""
                 if isinstance(channelId, list):
-                    channelStr = " channels " + ", ".join(f'<#{id}>' for id in channelId)
+                    channelStr = "channels " + ", ".join(f'<#{id}>' for id in channelId)
                 else:
-                    channelStr = f' channel <#{channelId}>'
+                    channelStr = f'channel <#{channelId}>'
                 await send("WRONG_CHANNEL", ctx, ctx.command.name, channelStr) # Send the use back to the right channel
             except KeyError: # Should not happen
                 await send("UNKNOWN_ERROR", ctx, "Channel key error")
@@ -111,7 +111,10 @@ def _addMainHandlers(client):
         if isinstance(error, commands.errors.InvalidEndOfQuotedStringError) or isinstance(error, commands.errors.ExpectedClosingQuoteError) or isinstance(error, commands.errors.UnexpectedQuoteError):
             await send("INVALID_STR", ctx, '"') # Tell the user not to use quotes
             return
-        await send("UNKNOWN_ERROR", ctx, type(error.original).__name__) # Print unhandled error
+        if isinstance(error.original, UnexpectedError):
+            await send("UNKNOWN_ERROR", ctx, error.original.reason)
+        else:
+            await send("UNKNOWN_ERROR", ctx, type(error.original).__name__) # Print unhandled error
         raise error
 
     # Reaction update handler (for rule acceptance)
@@ -126,14 +129,17 @@ def _addMainHandlers(client):
             global rulesMsg
             if str(payload.emoji) == "✅":
                 try:
-                    getPlayer(payload.member.id)
+                    p = getPlayer(payload.member.id)
                 except ElementNotFound: # if new player
-                    Player(payload.member.name, payload.member.id) # create a new profile
+                    p = Player(payload.member.name, payload.member.id) # create a new profile
+                if p.status == PlayerStatus.IS_NOT_REGISTERED:
                     await channelSend("REG_RULES", cfg.discord_ids["register"], payload.member.mention) # they can now register
-                    registered = payload.member.guild.get_role(cfg.discord_ids["registered_role"])
-                    info = payload.member.guild.get_role(cfg.discord_ids["info_role"])
+                registered = payload.member.guild.get_role(cfg.discord_ids["registered_role"])
+                info = payload.member.guild.get_role(cfg.discord_ids["info_role"])
+                notify = payload.member.guild.get_role(cfg.discord_ids["notify_role"])
+                if notify not in payload.member.roles and registered not in payload.member.roles:
                     await payload.member.add_roles(registered)
-                    await payload.member.remove_roles(info)
+                await payload.member.remove_roles(info)
 
             await rulesMsg.remove_reaction(payload.emoji, payload.member) # In any case remove the reaction, message is to stay clean
 

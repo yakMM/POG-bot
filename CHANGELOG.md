@@ -1,3 +1,10 @@
+# v1.0.8:
+- Fixed string when registering with a character already registered
+- Fixed roles issues when user would leave the server and come back
+- PS2 API error when registering a character is now clearly handled
+- Fixed lobby problems occuring when no match slot is available
+- freeze/unfreeze command is now working as expected
+
 # v1.0.7:
 - =map command should now work in all situations
 - Fixed match status message on faction selection

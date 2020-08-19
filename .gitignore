@@ -3,6 +3,7 @@ __pycache__/
 permissions.txt
 bot/test.py
 bot/test2.py
+bot/test3.py
 bot/others/
 bot/config_test.cfg
 bot/client_secret_test.json

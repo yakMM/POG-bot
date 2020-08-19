@@ -143,20 +143,23 @@ class AdminCog(commands.Cog, name='admin'):
     async def channel(self, ctx, *args):
         if len(args) == 1:
             arg = args[0]
+            memb = ctx.author
+            notify = memb.guild.get_role(cfg.discord_ids["notify_role"])
+            registered = memb.guild.get_role(cfg.discord_ids["registered_role"])
+            ov_notify = ctx.channel.overwrites_for(notify)
+            ov_registered = ctx.channel.overwrites_for(registered)
             if arg=="freeze":
-                memb = ctx.author
-                notify = memb.guild.get_role(cfg.discord_ids["notify_role"])
-                registered = memb.guild.get_role(cfg.discord_ids["registered_role"])
-                await ctx.channel.set_permissions(notify, send_messages=False)
-                await ctx.channel.set_permissions(registered, send_messages=False)
+                ov_notify.send_messages = False
+                ov_registered.send_messages = False
+                await ctx.channel.set_permissions(notify, overwrite=ov_notify)
+                await ctx.channel.set_permissions(registered, overwrite=ov_registered)
                 await send("BOT_FREEZED", ctx)
                 return
             if arg=="unfreeze":
-                memb = ctx.author
-                notify = memb.guild.get_role(cfg.discord_ids["notify_role"])
-                registered = memb.guild.get_role(cfg.discord_ids["registered_role"])
-                await ctx.channel.set_permissions(notify, send_messages=True)
-                await ctx.channel.set_permissions(registered, send_messages=True)
+                ov_notify.send_messages = True
+                ov_registered.send_messages = True
+                await ctx.channel.set_permissions(notify, overwrite=ov_notify)
+                await ctx.channel.set_permissions(registered, overwrite=ov_registered)
                 await send("BOT_UNFREEZED", ctx)
                 return
         await send("WRONG_USAGE", ctx, ctx.command.name)

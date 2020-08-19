@@ -113,7 +113,8 @@ def _lobbyHelp(msg):
                     , inline=False)
     if isAdmin(msg.author):
         embed.add_field(name="Staff Commands",
-                        value='`=clear` - Clear the lobby',
+                        value='`=clear` - Clear the lobby\n'
+                        '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                         inline=False)
     return embed
 
@@ -369,7 +370,7 @@ class _StringEnum(Enum):
     PK_NO_MAP = _Message("No map selected!")
 
     EXT_NOT_REGISTERED = _Message("You are not registered! Check <#{}>")
-    UNKNOWN_ERROR = _Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\nDetails:*{}*")
+    UNKNOWN_ERROR = _Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\nDetails: *{}*")
     STOP_SPAM = _Message("Please avoid spamming!")
     HELP = _Message("Available commands:",embed=_autoHelp)
     INVALID_COMMAND = _Message("Invalid command! Type `=help` for the list of available commands.")
@@ -379,6 +380,7 @@ class _StringEnum(Enum):
     NO_PERMISSION = _Message("The command `={}` can only be used by staff members!")
     CHANNEL_INIT = _Message("`Bot init`: Correctly hooked in channel <#{}>")
     INVALID_STR = _Message("You entered an invalid caracter! `{}`")
+    API_ERROR = _Message("Could not reach Planetside2 API, try again later!")
 
     BOT_UNLOCKED = _Message("Unlocked!")
     BOT_LOCKED = _Message("Locked!")
@@ -414,6 +416,9 @@ class _StringEnum(Enum):
     MAP_NOT_FOUND = _Message("Couldn't find a result for your search!")
     MAP_DISPLAY_LIST = _Message("Here are the maps found:", embed=_selectedMaps)
     MAP_SELECTED = _Message("The current map is **{}**")
+
+    MP_ADDED = _Message("Added {} to the map pool")
+    MP_REMOVED = _Message("Removed {} from the map pool")
 
     ACC_NOT_ENOUGH = _Message("Not enough accounts are available for this match!\n**Match has been canceled!**")
     ACC_UPDATE = _Message("", ping=False,embed=_account)

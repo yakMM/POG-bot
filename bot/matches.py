@@ -59,6 +59,7 @@ async def startMatchFromFullLobby():
         _lobbyStuck = True
         await channelSend("LB_STUCK", cfg.discord_ids["lobby"])
         return
+    _lobbyStuck = False
     match._setPlayerList(_lobbyList)
     for p in _lobbyList:
         p.match = match # Player status is modified automatically in IS_MATCHED
@@ -85,6 +86,7 @@ def clearLobby():
     for p in _lobbyList:
         p.status = PlayerStatus.IS_REGISTERED
     _lobbyList.clear()
+    _lobbyStuck = False
     return True
 
 
