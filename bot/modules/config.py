@@ -33,6 +33,28 @@ teamspeak_ids = {
     "ts_match_2_team_2": "",
 }
 
+audio_ids = {
+    "round_over": "",
+    "select_factions": "",
+    "select_map": "",
+    "select_teams": "",
+    "team_1_nc": "",
+    "team_1_tr": "",
+    "team_1_vs": "",
+    "team_2_nc": "",
+    "team_2_tr": "",
+    "team_2_vs": "",
+    "type_ready": "",
+    "5s": "",
+    "10s": "",
+    "30s": "",
+    "drop_match_1_picks": "",
+    "drop_match_2_picks": "",
+    "gelos_in_prison": "",
+    "map_selected": "",
+    "players_drop_channel": ""
+}
+
 ## General
 
 general = {
@@ -147,6 +169,17 @@ def getConfig(file):
             _errorMissing(key, 'Teamspeak_Ids', file)
         except ValueError:
             _errorIncorrect(key, 'Teamspeak_Ids', file)
+
+    # Audio_Ids section
+    _checkSection(config, "Audio_Ids", file)
+
+    for key in audio_ids:
+        try:
+            audio_ids[key] = config['Audio_Ids'][key]
+        except KeyError:
+            _errorMissing(key, 'Audio_Ids', file)
+        except ValueError:
+            _errorIncorrect(key, 'Audio_Ids', file)
 
     # Database section
     _checkSection(config, "Database", file)

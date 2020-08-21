@@ -13,6 +13,8 @@ from discord import Status, DMChannel
 from asyncio import sleep
 from random import seed
 from datetime import datetime as dt
+import logging
+from modules import ts3
 
 # Custom modules
 import modules.config as cfg
@@ -138,8 +140,8 @@ def _addMainHandlers(client):
                     await payload.member.add_roles(registered)
                     await payload.member.remove_roles(info)
 
-            await rulesMsg.remove_reaction(payload.emoji,
-                                           payload.member)  # In any case remove the reaction, message is to stay clean
+            await rulesMsg.remove_reaction(payload.emoji, payload.member)
+            # In any case remove the reaction, message is to stay clean
 
     # Reaction update handler (for accounts)
     @client.event
@@ -179,6 +181,8 @@ def _addMainHandlers(client):
 
 
 def main(launchStr=""):
+    logging.basicConfig(level="INFO")
+
     # Init order MATTERS
 
     # Seeding random generator
@@ -186,6 +190,9 @@ def main(launchStr=""):
 
     # Get data from the config file
     cfg.getConfig(f"config{launchStr}.cfg")
+
+    # Initialize teamspeak bots
+    ts3.init()
 
     # Set up command prefix
     client = commands.Bot(command_prefix=cfg.general["command_prefix"])
@@ -217,8 +224,8 @@ def main(launchStr=""):
     # Run server
     client.run(cfg.general["token"])
 
-
 if __name__ == "__main__":
+    logging.basicConfig(level="INFO")
     # execute only if run as a script
     # Use main() for production
     main("")
