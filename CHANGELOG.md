@@ -1,3 +1,9 @@
+# v1.0.9:
+- Updated Jaeger Calendar Link
+- Current UTC time is now displayed along Jaeger Calendar link
+- Speculative fix for "ghost" matches
+- Bot will now ping @Notify when queue is almost full
+
 # v1.0.8:
 - Fixed string when registering with a character already registered
 - Fixed roles issues when user would leave the server and come back

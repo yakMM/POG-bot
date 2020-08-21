@@ -19,6 +19,9 @@ Import this module and use only the following public function:
 from discord import Embed, Color, TextChannel, Message, User
 from discord.ext.commands import Context
 
+from datetime import datetime as dt
+from datetime import timezone as tz
+
 # Others
 from enum import Enum
 
@@ -265,8 +268,12 @@ def _teamUpdate(arg, match):
     return embed
 
 def _jaegerCalendar(arg):
-    embed = Embed(colour=Color.blue(), title="Jaeger Calendar", url = "https://docs.google.com/spreadsheets/d/1dS8dMz8FhxnSBxPs3gfj_L5PsFzC8mtHHMlUkNYtjEI/",
+    embed = Embed(colour=Color.blue(), title="Jaeger Calendar", url = "https://docs.google.com/spreadsheets/d/1eA4ybkAiz-nv_mPxu_laL504nwTDmc-9GnsojnTiSRE",
     description = "Pick a base currently available in the calendar!")
+    date = dt.now(tz.utc)
+    embed.add_field(name = "Current UTC time",
+                        value = date.strftime("%Y-%m-%d %H:%M UTC"),
+                        inline=False)
     return embed
 
 class _Message():
@@ -344,6 +351,7 @@ class _StringEnum(Enum):
     LB_WENT_INACTIVE = _Message("{} was removed from the lobby because they went offline!",embed=_lobbyList)
     LB_CLEARED = _Message("Lobby has been cleared!", embed=_lobbyList)
     LB_EMPTY = _Message("Lobby is already empty!")
+    LB_NOTIFY = _Message("{} queue is almost full, join to start a match!")
 
     PK_OVER = _Message("The teams are already made. You can't pick!")
     PK_NO_LOBBIED = _Message("You must first queue and wait for a match to begin. Check <#{}>")
