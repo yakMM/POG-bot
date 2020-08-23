@@ -1,5 +1,6 @@
 # discord.py
 from discord.ext import commands
+from logging import getLogger
 
 # Custom classes
 from classes.players import Player, getPlayer
@@ -12,6 +13,7 @@ from modules.tools import isAlNum
 from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
 from modules.database import update as dbUpdate
 
+log = getLogger(__name__)
 
 class registerCog(commands.Cog, name='register'):
     """
@@ -23,7 +25,7 @@ class registerCog(commands.Cog, name='register'):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print('Register Cog is online')
+        log.info('Register Cog is online')
         return # we don't display a message on each restart
         try:
             await channelSend("CHANNEL_INIT", cfg.discord_ids["register"], cfg.discord_ids["register"])

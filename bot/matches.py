@@ -12,6 +12,9 @@ from classes.accounts import AccountHander #ok
 from random import choice as randomChoice
 from lib import tasks
 from asyncio import sleep
+from logging import getLogger
+
+log = getLogger(__name__)
 
 _lobbyList = list()
 _lobbyStuck = False
@@ -222,7 +225,7 @@ class Match():
             if p.hasOwnAccount:
                 continue
             if p.account == None:
-                print(f"Debug: {p.name} has no account")
+                log.error(f"Debug: {p.name} has no account")
             if p.account.isValidated:
                 continue
             notReady.append(p.mention)

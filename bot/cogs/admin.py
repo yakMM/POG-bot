@@ -1,4 +1,5 @@
 from discord.ext import commands
+from logging import getLogger
 
 import modules.config as cfg
 from modules.enumerations import SelStatus, MatchStatus, PlayerStatus
@@ -13,6 +14,7 @@ from classes.players import removePlayer, getPlayer
 from matches import clearLobby, getMatch, getAllNamesInLobby, removeFromLobby
 
 
+log = getLogger(__name__)
 
 class AdminCog(commands.Cog, name='admin'):
     """
@@ -24,7 +26,7 @@ class AdminCog(commands.Cog, name='admin'):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print('Admin Cog is online')
+        log.info('Admin Cog is online')
 
     async def cog_check(self, ctx):
         return isAdmin(ctx.author)

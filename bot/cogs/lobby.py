@@ -1,5 +1,6 @@
 from discord.ext import commands
 from discord import Status as discordStatus
+from logging import getLogger
 
 from modules.display import send, channelSend
 import modules.config as cfg
@@ -8,6 +9,8 @@ from modules.exceptions import UnexpectedError, ElementNotFound, LobbyStuck
 from classes.players import PlayerStatus, getPlayer
 
 from matches import getLobbyLen, isLobbyStuck, removeFromLobby, addToLobby, getAllNamesInLobby
+
+log = getLogger(__name__)
 
 class LobbyCog(commands.Cog, name='lobby'):
     """
@@ -19,7 +22,7 @@ class LobbyCog(commands.Cog, name='lobby'):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print('Lobby Cog is online')
+        log.info('Lobby Cog is online')
         return # we don't display a message on each restart
         try:
             await channelSend("CHANNEL_INIT", cfg.discord_ids["lobby"], cfg.discord_ids["lobby"])

@@ -13,6 +13,9 @@ from discord import Status, DMChannel
 from asyncio import sleep
 from random import seed
 from datetime import datetime as dt
+import logging
+from time import gmtime
+from logging.handlers import RotatingFileHandler
 
 # Custom modules
 import modules.config as cfg
@@ -55,7 +58,7 @@ def _addMainHandlers(client):
             await client.process_commands(message)
             return
         if isinstance(message.channel, DMChannel): # if dm, print in console and ignore the message
-            print(message.author.name + ": " +message.content)
+            logging.info(message.author.name + ": " +message.content)
             return
         if message.channel.id not in (cfg.discord_ids["lobby"], cfg.discord_ids["register"], *cfg.discord_ids["matches"]):
             return
@@ -73,7 +76,7 @@ def _addMainHandlers(client):
     # on ready
     @client.event
     async def on_ready():
-        print('Client is online')
+        logging.info('Client is online')
 
         # fetch rule message, remove all reaction but the bot's
         global rulesMsg
@@ -187,6 +190,17 @@ def _test(client):
 
 
 def main(launchStr=""):
+
+    # Logging config
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    logging.Formatter.converter = gmtime
+    formatter = logging.Formatter('%(asctime)s | %(levelname)s %(message)s', "%Y-%m-%d %H:%M:%S UTC")
+    file_handler = RotatingFileHandler('../logging/bot_log.out', 'a', 1000000, 1)
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
     # Init order MATTERS
 
     # Seeding random generator
@@ -231,5 +245,5 @@ def main(launchStr=""):
 if __name__ == "__main__":
     # execute only if run as a script
     # Use main() for production
-    #main("_test")
-    main()
+    main("_test")
+    #main()

@@ -14,6 +14,7 @@ from datetime import datetime as dt
 #from discord.ext import tasks
 from lib import tasks
 from asyncio import get_event_loop
+from logging import getLogger
 
 # Custom modules
 import modules.config as cfg
@@ -23,6 +24,8 @@ from modules.exceptions import AccountsNotEnough
 X_OFFSET=3
 Y_OFFSET=3
 QUIT_DELAY = 300
+
+log = getLogger(__name__)
 
 
 class Account():
@@ -176,13 +179,13 @@ class AccountHander():
         """ Push updates to the google sheet
         """
         loop = get_event_loop()
-        print(f"GSpread loop on match: {self.__match.number}")
+        log.info(f"GSpread loop on match: {self.__match.number}")
         try:
             await loop.run_in_executor(None, self.__pushUpdateToSheet, row, vRow)
         except APIError as e:
-            print(f"GSpread APIError on match: {self.__match.number}\n{e}")
+            log.info(f"GSpread APIError on match: {self.__match.number}\n{e}")
             return
-        print(f"GSpread ok on match: {self.__match.number}")
+        log.info(f"GSpread ok on match: {self.__match.number}")
         self._updateSheet.cancel()
 
     def __pushUpdateToSheet(self, row, vRow):

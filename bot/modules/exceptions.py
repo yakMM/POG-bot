@@ -4,9 +4,9 @@
 # TODO: Implement proper logging?
 
 # Others:
-from logging import error
-from datetime import datetime as dt
-from datetime import timezone as tz
+from logging import getLogger
+
+log = getLogger(__name__)
 
 class CharNotFound(Exception):
     def __init__(self, char):
@@ -39,8 +39,7 @@ class UnexpectedError(Exception):
     def __init__(self, msg):
         self.reason = msg
         message = "Encountered unexpected error: "+msg
-        date = dt.now(tz.utc)
-        error(date.strftime("%Y-%m-%d %H:%M:%S UTC ") + message)
+        log.error(message)
         super().__init__(message)
 
 class ConfigError(Exception):
@@ -85,6 +84,5 @@ class ApiNotReachable(Exception):
     def __init__(self, url):
         self.url = url
         message = f"Cannot reach Api ({url})!"
-        date = dt.now(tz.utc)
-        error(date.strftime("%Y-%m-%d %H:%M:%S UTC ") + message)
+        log.error(message)
         super().__init__(message)

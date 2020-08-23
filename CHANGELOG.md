@@ -3,6 +3,7 @@
 - Current UTC time is now displayed along Jaeger Calendar link
 - Speculative fix for "ghost" matches
 - Bot will now ping @Notify when queue is almost full
+- Added logging in file
 
 # v1.0.8:
 - Fixed string when registering with a character already registered

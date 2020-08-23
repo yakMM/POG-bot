@@ -1,5 +1,6 @@
 from discord.ext import commands
 import discord
+from logging import getLogger
 
 import modules.config as cfg
 from modules.display import send, channelSend
@@ -12,7 +13,7 @@ from classes.maps import MapSelection
 from matches import getMatch
 from modules.enumerations import MatchStatus, SelStatus
 
-globId=0
+log = getLogger(__name__)
 
 class MatchesCog(commands.Cog, name='matches'):
     """
@@ -25,7 +26,7 @@ class MatchesCog(commands.Cog, name='matches'):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print('Matches Cog is online')
+        log.info('Matches Cog is online')
         return # we don't display a message on each restart
         try:
             for id in cfg.discord_ids["matches"]:
