@@ -12,6 +12,9 @@ from classes.accounts import AccountHander #ok
 from random import choice as randomChoice
 from lib import tasks
 from asyncio import sleep
+from logging import getLogger
+
+log = getLogger(__name__)
 
 _lobbyList = list()
 _lobbyStuck = False
@@ -31,7 +34,15 @@ def addToLobby(player):
     _lobbyList.append(player)
     player.status = PlayerStatus.IS_LOBBIED
     if len(_lobbyList) == cfg.general["lobby_size"]:
+        _autoPing.cancel()
         startMatchFromFullLobby.start()
+    elif len(_lobbyList) >= cfg.general["lobby_size"] - 4:
+        if not _autoPing.is_running():
+            _autoPing.start()
+
+@tasks.loop(seconds=100, delay=1, count=2)
+async def _autoPing():
+    await channelSend("LB_NOTIFY", cfg.discord_ids["lobby"], f'<@&{cfg.discord_ids["notify_role"]}>')
 
 def getLobbyLen():
     return len(_lobbyList)
@@ -41,15 +52,19 @@ def getAllNamesInLobby():
     return names
 
 def removeFromLobby(player):
-    global _lobbyStuck
     _lobbyList.remove(player)
-    _lobbyStuck = False
+    _onLobbyRemove()
     player.status = PlayerStatus.IS_REGISTERED
 
 def _onMatchFree():
     if len(_lobbyList) == cfg.general["lobby_size"]:
         startMatchFromFullLobby.start()
 
+def _onLobbyRemove():
+    global _lobbyStuck
+    _lobbyStuck = False
+    if len(_lobbyList) < cfg.general["lobby_size"]-4:
+        _autoPing.cancel()
 
 @tasks.loop(count=1)
 async def startMatchFromFullLobby():
@@ -57,8 +72,10 @@ async def startMatchFromFullLobby():
     match = _findSpotForMatch()
     if match == None:
         _lobbyStuck = True
+        _autoPing.cancel()
         await channelSend("LB_STUCK", cfg.discord_ids["lobby"])
         return
+    _lobbyStuck = False
     match._setPlayerList(_lobbyList)
     for p in _lobbyList:
         p.match = match # Player status is modified automatically in IS_MATCHED
@@ -85,6 +102,7 @@ def clearLobby():
     for p in _lobbyList:
         p.status = PlayerStatus.IS_REGISTERED
     _lobbyList.clear()
+    _onLobbyRemove()
     return True
 
 
@@ -168,7 +186,8 @@ class Match():
 
     def confirmMap(self):
         self.__mapSelector.confirm()
-        self.__ready.start()
+        if self.__status == MatchStatus.IS_MAPPING:
+            self.__ready.start()
 
     def pickMap(self, captain):
         if self.__mapSelector.status == SelStatus.IS_SELECTED:
@@ -206,7 +225,7 @@ class Match():
             if p.hasOwnAccount:
                 continue
             if p.account == None:
-                print(f"Debug: {p.name} has no account")
+                log.error(f"Debug: {p.name} has no account")
             if p.account.isValidated:
                 continue
             notReady.append(p.mention)
@@ -238,7 +257,7 @@ class Match():
         for tm in self.__teams:
             tm.captain.isTurn = True
         if self.__mapSelector.status == SelStatus.IS_CONFIRMED:
-            await channelSend("MATCH_MAP_AUTO", self.__id, self.__map.name)
+            await channelSend("MATCH_MAP_AUTO", self.__id, self.__mapSelector.map.name)
             self.__ready.start()
             return
         captainPings = [tm.captain.mention for tm in self.__teams]
@@ -261,7 +280,7 @@ class Match():
         await channelSend("MATCH_CONFIRM", self.__id, *captainPings, match=self)
 
     @tasks.loop(minutes=cfg.ROUND_LENGHT, delay=1, count=2)
-    async def __onMatchOver(self):
+    async def _onMatchOver(self):
         playerPings = [tm.allPings for tm in self.__teams]
         await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
         for tm in self.__teams:
@@ -288,7 +307,7 @@ class Match():
         await channelSend("MATCH_STARTED", self.__id, *playerPings, self.roundNo)
         self.__roundsStamps.append(int(dt.timestamp(dt.now())))
         self.__status = MatchStatus.IS_PLAYING
-        self.__onMatchOver.start()
+        self._onMatchOver.start()
 
 
     @tasks.loop(count=1)
@@ -309,7 +328,7 @@ class Match():
         Team and ActivePlayer objects should get garbage collected, nothing is referencing them anymore"""
 
         if self.status == MatchStatus.IS_PLAYING:
-            self.__onMatchOver.cancel()
+            self._onMatchOver.cancel()
             playerPings = [tm.allPings for tm in self.__teams]
             await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
             await channelSend("MATCH_OVER", self.__id)

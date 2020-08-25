@@ -4,9 +4,9 @@
 # TODO: Implement proper logging?
 
 # Others:
-from logging import error
-from datetime import datetime as dt
-from datetime import timezone as tz
+from logging import getLogger
+
+log = getLogger(__name__)
 
 class CharNotFound(Exception):
     def __init__(self, char):
@@ -37,11 +37,10 @@ class CharMissingFaction(Exception):
 
 class UnexpectedError(Exception):
     def __init__(self, msg):
-        self.message = "Encountered unexpected error: "+msg
         self.reason = msg
-        date = dt.now(tz.utc)
-        error(date.strftime("%Y-%m-%d %H:%M:%S %z ") + self.message)
-        super().__init__(self.message)
+        message = "Encountered unexpected error: "+msg
+        log.error(message)
+        super().__init__(message)
 
 class ConfigError(Exception):
     def __init__(self, msg):
@@ -50,13 +49,14 @@ class ConfigError(Exception):
 
 class DatabaseError(Exception):
     def __init__(self, msg):
-        self.message = "Error in user database: "+msg
-        super().__init__(self.message)
+        message = "Error in user database: "+msg
+        super().__init__(message)
 
 class StatusNotAllowed(Exception):
     def __init__(self, name):
-        self.message = "This status is not allowed: "+name
-        super().__init__(self.message)
+        self.name = name
+        message = "This status is not allowed: "+name
+        super().__init__(message)
 
 class AccountsNotEnough(Exception):
     pass
@@ -79,3 +79,10 @@ class AlreadyExists(Exception):
 class LobbyStuck(Exception):
     def __init__(self):
         super().__init__(f"Lobby stuck!")
+
+class ApiNotReachable(Exception):
+    def __init__(self, url):
+        self.url = url
+        message = f"Cannot reach Api ({url})!"
+        log.error(message)
+        super().__init__(message)

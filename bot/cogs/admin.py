@@ -1,4 +1,5 @@
 from discord.ext import commands
+from logging import getLogger
 
 import modules.config as cfg
 from modules.enumerations import SelStatus, MatchStatus, PlayerStatus
@@ -13,6 +14,7 @@ from classes.players import removePlayer, getPlayer
 from matches import clearLobby, getMatch, getAllNamesInLobby, removeFromLobby
 
 
+log = getLogger(__name__)
 
 class AdminCog(commands.Cog, name='admin'):
     """
@@ -24,7 +26,7 @@ class AdminCog(commands.Cog, name='admin'):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print('Admin Cog is online')
+        log.info('Admin Cog is online')
 
     async def cog_check(self, ctx):
         return isAdmin(ctx.author)
@@ -137,7 +139,32 @@ class AdminCog(commands.Cog, name='admin'):
             await send("BOT_UNLOCKED", ctx)
             return
         await send("WRONG_USAGE", ctx, ctx.command.name)
-        return
+
+    @commands.command()
+    @commands.guild_only()
+    async def channel(self, ctx, *args):
+        if len(args) == 1:
+            arg = args[0]
+            memb = ctx.author
+            notify = memb.guild.get_role(cfg.discord_ids["notify_role"])
+            registered = memb.guild.get_role(cfg.discord_ids["registered_role"])
+            ov_notify = ctx.channel.overwrites_for(notify)
+            ov_registered = ctx.channel.overwrites_for(registered)
+            if arg=="freeze":
+                ov_notify.send_messages = False
+                ov_registered.send_messages = False
+                await ctx.channel.set_permissions(notify, overwrite=ov_notify)
+                await ctx.channel.set_permissions(registered, overwrite=ov_registered)
+                await send("BOT_FREEZED", ctx)
+                return
+            if arg=="unfreeze":
+                ov_notify.send_messages = True
+                ov_registered.send_messages = True
+                await ctx.channel.set_permissions(notify, overwrite=ov_notify)
+                await ctx.channel.set_permissions(registered, overwrite=ov_registered)
+                await send("BOT_UNFREEZED", ctx)
+                return
+        await send("WRONG_USAGE", ctx, ctx.command.name)
 
 
 def setup(client):

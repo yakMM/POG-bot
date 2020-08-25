@@ -13,13 +13,16 @@ from discord import Status, DMChannel
 from asyncio import sleep
 from random import seed
 from datetime import datetime as dt
+import logging
+from time import gmtime
+from logging.handlers import RotatingFileHandler
 
 # Custom modules
 import modules.config as cfg
 from modules.display import send, channelSend, edit
 from modules.display import init as displayInit
 from modules.spam import isSpam, unlock
-from modules.exceptions import ElementNotFound
+from modules.exceptions import ElementNotFound, UnexpectedError
 from modules.database import init as dbInit, getAllPlayers, getAllMaps
 from modules.enumerations import PlayerStatus
 from modules.tools import isAdmin
@@ -55,7 +58,7 @@ def _addMainHandlers(client):
             await client.process_commands(message)
             return
         if isinstance(message.channel, DMChannel): # if dm, print in console and ignore the message
-            print(message.author.name + ": " +message.content)
+            logging.info(message.author.name + ": " +message.content)
             return
         if message.channel.id not in (cfg.discord_ids["lobby"], cfg.discord_ids["register"], *cfg.discord_ids["matches"]):
             return
@@ -73,7 +76,7 @@ def _addMainHandlers(client):
     # on ready
     @client.event
     async def on_ready():
-        print('Client is online')
+        logging.info('Client is online')
 
         # fetch rule message, remove all reaction but the bot's
         global rulesMsg
@@ -100,9 +103,9 @@ def _addMainHandlers(client):
                 channelId = cfg.discord_ids[cogName]
                 channelStr = ""
                 if isinstance(channelId, list):
-                    channelStr = " channels " + ", ".join(f'<#{id}>' for id in channelId)
+                    channelStr = "channels " + ", ".join(f'<#{id}>' for id in channelId)
                 else:
-                    channelStr = f' channel <#{channelId}>'
+                    channelStr = f'channel <#{channelId}>'
                 await send("WRONG_CHANNEL", ctx, ctx.command.name, channelStr) # Send the use back to the right channel
             except KeyError: # Should not happen
                 await send("UNKNOWN_ERROR", ctx, "Channel key error")
@@ -111,7 +114,10 @@ def _addMainHandlers(client):
         if isinstance(error, commands.errors.InvalidEndOfQuotedStringError) or isinstance(error, commands.errors.ExpectedClosingQuoteError) or isinstance(error, commands.errors.UnexpectedQuoteError):
             await send("INVALID_STR", ctx, '"') # Tell the user not to use quotes
             return
-        await send("UNKNOWN_ERROR", ctx, type(error.original).__name__) # Print unhandled error
+        if isinstance(error.original, UnexpectedError):
+            await send("UNKNOWN_ERROR", ctx, error.original.reason)
+        else:
+            await send("UNKNOWN_ERROR", ctx, type(error.original).__name__) # Print unhandled error
         raise error
 
     # Reaction update handler (for rule acceptance)
@@ -126,14 +132,17 @@ def _addMainHandlers(client):
             global rulesMsg
             if str(payload.emoji) == "✅":
                 try:
-                    getPlayer(payload.member.id)
+                    p = getPlayer(payload.member.id)
                 except ElementNotFound: # if new player
-                    Player(payload.member.name, payload.member.id) # create a new profile
+                    p = Player(payload.member.name, payload.member.id) # create a new profile
+                if p.status == PlayerStatus.IS_NOT_REGISTERED:
                     await channelSend("REG_RULES", cfg.discord_ids["register"], payload.member.mention) # they can now register
-                    registered = payload.member.guild.get_role(cfg.discord_ids["registered_role"])
-                    info = payload.member.guild.get_role(cfg.discord_ids["info_role"])
+                registered = payload.member.guild.get_role(cfg.discord_ids["registered_role"])
+                info = payload.member.guild.get_role(cfg.discord_ids["info_role"])
+                notify = payload.member.guild.get_role(cfg.discord_ids["notify_role"])
+                if notify not in payload.member.roles and registered not in payload.member.roles:
                     await payload.member.add_roles(registered)
-                    await payload.member.remove_roles(info)
+                await payload.member.remove_roles(info)
 
             await rulesMsg.remove_reaction(payload.emoji, payload.member) # In any case remove the reaction, message is to stay clean
 
@@ -181,6 +190,17 @@ def _test(client):
 
 
 def main(launchStr=""):
+
+    # Logging config
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    logging.Formatter.converter = gmtime
+    formatter = logging.Formatter('%(asctime)s | %(levelname)s %(message)s', "%Y-%m-%d %H:%M:%S UTC")
+    file_handler = RotatingFileHandler('../logging/bot_log.out', 'a', 1000000, 1)
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
     # Init order MATTERS
 
     # Seeding random generator
@@ -225,5 +245,5 @@ def main(launchStr=""):
 if __name__ == "__main__":
     # execute only if run as a script
     # Use main() for production
-    main("_test")
-    #main()
+    #main("_test")
+    main()

@@ -1,5 +1,6 @@
 # discord.py
 from discord.ext import commands
+from logging import getLogger
 
 # Custom classes
 from classes.players import Player, getPlayer
@@ -9,9 +10,10 @@ import modules.config as cfg
 from modules.enumerations import PlayerStatus
 from modules.display import channelSend, send
 from modules.tools import isAlNum
-from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists
+from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
 from modules.database import update as dbUpdate
 
+log = getLogger(__name__)
 
 class registerCog(commands.Cog, name='register'):
     """
@@ -23,7 +25,7 @@ class registerCog(commands.Cog, name='register'):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print('Register Cog is online')
+        log.info('Register Cog is online')
         return # we don't display a message on each restart
         try:
             await channelSend("CHANNEL_INIT", cfg.discord_ids["register"], cfg.discord_ids["register"])
@@ -123,10 +125,13 @@ async def _register(player, ctx, args):
             await send("REG_MISSING_FACTION",ctx,e.faction)
             return
         except CharAlreadyExists as e:
-            await send("REG_ALREADY_EXIST",ctx,e.char, f"<@{e.id}")
+            await send("REG_ALREADY_EXIST",ctx,e.char, f"<@{e.id}>")
             return
-        except UnexpectedError:
-            await send("UNKNOWN_ERROR",ctx,"Reg error, check logs")
+        except ApiNotReachable:
+            await send("API_ERROR",ctx)
+            return
+        except UnexpectedError as e:
+            await send("UNKNOWN_ERROR",ctx,e.reason)
             return
     if len(args) == 2: # if 2 args, it should be "no account", if not, invalid request. Again, check if update and push db if that's the case
         if args[0]=="no" and args[1]=="account":

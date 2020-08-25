@@ -3,10 +3,12 @@ __pycache__/
 permissions.txt
 bot/test.py
 bot/test2.py
+bot/test3.py
 bot/others/
 bot/config_test.cfg
 bot/client_secret_test.json
 bot/secret/
+logging/*
 bot/.idea/bot.iml
 bot/.idea/inspectionProfiles/profiles_settings.xml
 bot/.idea/inspectionProfiles/Project_Default.xml
@@ -14,10 +16,12 @@ bot/.idea/misc.xml
 bot/.idea/modules.xml
 bot/.idea/vcs.xml
 bot/.idea/workspace.xml
-bot/client_secret.json
+accounts_sheet_template.xlsx
+bot/client_secret_template.json
 bot/config.cfg
 POG-Bot-v3.ppk
+POG-Bot-v3
 sinusbot login - POG-Bot-v3.txt
 secret/config.cfg
 secret/client_secret.json
-POG-Bot-v3
+bot/client_secret.json
