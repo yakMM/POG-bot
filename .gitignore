@@ -7,3 +7,14 @@ bot/others/
 bot/config_test.cfg
 bot/client_secret_test.json
 bot/secret/
+bot/.idea/bot.iml
+bot/.idea/inspectionProfiles/profiles_settings.xml
+bot/.idea/inspectionProfiles/Project_Default.xml
+bot/.idea/misc.xml
+bot/.idea/modules.xml
+bot/.idea/vcs.xml
+bot/.idea/workspace.xml
+bot/client_secret.json
+bot/config.cfg
+POG-Bot-v3.ppk
+sinusbot login - POG-Bot-v3.txt
