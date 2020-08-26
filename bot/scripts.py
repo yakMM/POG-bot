@@ -8,7 +8,7 @@ import requests
 import json
 import asyncio
 
-LAUNCHSTR = "_test" # this should be empty if your files are config.cfg and client_secret.json
+LAUNCHSTR = ""  # this should be empty if your files are config.cfg and client_secret.json
 
 cfg.getConfig(f"config{LAUNCHSTR}.cfg")
 dbInit(cfg.database)
@@ -46,8 +46,6 @@ def pushAccounts():
 
 
 def getAllMapsFromApi():
-
-
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2/map_region/?c:limit=400&c:show=facility_id,facility_name,zone_id,facility_type_id'
     response = requests.get(url)
     jdata=json.loads(response.content)
@@ -57,7 +55,11 @@ def getAllMapsFromApi():
         return
 
     for mp in jdata["map_region_list"]:
+        print(mp)
         mp["_id"] = int(mp.pop("facility_id"))
         mp["zone_id"] = int(mp.pop("zone_id"))
         mp["type_id"] = int(mp.pop("facility_type_id"))
     forceBasesUpdate(jdata["map_region_list"])
+
+pushAccounts()
+getAllMapsFromApi()
