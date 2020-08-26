@@ -46,7 +46,7 @@ function my_update
     cd ..
     git clean -xdf
     git fetch --all
-    git reset --hard origin/master
+    git reset --hard
 
     chmod a+x commands/*
     cp ../secret/* bot/
