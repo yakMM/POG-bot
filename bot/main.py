@@ -171,7 +171,7 @@ def _addMainHandlers(client):
             return
         # If we reach this point, we know player has been given an account
         account = player.active.account
-        if reaction.message.id != account.message.id:  # chack if it's the right message
+        if reaction.message.id != account.message.id:  # check if it's the right message
             return
         if account.isValidated:  # Check if user didn't already react
             return
