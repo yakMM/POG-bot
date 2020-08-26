@@ -7,4 +7,8 @@ secret/*
 bot/.idea/*
 bot/config.cfg
 bot/client_secret.json
-sinusbot login - POG-Bot-v3.txt
+
+bot/test.py	
+bot/test2.py	
+bot/others/	
+bot/secret/
