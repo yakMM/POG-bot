@@ -91,13 +91,13 @@ async def startMatchFromFullLobby():
     # ts3: lobby full
     if match.id == cfg.discord_ids["matches"][0]:  # if match 1
         ts3.bot1.move(cfg.teamspeak_ids["ts_lobby"])  # IF IT HANGS HERE MAKE SURE webapi.js IS ENABLED FOR SINUSBOT
-        ts3.bot1.enqueue(ts3.AUDIO_ID_DROP_MATCH_1_PICKS)
+        ts3.bot1.enqueue(cfg.audio_ids["drop_match_1_picks"])
         await channelSend("LB_MATCH_STARTING", cfg.discord_ids["lobby"], match.id)
         await sleep(8)
         ts3.bot1.move(cfg.teamspeak_ids["ts_match_1_picks"])
     elif match.id == cfg.discord_ids["matches"][1]:  # if match 2
         ts3.bot2.move(cfg.teamspeak_ids["ts_lobby"])
-        ts3.bot2.enqueue(ts3.AUDIO_ID_DROP_MATCH_2_PICKS)
+        ts3.bot2.enqueue(cfg.audio_ids["drop_match_2_picks"])
         await channelSend("LB_MATCH_STARTING", cfg.discord_ids["lobby"], match.id)
         await sleep(8)
         ts3.bot2.move(cfg.teamspeak_ids["ts_match_2_picks"])
@@ -254,7 +254,7 @@ class Match:
         ts3bot = which_bot(self.__id)
         pick_channel = which_pick_channels(self.__id)
         ts3bot.move(pick_channel)
-        ts3bot.enqueue(ts3.AUDIO_ID_SELECT_FACTIONS)
+        ts3bot.enqueue(cfg.audio_ids["select_factions"])
 
     def factionPick(self, team, str):
         faction = cfg.i_factions[str]
@@ -313,7 +313,7 @@ class Match:
             # ts3: map selected
             pick_channel = which_pick_channels(self.__id)
             ts3bot.move(pick_channel)
-            ts3bot.enqueue(ts3.AUDIO_ID_MAP_SELECTED)
+            ts3bot.enqueue(cfg.audio_ids["map_selected"])
             self.__ready.start()
             return
         captainPings = [tm.captain.mention for tm in self.__teams]
@@ -322,7 +322,7 @@ class Match:
         await sleep(1)  # prevents bug when enqueuing songs too quickly
         pick_channel = which_pick_channels(self.__id)
         ts3bot.move(pick_channel)
-        ts3bot.enqueue(ts3.AUDIO_ID_SELECT_MAP)
+        ts3bot.enqueue(cfg.audio_ids["select_map"])
         await channelSend("PK_WAIT_MAP", self.__id, *captainPings)
 
     @tasks.loop(count=1)
@@ -344,8 +344,8 @@ class Match:
         team_channels = which_team_channels(self.__id)
         ts3.bot1.move(team_channels[0])
         ts3.bot2.move(team_channels[1])
-        ts3.bot1.enqueue(ts3.AUDIO_ID_TYPE_READY)
-        ts3.bot2.enqueue(ts3.AUDIO_ID_TYPE_READY)
+        ts3.bot1.enqueue(cfg.audio_ids["type_ready"])
+        ts3.bot2.enqueue(cfg.audio_ids["type_ready"])
 
 
     @tasks.loop(minutes=cfg.ROUND_LENGTH, delay=1, count=2)
@@ -357,24 +357,26 @@ class Match:
         team_channels = which_team_channels(self.__id)
         ts3.bot1.move(team_channels[0])
         ts3.bot2.move(team_channels[1])
-        ts3.bot1.play(ts3.AUDIO_ID_ROUND_OVER)
-        ts3.bot2.play(ts3.AUDIO_ID_ROUND_OVER)
+        ts3.bot1.play(cfg.audio_ids["round_over"])
+        ts3.bot2.play(cfg.audio_ids["round_over"])
         for tm in self.__teams:
             tm.captain.isTurn = True
         if self.roundNo < 2:
             await channelSend("MATCH_SWAP", self.__id)
             # ts3: swap sundies
             await sleep(1)
-            ts3.bot1.enqueue("1ae444aa-12db-40da-b341-9ff98962829e")
-            ts3.bot2.enqueue("1ae444aa-12db-40da-b341-9ff98962829e")
+            ts3.bot1.move(team_channels[0])
+            ts3.bot2.move(team_channels[1])
+            ts3.bot1.enqueue(cfg.audio_ids["switch_sides"])
+            ts3.bot2.enqueue(cfg.audio_ids["switch_sides"])
             await sleep(1)
             self.__status = MatchStatus.IS_WAITING
             captainPings = [tm.captain.mention for tm in self.__teams]
             await channelSend("MATCH_CONFIRM", self.__id, *captainPings, match=self)
             ts3.bot1.move(team_channels[0])
             ts3.bot2.move(team_channels[1])
-            ts3.bot1.enqueue(ts3.AUDIO_ID_TYPE_READY)
-            ts3.bot2.enqueue(ts3.AUDIO_ID_TYPE_READY)
+            ts3.bot1.enqueue(cfg.audio_ids["type_ready"])
+            ts3.bot2.enqueue(cfg.audio_ids["type_ready"])
             return
         await channelSend("MATCH_OVER", self.__id)
         self.__status = MatchStatus.IS_RUNNING
@@ -388,20 +390,20 @@ class Match:
         ts3.bot2.move(team_channels[1])
         await channelSend("MATCH_STARTING_1", self.__id, self.roundNo, "30")
         # ts3: 30s
-        ts3.bot1.play(ts3.AUDIO_ID_30S)
-        ts3.bot2.play(ts3.AUDIO_ID_30S)
+        ts3.bot1.play(cfg.audio_ids["30s"])
+        ts3.bot2.play(cfg.audio_ids["30s"])
         await sleep(10)
         await channelSend("MATCH_STARTING_2", self.__id, self.roundNo, "20")
         # ts3: 10s
         await sleep(8)
-        ts3.bot1.play(ts3.AUDIO_ID_10S)
-        ts3.bot2.play(ts3.AUDIO_ID_10S)
+        ts3.bot1.play(cfg.audio_ids["10s"])
+        ts3.bot2.play(cfg.audio_ids["10s"])
         await sleep(2)
         await channelSend("MATCH_STARTING_2", self.__id, self.roundNo, "10")
         await sleep(3.2)
         # ts3: 5s
-        ts3.bot1.play(ts3.AUDIO_ID_5S)
-        ts3.bot2.play(ts3.AUDIO_ID_5S)
+        ts3.bot1.play(cfg.audio_ids["5s"])
+        ts3.bot2.play(cfg.audio_ids["5s"])
         await sleep(6.8)
         playerPings = [tm.allPings for tm in self.__teams]
         await channelSend("MATCH_STARTED", self.__id, *playerPings, self.roundNo)
@@ -426,7 +428,7 @@ class Match:
         ts3bot = which_bot(self.__id)
         pick_channel = which_pick_channels(self.__id)
         ts3bot.move(pick_channel)
-        ts3bot.enqueue(ts3.AUDIO_ID_SELECT_TEAMS)
+        ts3bot.enqueue(cfg.audio_ids["select_teams"])
 
     async def clear(self):
         """ Clearing match and base player objetcts
@@ -440,8 +442,8 @@ class Match:
             team_channels = which_team_channels(self.__id)
             ts3.bot1.move(team_channels[0])
             ts3.bot2.move(team_channels[1])
-            ts3.bot1.play(ts3.AUDIO_ID_ROUND_OVER)
-            ts3.bot2.play(ts3.AUDIO_ID_ROUND_OVER)
+            ts3.bot1.play(cfg.audio_ids["round_over"])
+            ts3.bot2.play(cfg.audio_ids["round_over"])
             await channelSend("MATCH_OVER", self.__id)
             # ts3: round over
 

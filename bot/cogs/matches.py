@@ -195,22 +195,22 @@ async def _faction(ctx, captain, args):
         if captain.match.status != MatchStatus.IS_FACTION:
             await send("PK_FACTION_OK", ctx, team.name, cfg.factions[team.faction])  # faction picked
             if cfg.factions[team.faction] == "VS":  # Team 1 VS
-                ts3bot.enqueue(ts3.AUDIO_ID_TEAM_1_VS)
+                ts3bot.enqueue(cfg.audio_ids["team_1_vs"])
             elif cfg.factions[team.faction] == "NC":  # Team 1 NC
-                ts3bot.enqueue(ts3.AUDIO_ID_TEAM_1_NC)
+                ts3bot.enqueue(cfg.audio_ids["team_1_nc"])
             elif cfg.factions[team.faction] == "TR":  # Team 1 TR
-                ts3bot.enqueue(ts3.AUDIO_ID_TEAM_1_TR)
+                ts3bot.enqueue(cfg.audio_ids["team_1_tr"])
             return
         if newPicker == captain:
             await send("PK_FACTION_ALREADY", ctx, newPicker.mention)  # faction already picked
             return
         await send("PK_FACTION_OK_NEXT", ctx, team.name, cfg.factions[team.faction], newPicker.mention)
         if cfg.factions[team.faction] == "VS":  # Team 2 VS
-            ts3bot.enqueue(ts3.AUDIO_ID_TEAM_2_VS)
+            ts3bot.enqueue(cfg.audio_ids["team_2_vs"])
         elif cfg.factions[team.faction] == "NC":  # Team 2 NC
-            ts3bot.enqueue(ts3.AUDIO_ID_TEAM_2_NC)
+            ts3bot.enqueue(cfg.audio_ids["team_2_nc"])
         elif cfg.factions[team.faction] == "TR":  # Team 2 TR
-            ts3bot.enqueue(ts3.AUDIO_ID_TEAM_2_TR)
+            ts3bot.enqueue(cfg.audio_ids["team_2_tr"])
     except KeyError:
         await send("PK_NOT_VALID_FACTION", ctx)
 
@@ -229,10 +229,10 @@ async def _map(ctx, captain, args):
         await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
         ts3bot = which_bot(ctx.channel.id)
         # ts3: map selected
-        ts3bot.enqueue(ts3.AUDIO_ID_MAP_SELECTED)
+        ts3bot.enqueue(cfg.audio_ids["map_selected"])
         #ts3: players drop to team channels
         await sleep(1)
-        ts3bot.enqueue(ts3.AUDIO_ID_PLAYERS_DROP_CHANNEL)
+        ts3bot.enqueue(cfg.audio_ids["players_drop_channel"])
         # ts3: move bots to team channels:
         await sleep(4)
         team_channels = which_team_channels(ctx.channel.id)
