@@ -1,21 +1,11 @@
 __pycache__/
 */__pycache__/
 permissions.txt
-bot/test.py
-bot/test2.py
-bot/test3.py
-bot/others/
 bot/config_test.cfg
 bot/client_secret_test.json
-bot/secret/*
+secret/*
 bot/.idea/*
-bot/client_secret.json
-bot/client_secret_old.json
 POG-Bot-v3.ppk
-sinusbot login - POG-Bot-v3.txt
-accounts_sheet_template.xlsx
 bot/config.cfg
+bot/client_secret.json
 sinusbot login - POG-Bot-v3.txt
-POG-Bot-v3
-secret/client_secret.json
-secret/config.cfg
