@@ -12,7 +12,7 @@ import json
 #  default channel (Lobby or Match 2 for each bot), set nickname.
 
 
-class Ts3_bot:
+class Ts3Bot:
     def __init__(self, main_url, instance_name, username="admin", password=""):
         self.initialized = None
 
@@ -142,10 +142,10 @@ def init():
 
     try:
         global bot1, bot2
-        bot1 = Ts3_bot(None, None)
-        bot2 = Ts3_bot(None, None)
-        bot1 = Ts3_bot('http://x127.0.0.1:8087/api/v1/bot', "bot1", username='admin', password='pogbot')
-        bot2 = Ts3_bot('http://x127.0.0.1:8087/api/v1/bot', "bot2", username='admin', password='pogbot')
+        bot1 = Ts3Bot(None, None)
+        bot2 = Ts3Bot(None, None)
+        bot1 = Ts3Bot('http://x127.0.0.1:8087/api/v1/bot', "bot1", username='admin', password='pogbot')
+        bot2 = Ts3Bot('http://x127.0.0.1:8087/api/v1/bot', "bot2", username='admin', password='pogbot')
 
         if bot1.initialized and bot2.initialized:
             logging.info("TS3 bots are online")

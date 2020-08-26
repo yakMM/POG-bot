@@ -8,13 +8,12 @@ from modules.exceptions import ElementNotFound, DatabaseError
 from modules.tools import isAdmin
 from modules.database import remove
 from modules.loader import lockAll, unlockAll, isAllLocked
-
 from classes.players import removePlayer, getPlayer
-
 from matches import clearLobby, getMatch, getAllNamesInLobby, removeFromLobby
 
 
 log = getLogger(__name__)
+
 
 class AdminCog(commands.Cog, name='admin'):
     """
@@ -42,13 +41,13 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def clear(self, ctx):
-        if ctx.channel.id == cfg.discord_ids["lobby"]: # clear lobby
+        if ctx.channel.id == cfg.discord_ids["lobby"]:  # clear lobby
             if clearLobby():
                 await send("LB_CLEARED", ctx, namesInLobby=getAllNamesInLobby())
                 return
             await send("LB_EMPTY", ctx)
             return
-        if ctx.channel.id in cfg.discord_ids["matches"]: # clear a match channel
+        if ctx.channel.id in cfg.discord_ids["matches"]:  # clear a match channel
             match = getMatch(ctx.channel.id)
             if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
                 await send("MATCH_NO_MATCH", ctx, ctx.command.name)
@@ -77,7 +76,7 @@ class AdminCog(commands.Cog, name='admin'):
             await send("MATCH_ALREADY_STARTED", ctx, ctx.command.name)
             return
         sel = match.mapSelector
-        await sel.doSelectionProcess(ctx, args) # Handle the actual map selection
+        await sel.doSelectionProcess(ctx, args)  # Handle the actual map selection
         if sel.status == SelStatus.IS_SELECTED:
             match.confirmMap()
             await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
@@ -94,7 +93,7 @@ class AdminCog(commands.Cog, name='admin'):
         try:
             player = getPlayer(ctx.message.mentions[0].id)
         except ElementNotFound:
-            await send("RM_NOT_IN_DB", ctx) # player isn't even registered in the system...
+            await send("RM_NOT_IN_DB", ctx)  # player isn't even registered in the system...
             return
         if player.status == PlayerStatus.IS_LOBBIED:
             removeFromLobby(player)
@@ -103,7 +102,7 @@ class AdminCog(commands.Cog, name='admin'):
             try:
                 await remove(player)
             except DatabaseError:
-                pass # ignored if not yet in db
+                pass  # ignored if not yet in db
             memb = ctx.author.guild.get_member(player.id)
             removePlayer(player)
             notify = memb.guild.get_role(cfg.discord_ids["notify_role"])
@@ -121,17 +120,17 @@ class AdminCog(commands.Cog, name='admin'):
             await send("BOT_VERSION", ctx, cfg.VERSION, isAllLocked())
             return
         arg = args[0]
-        if arg=="version":
+        if arg == "version":
             await send("BOT_VERSION", ctx, cfg.VERSION, isAllLocked())
             return
-        if arg=="lock":
+        if arg == "lock":
             if isAllLocked():
                 await send("BOT_ALREADY", ctx, "locked")
                 return
             lockAll(self.client)
             await send("BOT_LOCKED", ctx)
             return
-        if arg=="unlock":
+        if arg == "unlock":
             if not isAllLocked():
                 await send("BOT_ALREADY", ctx, "unlocked")
                 return
@@ -150,14 +149,14 @@ class AdminCog(commands.Cog, name='admin'):
             registered = memb.guild.get_role(cfg.discord_ids["registered_role"])
             ov_notify = ctx.channel.overwrites_for(notify)
             ov_registered = ctx.channel.overwrites_for(registered)
-            if arg=="freeze":
+            if arg == "freeze":
                 ov_notify.send_messages = False
                 ov_registered.send_messages = False
                 await ctx.channel.set_permissions(notify, overwrite=ov_notify)
                 await ctx.channel.set_permissions(registered, overwrite=ov_registered)
                 await send("BOT_FREEZED", ctx)
                 return
-            if arg=="unfreeze":
+            if arg == "unfreeze":
                 ov_notify.send_messages = True
                 ov_registered.send_messages = True
                 await ctx.channel.set_permissions(notify, overwrite=ov_notify)

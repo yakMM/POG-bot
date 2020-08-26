@@ -1,4 +1,4 @@
-""" Retreives configuration from the config file
+""" Retrieves configuration from the config file
 """
 
 from json import loads
@@ -6,8 +6,7 @@ from requests import get
 from configparser import ConfigParser, ParsingError
 from modules.exceptions import ConfigError
 
-## DiscordIds
-
+# DiscordIds
 discord_ids = {
     "lobby": 0,
     "register": 0,
@@ -21,7 +20,7 @@ discord_ids = {
     "notify_role": 0
 }
 
-## TeamspeakIds
+# TeamspeakIds
 teamspeak_ids = {
     "ts_lobby": "",
     "ts_afk": "",
@@ -33,6 +32,7 @@ teamspeak_ids = {
     "ts_match_2_team_2": "",
 }
 
+# AudioIds
 audio_ids = {
     "round_over": "",
     "select_factions": "",
@@ -55,7 +55,7 @@ audio_ids = {
     "players_drop_channel": ""
 }
 
-## General
+# General
 
 general = {
     "token": "",
@@ -98,7 +98,7 @@ facilitiy_suffix = {
 
 PIL_MAPS_IDS = [3430, 302030, 239000, 305010, 230, 307010]  # peris, can, pale, ghanan, xeno, chac
 
-## Database
+# Database
 
 _collections = {
     "users": "",
@@ -113,14 +113,14 @@ database = {
 }
 
 
-## Methods
+# Methods
 
 def getConfig(file):
     config = ConfigParser()
     try:
         config.read(file)
     except ParsingError as e:
-        raise ConfigError(f"Parsing Error in '{file}'")
+        raise ConfigError(f"Parsing Error in '{file}'\n{e}")
 
     # General section
     _checkSection(config, "General", file)
@@ -208,7 +208,7 @@ def getConfig(file):
 
 
 def _checkSection(config, section, file):
-    if not section in config:
+    if section not in config:
         raise ConfigError(f"Missing section '{section}' in '{file}'")
 
 

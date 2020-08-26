@@ -58,9 +58,9 @@ def _addMainHandlers(client):
         if message.author == client.user:  # if bot, do nothing
             await client.process_commands(message)
             return
-          
-        if isinstance(message.channel, DMChannel): # if dm, print in console and ignore the message
-            logging.info(message.author.name + ": " +message.content)
+
+        if isinstance(message.channel, DMChannel):  # if dm, print in console and ignore the message
+            logging.info(message.author.name + ": " + message.content)
 
             return
         if message.channel.id not in (cfg.discord_ids["lobby"], cfg.discord_ids["register"], *cfg.discord_ids["matches"]):
@@ -81,7 +81,7 @@ def _addMainHandlers(client):
     async def on_ready():
         logging.info('Client is online')
 
-        # fetch rule message, remove all reaction but the bot's
+        # fetch rule message, remove all reaction except the bot's
         global rulesMsg
         rulesMsg = await client.get_channel(cfg.discord_ids["rules"]).fetch_message(cfg.discord_ids["rules_msg"])
         await rulesMsg.clear_reactions()
@@ -108,10 +108,10 @@ def _addMainHandlers(client):
                 if isinstance(channelId, list):
                     channelStr = "channels " + ", ".join(f'<#{id}>' for id in channelId)
                 else:
-                  
+
                     channelStr = f'channel <#{channelId}>'
-                await send("WRONG_CHANNEL", ctx, ctx.command.name, channelStr) # Send the use back to the right channel
-            except KeyError: # Should not happen
+                await send("WRONG_CHANNEL", ctx, ctx.command.name, channelStr)  # Send the use back to the right channel
+            except KeyError:  # Should not happen
 
                 await send("UNKNOWN_ERROR", ctx, "Channel key error")
             return
@@ -125,14 +125,14 @@ def _addMainHandlers(client):
         if isinstance(error.original, UnexpectedError):
             await send("UNKNOWN_ERROR", ctx, error.original.reason)
         else:
-            await send("UNKNOWN_ERROR", ctx, type(error.original).__name__) # Print unhandled error
+            await send("UNKNOWN_ERROR", ctx, type(error.original).__name__)  # Print unhandled error
 
         raise error
 
     # Reaction update handler (for rule acceptance)
     @client.event
     async def on_raw_reaction_add(payload):  # Has to be on_raw cause the message already exists when the bot starts
-        if payload.member == None or payload.member.bot:  # If bot, do nothing
+        if payload.member is None or payload.member.bot:  # If bot, do nothing
             return
         if isAllLocked():
             if not isAdmin(payload.member):
@@ -142,10 +142,10 @@ def _addMainHandlers(client):
             if str(payload.emoji) == "✅":
                 try:
                     p = getPlayer(payload.member.id)
-                except ElementNotFound: # if new player
-                    p = Player(payload.member.name, payload.member.id) # create a new profile
+                except ElementNotFound:  # if new player
+                    p = Player(payload.member.name, payload.member.id)  # create a new profile
                 if p.status == PlayerStatus.IS_NOT_REGISTERED:
-                    await channelSend("REG_RULES", cfg.discord_ids["register"], payload.member.mention) # they can now register
+                    await channelSend("REG_RULES", cfg.discord_ids["register"], payload.member.mention)  # they can now register
                 registered = payload.member.guild.get_role(cfg.discord_ids["registered_role"])
                 info = payload.member.guild.get_role(cfg.discord_ids["info_role"])
                 notify = payload.member.guild.get_role(cfg.discord_ids["notify_role"])
@@ -167,7 +167,7 @@ def _addMainHandlers(client):
             return
         if player.status != PlayerStatus.IS_PLAYING:
             return
-        if player.active.account == None:
+        if player.active.account is None:
             return
         # If we reach this point, we know player has been given an account
         account = player.active.account
@@ -245,10 +245,11 @@ def main(launchStr=""):
     # Run server
     client.run(cfg.general["token"])
 
+
 if __name__ == "__main__":
     logging.basicConfig(level="INFO")
     # execute only if run as a script
     # Use main() for production
 
-    #main("_test")
+    # main("_test")
     main()

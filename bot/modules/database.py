@@ -17,7 +17,7 @@ from classes.maps import Map  # ok
 collections = dict()
 
 
-## Public
+# Public
 def getAllPlayers():
     """ Get all players from db to memory
     """
@@ -74,7 +74,7 @@ def forceBasesUpdate(bases):
     collections["sBases"].insert_many(bases)
 
 
-## Private
+# Private
 def _update(p):
     """ Update player p into db
     """

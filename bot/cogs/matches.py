@@ -16,8 +16,8 @@ from classes.maps import MapSelection
 from matches import getMatch, which_bot, which_team_channels
 from modules.enumerations import MatchStatus, SelStatus
 
-
 log = getLogger(__name__)
+
 
 class MatchesCog(commands.Cog, name='matches'):
     """
@@ -31,7 +31,7 @@ class MatchesCog(commands.Cog, name='matches'):
     async def on_ready(self):
 
         log.info('Matches Cog is online')
-        return # we don't display a message on each restart
+        return  # we don't display a message on each restart
         try:
             for id in cfg.discord_ids["matches"]:
                 await channelSend("CHANNEL_INIT", id, id)
@@ -58,7 +58,7 @@ class MatchesCog(commands.Cog, name='matches'):
             await send("PK_HELP", ctx)  # =p help shows the help
             return
         player = await _testPlayer(ctx, match)
-        if player == None:
+        if player is None:
             return
         if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
             await send("MATCH_NOT_READY", ctx, ctx.command.name)  # Edge case, will happen very rarely if not never
@@ -101,7 +101,7 @@ class MatchesCog(commands.Cog, name='matches'):
     async def ready(self, ctx):  # when ready
         match = getMatch(ctx.channel.id)
         player = await _testPlayer(ctx, match)
-        if player == None:
+        if player is None:
             return
         if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
             await send("MATCH_ALREADY", ctx, ctx.command.name)  # match not ready for this command
@@ -114,7 +114,7 @@ class MatchesCog(commands.Cog, name='matches'):
         if isinstance(aPlayer, TeamCaptain):
             if aPlayer.isTurn:
                 result = aPlayer.match.onTeamReady(aPlayer.team)
-                if result != None:
+                if result is not None:
                     await send("MATCH_PLAYERS_NOT_READY", ctx, aPlayer.team.name, " ".join(result))
                     return
                 await send("MATCH_TEAM_READY", ctx, aPlayer.team.name, match=match)
@@ -229,7 +229,7 @@ async def _map(ctx, captain, args):
         ts3bot = which_bot(ctx.channel.id)
         # ts3: map selected
         ts3bot.enqueue(cfg.audio_ids["map_selected"])
-        #ts3: players drop to team channels
+        # ts3: players drop to team channels
         await sleep(1)
         ts3bot.enqueue(cfg.audio_ids["players_drop_channel"])
         # ts3: move bots to team channels:

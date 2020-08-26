@@ -43,6 +43,7 @@ def addToLobby(player):
         if not _autoPing.is_running():
             _autoPing.start()
 
+
 @tasks.loop(seconds=100, delay=1, count=2)
 async def _autoPing():
     await channelSend("LB_NOTIFY", cfg.discord_ids["lobby"], f'<@&{cfg.discord_ids["notify_role"]}>')
@@ -67,17 +68,19 @@ def _onMatchFree():
     if len(_lobbyList) == cfg.general["lobby_size"]:
         startMatchFromFullLobby.start()
 
+
 def _onLobbyRemove():
     global _lobbyStuck
     _lobbyStuck = False
     if len(_lobbyList) < cfg.general["lobby_size"]-4:
         _autoPing.cancel()
 
+
 @tasks.loop(count=1)
 async def startMatchFromFullLobby():
     global _lobbyStuck
     match = _findSpotForMatch()
-    if match == None:
+    if match is None:
         _lobbyStuck = True
         _autoPing.cancel()
         await channelSend("LB_STUCK", cfg.discord_ids["lobby"])
@@ -276,7 +279,7 @@ class Match:
         for p in team.players:
             if p.hasOwnAccount:
                 continue
-            if p.account == None:
+            if p.account is None:
                 log.error(f"Debug: {p.name} has no account")
             if p.account.isValidated:
                 continue
@@ -346,7 +349,6 @@ class Match:
         ts3.bot2.move(team_channels[1])
         ts3.bot1.enqueue(cfg.audio_ids["type_ready"])
         ts3.bot2.enqueue(cfg.audio_ids["type_ready"])
-
 
     @tasks.loop(minutes=cfg.ROUND_LENGTH, delay=1, count=2)
     async def __onMatchOver(self):
