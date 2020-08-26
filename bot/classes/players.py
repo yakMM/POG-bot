@@ -114,8 +114,8 @@ class Player:
 
     @status.setter
     def status(self, status):
-        if status in (PlayerStatus.IS_NOT_REGISTERED,
-                      PlayerStatus.IS_MATCHED):  # these status are set automatically from inside the class, can't set them from outside
+        if status in (PlayerStatus.IS_NOT_REGISTERED, PlayerStatus.IS_MATCHED):
+            # these status are set automatically from inside the class, can't set them from outside
             raise StatusNotAllowed(status.name)
             return
         self._status = status
@@ -177,8 +177,9 @@ class Player:
         newIds = [0, 0, 0]
         newNames = ["N/A", "N/A", "N/A"]
         for iName in charList:
-            url = 'http://census.daybreakgames.com/s:' + cfg.general[
-                'api_key'] + '/get/ps2:v2/character/?name.first_lower=' + iName.lower() + '&c:show=character_id,faction_id,name&c:resolve=world'
+            url = 'http://census.daybreakgames.com/s:' + cfg.general['api_key'] + \
+                  '/get/ps2:v2/character/?name.first_lower=' + iName.lower() +\
+                  '&c:show=character_id,faction_id,name&c:resolve=world'
             jdata = await httpRequest(url)
             
             try:
