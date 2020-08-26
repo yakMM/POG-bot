@@ -1,3 +1,22 @@
+# v1.0.9:
+- Updated Jaeger Calendar Link
+- Current UTC time is now displayed along Jaeger Calendar link
+- Speculative fix for "ghost" matches
+- Bot will now ping @Notify when queue is almost full
+- Added logging in file
+
+# v1.0.8:
+- Fixed string when registering with a character already registered
+- Fixed roles issues when user would leave the server and come back
+- PS2 API error when registering a character is now clearly handled
+- Fixed lobby problems occuring when no match slot is available
+- freeze/unfreeze command is now working as expected
+
+# v1.0.7:
+- =map command should now work in all situations
+- Fixed match status message on faction selection
+- Added possibility to freeze and unfreeze channels
+
 # v1.0.6:
 - Fixed critical bug in account distribution (every account could only be used 1 time)
 - Match lenght is now 10 minutes

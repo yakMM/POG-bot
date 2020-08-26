@@ -19,6 +19,9 @@ Import this module and use only the following public function:
 from discord import Embed, Color, TextChannel, Message, User
 from discord.ext.commands import Context
 
+from datetime import datetime as dt
+from datetime import timezone as tz
+
 # Others
 from enum import Enum
 
@@ -113,7 +116,8 @@ def _lobbyHelp(msg):
                     , inline=False)
     if isAdmin(msg.author):
         embed.add_field(name="Staff Commands",
-                        value='`=clear` - Clear the lobby',
+                        value='`=clear` - Clear the lobby\n'
+                        '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                         inline=False)
     return embed
 
@@ -264,8 +268,12 @@ def _teamUpdate(arg, match):
     return embed
 
 def _jaegerCalendar(arg):
-    embed = Embed(colour=Color.blue(), title="Jaeger Calendar", url = "https://docs.google.com/spreadsheets/d/1dS8dMz8FhxnSBxPs3gfj_L5PsFzC8mtHHMlUkNYtjEI/",
+    embed = Embed(colour=Color.blue(), title="Jaeger Calendar", url = "https://docs.google.com/spreadsheets/d/1eA4ybkAiz-nv_mPxu_laL504nwTDmc-9GnsojnTiSRE",
     description = "Pick a base currently available in the calendar!")
+    date = dt.now(tz.utc)
+    embed.add_field(name = "Current UTC time",
+                        value = date.strftime("%Y-%m-%d %H:%M UTC"),
+                        inline=False)
     return embed
 
 class _Message():
@@ -343,6 +351,7 @@ class _StringEnum(Enum):
     LB_WENT_INACTIVE = _Message("{} was removed from the lobby because they went offline!",embed=_lobbyList)
     LB_CLEARED = _Message("Lobby has been cleared!", embed=_lobbyList)
     LB_EMPTY = _Message("Lobby is already empty!")
+    LB_NOTIFY = _Message("{} queue is almost full, join to start a match!")
 
     PK_OVER = _Message("The teams are already made. You can't pick!")
     PK_NO_LOBBIED = _Message("You must first queue and wait for a match to begin. Check <#{}>")
@@ -369,7 +378,7 @@ class _StringEnum(Enum):
     PK_NO_MAP = _Message("No map selected!")
 
     EXT_NOT_REGISTERED = _Message("You are not registered! Check <#{}>")
-    UNKNOWN_ERROR = _Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\nDetails:*{}*")
+    UNKNOWN_ERROR = _Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\nDetails: *{}*")
     STOP_SPAM = _Message("Please avoid spamming!")
     HELP = _Message("Available commands:",embed=_autoHelp)
     INVALID_COMMAND = _Message("Invalid command! Type `=help` for the list of available commands.")
@@ -379,12 +388,15 @@ class _StringEnum(Enum):
     NO_PERMISSION = _Message("The command `={}` can only be used by staff members!")
     CHANNEL_INIT = _Message("`Bot init`: Correctly hooked in channel <#{}>")
     INVALID_STR = _Message("You entered an invalid caracter! `{}`")
+    API_ERROR = _Message("Could not reach Planetside2 API, try again later!")
 
     BOT_UNLOCKED = _Message("Unlocked!")
     BOT_LOCKED = _Message("Locked!")
     BOT_IS_LOCKED = _Message("Unlock the bot before using this command!")
     BOT_ALREADY = _Message("Already {}!")
     BOT_VERSION = _Message("Version `{}`, locked: `{}`")
+    BOT_FREEZED = _Message("Channel freezed!")
+    BOT_UNFREEZED = _Message("Channel unfreezed!")
 
     MATCH_INIT = _Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player",embed=_teamUpdate)
@@ -412,6 +424,9 @@ class _StringEnum(Enum):
     MAP_NOT_FOUND = _Message("Couldn't find a result for your search!")
     MAP_DISPLAY_LIST = _Message("Here are the maps found:", embed=_selectedMaps)
     MAP_SELECTED = _Message("The current map is **{}**")
+
+    MP_ADDED = _Message("Added {} to the map pool")
+    MP_REMOVED = _Message("Removed {} from the map pool")
 
     ACC_NOT_ENOUGH = _Message("Not enough accounts are available for this match!\n**Match has been canceled!**")
     ACC_UPDATE = _Message("", ping=False,embed=_account)

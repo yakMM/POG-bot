@@ -10,7 +10,7 @@ from aiohttp.client_exceptions import ClientOSError
 from json import loads
 
 # Custom modules
-from modules.exceptions import UnexpectedError
+from modules.exceptions import UnexpectedError, ApiNotReachable
 
 
 ## PUBLIC:
@@ -20,7 +20,7 @@ async def request(url):
         try:
             result = await _fetch(client, url)
         except ClientOSError:
-            raise UnexpectedError(f"ClienOSError when querrying API (url={url})")
+            raise ApiNotReachable(url)
         return loads(result)
 
 

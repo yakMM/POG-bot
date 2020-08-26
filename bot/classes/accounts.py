@@ -7,11 +7,14 @@
 
 # Ext imports
 from gspread import service_account
+from gspread.exceptions import APIError
 from numpy import array, vstack
 from datetime import datetime as dt
+
+#from discord.ext import tasks
 from lib import tasks
 from asyncio import get_event_loop
-from concurrent.futures import ThreadPoolExecutor
+from logging import getLogger
 
 # Custom modules
 import modules.config as cfg
@@ -21,6 +24,8 @@ from modules.exceptions import AccountsNotEnough
 X_OFFSET=3
 Y_OFFSET=3
 QUIT_DELAY = 300
+
+log = getLogger(__name__)
 
 
 class Account():
@@ -142,26 +147,6 @@ class AccountHander():
         """
         if len(self.__freeAccounts) == 0:
             return
-        loop = get_event_loop()
-        await loop.run_in_executor(ThreadPoolExecutor(), self.__updateSheet)
-        for acc in self.__freeAccounts:
-            if acc.message != None:
-                acc.isDestroyed = True
-                await edit("ACC_UPDATE", acc.message, account=acc)
-                if acc.isValidated:
-                    await privateSend("ACC_OVER", acc.aPlayer.id)
-                else:
-                    await remReaction(acc.message)
-
-
-    def __updateSheet(self):
-        """ Push updates to the google sheet
-        """
-        gc = service_account(filename=type(self)._secretFile)
-        sh = gc.open_by_key(cfg.database["accounts"])
-        rawSheet = sh.worksheet("RAW")
-        visibleSheet = sh.worksheet("VISIBLE")
-        # row will be raw data while vrow will be user-readable data
         row = ['']*self.__xMax
         vRow = ['']*self.__xMax
         row[0] = str(self.__match.number)
@@ -179,6 +164,35 @@ class AccountHander():
             if acc.isValidated:
                 row[acc.x] = str(acc.aPlayer.id)
                 vRow[acc.x] = acc.aPlayer.name
+        self._updateSheet.start(row, vRow)
+        for acc in self.__freeAccounts:
+            if acc.message != None:
+                acc.isDestroyed = True
+                await edit("ACC_UPDATE", acc.message, account=acc)
+                if acc.isValidated:
+                    await privateSend("ACC_OVER", acc.aPlayer.id)
+                else:
+                    await remReaction(acc.message)
+
+    @tasks.loop(seconds=2, count=5)
+    async def _updateSheet(self, row, vRow):
+        """ Push updates to the google sheet
+        """
+        loop = get_event_loop()
+        log.info(f"GSpread loop on match: {self.__match.number}")
+        try:
+            await loop.run_in_executor(None, self.__pushUpdateToSheet, row, vRow)
+        except APIError as e:
+            log.info(f"GSpread APIError on match: {self.__match.number}\n{e}")
+            return
+        log.info(f"GSpread ok on match: {self.__match.number}")
+        self._updateSheet.cancel()
+
+    def __pushUpdateToSheet(self, row, vRow):
+        gc = service_account(filename=type(self)._secretFile)
+        sh = gc.open_by_key(cfg.database["accounts"])
+        rawSheet = sh.worksheet("RAW")
+        visibleSheet = sh.worksheet("VISIBLE")
         lt = self.__letterFromNumber(self.__xMax-1)
         y = self.__yCoord
         rawSheet.update(f"A{y}:{lt}{y}", [row])

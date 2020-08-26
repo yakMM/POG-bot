@@ -4,7 +4,6 @@
 # External modules
 from pymongo import MongoClient
 from asyncio import get_event_loop
-from concurrent.futures import ThreadPoolExecutor
 
 # Custom modules:
 from modules.exceptions import DatabaseError
@@ -49,14 +48,14 @@ async def update(p):
     """ Launch the task updating player p in database
     """
     loop = get_event_loop()
-    await loop.run_in_executor(ThreadPoolExecutor(), _update, p)
+    await loop.run_in_executor(None, _update, p)
 
 
 async def remove(p):
     """ Launch the task updating player p in database
     """
     loop = get_event_loop()
-    await loop.run_in_executor(ThreadPoolExecutor(), _remove, p)
+    await loop.run_in_executor(None, _remove, p)
 
 
 def init(config):
