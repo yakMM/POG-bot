@@ -63,8 +63,7 @@ class MatchesCog(commands.Cog, name='matches'):
         if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
             await send("MATCH_NOT_READY", ctx, ctx.command.name)  # Edge case, will happen very rarely if not never
             return
-        if match.status in (
-        MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
+        if match.status in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
             await send("PK_OVER", ctx)  # Picking process is over
             return
         if player.status == PlayerStatus.IS_MATCHED:
