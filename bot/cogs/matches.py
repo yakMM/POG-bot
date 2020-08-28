@@ -230,10 +230,10 @@ async def _map(ctx, captain, args):
         # ts3: map selected
         ts3bot.enqueue(cfg.audio_ids["map_selected"])
         # ts3: players drop to team channels
-        await sleep(1)
+        await sleep(ts3bot.get_duration(cfg.audio_ids["map_selected"]))
         ts3bot.enqueue(cfg.audio_ids["players_drop_channel"])
         # ts3: move bots to team channels:
-        await sleep(4)
+        await sleep(ts3bot.get_duration(cfg.audio_ids["players_drop_channel"]))
         team_channels = which_team_channels(ctx.channel.id)
         ts3.bot1.move(team_channels[0])
         ts3.bot2.move(team_channels[1])

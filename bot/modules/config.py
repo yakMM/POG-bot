@@ -50,6 +50,7 @@ audio_ids = {
     "30s": "",
     "drop_match_1_picks": "",
     "drop_match_2_picks": "",
+    "drop_match_3_picks": "",
     "gelos_in_prison": "",
     "map_selected": "",
     "players_drop_channel": ""
@@ -61,7 +62,9 @@ general = {
     "token": "",
     "api_key": "",
     "command_prefix": "",
-    "lobby_size": 0
+    "lobby_size": 0,
+    "sinusbot_user": "",
+    "sinusbot_pass": ""
 }
 
 AFK_TIME = 20  # minutes

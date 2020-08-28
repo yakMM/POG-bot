@@ -1,6 +1,10 @@
 import logging
 import requests
 import json
+from logging import getLogger
+import modules.config as cfg
+
+log = getLogger(__name__)
 
 
 # audio files use https://www.naturalreaders.com/online/ English (UK) - Amy voice
@@ -13,6 +17,9 @@ import json
 
 
 class Ts3Bot:
+    class WebapiError(Exception):
+        pass
+
     def __init__(self, main_url, instance_name, username="admin", password=""):
         self.initialized = None
 
@@ -26,133 +33,155 @@ class Ts3Bot:
             self.auth_token = requests.post(self.main_url + login_endpoint, data=data).json()["token"]
 
             instances_endpoint = '/instances'
-            response = requests.get(self.main_url + instances_endpoint,
+            instances_response = requests.get(self.main_url + instances_endpoint,
                                     headers={"Authorization": "Bearer " + self.auth_token}).json()
 
             self.instanceId = None
             try:
-                for instance in response:
+                for instance in instances_response:
                     if instance["name"] == instance_name:
                         self.instanceId = instance["uuid"]
                 assert self.instanceId
                 self.initialized = True
             except AssertionError as ae:
-                logging.error(f"Assertion Error. Instance ID not returned.\n{ae}")
+                log.error(f"Assertion Error. Instance ID not returned.\n{ae}")
+
+            # load song ids and durations into memory
+            songlist_endpoint = "/files"
+            songlist_response = requests.get(self.main_url + songlist_endpoint,
+                                    headers={"Authorization": "Bearer " + self.auth_token}).json()
+            self.track_durations = {}
+            for track in songlist_response:
+                if track['uuid'] in cfg.audio_ids.values():
+                    self.track_durations[track['uuid']] = track['duration']
+                    # uncomment this line below if you want to print the song names, ids, and durations to the log file:
+                    # log.info(track['title'], track['uuid'], track['duration'])
+
+    def check_initialized(self):
+        if self.initialized:
+            return True
+        else:
+            log.warning(f"Unable to complete request. TS3 bot not initialized.")
+            return False
 
     def enqueue(self, songId):
         # enqueue will wait for the previous audio file to finish playing.
-        # must wait >1 second between enqueues due to a sinusbot bug
-        if self.initialized:
+        # must wait >0.1 second between enqueues due to a sinusbot bug
+        if self.check_initialized():
             endpoint = "/queue/append/"
             response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint + songId,
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
-        else:
-            logging.warning("Error: unable to complete request, ts3 bot not initialized")
+
+    def get_duration(self, songId):
+        if self.check_initialized():
+            pad = 200  # extra time in ms to extend past duration
+            try:
+                return (self.track_durations[songId] + pad)/1000
+            except KeyError:
+                logging.warning("Track uuid does not exist!")
+                return 0
 
     def get_list(self):
-        if self.initialized:
+        if self.check_initialized():
             endpoint = "/files"
             response = requests.get(self.main_url + endpoint,
                                     headers={"Authorization": "Bearer " + self.auth_token}).json()
             tracks = []
             for track in response:
-                tracks.append((track['uuid'], track['title']))
+                tracks.append((track['uuid'], track['title'], track['duration']))
             return tracks
-        else:
-            logging.warning("Error: unable to complete request, ts3 bot not initialized")
 
     def move(self, channelId, channelPass=""):
-        if self.initialized:
+        if self.check_initialized():
             endpoint = "/event/move"
             response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint,
                                      headers={"Authorization": "Bearer " + self.auth_token,
                                               'Content-Type': 'application/json'},
                                      data=json.dumps({"id": channelId, "password": channelPass}))
             return response
-        else:
-            logging.warning("Error: unable to complete request, ts3 bot not initialized")
 
     def play(self, songId):  # play will cut off any audio file currently playing
-        if self.initialized:
+        if self.check_initialized():
             endpoint = "/play/byId/"
             response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint + songId,
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
-        else:
-            logging.warning("Error: unable to complete request, ts3 bot not initialized")
 
     def restart(self):
-        if self.initialized:
+        if self.check_initialized():
             endpoint = "/respawn"
             response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint,
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
-        else:
-            logging.warning("Error: unable to complete request, ts3 bot not initialized")
 
     def shutdown(self):
-        if self.initialized:
+        if self.check_initialized():
             endpoint = "/kill"
             response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint,
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
-        else:
-            logging.warning("Error: unable to complete request, ts3 bot not initialized")
 
     def spawn(self):
-        if self.initialized:
+        if self.check_initialized():
             endpoint = "/spawn"
             response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint,
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
-        else:
-            logging.warning("Error: unable to complete request, ts3 bot not initialized")
 
     def stop_song(self):
-        if self.initialized:
+        if self.check_initialized():
             endpoint = "/stop"
             response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint,
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
-        else:
-            logging.warning("Error: unable to complete request, ts3 bot not initialized")
 
     def volume(self, value):
-        if self.initialized:
+        if self.check_initialized():
             endpoint = "/volume/set/"
             response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint + str(value),
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
-        else:
-            logging.warning("Error: unable to complete request, ts3 bot not initialized")
 
     def get_queue(self):
-        if self.initialized:
+        if self.check_initialized():
             endpoint = "/queue"
             response = requests.get(self.main_url + "/i/" + self.instanceId + endpoint,
                                     headers={"Authorization": "Bearer " + self.auth_token})
             return response.content
-        else:
-            logging.warning("Error: unable to complete request, ts3 bot not initialized")
 
 
 def init():
-    logging.basicConfig(level="INFO")
-
     try:
         global bot1, bot2
         bot1 = Ts3Bot(None, None)
         bot2 = Ts3Bot(None, None)
-        bot1 = Ts3Bot('http://x127.0.0.1:8087/api/v1/bot', "bot1", username='admin', password='pogbot')
-        bot2 = Ts3Bot('http://x127.0.0.1:8087/api/v1/bot', "bot2", username='admin', password='pogbot')
+
+        bot1 = Ts3Bot('http://127.0.0.1:8087/api/v1/bot', "bot1",
+                      username=cfg.general["sinusbot_user"], password=cfg.general["sinusbot_pass"])
+        bot2 = Ts3Bot('http://127.0.0.1:8087/api/v1/bot', "bot2",
+                      username=cfg.general["sinusbot_user"], password=cfg.general["sinusbot_pass"])
 
         if bot1.initialized and bot2.initialized:
-            logging.info("TS3 bots are online")
+            # test if webapi.js extension is enabled by moving bots to a nonexistant channel and checking http response
+            if bot1.move("").status_code != 500 and bot2.move("").status_code != 500:
+                log.info("TS3 bots are online")
+            else:
+                bot1.initialized = False
+                bot2.initialized = False
+                raise Ts3Bot.WebapiError
         else:
             raise ConnectionError
-
     except ConnectionError as ce:
-        logging.warning(f"Unable to initialize TS3 bots!\n{ce}")
+        log.warning(f"Unable to initialize TS3 bots! Continuing script without bots functioning...\n{ce}")
+    except Ts3Bot.WebapiError as we:
+        log.warning(f"Unable to send 'move' command to TS3 bots! Is the webapi extension enabled for Sinusbot? "
+                    f"Continuing script without bots functioning...\n{we}")
     except Exception as e:
-        logging.error(f"Uncaught exception starting ts3 bots! Unable to initialize TS3 bots: {type(e).__name__}\n{e}")
+        log.error(f"Uncaught exception starting ts3 bots! Continuing script without bots functioning... {type(e).__name__}\n{e}")
+
+
+############ TESTING: ##############
+cfg.getConfig(f"config{''}.cfg")
+init()
+bot1.enqueue(cfg.audio_ids["drop_match_3_picks"])

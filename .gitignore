@@ -4,7 +4,7 @@ permissions.txt
 bot/config_test.cfg
 bot/client_secret_test.json
 secret/*
-.idea/*
+bot/.idea/*
 bot/config.cfg
 bot/client_secret.json
 logging/*
