@@ -180,8 +180,3 @@ def init():
     except Exception as e:
         log.error(f"Uncaught exception starting ts3 bots! Continuing script without bots functioning... {type(e).__name__}\n{e}")
 
-
-############ TESTING: ##############
-cfg.getConfig(f"config{''}.cfg")
-init()
-bot1.enqueue(cfg.audio_ids["drop_match_3_picks"])
