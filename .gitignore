@@ -12,3 +12,6 @@ bot/test.py
 bot/test2.py	
 bot/others/	
 bot/secret/
+bot/config - local.cfg
+bot/config - local.cfg
+bot/config - dev hosted.cfg

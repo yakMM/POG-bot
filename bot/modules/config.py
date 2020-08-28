@@ -51,6 +51,7 @@ audio_ids = {
     "drop_match_1_picks": "",
     "drop_match_2_picks": "",
     "drop_match_3_picks": "",
+    "factions_selected": "",
     "gelos_in_prison": "",
     "map_selected": "",
     "players_drop_channel": ""

@@ -436,7 +436,7 @@ class Match:
         self.__status = MatchStatus.IS_PICKING
         await channelSend("MATCH_SHOW_PICKS", self.__id, self.__teams[0].captain.mention, match=self)
         # ts3: select teams
-        await sleep(10)
+        await sleep(17)  # wait some time after the bot moves before announcing to select players for teams
         ts3bot = which_bot(self.__id)
         pick_channel = which_pick_channels(self.__id)
         ts3bot.move(pick_channel)

@@ -20,6 +20,9 @@ class Ts3Bot:
     class WebapiError(Exception):
         pass
 
+    class SinusbotAuthError(Exception):
+        pass
+
     def __init__(self, main_url, instance_name, username="admin", password=""):
         self.initialized = None
 
@@ -30,7 +33,15 @@ class Ts3Bot:
 
             login_endpoint = '/login'
             data = {'username': username, 'password': password, 'botId': self.botId}
-            self.auth_token = requests.post(self.main_url + login_endpoint, data=data).json()["token"]
+            self.auth_token = ""
+            try:
+                login_response = requests.post(self.main_url + login_endpoint, data=data)
+                if login_response.status_code == 401:
+                    raise self.SinusbotAuthError
+                else:
+                    self.auth_token = login_response.json()["token"]
+            except self.SinusbotAuthError as sae:
+                log.error(f"Bad sinusbot username or password. Unable to connect.\n{sae}")
 
             instances_endpoint = '/instances'
             instances_response = requests.get(self.main_url + instances_endpoint,
@@ -54,8 +65,7 @@ class Ts3Bot:
             for track in songlist_response:
                 if track['uuid'] in cfg.audio_ids.values():
                     self.track_durations[track['uuid']] = track['duration']
-                    # uncomment this line below if you want to print the song names, ids, and durations to the log file:
-                    # log.info(track['title'], track['uuid'], track['duration'])
+                    log.debug(track['uuid'], str(track['duration']))
 
     def check_initialized(self):
         if self.initialized:
@@ -182,8 +192,8 @@ def init():
     except Exception as e:
         log.error(f"Uncaught exception starting ts3 bots! Continuing script without bots functioning... {type(e).__name__}\n{e}")
 
+
 # FOR TESTING:
 if __name__ == "__main__":
     cfg.getConfig(f"config{''}.cfg")
     init()
-    print(bot1.get_duration(cfg.audio_ids["drop_match_1_picks"]))
