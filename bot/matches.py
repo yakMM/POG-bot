@@ -155,7 +155,7 @@ def which_pick_channels(match_id):
     pick_channel = ""
     for i in range(0, 3):
         if match_id == cfg.discord_ids["matches"][i]:
-            pick_channel = cfg.teamspeak_ids[f"ts_match_{i}_picks"]
+            pick_channel = cfg.teamspeak_ids[f"ts_match_{i+1}_picks"]
     return pick_channel
 
 
@@ -163,7 +163,7 @@ def which_team_channels(match_id):
     team_channels = ("", "")
     for i in range(0, 3):
         if match_id == cfg.discord_ids["matches"][i]:
-            team_channels = (cfg.teamspeak_ids[f"ts_match_{i}_team_1"], cfg.teamspeak_ids[f"ts_match_{i}_team_2"])
+            team_channels = (cfg.teamspeak_ids[f"ts_match_{i+1}_team_1"], cfg.teamspeak_ids[f"ts_match_{i+1}_team_2"])
     return team_channels
 
 

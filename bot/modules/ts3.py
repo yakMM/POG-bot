@@ -75,12 +75,14 @@ class Ts3Bot:
 
     def get_duration(self, songId):
         if self.check_initialized():
-            pad = 200  # extra time in ms to extend past duration
+            pad = 400  # extra time in ms to extend past duration
             try:
                 return (self.track_durations[songId] + pad)/1000
             except KeyError:
                 logging.warning("Track uuid does not exist!")
                 return 0
+        else:
+            return 0
 
     def get_list(self):
         if self.check_initialized():
@@ -157,9 +159,9 @@ def init():
         bot1 = Ts3Bot(None, None)
         bot2 = Ts3Bot(None, None)
 
-        bot1 = Ts3Bot('http://127.0.0.1:8087/api/v1/bot', "bot1",
+        bot1 = Ts3Bot('http://localhost:8087/api/v1/bot', "bot1",
                       username=cfg.general["sinusbot_user"], password=cfg.general["sinusbot_pass"])
-        bot2 = Ts3Bot('http://127.0.0.1:8087/api/v1/bot', "bot2",
+        bot2 = Ts3Bot('http://localhost:8087/api/v1/bot', "bot2",
                       username=cfg.general["sinusbot_user"], password=cfg.general["sinusbot_pass"])
 
         if bot1.initialized and bot2.initialized:
@@ -180,3 +182,8 @@ def init():
     except Exception as e:
         log.error(f"Uncaught exception starting ts3 bots! Continuing script without bots functioning... {type(e).__name__}\n{e}")
 
+# FOR TESTING:
+if __name__ == "__main__":
+    cfg.getConfig(f"config{''}.cfg")
+    init()
+    print(bot1.get_duration(cfg.audio_ids["drop_match_1_picks"]))
