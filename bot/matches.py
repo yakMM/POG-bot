@@ -329,7 +329,8 @@ class Match:
         # ts3: select map
         pick_channel = which_pick_channels(self.__id)
         ts3bot.move(pick_channel)
-        await sleep(0.1)  # prevents bug when enqueuing songs too quickly
+        await sleep(1)  # prevents playing this before faction announce
+        # await sleep(ts3bot.get_duration(cfg.audio_ids["team_2_tr"]))  # prevents playing this before faction announce
         ts3bot.enqueue(cfg.audio_ids["select_map"])
         await channelSend("PK_WAIT_MAP", self.__id, *captainPings)
 
