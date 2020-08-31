@@ -10,23 +10,27 @@ from modules.exceptions import DatabaseError
 
 # Modules for the custom classes
 # Circular import disclaimer: database.py is only imported by main.py, so it's fine to import the following:
-from classes.players import Player # ok
-from classes.maps import Map # ok
+from classes.players import Player  # ok
+from classes.maps import Map  # ok
 
 # dict for the collections
 collections = dict()
 
-## Public
+
+# Public
 def getAllPlayers():
     """ Get all players from db to memory
     """
     users = collections["users"].find()
     # Adding them
+
     try:
         for result in users:
-            Player.newFromData(result)
+            if type(result["_id"]) == int:
+                Player.newFromData(result)
     except KeyError:
         raise DatabaseError("KeyError when retrieving players")
+
 
 def getAllMaps():
     """ Get all maps from db to memory
@@ -60,6 +64,7 @@ def init(config):
     for collec in config["collections"]:
         collections[collec] = db[config["collections"][collec]]
 
+
 def forceBasesUpdate(bases):
     """ This is only called from external script for db maintenance
     """
@@ -67,17 +72,18 @@ def forceBasesUpdate(bases):
     collections["sBases"].insert_many(bases)
 
 
-## Private
+# Private
 def _update(p):
     """ Update player p into db
     """
-    if collections["users"].count_documents({ "_id": p.id }) != 0:
-        collections["users"].update_one({"_id":p.id},{"$set":p.getData()})
+    if collections["users"].count_documents({"_id": p.id}) != 0:
+        collections["users"].update_one({"_id": p.id}, {"$set": p.getData()})
     else:
         collections["users"].insert_one(p.getData())
 
+
 def _remove(p):
-    if collections["users"].count_documents({ "_id": p.id }) != 0:
-        collections["users"].delete_one({"_id":p.id}) 
+    if collections["users"].count_documents({"_id": p.id}) != 0:
+        collections["users"].delete_one({"_id": p.id})
     else:
         raise DatabaseError(f"Player {p.id} not in database")

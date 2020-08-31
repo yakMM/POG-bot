@@ -23,12 +23,11 @@ class LobbyCog(commands.Cog, name='lobby'):
     @commands.Cog.listener()
     async def on_ready(self):
         log.info('Lobby Cog is online')
-        return # we don't display a message on each restart
+        return  # we don't display a message on each restart
         try:
             await channelSend("CHANNEL_INIT", cfg.discord_ids["lobby"], cfg.discord_ids["lobby"])
         except AttributeError:
             raise UnexpectedError("Invalid channel id!")
-
 
     async def cog_check(self, ctx):
         return ctx.channel.id == cfg.discord_ids['lobby']
@@ -47,13 +46,13 @@ class LobbyCog(commands.Cog, name='lobby'):
     async def join(self, ctx):
         """ Join queue
         """
-        if getLobbyLen() > cfg.general["lobby_size"]: # This should not happen EVER
+        if getLobbyLen() > cfg.general["lobby_size"]:  # This should not happen EVER
             await send("UNKNOWN_ERROR", ctx, "Lobby Overflow")
             return
         try:
             player = getPlayer(ctx.message.author.id)
         except ElementNotFound:
-            await send("EXT_NOT_REGISTERED", ctx,  cfg.discord_ids["register"])
+            await send("EXT_NOT_REGISTERED", ctx, cfg.discord_ids["register"])
             return
         if player.status == PlayerStatus.IS_NOT_REGISTERED:
             await send("EXT_NOT_REGISTERED", ctx, cfg.discord_ids["register"])
@@ -72,9 +71,7 @@ class LobbyCog(commands.Cog, name='lobby'):
             return
 
         addToLobby(player)
-        await send("LB_ADDED", ctx,  namesInLobby=getAllNamesInLobby())
-
-
+        await send("LB_ADDED", ctx, namesInLobby=getAllNamesInLobby())
 
     @commands.command(aliases=['l'])
     @commands.guild_only()
@@ -92,7 +89,6 @@ class LobbyCog(commands.Cog, name='lobby'):
             return
         await send("LB_NOT_IN", ctx)
 
-
     @commands.command(aliases=['q'])
     @commands.guild_only()
     async def queue(self, ctx):
@@ -106,6 +102,7 @@ class LobbyCog(commands.Cog, name='lobby'):
             await send("LB_STUCK", ctx)
             return
         await send("LB_QUEUE", ctx, namesInLobby=getAllNamesInLobby())
+
 
 def setup(client):
     client.add_cog(LobbyCog(client))
