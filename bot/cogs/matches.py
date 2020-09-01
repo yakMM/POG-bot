@@ -24,16 +24,6 @@ class MatchesCog(commands.Cog, name='matches'):
     def __init__(self, client):
         self.client = client
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        log.info('Matches Cog is online')
-        return # we don't display a message on each restart
-        try:
-            for id in cfg.discord_ids["matches"]:
-                await channelSend("CHANNEL_INIT", id, id)
-        except AttributeError:
-            raise UnexpectedError("Invalid channel id!")
-
     async def cog_check(self, ctx): # Check if right channel
         return ctx.channel.id in cfg.discord_ids['matches']
     

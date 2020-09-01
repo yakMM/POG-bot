@@ -20,16 +20,6 @@ class LobbyCog(commands.Cog, name='lobby'):
     def __init__(self, client):
         self.client = client
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        log.info('Lobby Cog is online')
-        return # we don't display a message on each restart
-        try:
-            await channelSend("CHANNEL_INIT", cfg.discord_ids["lobby"], cfg.discord_ids["lobby"])
-        except AttributeError:
-            raise UnexpectedError("Invalid channel id!")
-
-
     async def cog_check(self, ctx):
         return ctx.channel.id == cfg.discord_ids['lobby']
 

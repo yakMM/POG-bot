@@ -12,6 +12,7 @@ from modules.display import channelSend, send
 from modules.tools import isAlNum
 from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
 from modules.database import update as dbUpdate
+from modules.roles import getRole
 
 log = getLogger(__name__)
 
@@ -23,14 +24,6 @@ class registerCog(commands.Cog, name='register'):
     def __init__(self, client):
         self.client = client
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        log.info('Register Cog is online')
-        return # we don't display a message on each restart
-        try:
-            await channelSend("CHANNEL_INIT", cfg.discord_ids["register"], cfg.discord_ids["register"])
-        except AttributeError:
-            raise UnexpectedError("Invalid channel id!")
 
     """
     Registered Commands:
@@ -59,17 +52,18 @@ class registerCog(commands.Cog, name='register'):
     @commands.command()
     @commands.guild_only()
     async def notify(self, ctx):
-        member = ctx.author
-        notify = member.guild.get_role(cfg.discord_ids["notify_role"])
-        registered = member.guild.get_role(cfg.discord_ids["registered_role"])
-        if notify in member.roles:
-            await member.add_roles(registered)
-            await member.remove_roles(notify)
+        try:
+            player = getPlayer(ctx.author.id)
+        except ElementNotFound:
+            await send("REG_NO_RULE", ctx, cfg.discord_ids["rules"])
+            return
+        if player.isNotify:
+            player.isNotify = False
             await send("NOTIFY_REMOVED", ctx)
         else:
-            await member.add_roles(notify)
-            await member.remove_roles(registered)
+            player.isNotify = True
             await send("NOTIFY_ADDED", ctx)
+        await dbUpdate(player)
 
 def setup(client):
     client.add_cog(registerCog(client))

@@ -6,9 +6,10 @@ import enum
 # Custom modules
 import modules.config as cfg
 from modules.asynchttp import request as httpRequest
-from modules.exceptions import UnexpectedError, ElementNotFound, StatusNotAllowed, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
+from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
 from modules.enumerations import PlayerStatus
 from lib import tasks
+from modules.roles import onNotifyUpdate
 
 WORLD_ID = 19 # Jaeger ID
 
@@ -36,6 +37,9 @@ def removePlayer(p):
             del _namesChecking[i][p.igIds[i]]
     del _allPlayers[p.id]
 
+def getAllPlayersList():
+    return _allPlayers.values()
+
 class Player():
     """ Basic player class, every registered user matches a Player object contained in the dictionary
     """
@@ -46,6 +50,7 @@ class Player():
         self._rank = 0
         self._igNames = ["N/A", "N/A", "N/A"]
         self._igIds = [0,0,0]
+        self._roles = {"notify" : False}
         self._status = PlayerStatus.IS_NOT_REGISTERED
         self._hasOwnAccount = False
         self._active = None
@@ -57,6 +62,7 @@ class Player():
         obj = cls(data["name"], data["_id"])
         obj._status=PlayerStatus.IS_REGISTERED
         obj._rank = data["rank"]
+        obj._roles = data["roles"]
         obj._igNames = data["igNames"]
         obj._igIds = data["igIds"]
         obj._hasOwnAccount = data["hasOwnAccount"]
@@ -69,7 +75,7 @@ class Player():
         return self._active
 
     def clean(self):
-        self._status = PlayerStatus.IS_REGISTERED
+        self.status = PlayerStatus.IS_REGISTERED
         self._match = None
         self._active = None
         if not self._hasOwnAccount:
@@ -79,6 +85,28 @@ class Player():
     @property
     def name(self):
         return self._name
+    
+    @property
+    def isNotify(self):
+        return self._roles["notify"]
+    
+    @isNotify.setter
+    def isNotify(self, value):
+        self._roles["notify"] = value
+        self.updateRole()
+    
+    def updateRole(self):
+        try:
+            self.roleTask.start()
+        except RuntimeError: # if task is already active
+            pass
+
+    
+    @tasks.loop(count=1)
+    async def roleTask(self):
+        await onNotifyUpdate(self)
+
+
 
     @property
     def id(self):
@@ -110,10 +138,9 @@ class Player():
 
     @status.setter
     def status(self, status):
-        if status in (PlayerStatus.IS_NOT_REGISTERED, PlayerStatus.IS_MATCHED): # these status are set automatically from inside the class, can't set them from outside
-            raise StatusNotAllowed(status.name)
-            return
         self._status = status
+        self.updateRole()
+        self.onInactive.cancel()
 
     @property
     def match(self): # when in match
@@ -121,9 +148,8 @@ class Player():
 
     @match.setter
     def match(self, m):
-        self.onInactive.cancel() # don't want player to be kicked because becoming offline if in match
         self._match = m
-        self._status = PlayerStatus.IS_MATCHED
+        self.status = PlayerStatus.IS_MATCHED
 
     @property
     def hasOwnAccount(self):
@@ -133,6 +159,7 @@ class Player():
         data = {"_id" : self._id,
                 "name" : self._name,
                 "rank" : self._rank,
+                "roles" : self._roles,
                 "igNames" : self._igNames,
                 "igIds" : self._igIds,
                 "hasOwnAccount" : self._hasOwnAccount
@@ -146,18 +173,18 @@ class Player():
         """
         updated = False
         if charList == None:
-            if(self._status == PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount):
+            if(self.status == PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount):
                 updated = True
             self._igIds = [0,0,0]
             self._igNames = ["N/A", "N/A", "N/A"]
-            if self._status == PlayerStatus.IS_NOT_REGISTERED:
-                self._status = PlayerStatus.IS_REGISTERED
+            if self.status == PlayerStatus.IS_NOT_REGISTERED:
+                self.status = PlayerStatus.IS_REGISTERED
             self._hasOwnAccount = False
             return updated
         updated = await self._addCharacters(charList)
         if updated:
-            if self._status == PlayerStatus.IS_NOT_REGISTERED:
-                self._status = PlayerStatus.IS_REGISTERED
+            if self.status == PlayerStatus.IS_NOT_REGISTERED:
+                self.status = PlayerStatus.IS_REGISTERED
             self._hasOwnAccount = True
         return updated
 

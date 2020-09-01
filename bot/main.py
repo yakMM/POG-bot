@@ -27,10 +27,11 @@ from modules.database import init as dbInit, getAllPlayers, getAllMaps
 from modules.enumerations import PlayerStatus
 from modules.tools import isAdmin
 from modules.loader import init as cogInit, isAllLocked, unlockAll
+from modules.roles import getRole, init as rolesInit, checkRoles, onNotifyUpdate
 
 # Modules for the custom classes
 from matches import onPlayerInactive, onPlayerActive, init as matchesInit
-from classes.players import Player, getPlayer
+from classes.players import Player, getPlayer, getAllPlayersList
 from classes.accounts import AccountHander
 
 
@@ -76,7 +77,7 @@ def _addMainHandlers(client):
     # on ready
     @client.event
     async def on_ready():
-        logging.info('Client is online')
+        rolesInit(client)
 
         # fetch rule message, remove all reaction but the bot's
         global rulesMsg
@@ -84,6 +85,10 @@ def _addMainHandlers(client):
         await rulesMsg.clear_reactions()
         await sleep(0.2)
         await rulesMsg.add_reaction('✅')
+
+        await checkRoles(getAllPlayersList())
+        unlockAll(client)
+        logging.info('Client is ready!')
 
     # Global command error handler
     @client.event
@@ -135,13 +140,13 @@ def _addMainHandlers(client):
                     p = getPlayer(payload.member.id)
                 except ElementNotFound: # if new player
                     p = Player(payload.member.name, payload.member.id) # create a new profile
-                if p.status == PlayerStatus.IS_NOT_REGISTERED:
-                    await channelSend("REG_RULES", cfg.discord_ids["register"], payload.member.mention) # they can now register
-                registered = payload.member.guild.get_role(cfg.discord_ids["registered_role"])
-                info = payload.member.guild.get_role(cfg.discord_ids["info_role"])
-                notify = payload.member.guild.get_role(cfg.discord_ids["notify_role"])
+                registered = getRole("registered")
+                info = getRole("info")
+                notify = getRole("notify")
                 if notify not in payload.member.roles and registered not in payload.member.roles:
                     await payload.member.add_roles(registered)
+                    if p.status == PlayerStatus.IS_NOT_REGISTERED:
+                        await channelSend("REG_RULES", cfg.discord_ids["register"], payload.member.mention) # they can now register
                 await payload.member.remove_roles(info)
 
             await rulesMsg.remove_reaction(payload.emoji, payload.member) # In any case remove the reaction, message is to stay clean
@@ -170,17 +175,24 @@ def _addMainHandlers(client):
             await edit("ACC_UPDATE", account.message, account=account)
             await account.message.remove_reaction(reaction.emoji,client.user)
 
-    # Status update handler (for inactivity)
     @client.event
     async def on_member_update(before, after):
+        if before.status != after.status:
+            on_status_update(after)
+
+    # Status update handler (for inactivity)
+    def on_status_update(user):
+        print(f"Status ({user.name}): {user.status}")
         try:
-            player = getPlayer(after.id)
+            player = getPlayer(user.id)
         except ElementNotFound:
             return
-        if after.status == Status.offline:
+        if user.status == Status.offline:
             onPlayerInactive(player)
         else:
             onPlayerActive(player)
+        player.updateRole()
+
 
 # TODO: testing, to be removed
 def _test(client):
@@ -236,7 +248,6 @@ def main(launchStr=""):
 
     # Add all cogs
     cogInit(client)
-    unlockAll(client)
 
     # Run server
     client.run(cfg.general["token"])
@@ -245,5 +256,5 @@ def main(launchStr=""):
 if __name__ == "__main__":
     # execute only if run as a script
     # Use main() for production
-    #main("_test")
-    main()
+    main("_test")
+    #main()

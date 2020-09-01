@@ -392,7 +392,7 @@ class _StringEnum(Enum):
 
     BOT_UNLOCKED = _Message("Unlocked!")
     BOT_LOCKED = _Message("Locked!")
-    BOT_IS_LOCKED = _Message("Unlock the bot before using this command!")
+    BOT_IS_LOCKED = _Message("Bot is locked!")
     BOT_ALREADY = _Message("Already {}!")
     BOT_VERSION = _Message("Version `{}`, locked: `{}`")
     BOT_FREEZED = _Message("Channel freezed!")

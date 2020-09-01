@@ -1,3 +1,8 @@
+# v1.0.10:
+- All players will now have accurate roles depending on their status
+- Notify role should now reflect more accurately players ready to queue
+- Fixed a bug with afk players in queue
+
 # v1.0.9:
 - Updated Jaeger Calendar Link
 - Current UTC time is now displayed along Jaeger Calendar link

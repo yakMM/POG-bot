@@ -8,6 +8,7 @@ from modules.exceptions import ElementNotFound, DatabaseError
 from modules.tools import isAdmin
 from modules.database import remove
 from modules.loader import lockAll, unlockAll, isAllLocked
+from modules.roles import getRole
 
 from classes.players import removePlayer, getPlayer
 
@@ -23,10 +24,6 @@ class AdminCog(commands.Cog, name='admin'):
 
     def __init__(self, client):
         self.client = client
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        log.info('Admin Cog is online')
 
     async def cog_check(self, ctx):
         return isAdmin(ctx.author)
@@ -106,10 +103,11 @@ class AdminCog(commands.Cog, name='admin'):
                 pass # ignored if not yet in db
             memb = ctx.author.guild.get_member(player.id)
             removePlayer(player)
-            notify = memb.guild.get_role(cfg.discord_ids["notify_role"])
-            registered = memb.guild.get_role(cfg.discord_ids["registered_role"])
-            await memb.remove_roles(notify)
-            await memb.remove_roles(registered)
+            registered = getRole("registered")
+            notify = getRole("notify")
+            if memb is not None:
+                await memb.remove_roles(notify)
+                await memb.remove_roles(registered)
             await send("RM_OK", ctx)
             return
         await send("RM_IN_MATCH", ctx)

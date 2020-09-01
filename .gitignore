@@ -7,5 +7,7 @@ bot/test3.py
 bot/others/
 bot/config_test.cfg
 bot/client_secret_test.json
-bot/secret/
+bot/config.cfg
+bot/client_secret.json
+secret/
 logging/*

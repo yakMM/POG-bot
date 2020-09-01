@@ -2,13 +2,13 @@ from gspread import service_account
 from numpy import array
 import modules.config as cfg
 from modules.database import _update, init as dbInit
-from classes.players import Player
-from modules.database import forceBasesUpdate
+from classes.players import Player, _allPlayers
+from modules.database import forceBasesUpdate, getAllPlayers, _update
 import requests
 import json
 import asyncio
 
-LAUNCHSTR = "_test" # this should be empty if your files are config.cfg and client_secret.json
+LAUNCHSTR = "" # this should be empty if your files are config.cfg and client_secret.json
 
 cfg.getConfig(f"config{LAUNCHSTR}.cfg")
 dbInit(cfg.database)
@@ -61,3 +61,9 @@ def getAllMapsFromApi():
         mp["zone_id"] = int(mp.pop("zone_id"))
         mp["type_id"] = int(mp.pop("facility_type_id"))
     forceBasesUpdate(jdata["map_region_list"])
+
+def dbEdit():
+    getAllPlayers()
+    for p in _allPlayers.values():
+        _update(p)
+
