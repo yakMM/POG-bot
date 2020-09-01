@@ -30,7 +30,7 @@ general = {
     "lobby_size" : 0
     }
 
-AFK_TIME = 20 # minutes
+AFK_TIME = 15 # minutes
 ROUND_LENGHT = 10 # minutes
 VERSION = "0"
 

@@ -60,7 +60,7 @@ class Player():
     @classmethod
     def newFromData(cls, data): # make a new Player object from database data
         obj = cls(data["name"], data["_id"])
-        obj._status=PlayerStatus.IS_REGISTERED
+        obj._status = PlayerStatus.IS_REGISTERED
         obj._rank = data["rank"]
         obj._roles = data["roles"]
         obj._igNames = data["igNames"]
@@ -73,14 +73,6 @@ class Player():
     @property
     def active(self): # "Active player" object, when player is in a match, contains more info
         return self._active
-
-    def clean(self):
-        self.status = PlayerStatus.IS_REGISTERED
-        self._match = None
-        self._active = None
-        if not self._hasOwnAccount:
-            self._igNames = ["N/A", "N/A", "N/A"]
-            self._igIds = [0,0,0]
 
     @property
     def name(self):
@@ -97,16 +89,52 @@ class Player():
     
     def updateRole(self):
         try:
+            self.roleTask.cancel()
             self.roleTask.start()
         except RuntimeError: # if task is already active
             pass
 
-    
     @tasks.loop(count=1)
     async def roleTask(self):
         await onNotifyUpdate(self)
 
+    def onLobbyLeave(self):
+        self._status = PlayerStatus.IS_REGISTERED
+        self.inactiveTask.stop()
+        self.updateRole()
+    
+    def onLobbyAdd(self):
+        self._status = PlayerStatus.IS_LOBBIED
+        self.updateRole()
 
+    def onMatchReady(self):
+        self._status = PlayerStatus.IS_PLAYING
+    
+    def onPlayerClean(self):
+        self._match = None
+        self._active = None
+        if not self._hasOwnAccount:
+            self._igNames = ["N/A", "N/A", "N/A"]
+            self._igIds = [0,0,0]
+        self._status = PlayerStatus.IS_REGISTERED
+        self.updateRole()
+    
+    def onMatchSelected(self, m):
+        self._match = m
+        self._status = PlayerStatus.IS_MATCHED
+        self.inactiveTask.cancel()
+    
+    def onInactive(self, fct):
+        if self._status is PlayerStatus.IS_LOBBIED:
+            self.inactiveTask.start(fct)
+    
+    def onActive(self):
+        if self.status is PlayerStatus.IS_LOBBIED:
+            self.inactiveTask.cancel()
+    
+    @tasks.loop(minutes=cfg.AFK_TIME,delay=1, count=2)
+    async def inactiveTask(self, fct): # when inactive for cfg.AFK_TIME, execute fct
+        await fct(self)
 
     @property
     def id(self):
@@ -136,20 +164,9 @@ class Player():
     def status(self):
         return self._status
 
-    @status.setter
-    def status(self, status):
-        self._status = status
-        self.updateRole()
-        self.onInactive.cancel()
-
     @property
     def match(self): # when in match
         return self._match
-
-    @match.setter
-    def match(self, m):
-        self._match = m
-        self.status = PlayerStatus.IS_MATCHED
 
     @property
     def hasOwnAccount(self):
@@ -173,18 +190,18 @@ class Player():
         """
         updated = False
         if charList == None:
-            if(self.status == PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount):
+            if(self._status == PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount):
                 updated = True
             self._igIds = [0,0,0]
             self._igNames = ["N/A", "N/A", "N/A"]
-            if self.status == PlayerStatus.IS_NOT_REGISTERED:
-                self.status = PlayerStatus.IS_REGISTERED
+            if self._status == PlayerStatus.IS_NOT_REGISTERED:
+                self._status = PlayerStatus.IS_REGISTERED
             self._hasOwnAccount = False
             return updated
         updated = await self._addCharacters(charList)
         if updated:
-            if self.status == PlayerStatus.IS_NOT_REGISTERED:
-                self.status = PlayerStatus.IS_REGISTERED
+            if self._status == PlayerStatus.IS_NOT_REGISTERED:
+                self._status = PlayerStatus.IS_REGISTERED
             self._hasOwnAccount = True
         return updated
 
@@ -236,10 +253,6 @@ class Player():
                 _namesChecking[i][self._igIds[i]] = self
         return updated
 
-    @tasks.loop(minutes=cfg.AFK_TIME,delay=1, count=2)
-    async def onInactive(self, fct): # when inactive for cfg.AFK_TIME, execute fct
-        await fct(self)
-
 
 class ActivePlayer:
     """ ActivePlayer class, with more data than Player class, for when match is happening
@@ -254,9 +267,10 @@ class ActivePlayer:
         self.__score=0
         self.__team = team
         self.__account = None
+        self.__player._status = PlayerStatus.IS_PICKED
 
     def clean(self):
-        self.__player.clean()
+        self.__player.onPlayerClean()
 
     @property
     def name(self):
@@ -265,10 +279,6 @@ class ActivePlayer:
     @property
     def status(self):
         return self.__player.status
-
-    @status.setter
-    def status(self, status):
-        self.__player.status = status
 
     @property
     def id(self):

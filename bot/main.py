@@ -30,7 +30,7 @@ from modules.loader import init as cogInit, isAllLocked, unlockAll
 from modules.roles import getRole, init as rolesInit, checkRoles, onNotifyUpdate
 
 # Modules for the custom classes
-from matches import onPlayerInactive, onPlayerActive, init as matchesInit
+from matches import onInactiveConfirmed, init as matchesInit
 from classes.players import Player, getPlayer, getAllPlayersList
 from classes.accounts import AccountHander
 
@@ -182,15 +182,14 @@ def _addMainHandlers(client):
 
     # Status update handler (for inactivity)
     def on_status_update(user):
-        print(f"Status ({user.name}): {user.status}")
         try:
             player = getPlayer(user.id)
         except ElementNotFound:
             return
         if user.status == Status.offline:
-            onPlayerInactive(player)
+            player.onInactive(onInactiveConfirmed)
         else:
-            onPlayerActive(player)
+            player.onActive()
         player.updateRole()
 
 

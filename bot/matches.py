@@ -25,24 +25,34 @@ def getMatch(id):
         raise ElementNotFound(id) # should never happen
     return _allMatches[id]
 
-
 def isLobbyStuck():
     global _lobbyStuck
     return _lobbyStuck
 
+def _autoPingTreshold():
+    return 2
+    tresh = cfg.general["lobby_size"] - cfg.general["lobby_size"] // 3
+    return tresh
+
+def _autoPingCancel():
+    _autoPing.cancel()
+    _autoPing.already = False
+
 def addToLobby(player):
     _lobbyList.append(player)
-    player.status = PlayerStatus.IS_LOBBIED
+    player.onLobbyAdd()
     if len(_lobbyList) == cfg.general["lobby_size"]:
-        _autoPing.cancel()
         startMatchFromFullLobby.start()
-    elif len(_lobbyList) >= cfg.general["lobby_size"] - 4:
-        if not _autoPing.is_running():
+    elif len(_lobbyList) >= _autoPingTreshold():
+        if not _autoPing.is_running() and not _autoPing.already:
+            print("launch")
             _autoPing.start()
+            _autoPing.already = True
 
-@tasks.loop(seconds=100, delay=1, count=2)
+@tasks.loop(seconds=10, delay=1, count=2)
 async def _autoPing():
     await channelSend("LB_NOTIFY", cfg.discord_ids["lobby"], f'<@&{cfg.discord_ids["notify_role"]}>')
+_autoPing.already = False
 
 def getLobbyLen():
     return len(_lobbyList)
@@ -54,7 +64,7 @@ def getAllNamesInLobby():
 def removeFromLobby(player):
     _lobbyList.remove(player)
     _onLobbyRemove()
-    player.status = PlayerStatus.IS_REGISTERED
+    player.onLobbyLeave()
 
 def _onMatchFree():
     if len(_lobbyList) == cfg.general["lobby_size"]:
@@ -63,8 +73,8 @@ def _onMatchFree():
 def _onLobbyRemove():
     global _lobbyStuck
     _lobbyStuck = False
-    if len(_lobbyList) < cfg.general["lobby_size"]-4:
-        _autoPing.cancel()
+    if len(_lobbyList) < _autoPingTreshold():
+        _autoPingCancel()
 
 @tasks.loop(count=1)
 async def startMatchFromFullLobby():
@@ -72,24 +82,16 @@ async def startMatchFromFullLobby():
     match = _findSpotForMatch()
     if match == None:
         _lobbyStuck = True
-        _autoPing.cancel()
+        _autoPingCancel()
         await channelSend("LB_STUCK", cfg.discord_ids["lobby"])
         return
     _lobbyStuck = False
     match._setPlayerList(_lobbyList)
     for p in _lobbyList:
-        p.match = match # Player status is modified automatically in IS_MATCHED
+        p.onMatchSelected(match) # Player status is modified automatically in IS_MATCHED
     _lobbyList.clear()
     match._launch.start()
     await channelSend("LB_MATCH_STARTING", cfg.discord_ids["lobby"], match.id)
-
-def onPlayerInactive(player):
-    if player.status == PlayerStatus.IS_LOBBIED:
-        player.onInactive.start(onInactiveConfirmed)
-
-def onPlayerActive(player):
-    if player.status == PlayerStatus.IS_LOBBIED:
-        player.onInactive.cancel()
 
 async def onInactiveConfirmed(player):
     removeFromLobby(player)
@@ -100,7 +102,7 @@ def clearLobby():
     if len(_lobbyList) == 0:
         return False
     for p in _lobbyList:
-        p.status = PlayerStatus.IS_REGISTERED
+        p.onLobbyLeave()
     _lobbyList.clear()
     _onLobbyRemove()
     return True
@@ -267,7 +269,7 @@ class Match():
     @tasks.loop(count=1)
     async def __ready(self):
         for tm in self.__teams:
-            tm.matchReady()
+            tm.onMatchReady()
             tm.captain.isTurn = True
         captainPings = [tm.captain.mention for tm in self.__teams]
         try:
@@ -281,7 +283,7 @@ class Match():
 
     @tasks.loop(minutes=cfg.ROUND_LENGHT, delay=1, count=2)
     async def _onMatchOver(self):
-        playerPings = [tm.allPings for tm in self.__teams]
+        playerPings = [" ".join(tm.allPings) for tm in self.__teams]
         await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
         for tm in self.__teams:
             tm.captain.isTurn = True
@@ -303,7 +305,7 @@ class Match():
         await sleep(10)
         await channelSend("MATCH_STARTING_2", self.__id, self.roundNo, "10")
         await sleep(10)
-        playerPings = [tm.allPings for tm in self.__teams]
+        playerPings = [" ".join(tm.allPings) for tm in self.__teams]
         await channelSend("MATCH_STARTED", self.__id, *playerPings, self.roundNo)
         self.__roundsStamps.append(int(dt.timestamp(dt.now())))
         self.__status = MatchStatus.IS_PLAYING
@@ -329,7 +331,7 @@ class Match():
 
         if self.status == MatchStatus.IS_PLAYING:
             self._onMatchOver.cancel()
-            playerPings = [tm.allPings for tm in self.__teams]
+            playerPings = [" ".join(tm.allPings) for tm in self.__teams]
             await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
             await channelSend("MATCH_OVER", self.__id)
 
@@ -338,12 +340,12 @@ class Match():
 
         # Clean players if left in the list
         for p in self.__players.values():
-            p.clean()
+            p.onPlayerClean()
 
         # Clean players if in teams
         for tm in self.__teams:
-            for p in tm.players:
-                p.clean()
+            for aPlayer in tm.players:
+                aPlayer.clean()
         
         # Clean mapSelector
         self.__mapSelector.clean()

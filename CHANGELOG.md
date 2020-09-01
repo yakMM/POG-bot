@@ -2,6 +2,8 @@
 - All players will now have accurate roles depending on their status
 - Notify role should now reflect more accurately players ready to queue
 - Fixed a bug with afk players in queue
+- Overhauled player status code
+- Tweaked the conditions for the bot to ping @Notify
 
 # v1.0.9:
 - Updated Jaeger Calendar Link

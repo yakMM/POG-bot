@@ -46,13 +46,15 @@ class Team:
 
     @property
     def playerPings(self):
+        # Excluding captain
         pings = [p.mention for p in self.__players[1:]]
         return pings
 
     @property
     def allPings(self):
+        # All players with captain
         pings = [p.mention for p in self.__players]
-        return " ".join(pings)
+        return pings
 
     @property
     def captain(self):
@@ -65,10 +67,9 @@ class Team:
     def addPlayer(self, cls, player):
         active = cls(player, self)
         self.__players.append(active)
-        active.status = PlayerStatus.IS_PICKED
 
-    def matchReady(self):
+    def onMatchReady(self):
         for p in self.__players:
-            p.status = PlayerStatus.IS_PLAYING
+            p.onMatchReady()
 
 
