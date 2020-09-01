@@ -145,7 +145,7 @@ def _addMainHandlers(client):
                 notify = getRole("notify")
                 if notify not in payload.member.roles and registered not in payload.member.roles:
                     await payload.member.add_roles(registered)
-                    if p.status == PlayerStatus.IS_NOT_REGISTERED:
+                    if p.status is PlayerStatus.IS_NOT_REGISTERED:
                         await channelSend("REG_RULES", cfg.discord_ids["register"], payload.member.mention) # they can now register
                 await payload.member.remove_roles(info)
 
@@ -160,7 +160,7 @@ def _addMainHandlers(client):
             return
         if player.hasOwnAccount:
             return
-        if player.status != PlayerStatus.IS_PLAYING:
+        if player.status is not PlayerStatus.IS_PLAYING:
             return
         if player.active.account == None:
             return
@@ -255,5 +255,6 @@ def main(launchStr=""):
 if __name__ == "__main__":
     # execute only if run as a script
     # Use main() for production
-    main("_test")
-    #main()
+
+    # main("_test")
+    main()

@@ -8,6 +8,7 @@ from modules.exceptions import ElementNotFound
 from modules.display import send
 
 _allMapsList = list()
+mainMapPool = list()
 
 MAX_SELECTED = 15
 
@@ -25,7 +26,27 @@ class Map():
         self.__name = data["facility_name"]
         self.__zoneId = data["zone_id"]
         self.__typeId = data["type_id"]
+        self.__inPool = data["in_map_pool"]
+        if self.__inPool:
+            mainMapPool.append(self)
         _allMapsList.append(self)
+    
+    def getData(self): # get data for database push
+        data = {"_id" : self.__id,
+                "facility_name" : self.__name,
+                "zone_id" : self.__zoneId,
+                "type_id" : self.__typeId,
+                "in_map_pool" : self.__inPool 
+                }
+        return data
+
+    @property
+    def pool(self):
+        return self.__inPool
+    
+    @pool.setter
+    def pool(self, bl):
+        self.__inPool = bl
 
     @property
     def id(self):
@@ -39,34 +60,16 @@ class Map():
         return name
 
 class MapSelection():
-    def __init__(self, id):
+    def __init__(self, id, mapList=_allMapsList):
         self.__id = id
         self.__selection = list()
         self.__selected = None
+        self.__allMaps = mapList
         self.__status = SelStatus.IS_EMPTY
         _mapSelectionsDict[self.__id] = self
 
-    def selectFromIdList(self, ids):
-        self.__selection.clear()
-        if len(ids) > MAX_SELECTED:
-            self.__status = SelStatus.IS_TOO_MUCH
-            return
-        for map in _allMapsList:
-            for id in ids:
-                if id == map.id:
-                    self.__selection.append(map)
-                    break
-        self.__status = SelStatus.IS_SELECTION
-
-    def toString(self):
-        result=""
-        for i in range(len(self.__selection)):
-            result+=f"\n**{str(i+1)}**: " + self.__selection[i].name
-        return result
-
-
     def __doSelection(self, args):
-        if self.__status == SelStatus.IS_SELECTION and len(args) == 1 and args[0].isnumeric():
+        if self.__status is SelStatus.IS_SELECTION and len(args) == 1 and args[0].isnumeric():
             index = int(args[0])
             if index > 0 and index <= len(self.__selection):
                 self.__selected = self.__selection[index-1]
@@ -74,7 +77,7 @@ class MapSelection():
             return
         arg=" ".join(args)
         self.__selection.clear()
-        for map in _allMapsList:
+        for map in self.__allMaps:
             if len(self.__selection) > MAX_SELECTED:
                 self.__status = SelStatus.IS_TOO_MUCH
                 return
@@ -90,11 +93,14 @@ class MapSelection():
         self.__status = SelStatus.IS_SELECTION
     
     async def doSelectionProcess(self, ctx, args):
+        if self.__status is SelStatus.IS_EMPTY and self.isSmallPool:
+            self.__status = SelStatus.IS_SELECTION
+            self.__selection = self.__allMaps.copy()
         if len(args) == 0:
-            if self.__status == SelStatus.IS_SELECTION:
+            if self.__status is SelStatus.IS_SELECTION:
                 await send("MAP_DISPLAY_LIST", ctx, sel=self)
                 return
-            if self.__status == SelStatus.IS_SELECTED:
+            if self.__status is SelStatus.IS_SELECTED:
                 await send("MAP_SELECTED", ctx, self.__selected.name)
                 return
             await send("MAP_HELP", ctx)
@@ -103,26 +109,36 @@ class MapSelection():
                 await send("MAP_HELP", ctx)
                 return
         self.__doSelection(args)
-        if self.__status == SelStatus.IS_EMPTY:
+        if self.__status is SelStatus.IS_EMPTY:
             await send("MAP_NOT_FOUND", ctx)
             return
-        if self.__status == SelStatus.IS_TOO_MUCH:
+        if self.__status is SelStatus.IS_TOO_MUCH:
             await send("MAP_TOO_MUCH", ctx)
             return
-        if self.__status == SelStatus.IS_SELECTION:
+        if self.__status is SelStatus.IS_SELECTION:
             await send("MAP_DISPLAY_LIST", ctx, sel=self)
             return
         # If successfully selected:
         return self.__selected
 
     @property
-    def map(self):
-        return self.__selected
-
+    def stringList(self):
+        result=list()
+        if len(self.__selection) > 0:
+            for i in range(len(self.__selection)):
+                result.append(f"**{str(i+1)}**: " + self.__selection[i].name)
+        elif self.isSmallPool:
+            for i in range(len(self.__allMaps)):
+                result.append(f"**{str(i+1)}**: " + self.__allMaps[i].name)
+        return result
 
     @property
-    def selection(self):
-        return self.__selection
+    def isSmallPool(self):
+        return len(self.__allMaps) <= MAX_SELECTED
+
+    @property
+    def map(self):
+        return self.__selected
 
     @property
     def id(self):
@@ -133,16 +149,10 @@ class MapSelection():
         return self.__status
     
     def confirm(self):
-        if self.__status == SelStatus.IS_SELECTED:
+        if self.__status is SelStatus.IS_SELECTED:
             self.__status = SelStatus.IS_CONFIRMED
             return True
         return False
 
     def clean(self):
         del _mapSelectionsDict[self.__id]
-
-
-class MapPool(MapSelection):
-    def __init__(self, id, mapList):
-        super().__init__(id)
-

@@ -47,11 +47,11 @@ class AdminCog(commands.Cog, name='admin'):
             return
         if ctx.channel.id in cfg.discord_ids["matches"]: # clear a match channel
             match = getMatch(ctx.channel.id)
-            if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
+            if match.status is MatchStatus.IS_FREE:
                 await send("MATCH_NO_MATCH", ctx, ctx.command.name)
                 return
-            if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_RESULT):
-                await send("MATCH_ALREADY_STARTED", ctx, ctx.command.name)
+            if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_RESULT, MatchStatus.IS_RUNNING):
+                await send("MATCH_NO_COMMAND", ctx, ctx.command.name)
                 return
             await send("MATCH_CLEAR", ctx)
             await match.clear()
@@ -67,15 +67,15 @@ class AdminCog(commands.Cog, name='admin'):
             await send("WRONG_CHANNEL", ctx, ctx.command.name, " channels " + ", ".join(f'<#{id}>' for id in cfg.discord_ids["matches"]))
             return
         match = getMatch(ctx.channel.id)
-        if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
+        if match.status is MatchStatus.IS_FREE:
             await send("MATCH_NO_MATCH", ctx, ctx.command.name)
             return
-        if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
-            await send("MATCH_ALREADY_STARTED", ctx, ctx.command.name)
+        if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT, MatchStatus.IS_RUNNING):
+            await send("MATCH_NO_COMMAND", ctx, ctx.command.name)
             return
         sel = match.mapSelector
         await sel.doSelectionProcess(ctx, args) # Handle the actual map selection
-        if sel.status == SelStatus.IS_SELECTED:
+        if sel.status is SelStatus.IS_SELECTED:
             match.confirmMap()
             await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
 
@@ -93,7 +93,7 @@ class AdminCog(commands.Cog, name='admin'):
         except ElementNotFound:
             await send("RM_NOT_IN_DB", ctx) # player isn't even registered in the system...
             return
-        if player.status == PlayerStatus.IS_LOBBIED:
+        if player.status is PlayerStatus.IS_LOBBIED:
             removeFromLobby(player)
             await channelSend("RM_LOBBY", cfg.discord_ids["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
         if player.status in (PlayerStatus.IS_REGISTERED, PlayerStatus.IS_NOT_REGISTERED):

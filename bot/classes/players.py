@@ -193,17 +193,17 @@ class Player():
         """
         updated = False
         if charList == None:
-            if(self.__status == PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount):
+            if(self.__status is PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount):
                 updated = True
             self._igIds = [0,0,0]
             self._igNames = ["N/A", "N/A", "N/A"]
-            if self.__status == PlayerStatus.IS_NOT_REGISTERED:
+            if self.__status is PlayerStatus.IS_NOT_REGISTERED:
                 self.__status = PlayerStatus.IS_REGISTERED
             self._hasOwnAccount = False
             return updated
         updated = await self._addCharacters(charList)
         if updated:
-            if self.__status == PlayerStatus.IS_NOT_REGISTERED:
+            if self.__status is PlayerStatus.IS_NOT_REGISTERED:
                 self.__status = PlayerStatus.IS_REGISTERED
             self._hasOwnAccount = True
         return updated

@@ -45,16 +45,16 @@ class LobbyCog(commands.Cog, name='lobby'):
         except ElementNotFound:
             await send("EXT_NOT_REGISTERED", ctx,  cfg.discord_ids["register"])
             return
-        if player.status == PlayerStatus.IS_NOT_REGISTERED:
+        if player.status is PlayerStatus.IS_NOT_REGISTERED:
             await send("EXT_NOT_REGISTERED", ctx, cfg.discord_ids["register"])
             return
         if ctx.author.status == discordStatus.offline:
             await send("LB_OFFLINE", ctx)
             return
-        if player.status == PlayerStatus.IS_LOBBIED:
+        if player.status is PlayerStatus.IS_LOBBIED:
             await send("LB_ALREADY_IN", ctx)
             return
-        if player.status != PlayerStatus.IS_REGISTERED:
+        if player.status is not PlayerStatus.IS_REGISTERED:
             await send("LB_IN_MATCH", ctx)
             return
         if isLobbyStuck():
@@ -76,7 +76,7 @@ class LobbyCog(commands.Cog, name='lobby'):
         except ElementNotFound:
             await send("LB_NOT_IN", ctx)
             return
-        if player.status == PlayerStatus.IS_LOBBIED:
+        if player.status is PlayerStatus.IS_LOBBIED:
             removeFromLobby(player)
             await send("LB_REMOVED", ctx, namesInLobby=getAllNamesInLobby())
             return

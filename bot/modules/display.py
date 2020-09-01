@@ -224,7 +224,8 @@ def _selectedMaps(msg, sel):
     """ Returns a list of maps currently selected
     """
     embed = Embed(colour=Color.blue())
-    embed.add_field(name=f"{len(sel.selection)} maps found",value=sel.toString(),inline=False)
+    maps = sel.stringList
+    embed.add_field(name=f"{len(maps)} maps found",value="\n".join(maps),inline=False)
     return embed
 
 def _teamUpdate(arg, match):
@@ -251,7 +252,7 @@ def _teamUpdate(arg, match):
         else:
             value = f"Captain: {tm.captain.mention}\n"
         value += "Players:\n"+'\n'.join(tm.playerPings)
-        if match.status == MatchStatus.IS_WAITING:
+        if match.status is MatchStatus.IS_WAITING:
             if tm.captain.isTurn:
                 name = f"{tm.name} [{cfg.factions[tm.faction]}] - not ready"
             else:
@@ -263,7 +264,7 @@ def _teamUpdate(arg, match):
         embed.add_field(name = name,
                         value = value,
                         inline=False)
-    if match.status == MatchStatus.IS_PICKING:
+    if match.status is MatchStatus.IS_PICKING:
         embed.add_field(name=f'Remaining',value="\n".join(match.playerPings) ,inline=False)
     return embed
 
@@ -373,7 +374,7 @@ class _StringEnum(Enum):
     PK_FACTION_ALREADY = _Message("Faction already picked by the other team!")
     PK_FACTION_OK_NEXT = _Message("{} chose {}! {} pick a faction!", ping=False)
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
-    PK_WAIT_MAP = _Message("{} {} Pick an available map with `=p base name`!", ping=False, embed=_jaegerCalendar)
+    PK_WAIT_MAP = _Message("{} {} Pick an available map!", ping=False, embed=_jaegerCalendar)
     PK_MAP_OK_CONFIRM = _Message("Picked {}! {} confirm with `=p confirm` if you agree")
     PK_NO_MAP = _Message("No map selected!")
 
@@ -409,7 +410,7 @@ class _StringEnum(Enum):
     MATCH_STARTING_2 = _Message("Round {} is starting in {} seconds!")
     MATCH_STARTED = _Message("{}\n{}\nRound {} is starting now!")
     MATCH_NO_MATCH = _Message("Can't use command `={}`, no match is happening here!")
-    MATCH_ALREADY_STARTED = _Message("Can't use command `={}` now!")
+    MATCH_NO_COMMAND = _Message("Can't use command `={}` now!")
     MATCH_CLEARED = _Message("Successfully cleared!")
     MATCH_PLAYERS_NOT_READY = _Message("Can't get {} ready, {} did not accept their Jaeger accounts", ping=False)
     MATCH_CLEAR = _Message("Clearing match...",ping=False)
@@ -423,6 +424,7 @@ class _StringEnum(Enum):
     MAP_TOO_MUCH = _Message("Too many maps found! Try to be more precise")
     MAP_NOT_FOUND = _Message("Couldn't find a result for your search!")
     MAP_DISPLAY_LIST = _Message("Here are the maps found:", embed=_selectedMaps)
+    MAP_SHOW_POOL = _Message("Map list:", embed=_selectedMaps)
     MAP_SELECTED = _Message("The current map is **{}**")
 
     MP_ADDED = _Message("Added {} to the map pool")

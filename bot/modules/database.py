@@ -44,7 +44,7 @@ async def update(p):
     """ Launch the task updating player p in database
     """
     loop = get_event_loop()
-    await loop.run_in_executor(None, _update, p)
+    await loop.run_in_executor(None, _updatePlayer, p)
 
 async def remove(p):
     """ Launch the task updating player p in database
@@ -68,13 +68,21 @@ def forceBasesUpdate(bases):
 
 
 ## Private
-def _update(p):
+def _updatePlayer(p):
     """ Update player p into db
     """
     if collections["users"].count_documents({ "_id": p.id }) != 0:
         collections["users"].update_one({"_id":p.id},{"$set":p.getData()})
     else:
         collections["users"].insert_one(p.getData())
+
+def _updateMap(m):
+    """ Update map m into db
+    """
+    if collections["sBases"].count_documents({ "_id": m.id }) != 0:
+        collections["sBases"].update_one({"_id":m.id},{"$set":m.getData()})
+    else:
+        raise DatabaseError(f"Map {m.id} not in database")
 
 def _remove(p):
     if collections["users"].count_documents({ "_id": p.id }) != 0:

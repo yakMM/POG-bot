@@ -1,9 +1,9 @@
 from gspread import service_account
 from numpy import array
 import modules.config as cfg
-from modules.database import _update, init as dbInit
 from classes.players import Player, _allPlayers
-from modules.database import forceBasesUpdate, getAllPlayers, _update
+from modules.database import forceBasesUpdate, getAllPlayers, _updatePlayer, _updateMap, getAllMaps, init as dbInit
+from classes.maps import _allMapsList
 import requests
 import json
 import asyncio
@@ -40,7 +40,7 @@ def pushAccounts():
         charList=[f"PSBx{acc}VS", f"PSBx{acc}TR", f"PSBx{acc}NC"]
         p._hasOwnAccount = True
         loop.run_until_complete(p._addCharacters(charList))
-        _update(p)
+        _updatePlayer(p)
     loop.close()
 
 
@@ -62,8 +62,22 @@ def getAllMapsFromApi():
         mp["type_id"] = int(mp.pop("facility_type_id"))
     forceBasesUpdate(jdata["map_region_list"])
 
-def dbEdit():
+def playersDbUpdate():
     getAllPlayers()
     for p in _allPlayers.values():
-        _update(p)
+        _updatePlayer(p)
 
+def mapDbUpdate():
+    getAllMaps()
+    for m in _allMapsList:
+        print(str(m.id))
+        _updateMap(m)
+
+def setMapPool():
+    ids = [302030,239000,305010,230,3430,3620,307010]
+    # acan,pale,ghanan,xenotech,peris,rashnu,chac
+    getAllMaps()
+    for m in _allMapsList:
+        if m.id in ids:
+            m.pool = True
+            _updateMap(m)

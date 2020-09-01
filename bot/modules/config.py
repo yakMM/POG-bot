@@ -14,6 +14,7 @@ discord_ids = {
     "matches" : list(),
     "results" : 0,
     "rules" : 0,
+    "staff" : 0,
     "rules_msg" : 0,
     "admin_role" : 0,
     "info_role" : 0,
@@ -61,8 +62,6 @@ facilitiy_suffix = {
 3 : "Bio Lab",
 4 : "Tech Plant"
 }
-
-PIL_MAPS_IDS = [3430,302030,239000,305010,230,307010] #peris, can, pale, ghanan, xeno, chac
 
 
 ## Database

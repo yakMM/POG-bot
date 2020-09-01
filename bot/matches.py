@@ -6,7 +6,7 @@ from datetime import datetime as dt
 
 from classes.teams import Team #ok
 from classes.players import TeamCaptain, ActivePlayer #ok
-from classes.maps import MapSelection #ok
+from classes.maps import MapSelection, mainMapPool #ok
 from classes.accounts import AccountHander #ok
 
 from random import choice as randomChoice
@@ -108,7 +108,7 @@ def clearLobby():
 
 def _findSpotForMatch():
     for match in _allMatches.values():
-        if match.status == MatchStatus.IS_FREE :
+        if match.status is MatchStatus.IS_FREE :
             return match
     return None
 
@@ -186,11 +186,11 @@ class Match():
 
     def confirmMap(self):
         self.__mapSelector.confirm()
-        if self.__status == MatchStatus.IS_MAPPING:
+        if self.__status is MatchStatus.IS_MAPPING:
             self.__ready.start()
 
     def pickMap(self, captain):
-        if self.__mapSelector.status == SelStatus.IS_SELECTED:
+        if self.__mapSelector.status is SelStatus.IS_SELECTED:
             captain.isTurn = False
             other = self.__teams[captain.team.id-1]
             other.captain.isTurn = True
@@ -242,30 +242,21 @@ class Match():
 
     @tasks.loop(count=1)
     async def __findMap(self):
-        # LEGACY CODE
-        # Disabling map at random:
-        # if self.__map == None:
-        #     try:
-        #         sel = getMapSelection(self.__id)
-        #     except ElementNotFound:
-        #         sel = MapSelection(self.__id)
-        #     sel.selectFromIdList(cfg.PIL_MAPS_IDS)
-        #     if sel.status not in (SelStatus.IS_SELECTED, SelStatus.IS_SELECTION):
-        #         await channelSend("UNKNOWN_ERROR", self.__id, "Can't find a map at random!")
-        #         return
-        #     self.__map = randomChoice(sel.selection)
         for tm in self.__teams:
             tm.captain.isTurn = True
-        if self.__mapSelector.status == SelStatus.IS_CONFIRMED:
+        if self.__mapSelector.status is SelStatus.IS_CONFIRMED:
             await channelSend("MATCH_MAP_AUTO", self.__id, self.__mapSelector.map.name)
             self.__ready.start()
             return
         captainPings = [tm.captain.mention for tm in self.__teams]
         self.__status = MatchStatus.IS_MAPPING
         await channelSend("PK_WAIT_MAP", self.__id, *captainPings)
+        # if self.__mapSelector.isSmallPool:
+        #     await channelSend("MAP_SHOW_POOL", self.__id, sel=self.__mapSelector)
 
     @tasks.loop(count=1)
     async def __ready(self):
+        self.__status = MatchStatus.IS_RUNNING
         for tm in self.__teams:
             tm.onMatchReady()
             tm.captain.isTurn = True
@@ -314,7 +305,7 @@ class Match():
     async def _launch(self):
         await channelSend("MATCH_INIT", self.__id, " ".join(self.playerPings))
         self.__accounts = AccountHander(self)
-        self.__mapSelector = MapSelection(self)
+        self.__mapSelector = MapSelection(self, mainMapPool)
         for i in range(len(self.__teams)):
             self.__teams[i] = Team(i, f"Team {i+1}", self)
             key = randomChoice(list(self.__players))
@@ -327,7 +318,7 @@ class Match():
         """ Clearing match and base player objetcts
         Team and ActivePlayer objects should get garbage collected, nothing is referencing them anymore"""
 
-        if self.status == MatchStatus.IS_PLAYING:
+        if self.status is MatchStatus.IS_PLAYING:
             self._onMatchOver.cancel()
             playerPings = [" ".join(tm.allPings) for tm in self.__teams]
             await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
@@ -361,7 +352,7 @@ class Match():
 
     @property
     def map(self):
-        if self.__mapSelector.status == SelStatus.IS_CONFIRMED:
+        if self.__mapSelector.status is SelStatus.IS_CONFIRMED:
             return self.__mapSelector.map
 
     # TODO: testing only
@@ -371,7 +362,7 @@ class Match():
     
     @property
     def roundNo(self):
-        if self.__status == MatchStatus.IS_PLAYING:
+        if self.__status is MatchStatus.IS_PLAYING:
             return len(self.__roundsStamps)
         if self.__status in (MatchStatus.IS_STARTING, MatchStatus.IS_WAITING):
             return len(self.__roundsStamps)+1

@@ -78,7 +78,7 @@ async def _register(player, ctx, args):
     Parameters:
     ingameNames (str, list of str): If a list, will add each name one by one. If a string, will add the faction suffixes automatically.
     """
-    if player.status == PlayerStatus.IS_PLAYING: # Can't register if already playing
+    if player.status is PlayerStatus.IS_PLAYING: # Can't register if already playing
         await send("REG_FREEZED",ctx)
         return
     for name in args:
@@ -86,7 +86,7 @@ async def _register(player, ctx, args):
             await send("INVALID_STR",ctx, name)
             return
     if len(args) == 0: # If user did not input any arg, display their current registration status
-        if player.status == PlayerStatus.IS_NOT_REGISTERED:
+        if player.status is PlayerStatus.IS_NOT_REGISTERED:
             await send("REG_NOT_REGISTERED",ctx)
             return
         if player.hasOwnAccount:
@@ -94,7 +94,7 @@ async def _register(player, ctx, args):
             return
         await send("REG_IS_REGISTERED_NOA",ctx)
         return
-    wasPlayerRegistered = player.status != PlayerStatus.IS_NOT_REGISTERED # store previous status
+    wasPlayerRegistered = player.status is not PlayerStatus.IS_NOT_REGISTERED # store previous status
     if len(args) == 1 or len(args) == 3: # if 1 or 3 args
         if len(args) == 1 and args[0]=="help": # =r help displays hel^p
             await send("REG_HELP",ctx)
