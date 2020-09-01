@@ -300,7 +300,7 @@ class Match:
             self.__startMatch.start()
 
     @tasks.loop(count=1)
-    async def __findMap(self):
+    async def __findMap(self):  # legacy way of picking maps using "=p <map name>" and "=p confirm"
         # LEGACY CODE
         # Disabling map at random:
         # if self.__map == None:
@@ -330,7 +330,28 @@ class Match:
         pick_channel = which_pick_channels(self.__id)
         ts3bot.move(pick_channel)
         await sleep(1)  # prevents playing this before faction announce
-        # await sleep(ts3bot.get_duration(cfg.audio_ids["team_2_tr"]))  # prevents playing this before faction announce
+        ts3bot.enqueue(cfg.audio_ids["select_map"])
+        await channelSend("PK_WAIT_MAP", self.__id, *captainPings)
+
+    @tasks.loop(count=1)
+    async def __findMapFromCal(self):  # new way of picking maps from availability in jaeger calendar
+        ts3bot = which_bot(self.__id)
+        for tm in self.__teams:
+            tm.captain.isTurn = True
+        if self.__mapSelector.status == SelStatus.IS_CONFIRMED:
+            await channelSend("MATCH_MAP_AUTO", self.__id, self.__mapSelector.map.name)
+            # ts3: map selected
+            pick_channel = which_pick_channels(self.__id)
+            ts3bot.move(pick_channel)
+            ts3bot.enqueue(cfg.audio_ids["map_selected"])
+            self.__ready.start()
+            return
+        captainPings = [tm.captain.mention for tm in self.__teams]
+        self.__status = MatchStatus.IS_MAPPING
+        # ts3: select map
+        pick_channel = which_pick_channels(self.__id)
+        ts3bot.move(pick_channel)
+        await sleep(1)  # prevents playing this before faction announce
         ts3bot.enqueue(cfg.audio_ids["select_map"])
         await channelSend("PK_WAIT_MAP", self.__id, *captainPings)
 

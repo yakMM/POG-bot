@@ -19,8 +19,7 @@ collections = dict()
 
 # Public
 def getAllPlayers():
-    """ Get all players from db to memory
-    """
+    """ Get all players from db to memory"""
     users = collections["users"].find()
     # Adding them
 
@@ -33,8 +32,7 @@ def getAllPlayers():
 
 
 def getAllMaps():
-    """ Get all maps from db to memory
-    """
+    """ Get all maps from db to memory"""
     maps = collections["sBases"].find()
     # Adding them
     try:
@@ -45,8 +43,7 @@ def getAllMaps():
 
 
 async def update(p):
-    """ Launch the task updating player p in database
-    """
+    """ Launch the task updating player p in database"""
     loop = get_event_loop()
     await loop.run_in_executor(None, _update, p)
 
@@ -59,8 +56,7 @@ async def remove(p):
 
 
 def init(config):
-    """ Init
-    """
+    """ Init"""
     cluster = MongoClient(config["url"])
     db = cluster[config["cluster"]]
     for collec in config["collections"]:
@@ -68,16 +64,14 @@ def init(config):
 
 
 def forceBasesUpdate(bases):
-    """ This is only called from external script for db maintenance
-    """
+    """ This is only called from external script for db maintenance"""
     collections["sBases"].delete_many({})
     collections["sBases"].insert_many(bases)
 
 
 # Private
 def _update(p):
-    """ Update player p into db
-    """
+    """ Update player p into db"""
     if collections["users"].count_documents({"_id": p.id}) != 0:
         collections["users"].update_one({"_id": p.id}, {"$set": p.getData()})
     else:

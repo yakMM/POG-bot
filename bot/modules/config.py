@@ -65,7 +65,8 @@ general = {
     "command_prefix": "",
     "lobby_size": 0,
     "sinusbot_user": "",
-    "sinusbot_pass": ""
+    "sinusbot_pass": "",
+    "jaeger_cal": ""
 }
 
 AFK_TIME = 20  # minutes

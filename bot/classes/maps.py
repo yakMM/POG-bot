@@ -13,14 +13,16 @@ MAX_SELECTED = 15
 
 _mapSelectionsDict = dict()
 
+
 def getMapSelection(id):
     sel = _mapSelectionsDict.get(id)
-    if sel == None:
+    if sel is None:
         raise ElementNotFound(id)
     return sel
 
-class Map():
-    def __init__(self,data):
+
+class Map:
+    def __init__(self, data):
         self.__id = data["_id"]
         self.__name = data["facility_name"]
         self.__zoneId = data["zone_id"]
@@ -38,7 +40,8 @@ class Map():
             name += f" {cfg.facilitiy_suffix[self.__typeId]}"
         return name
 
-class MapSelection():
+
+class MapSelection:
     def __init__(self, id):
         self.__id = id
         self.__selection = list()
@@ -59,20 +62,24 @@ class MapSelection():
         self.__status = SelStatus.IS_SELECTION
 
     def toString(self):
-        result=""
+        result = ""
         for i in range(len(self.__selection)):
-            result+=f"\n**{str(i+1)}**: " + self.__selection[i].name
+            result += f"\n**{str(i + 1)}**: " + self.__selection[i].name
         return result
 
+    def check_available(self, map):
+        # IF MAP IS AVAILABLE RETURN TRUE ELSE RETURN FALSE
+        available = False
+        return available
 
     def __doSelection(self, args):
         if self.__status == SelStatus.IS_SELECTION and len(args) == 1 and args[0].isnumeric():
             index = int(args[0])
-            if index > 0 and index <= len(self.__selection):
-                self.__selected = self.__selection[index-1]
+            if 0 < index <= len(self.__selection):
+                self.__selected = self.__selection[index - 1]
                 self.__status = SelStatus.IS_SELECTED
             return
-        arg=" ".join(args)
+        arg = " ".join(args)
         self.__selection.clear()
         for map in _allMapsList:
             if len(self.__selection) > MAX_SELECTED:
@@ -81,14 +88,19 @@ class MapSelection():
             if arg in map.name.lower():
                 self.__selection.append(map)
         if len(self.__selection) == 1:
-            self.__selected = self.__selection[0]
-            self.__status = SelStatus.IS_SELECTED
-            return
+            if self.check_available(self.__selection):
+                self.__selected = self.__selection[0]
+                self.__status = SelStatus.IS_SELECTED
+                return
+            else:
+                self.__selected = self.__selection[0]
+                self.__status = SelStatus.IS_BOOKED
+                return
         if len(self.__selection) == 0:
             self.__status = SelStatus.IS_EMPTY
             return
         self.__status = SelStatus.IS_SELECTION
-    
+
     async def doSelectionProcess(self, ctx, args):
         if len(args) == 0:
             if self.__status == SelStatus.IS_SELECTION:
@@ -100,14 +112,18 @@ class MapSelection():
             await send("MAP_HELP", ctx)
             return
         if len(args) == 1 and args[0] == "help":
-                await send("MAP_HELP", ctx)
-                return
+            await send("MAP_HELP", ctx)
+            return
         self.__doSelection(args)
         if self.__status == SelStatus.IS_EMPTY:
             await send("MAP_NOT_FOUND", ctx)
             return
         if self.__status == SelStatus.IS_TOO_MUCH:
             await send("MAP_TOO_MUCH", ctx)
+            return
+        if self.__status == SelStatus.IS_BOOKED:
+            await send("MAP_BOOKED", ctx, self.__selected.name)
+            self.__status = SelStatus.IS_SELECTED
             return
         if self.__status == SelStatus.IS_SELECTION:
             await send("MAP_DISPLAY_LIST", ctx, sel=self)
@@ -116,7 +132,6 @@ class MapSelection():
     @property
     def map(self):
         return self.__selected
-
 
     @property
     def selection(self):
@@ -129,7 +144,7 @@ class MapSelection():
     @property
     def status(self):
         return self.__status
-    
+
     def confirm(self):
         if self.__status == SelStatus.IS_SELECTED:
             self.__status = SelStatus.IS_CONFIRMED
@@ -143,4 +158,3 @@ class MapSelection():
 class MapPool(MapSelection):
     def __init__(self, id, mapList):
         super().__init__(id)
-

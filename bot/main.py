@@ -218,6 +218,7 @@ def main(launchStr=""):
     # Set up command prefix
     client = commands.Bot(command_prefix=cfg.general["command_prefix"])
 
+
     # Remove default help
     client.remove_command('help')
 
@@ -227,7 +228,7 @@ def main(launchStr=""):
     getAllMaps()
 
     # Get Account sheet from drive
-    AccountHander.init(f"client_secret{launchStr}.json")
+    AccountHander.init(f"gspread_client_secret{launchStr}.json")
 
     # Initialise matches channels
     matchesInit(cfg.discord_ids["matches"])
