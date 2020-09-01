@@ -101,20 +101,25 @@ class MapSelection:
 
     def is_available(self, map):  # if map is available in jaeger calendar, return true, else return false.
         # todo: move this to init for map selector, should only happen once per match to prevent api calls to jaeger cal
-        ws = self.__jaeger_cal.sh.worksheet("Current")
-        date_col = ws.col_values(1)
-        for index, cell in enumerate(date_col):
-            if cell == dt.today().date():  # gets us the header for the current date section in the google sheet
-                date_rng_start = index + 1
-            if cell == dt.today().date() + dt.timedelta(days=1):  # gets us the header for tomorrow's date in the sheet
-                date_rng_end = index - 1  # now we know the range on the google sheet to look for base availability
-        status = ws.batch_get([f"B{date_rng_start}:B{date_rng_end}"])
-        bases = ws.batch_get([f"D{date_rng_start}:D{date_rng_end}"])
-
         available = True
-        for i in range (date_rng_start, date_rng_end + 1):
-            if map in bases[i].name.lower() and status[i] != "":
-                available = False
+        try:
+            date_rng_start = date_rng_end = None
+            ws = self.__jaeger_cal.sh.worksheet("Current")
+            date_col = ws.col_values(1)
+            for index, cell in enumerate(date_col):
+                if cell == dt.today().date():  # gets us the header for the current date section in the google sheet
+                    date_rng_start = index + 1
+                if cell == dt.today().date() + dt.timedelta(days=1):  # gets us the header for tomorrow's date in the sheet
+                    date_rng_end = index - 1  # now we know the range on the google sheet to look for base availability
+            assert date_rng_start and date_rng_end
+            status = ws.batch_get([f"B{date_rng_start}:B{date_rng_end}"])
+            bases = ws.batch_get([f"D{date_rng_start}:D{date_rng_end}"])
+
+            for i in range(date_rng_start, date_rng_end + 1):
+                if map in bases[i].name.lower() and status[i] != "":
+                    available = False
+        except AssertionError:
+            log.warning(f"Unable to find date range in Jaeger calendar for today's date. Returned: '{date_rng_start}' to '{date_rng_end}'")
         return available
 
     def __doSelection(self, args):
