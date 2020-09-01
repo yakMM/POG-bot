@@ -4,6 +4,7 @@
 - Fixed a bug with afk players in queue
 - Overhauled player status code
 - Tweaked the conditions for the bot to ping @Notify
+- Fixed a bug allowing the one captain to choose a map and confirm it
 
 # v1.0.9:
 - Updated Jaeger Calendar Link

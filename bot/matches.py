@@ -30,7 +30,6 @@ def isLobbyStuck():
     return _lobbyStuck
 
 def _autoPingTreshold():
-    return 2
     tresh = cfg.general["lobby_size"] - cfg.general["lobby_size"] // 3
     return tresh
 
@@ -45,11 +44,10 @@ def addToLobby(player):
         startMatchFromFullLobby.start()
     elif len(_lobbyList) >= _autoPingTreshold():
         if not _autoPing.is_running() and not _autoPing.already:
-            print("launch")
             _autoPing.start()
             _autoPing.already = True
 
-@tasks.loop(seconds=10, delay=1, count=2)
+@tasks.loop(minutes=3, delay=1, count=2)
 async def _autoPing():
     await channelSend("LB_NOTIFY", cfg.discord_ids["lobby"], f'<@&{cfg.discord_ids["notify_role"]}>')
 _autoPing.already = False

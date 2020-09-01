@@ -194,7 +194,8 @@ async def _map(ctx, captain, args):
         match.confirmMap()
         await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
         return
-    await sel.doSelectionProcess(ctx, args) # Handle the actual map selection
-    newPicker = match.pickMap(captain)
-    if newPicker != captain:
-        await send("PK_MAP_OK_CONFIRM", ctx, sel.map.name, newPicker.mention )
+    map = await sel.doSelectionProcess(ctx, args) # Handle the actual map selection
+    if map is not None:
+        newPicker = match.pickMap(captain)
+        if newPicker != captain:
+            await send("PK_MAP_OK_CONFIRM", ctx, sel.map.name, newPicker.mention )

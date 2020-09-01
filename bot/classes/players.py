@@ -45,13 +45,13 @@ class Player():
     """
 
     def __init__(self, name, id):
-        self._name = name
-        self._id = id
+        self.__name = name
+        self.__id = id
         self._rank = 0
         self._igNames = ["N/A", "N/A", "N/A"]
         self._igIds = [0,0,0]
-        self._roles = {"notify" : False}
-        self._status = PlayerStatus.IS_NOT_REGISTERED
+        self.__roles = {"notify" : False}
+        self.__status = PlayerStatus.IS_NOT_REGISTERED
         self._hasOwnAccount = False
         self._active = None
         self._match = None
@@ -60,9 +60,9 @@ class Player():
     @classmethod
     def newFromData(cls, data): # make a new Player object from database data
         obj = cls(data["name"], data["_id"])
-        obj._status = PlayerStatus.IS_REGISTERED
+        obj.__status = PlayerStatus.IS_REGISTERED
         obj._rank = data["rank"]
-        obj._roles = data["roles"]
+        obj.__roles = data["roles"]
         obj._igNames = data["igNames"]
         obj._igIds = data["igIds"]
         obj._hasOwnAccount = data["hasOwnAccount"]
@@ -76,15 +76,15 @@ class Player():
 
     @property
     def name(self):
-        return self._name
+        return self.__name
     
     @property
     def isNotify(self):
-        return self._roles["notify"]
+        return self.__roles["notify"]
     
     @isNotify.setter
     def isNotify(self, value):
-        self._roles["notify"] = value
+        self.__roles["notify"] = value
         self.updateRole()
     
     def updateRole(self):
@@ -99,16 +99,16 @@ class Player():
         await onNotifyUpdate(self)
 
     def onLobbyLeave(self):
-        self._status = PlayerStatus.IS_REGISTERED
+        self.__status = PlayerStatus.IS_REGISTERED
         self.inactiveTask.stop()
         self.updateRole()
     
     def onLobbyAdd(self):
-        self._status = PlayerStatus.IS_LOBBIED
+        self.__status = PlayerStatus.IS_LOBBIED
         self.updateRole()
 
     def onMatchReady(self):
-        self._status = PlayerStatus.IS_PLAYING
+        self.__status = PlayerStatus.IS_PLAYING
     
     def onPlayerClean(self):
         self._match = None
@@ -116,16 +116,19 @@ class Player():
         if not self._hasOwnAccount:
             self._igNames = ["N/A", "N/A", "N/A"]
             self._igIds = [0,0,0]
-        self._status = PlayerStatus.IS_REGISTERED
+        self.__status = PlayerStatus.IS_REGISTERED
         self.updateRole()
+    
+    def onPicked(self):
+        self.__status = PlayerStatus.IS_PICKED
     
     def onMatchSelected(self, m):
         self._match = m
-        self._status = PlayerStatus.IS_MATCHED
+        self.__status = PlayerStatus.IS_MATCHED
         self.inactiveTask.cancel()
     
     def onInactive(self, fct):
-        if self._status is PlayerStatus.IS_LOBBIED:
+        if self.__status is PlayerStatus.IS_LOBBIED:
             self.inactiveTask.start(fct)
     
     def onActive(self):
@@ -138,11 +141,11 @@ class Player():
 
     @property
     def id(self):
-        return self._id
+        return self.__id
     
     @property
     def mention(self):
-        return f"<@{self._id}>" 
+        return f"<@{self.__id}>" 
 
     @property
     def rank(self):
@@ -162,7 +165,7 @@ class Player():
 
     @property
     def status(self):
-        return self._status
+        return self.__status
 
     @property
     def match(self): # when in match
@@ -173,10 +176,10 @@ class Player():
         return self._hasOwnAccount
 
     def getData(self): # get data for database push
-        data = {"_id" : self._id,
-                "name" : self._name,
+        data = {"_id" : self.__id,
+                "name" : self.__name,
                 "rank" : self._rank,
-                "roles" : self._roles,
+                "roles" : self.__roles,
                 "igNames" : self._igNames,
                 "igIds" : self._igIds,
                 "hasOwnAccount" : self._hasOwnAccount
@@ -190,18 +193,18 @@ class Player():
         """
         updated = False
         if charList == None:
-            if(self._status == PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount):
+            if(self.__status == PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount):
                 updated = True
             self._igIds = [0,0,0]
             self._igNames = ["N/A", "N/A", "N/A"]
-            if self._status == PlayerStatus.IS_NOT_REGISTERED:
-                self._status = PlayerStatus.IS_REGISTERED
+            if self.__status == PlayerStatus.IS_NOT_REGISTERED:
+                self.__status = PlayerStatus.IS_REGISTERED
             self._hasOwnAccount = False
             return updated
         updated = await self._addCharacters(charList)
         if updated:
-            if self._status == PlayerStatus.IS_NOT_REGISTERED:
-                self._status = PlayerStatus.IS_REGISTERED
+            if self.__status == PlayerStatus.IS_NOT_REGISTERED:
+                self.__status = PlayerStatus.IS_REGISTERED
             self._hasOwnAccount = True
         return updated
 
@@ -267,7 +270,7 @@ class ActivePlayer:
         self.__score=0
         self.__team = team
         self.__account = None
-        self.__player._status = PlayerStatus.IS_PICKED
+        self.__player.onPicked()
 
     def clean(self):
         self.__player.onPlayerClean()
@@ -296,7 +299,8 @@ class ActivePlayer:
         self.__player._igNames = fakePlayer.igNames.copy()
         self.__player._igIds = fakePlayer.igIds.copy()
 
-
+    def onMatchReady(self):
+        self.__player.onMatchReady()
 
     @property
     def mention(self):

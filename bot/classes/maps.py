@@ -112,6 +112,8 @@ class MapSelection():
         if self.__status == SelStatus.IS_SELECTION:
             await send("MAP_DISPLAY_LIST", ctx, sel=self)
             return
+        # If successfully selected:
+        return self.__selected
 
     @property
     def map(self):
