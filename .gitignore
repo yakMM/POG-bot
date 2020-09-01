@@ -3,6 +3,7 @@ __pycache__/
 permissions.txt
 bot/config_test.cfg
 bot/client_secret_test.json
+bot/gspread_client_secret.json
 secret/*
 bot/.idea/*
 bot/config.cfg
