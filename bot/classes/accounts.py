@@ -81,7 +81,7 @@ class Account:
         self.__aPlayer.acceptAccount()
 
 
-class AccountHander():
+class AccountHander:
     """ AccountHander object, interface for giving accounts"""
 
     _currentNumber = 0  # number of matches played/registered in the sheet

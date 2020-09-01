@@ -24,6 +24,7 @@ from datetime import timezone as tz
 
 # Others
 from enum import Enum
+from string import capwords
 
 # Custom modules
 import modules.config as cfg
@@ -293,7 +294,6 @@ def _jaegerCalendar(arg):
 def _availableMaps(maps):
     """ Returns a list of maps to embed in the available maps message
     """
-    maps = sel.get_available_maps()
     embed = Embed(colour=Color.blue())
     embed.add_field(name=f"{len(maps)} maps are currently available", value=maps.toString(), inline=False)
     return embed

@@ -6,6 +6,12 @@ import modules.config as cfg
 from modules.enumerations import SelStatus
 from modules.exceptions import ElementNotFound
 from modules.display import send
+from logging import getLogger
+from gspread import service_account
+from gspread.exceptions import APIError
+from datetime import datetime as dt
+
+log = getLogger(__name__)
 
 _allMapsList = list()
 
@@ -19,6 +25,17 @@ def getMapSelection(id):
     if sel is None:
         raise ElementNotFound(id)
     return sel
+
+
+def names_to_maps(map_names):  # returns a list of map objects from a list of map names
+    formatted = list()
+    for map_name in map_names:
+        for map in _allMapsList:
+            if map_name.lower() in map.name.lower():
+                formatted.append(map)
+            else:
+                log.warning(f"Map named '{map_name}' could not be found and is being omitted from the formatted list")
+    return formatted
 
 
 class Map:
@@ -41,13 +58,21 @@ class Map:
         return name
 
 
+class JaegerCalendarHandler:
+    def __init__(self, secretFile):
+        self._secretFile = secretFile
+        self.gc = service_account(filename=secretFile)
+        self.sh = self.gc.open_by_key(cfg.general["jaeger_cal"])
+
+
 class MapSelection:
     def __init__(self, id):
         self.__id = id
-        self.__selection = list()
+        self.__selection = self.get_available(names_to_maps(cfg.general["map_pool"]))
         self.__selected = None
-        self.__status = SelStatus.IS_EMPTY
+        self.__status = SelStatus.IS_SELECTION
         _mapSelectionsDict[self.__id] = self
+        self.__jaeger_cal = JaegerCalendarHandler(self)
 
     def selectFromIdList(self, ids):
         self.__selection.clear()
@@ -67,9 +92,29 @@ class MapSelection:
             result += f"\n**{str(i + 1)}**: " + self.__selection[i].name
         return result
 
-    def check_available(self, map):
-        # IF MAP IS AVAILABLE RETURN TRUE ELSE RETURN FALSE
-        available = False
+    def get_available(self, maps):
+        available = list()
+        for map in maps:
+            if self.is_available(map):
+                available.append(map)
+        return available
+
+    def is_available(self, map):  # if map is available in jaeger calendar, return true, else return false.
+        # todo: move this to init for map selector, should only happen once per match to prevent api calls to jaeger cal
+        ws = self.__jaeger_cal.sh.worksheet("Current")
+        date_col = ws.col_values(1)
+        for index, cell in enumerate(date_col):
+            if cell == dt.today().date():  # gets us the header for the current date section in the google sheet
+                date_rng_start = index + 1
+            if cell == dt.today().date() + dt.timedelta(days=1):  # gets us the header for tomorrow's date in the sheet
+                date_rng_end = index - 1  # now we know the range on the google sheet to look for base availability
+        status = ws.batch_get([f"B{date_rng_start}:B{date_rng_end}"])
+        bases = ws.batch_get([f"D{date_rng_start}:D{date_rng_end}"])
+
+        available = True
+        for i in range (date_rng_start, date_rng_end + 1):
+            if map in bases[i].name.lower() and status[i] != "":
+                available = False
         return available
 
     def __doSelection(self, args):
@@ -88,12 +133,11 @@ class MapSelection:
             if arg in map.name.lower():
                 self.__selection.append(map)
         if len(self.__selection) == 1:
-            if self.check_available(self.__selection):
-                self.__selected = self.__selection[0]
+            self.__selected = self.__selection[0]
+            if self.is_available(self.__selected):
                 self.__status = SelStatus.IS_SELECTED
                 return
             else:
-                self.__selected = self.__selection[0]
                 self.__status = SelStatus.IS_BOOKED
                 return
         if len(self.__selection) == 0:

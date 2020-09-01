@@ -66,7 +66,8 @@ general = {
     "lobby_size": 0,
     "sinusbot_user": "",
     "sinusbot_pass": "",
-    "jaeger_cal": ""
+    "jaeger_cal": "",
+    "map_pool": list()
 }
 
 AFK_TIME = 20  # minutes
@@ -101,7 +102,7 @@ facilitiy_suffix = {
     4: "Tech Plant"
 }
 
-PIL_MAPS_IDS = [3430, 302030, 239000, 305010, 230, 307010]  # peris, can, pale, ghanan, xeno, chac
+PIL_MAPS_IDS = [3430, 302030, 239000, 305010, 230, 307010]  # peris, acan, pale, ghanan, xeno, chac
 
 # Database
 
@@ -132,10 +133,16 @@ def getConfig(file):
 
     for key in general:
         try:
-            if isinstance(general[key], int):
-                general[key] = int(config['General'][key])
+            if key == "map_pool":
+                tmp = config['General'][key].split(',')
+                discord_ids[key].clear()
+                for map in tmp:
+                    general[key].append(map)
             else:
-                general[key] = config['General'][key]
+                if isinstance(general[key], int):
+                    general[key] = int(config['General'][key])
+                else:
+                    general[key] = config['General'][key]
         except KeyError:
             _errorMissing(key, 'General', file)
         except ValueError:
