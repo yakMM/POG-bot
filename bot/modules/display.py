@@ -397,6 +397,8 @@ class _StringEnum(Enum):
     PK_FACTION_ALREADY = _Message("Faction already picked by the other team!")
     PK_FACTION_OK_NEXT = _Message("{} chose {}! {} pick a faction!", ping=False)
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
+    # PK_WAIT_MAP = _Message("{} {} Pick a map from the list of available maps below using `=p #`. To choose a map not on the list use `=p base name`",
+    #     ping=False, embed=_selectedMaps)
     PK_WAIT_MAP = _Message("{} {} Pick a map from the list using `=p #`. To choose a map not on the list use `=p base name`",
         ping=False, embed=_selectedMaps)
     PK_MAP_OK_CONFIRM = _Message("Picked **{}**! {} confirm with `=p confirm` if you agree")
@@ -448,7 +450,7 @@ class _StringEnum(Enum):
     MAP_HELP = _Message("Here is how to choose a map:", embed=_mapHelp)
     MAP_TOO_MUCH = _Message("Too many maps found! Try to be more precise")
     MAP_NOT_FOUND = _Message("Couldn't find a result for your search!")
-    MAP_DISPLAY_LIST = _Message("Here are the maps found:", embed=_selectedMaps)
+    MAP_DISPLAY_LIST = _Message("", embed=_selectedMaps)
     MAP_SELECTED = _Message("The current map is **{}**")
     MAP_BOOKED = _Message("WARNING: **{}** is currently reserved in the Jaeger Calendar. Please check availability before confirming this map.",
         embed=_jaegerCalendar)

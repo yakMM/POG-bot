@@ -75,11 +75,11 @@ class MapSelection:
     def __init__(self, id):
         self.__id = id
         self.booked = list()
-        # self.get_booked(_allMapsList)
-        # self.__selection = self.select_available(names_to_maps(cfg.general["map_pool"]))
-        self.__selection = list()
+        self.get_booked(_allMapsList)
+        self.__selection = self.select_available(names_to_maps(cfg.general["map_pool"]))
+        # self.__selection = list()
         self.__selected = None
-        self.__status = SelStatus.IS_EMPTY
+        self.__status = SelStatus.IS_SELECTION
         _mapSelectionsDict[self.__id] = self
 
     def selectFromIdList(self, ids):

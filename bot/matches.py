@@ -331,8 +331,7 @@ class Match:
         ts3bot.move(pick_channel)
         await sleep(1)  # prevents playing this before faction announce
         ts3bot.enqueue(cfg.audio_ids["select_map"])
-        await channelSend("PK_WAIT_MAP", self.__id, *captainPings)
-        # await channelSend("MAP_DISPLAY_LIST", self.__id, sel=self.__mapSelector.__selection)
+        await channelSend("PK_WAIT_MAP", self.__id, sel=self.__mapSelector, *captainPings)
 
     # @tasks.loop(count=1)
     # async def __findMapFromCal(self):  # new way of picking maps from availability in jaeger calendar
