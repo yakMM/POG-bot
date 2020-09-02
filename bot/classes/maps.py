@@ -35,7 +35,7 @@ def names_to_maps(map_names):  # returns a list of map objects from a list of ma
             if map_name.lower() in map.name.lower():
                 formatted.append(map)
             else:
-                log.warning(f"Map named '{map_name}' could not be found and is being omitted from the formatted list")
+                log.debug(f"Map named '{map_name}' could not be found and is being omitted from the formatted list")
     return formatted
 
 
@@ -77,7 +77,6 @@ class MapSelection:
         self.booked = list()
         self.get_booked(_allMapsList)
         self.__selection = self.select_available(names_to_maps(cfg.general["map_pool"]))
-        # self.__selection = list()
         self.__selected = None
         self.__status = SelStatus.IS_SELECTION
         _mapSelectionsDict[self.__id] = self
