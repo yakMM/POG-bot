@@ -1,6 +1,6 @@
 """
 Taken from Rapptz's discord.py task extension.
-Modified for the need of POG bot app: Added a delay functionnality
+Modified for the need of POG bot app: Added a delay functionality
 """
 
 import asyncio

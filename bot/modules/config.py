@@ -135,7 +135,7 @@ def getConfig(file):
         try:
             if key == "map_pool":
                 tmp = config['General'][key].split(',')
-                discord_ids[key].clear()
+                general[key].clear()
                 for map in tmp:
                     general[key].append(map)
             else:

@@ -33,7 +33,7 @@ from modules.loader import init as cogInit, isAllLocked, unlockAll
 from matches import onPlayerInactive, onPlayerActive, init as matchesInit
 from classes.players import Player, getPlayer
 from classes.accounts import AccountHander
-from classes.maps import JaegerCalendarHandler
+from classes.maps import createJeagerCalObj
 
 
 def _addMainHandlers(client):
@@ -230,8 +230,8 @@ def main(launchStr=""):
     # Get Account sheet from drive
     AccountHander.init(f"gspread_client_secret{launchStr}.json")
 
-    # Establish connection with Jaeger Calendar
-    JaegerCalendarHandler.init(f"gspread_client_secret{launchStr}.json")
+    # Establish connection with Jaeger Calendar and create a global object
+    createJeagerCalObj(f"gspread_client_secret{launchStr}.json")
 
     # Initialise matches channels
     matchesInit(cfg.discord_ids["matches"])

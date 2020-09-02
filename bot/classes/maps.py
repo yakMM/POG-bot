@@ -9,7 +9,8 @@ from modules.display import send
 from logging import getLogger
 from gspread import service_account
 from gspread.exceptions import APIError
-from datetime import datetime as dt
+import datetime as dt
+import numpy as np
 
 log = getLogger(__name__)
 
@@ -58,6 +59,11 @@ class Map:
         return name
 
 
+def createJeagerCalObj(secretFile):
+    global jaeger_cal_obj
+    jaeger_cal_obj = JaegerCalendarHandler(secretFile)
+
+
 class JaegerCalendarHandler:
     def __init__(self, secretFile):
         self._secretFile = secretFile
@@ -68,11 +74,13 @@ class JaegerCalendarHandler:
 class MapSelection:
     def __init__(self, id):
         self.__id = id
-        self.__selection = self.get_available(names_to_maps(cfg.general["map_pool"]))
+        self.booked = list()
+        # self.get_booked(_allMapsList)
+        # self.__selection = self.select_available(names_to_maps(cfg.general["map_pool"]))
+        self.__selection = list()
         self.__selected = None
-        self.__status = SelStatus.IS_SELECTION
+        self.__status = SelStatus.IS_EMPTY
         _mapSelectionsDict[self.__id] = self
-        self.__jaeger_cal = JaegerCalendarHandler(self)
 
     def selectFromIdList(self, ids):
         self.__selection.clear()
@@ -92,35 +100,55 @@ class MapSelection:
             result += f"\n**{str(i + 1)}**: " + self.__selection[i].name
         return result
 
-    def get_available(self, maps):
+    def is_available(self, map):
+        available = True
+        if map in self.booked:
+            available = False
+        return available
+
+    def select_available(self, maps):  # returns available maps from a list of maps
         available = list()
         for map in maps:
             if self.is_available(map):
                 available.append(map)
         return available
 
-    def is_available(self, map):  # if map is available in jaeger calendar, return true, else return false.
-        # todo: move this to init for map selector, should only happen once per match to prevent api calls to jaeger cal
-        available = True
+    def get_booked(self, maplist):  # runs on class init, saves a list of booked maps at the time of init to self.booked
         try:
             date_rng_start = date_rng_end = None
-            ws = self.__jaeger_cal.sh.worksheet("Current")
-            date_col = ws.col_values(1)
-            for index, cell in enumerate(date_col):
-                if cell == dt.today().date():  # gets us the header for the current date section in the google sheet
+            ws = jaeger_cal_obj.sh.worksheet("Current")
+            cal_export = np.array(ws.get_all_values())
+            date_col = cal_export[:, 0]
+            for index, value in enumerate(date_col):
+                if not date_rng_start and value == dt.datetime.utcnow().strftime('%b-%d'):  # gets us the header for the current date section in the google sheet
                     date_rng_start = index + 1
-                if cell == dt.today().date() + dt.timedelta(days=1):  # gets us the header for tomorrow's date in the sheet
-                    date_rng_end = index - 1  # now we know the range on the google sheet to look for base availability
+                    continue
+                if value == (dt.datetime.utcnow() + dt.timedelta(days=1)).strftime('%b-%d'):  # gets us the header for tomorrow's date in the sheet
+                    date_rng_end = index  # now we know the range on the google sheet to look for base availability
+                    break
             assert date_rng_start and date_rng_end
-            status = ws.batch_get([f"B{date_rng_start}:B{date_rng_end}"])
-            bases = ws.batch_get([f"D{date_rng_start}:D{date_rng_end}"])
 
-            for i in range(date_rng_start, date_rng_end + 1):
-                if map in bases[i].name.lower() and status[i] != "":
-                    available = False
+            today_bookings = cal_export[date_rng_start:date_rng_end, ]
+
+            for map in maplist:
+                for booking in today_bookings:
+                    booked_maps = booking[3].replace('/', ',').split(",")
+                    booked_maps = [map.strip() for map in booked_maps]
+                    for booked_map in booked_maps:
+                        if booked_map.lower() in map.name.lower():
+                            start_time = booking[10]  # 45 mins before start of reservation
+                            if booking[11] != "":
+                                end_time = booking[11]
+                            else:
+                                end_time = booking[9]
+                            if start_time <= dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') <= end_time:
+                                # if date formatting in google calendar hidden cells changes, this needs to be updated too.
+                                self.booked.append(map)
         except AssertionError:
             log.warning(f"Unable to find date range in Jaeger calendar for today's date. Returned: '{date_rng_start}' to '{date_rng_end}'")
-        return available
+        except Exception as e:
+            log.error(f"Uncaught exception getting booked maps from jaeger calendar\n{str(e)}")  # delete when done testing
+        return
 
     def __doSelection(self, args):
         if self.__status == SelStatus.IS_SELECTION and len(args) == 1 and args[0].isnumeric():
