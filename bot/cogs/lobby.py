@@ -12,6 +12,7 @@ from matches import getLobbyLen, isLobbyStuck, removeFromLobby, addToLobby, getA
 
 log = getLogger(__name__)
 
+
 class LobbyCog(commands.Cog, name='lobby'):
     """
     Lobby cog, handle the commands from lobby channel
@@ -37,7 +38,7 @@ class LobbyCog(commands.Cog, name='lobby'):
     async def join(self, ctx):
         """ Join queue
         """
-        if getLobbyLen() > cfg.general["lobby_size"]: # This should not happen EVER
+        if getLobbyLen() > cfg.general["lobby_size"]:  # This should not happen EVER
             await send("UNKNOWN_ERROR", ctx, "Lobby Overflow")
             return
         try:
@@ -64,8 +65,6 @@ class LobbyCog(commands.Cog, name='lobby'):
         addToLobby(player)
         await send("LB_ADDED", ctx,  namesInLobby=getAllNamesInLobby())
 
-
-
     @commands.command(aliases=['l'])
     @commands.guild_only()
     async def leave(self, ctx):
@@ -82,7 +81,6 @@ class LobbyCog(commands.Cog, name='lobby'):
             return
         await send("LB_NOT_IN", ctx)
 
-
     @commands.command(aliases=['q'])
     @commands.guild_only()
     async def queue(self, ctx):
@@ -96,6 +94,7 @@ class LobbyCog(commands.Cog, name='lobby'):
             await send("LB_STUCK", ctx)
             return
         await send("LB_QUEUE", ctx, namesInLobby=getAllNamesInLobby())
+
 
 def setup(client):
     client.add_cog(LobbyCog(client))

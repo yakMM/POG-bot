@@ -13,7 +13,7 @@ from json import loads
 from modules.exceptions import UnexpectedError, ApiNotReachable
 
 
-## PUBLIC:
+# PUBLIC:
 
 async def request(url):
     async with ClientSession() as client:
@@ -24,15 +24,10 @@ async def request(url):
         return loads(result)
 
 
-## PRIVATE:
+# PRIVATE:
 
 async def _fetch(client, url):
     async with client.get(url) as resp:
         if(resp.status != 200):
             raise UnexpectedError("Received wrong status from http page: "+str(resp.status))
         return await resp.text()
-
-
-
-
-

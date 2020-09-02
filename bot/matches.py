@@ -4,10 +4,10 @@ from modules.display import channelSend, edit
 from modules.enumerations import PlayerStatus, MatchStatus, SelStatus
 from datetime import datetime as dt
 
-from classes.teams import Team #ok
-from classes.players import TeamCaptain, ActivePlayer #ok
-from classes.maps import MapSelection, mainMapPool #ok
-from classes.accounts import AccountHander #ok
+from classes.teams import Team  # ok
+from classes.players import TeamCaptain, ActivePlayer  # ok
+from classes.maps import MapSelection, mainMapPool  # ok
+from classes.accounts import AccountHander  # ok
 
 from random import choice as randomChoice
 from lib import tasks
@@ -20,22 +20,27 @@ _lobbyList = list()
 _lobbyStuck = False
 _allMatches = dict()
 
+
 def getMatch(id):
     if id not in _allMatches:
-        raise ElementNotFound(id) # should never happen
+        raise ElementNotFound(id)  # should never happen
     return _allMatches[id]
+
 
 def isLobbyStuck():
     global _lobbyStuck
     return _lobbyStuck
 
+
 def _autoPingTreshold():
     tresh = cfg.general["lobby_size"] - cfg.general["lobby_size"] // 3
     return tresh
 
+
 def _autoPingCancel():
     _autoPing.cancel()
     _autoPing.already = False
+
 
 def addToLobby(player):
     _lobbyList.append(player)
@@ -47,32 +52,39 @@ def addToLobby(player):
             _autoPing.start()
             _autoPing.already = True
 
+
 @tasks.loop(minutes=3, delay=1, count=2)
 async def _autoPing():
     await channelSend("LB_NOTIFY", cfg.discord_ids["lobby"], f'<@&{cfg.discord_ids["notify_role"]}>')
 _autoPing.already = False
 
+
 def getLobbyLen():
     return len(_lobbyList)
+
 
 def getAllNamesInLobby():
     names = [p.mention for p in _lobbyList]
     return names
+
 
 def removeFromLobby(player):
     _lobbyList.remove(player)
     _onLobbyRemove()
     player.onLobbyLeave()
 
+
 def _onMatchFree():
     if len(_lobbyList) == cfg.general["lobby_size"]:
         startMatchFromFullLobby.start()
+
 
 def _onLobbyRemove():
     global _lobbyStuck
     _lobbyStuck = False
     if len(_lobbyList) < _autoPingTreshold():
         _autoPingCancel()
+
 
 @tasks.loop(count=1)
 async def startMatchFromFullLobby():
@@ -86,10 +98,12 @@ async def startMatchFromFullLobby():
     _lobbyStuck = False
     match._setPlayerList(_lobbyList)
     for p in _lobbyList:
-        p.onMatchSelected(match) # Player status is modified automatically in IS_MATCHED
+        # Player status is modified automatically in IS_MATCHED
+        p.onMatchSelected(match)
     _lobbyList.clear()
     match._launch.start()
     await channelSend("LB_MATCH_STARTING", cfg.discord_ids["lobby"], match.id)
+
 
 async def onInactiveConfirmed(player):
     removeFromLobby(player)
@@ -108,9 +122,10 @@ def clearLobby():
 
 def _findSpotForMatch():
     for match in _allMatches.values():
-        if match.status is MatchStatus.IS_FREE :
+        if match.status is MatchStatus.IS_FREE:
             return match
     return None
+
 
 def init(list):
     for id in list:
@@ -119,7 +134,7 @@ def init(list):
 
 class Match():
 
-    def __init__(self,id):
+    def __init__(self, id):
         self.__id = id
         self.__players = dict()
         self.__status = MatchStatus.IS_FREE
@@ -206,11 +221,11 @@ class Match():
         await channelSend("PK_OK_FACTION", self.__id, picker.mention, match=self)
 
     def factionPick(self, team, str):
-        faction=cfg.i_factions[str]
+        faction = cfg.i_factions[str]
         other = self.__teams[team.id-1]
         if other.faction == faction:
             return team.captain
-        team.faction=faction
+        team.faction = faction
         team.captain.isTurn = False
         if other.faction != 0:
             self.__status = MatchStatus.IS_MAPPING
@@ -238,7 +253,6 @@ class Match():
         if not other.captain.isTurn:
             self.__status = MatchStatus.IS_STARTING
             self.__startMatch.start()
-
 
     @tasks.loop(count=1)
     async def __findMap(self):
@@ -300,7 +314,6 @@ class Match():
         self.__status = MatchStatus.IS_PLAYING
         self._onMatchOver.start()
 
-
     @tasks.loop(count=1)
     async def _launch(self):
         await channelSend("MATCH_INIT", self.__id, " ".join(self.playerPings))
@@ -335,10 +348,10 @@ class Match():
         for tm in self.__teams:
             for aPlayer in tm.players:
                 aPlayer.clean()
-        
+
         # Clean mapSelector
         self.__mapSelector.clean()
-        
+
         # Release all objects:
         self.__accounts = None
         self.__mapSelector = None
@@ -349,7 +362,6 @@ class Match():
         self.__status = MatchStatus.IS_FREE
         _onMatchFree()
 
-
     @property
     def map(self):
         if self.__mapSelector.status is SelStatus.IS_CONFIRMED:
@@ -359,7 +371,7 @@ class Match():
     @property
     def players(self):
         return self.__players
-    
+
     @property
     def roundNo(self):
         if self.__status is MatchStatus.IS_PLAYING:
@@ -367,9 +379,7 @@ class Match():
         if self.__status in (MatchStatus.IS_STARTING, MatchStatus.IS_WAITING):
             return len(self.__roundsStamps)+1
         return 0
-    
+
     @property
     def mapSelector(self):
         return self.__mapSelector
-
-

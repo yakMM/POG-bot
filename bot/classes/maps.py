@@ -14,14 +14,16 @@ MAX_SELECTED = 15
 
 _mapSelectionsDict = dict()
 
+
 def getMapSelection(id):
     sel = _mapSelectionsDict.get(id)
     if sel == None:
         raise ElementNotFound(id)
     return sel
 
+
 class Map():
-    def __init__(self,data):
+    def __init__(self, data):
         self.__id = data["_id"]
         self.__name = data["facility_name"]
         self.__zoneId = data["zone_id"]
@@ -30,20 +32,20 @@ class Map():
         if self.__inPool:
             mainMapPool.append(self)
         _allMapsList.append(self)
-    
-    def getData(self): # get data for database push
-        data = {"_id" : self.__id,
-                "facility_name" : self.__name,
-                "zone_id" : self.__zoneId,
-                "type_id" : self.__typeId,
-                "in_map_pool" : self.__inPool 
+
+    def getData(self):  # get data for database push
+        data = {"_id": self.__id,
+                "facility_name": self.__name,
+                "zone_id": self.__zoneId,
+                "type_id": self.__typeId,
+                "in_map_pool": self.__inPool
                 }
         return data
 
     @property
     def pool(self):
         return self.__inPool
-    
+
     @pool.setter
     def pool(self, bl):
         self.__inPool = bl
@@ -58,6 +60,7 @@ class Map():
         if self.__typeId in cfg.facilitiy_suffix:
             name += f" {cfg.facilitiy_suffix[self.__typeId]}"
         return name
+
 
 class MapSelection():
     def __init__(self, id, mapList=_allMapsList):
@@ -75,7 +78,7 @@ class MapSelection():
                 self.__selected = self.__selection[index-1]
                 self.__status = SelStatus.IS_SELECTED
             return
-        arg=" ".join(args)
+        arg = " ".join(args)
         self.__selection.clear()
         for map in self.__allMaps:
             if len(self.__selection) > MAX_SELECTED:
@@ -91,7 +94,7 @@ class MapSelection():
             self.__status = SelStatus.IS_EMPTY
             return
         self.__status = SelStatus.IS_SELECTION
-    
+
     async def doSelectionProcess(self, ctx, args):
         if self.__status is SelStatus.IS_EMPTY and self.isSmallPool:
             self.__status = SelStatus.IS_SELECTION
@@ -106,8 +109,8 @@ class MapSelection():
             await send("MAP_HELP", ctx)
             return
         if len(args) == 1 and args[0] == "help":
-                await send("MAP_HELP", ctx)
-                return
+            await send("MAP_HELP", ctx)
+            return
         self.__doSelection(args)
         if self.__status is SelStatus.IS_EMPTY:
             await send("MAP_NOT_FOUND", ctx)
@@ -123,7 +126,7 @@ class MapSelection():
 
     @property
     def stringList(self):
-        result=list()
+        result = list()
         if len(self.__selection) > 0:
             for i in range(len(self.__selection)):
                 result.append(f"**{str(i+1)}**: " + self.__selection[i].name)
@@ -147,7 +150,7 @@ class MapSelection():
     @property
     def status(self):
         return self.__status
-    
+
     def confirm(self):
         if self.__status is SelStatus.IS_SELECTED:
             self.__status = SelStatus.IS_CONFIRMED

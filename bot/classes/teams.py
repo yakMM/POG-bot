@@ -3,14 +3,15 @@
 
 from modules.enumerations import PlayerStatus
 
+
 class Team:
     def __init__(self, id, name, match):
         self.__id = id
         self.__name = name
-        self.__players=list()
-        self.__score=0
-        self.__faction=0
-        self.__cap=0
+        self.__players = list()
+        self.__score = 0
+        self.__faction = 0
+        self.__cap = 0
         self.__match = match
 
     @property
@@ -30,15 +31,15 @@ class Team:
         return self.__faction
 
     @faction.setter
-    def faction(self,faction):
-        self.__faction=faction
+    def faction(self, faction):
+        self.__faction = faction
 
     @property
     def score(self):
         return self.__score
 
     def addScore(self, points):
-        self.__score+=points
+        self.__score += points
 
     @property
     def cap(self):
@@ -61,8 +62,8 @@ class Team:
         return self.__players[0]
 
     def addCap(self, points):
-        self.__cap+=points
-        self.__score+=points
+        self.__cap += points
+        self.__score += points
 
     def addPlayer(self, cls, player):
         active = cls(player, self)
@@ -71,5 +72,3 @@ class Team:
     def onMatchReady(self):
         for p in self.__players:
             p.onMatchReady()
-
-

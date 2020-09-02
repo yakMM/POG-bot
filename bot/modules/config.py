@@ -6,79 +6,80 @@ from requests import get
 from configparser import ConfigParser, ParsingError
 from modules.exceptions import ConfigError
 
-## DiscordIds
+# DiscordIds
 
 discord_ids = {
-    "lobby" : 0,
-    "register" : 0,
-    "matches" : list(),
-    "results" : 0,
-    "rules" : 0,
-    "staff" : 0,
-    "rules_msg" : 0,
-    "admin_role" : 0,
-    "info_role" : 0,
-    "registered_role" : 0,
-    "notify_role" : 0
-    }
+    "lobby": 0,
+    "register": 0,
+    "matches": list(),
+    "results": 0,
+    "rules": 0,
+    "staff": 0,
+    "rules_msg": 0,
+    "admin_role": 0,
+    "info_role": 0,
+    "registered_role": 0,
+    "notify_role": 0
+}
 
-## General
+# General
 
 general = {
-    "token" : "",
-    "api_key" : "",
-    "command_prefix" : "",
-    "lobby_size" : 0
-    }
+    "token": "",
+    "api_key": "",
+    "command_prefix": "",
+    "lobby_size": 0
+}
 
-AFK_TIME = 15 # minutes
-ROUND_LENGHT = 10 # minutes
+AFK_TIME = 15  # minutes
+ROUND_LENGHT = 10  # minutes
 VERSION = "0"
 
 factions = {
-    1 : "VS",
-    2 : "NC",
-    3 : "TR"
+    1: "VS",
+    2: "NC",
+    3: "TR"
 }
 
 # Lazy way to get factions from user input:
 i_factions = {
-    "VS" : 1,
-    "NC" : 2,
-    "TR" : 3
+    "VS": 1,
+    "NC": 2,
+    "TR": 3
 }
 
 # http://census.daybreakgames.com/get/ps2:v2/zone?c:limit=100
 zones = {
-2 : "Indar",
-4 : "Hossin",
-6 : "Amerish",
-8 : "Esamir"
+    2: "Indar",
+    4: "Hossin",
+    6: "Amerish",
+    8: "Esamir"
 }
 
 # http://census.daybreakgames.com/get/ps2:v2/facility_type?c:limit=100
 facilitiy_suffix = {
-2 : "Amp Station",
-3 : "Bio Lab",
-4 : "Tech Plant"
+    2: "Amp Station",
+    3: "Bio Lab",
+    4: "Tech Plant"
 }
 
 
-## Database
+# Database
 
 _collections = {
-    "users" : "",
-    "sBases" : ""
-    }
+    "users": "",
+    "sBases": ""
+}
 
 database = {
-    "url" : "",
-    "cluster" : "",
-    "accounts" : "",
-    "collections" : _collections
-    }
+    "url": "",
+    "cluster": "",
+    "accounts": "",
+    "collections": _collections
+}
 
-## Methods
+# Methods
+
 
 def getConfig(file):
     config = ConfigParser()
@@ -87,16 +88,15 @@ def getConfig(file):
     except ParsingError as e:
         raise ConfigError(f"Parsing Error in '{file}'")
 
-
     # General section
     _checkSection(config, "General", file)
 
     for key in general:
         try:
-            if isinstance(general[key],int):
-                general[key]=int(config['General'][key])
+            if isinstance(general[key], int):
+                general[key] = int(config['General'][key])
             else:
-                general[key]=config['General'][key]
+                general[key] = config['General'][key]
         except KeyError:
             _errorMissing(key, 'General', file)
         except ValueError:
@@ -104,10 +104,10 @@ def getConfig(file):
 
     # Testing api key
     url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
-    jdata=loads(get(url).content)
+    jdata = loads(get(url).content)
     if 'error' in jdata:
-        raise ConfigError(f"Incorrect api key: {general['api_key']} in '{file}'")
-
+        raise ConfigError(
+            f"Incorrect api key: {general['api_key']} in '{file}'")
 
     # Discord_Ids section
     _checkSection(config, "Discord_Ids", file)
@@ -126,21 +126,18 @@ def getConfig(file):
         except ValueError:
             _errorIncorrect(key, 'Discord_Ids', file)
 
-
     # Database section
     _checkSection(config, "Database", file)
 
     for key in database:
         if key != "collections":
             try:
-                database[key]=config['Database'][key]
+                database[key] = config['Database'][key]
             except KeyError:
                 _errorMissing(key, 'Database', file)
 
-
     # Collections section
     _checkSection(config, "Collections", file)
-
 
     for key in database["collections"]:
         try:
@@ -148,17 +145,18 @@ def getConfig(file):
         except KeyError:
             _errorMissing(key, 'Collections', file)
 
-
     # Version
     with open('../CHANGELOG.md', 'r', encoding='utf-8') as txt:
-        txt_str=txt.readline()
+        txt_str = txt.readline()
     global VERSION
-    VERSION = txt_str[3:-2] # Extracts "X.X.X" from string "# vX.X.X:" in a lazy way
+    # Extracts "X.X.X" from string "# vX.X.X:" in a lazy way
+    VERSION = txt_str[3:-2]
 
 
 def _checkSection(config, section, file):
     if not section in config:
         raise ConfigError(f"Missing section '{section}' in '{file}'")
+
 
 def _errorMissing(field, section, file):
     raise ConfigError(f"Missing field '{field}' in '{section}' in '{file}'")

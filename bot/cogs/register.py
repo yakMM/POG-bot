@@ -16,6 +16,7 @@ from modules.roles import getRole
 
 log = getLogger(__name__)
 
+
 class registerCog(commands.Cog, name='register'):
     """
     Register cog, handle the commands from register channel
@@ -24,22 +25,20 @@ class registerCog(commands.Cog, name='register'):
     def __init__(self, client):
         self.client = client
 
-
     """
     Registered Commands:
 
     =register
     """
 
-    async def cog_check(self, ctx): # Check if right channel
+    async def cog_check(self, ctx):  # Check if right channel
         return ctx.channel.id == cfg.discord_ids['register']
-
 
     @commands.command(aliases=['r'])
     @commands.guild_only()
     async def register(self, ctx, *args):
-        if len(ctx.message.mentions) != 0: # Don't want a mention here
-            await send("REG_INVALID",ctx)
+        if len(ctx.message.mentions) != 0:  # Don't want a mention here
+            await send("REG_INVALID", ctx)
             return
         try:
             player = getPlayer(ctx.author.id)
@@ -65,8 +64,10 @@ class registerCog(commands.Cog, name='register'):
             await send("NOTIFY_ADDED", ctx)
         await dbUpdate(player)
 
+
 def setup(client):
     client.add_cog(registerCog(client))
+
 
 async def _register(player, ctx, args):
     """
@@ -78,65 +79,68 @@ async def _register(player, ctx, args):
     Parameters:
     ingameNames (str, list of str): If a list, will add each name one by one. If a string, will add the faction suffixes automatically.
     """
-    if player.status is PlayerStatus.IS_PLAYING: # Can't register if already playing
-        await send("REG_FREEZED",ctx)
+    if player.status is PlayerStatus.IS_PLAYING:  # Can't register if already playing
+        await send("REG_FROZEN", ctx)
         return
     for name in args:
-        if not isAlNum(name): # Char names are only alphanum names
-            await send("INVALID_STR",ctx, name)
+        if not isAlNum(name):  # Char names are only alphanum names
+            await send("INVALID_STR", ctx, name)
             return
-    if len(args) == 0: # If user did not input any arg, display their current registration status
+    if len(args) == 0:  # If user did not input any arg, display their current registration status
         if player.status is PlayerStatus.IS_NOT_REGISTERED:
-            await send("REG_NOT_REGISTERED",ctx)
+            await send("REG_NOT_REGISTERED", ctx)
             return
         if player.hasOwnAccount:
-            await send("REG_IS_REGISTERED_OWN",ctx,*player.igNames)
+            await send("REG_IS_REGISTERED_OWN", ctx, *player.igNames)
             return
-        await send("REG_IS_REGISTERED_NOA",ctx)
+        await send("REG_IS_REGISTERED_NOA", ctx)
         return
-    wasPlayerRegistered = player.status is not PlayerStatus.IS_NOT_REGISTERED # store previous status
-    if len(args) == 1 or len(args) == 3: # if 1 or 3 args
-        if len(args) == 1 and args[0]=="help": # =r help displays hel^p
-            await send("REG_HELP",ctx)
+    # store previous status
+    wasPlayerRegistered = player.status is not PlayerStatus.IS_NOT_REGISTERED
+    if len(args) == 1 or len(args) == 3:  # if 1 or 3 args
+        if len(args) == 1 and args[0] == "help":  # =r help displays hel^p
+            await send("REG_HELP", ctx)
             return
         try:
-            if not await player.register(args): # player.register return a boolean: hasTheProfileBeenUpdated
-                await send("REG_IS_REGISTERED_OWN",ctx,*player.igNames) # if no update, say "you are already registered etc"
+            # player.register return a boolean: hasTheProfileBeenUpdated
+            if not await player.register(args):
+                # if no update, say "you are already registered etc"
+                await send("REG_IS_REGISTERED_OWN", ctx, *player.igNames)
                 return
-            await dbUpdate(player) # push update to db
+            await dbUpdate(player)  # push update to db
             if wasPlayerRegistered:
-                await send("REG_UPDATE_OWN",ctx,*player.igNames)
+                await send("REG_UPDATE_OWN", ctx, *player.igNames)
                 return
-            await send("REG_WITH_CHARS",ctx,*player.igNames)
+            await send("REG_WITH_CHARS", ctx, *player.igNames)
             return
-        except CharNotFound as e: # if problems with chars
-            await send("REG_CHAR_NOT_FOUND",ctx,e.char)
+        except CharNotFound as e:  # if problems with chars
+            await send("REG_CHAR_NOT_FOUND", ctx, e.char)
             return
         except CharInvalidWorld as e:
-            await send("REG_NOT_JAEGER",ctx,e.char)
+            await send("REG_NOT_JAEGER", ctx, e.char)
             return
         except CharMissingFaction as e:
-            await send("REG_MISSING_FACTION",ctx,e.faction)
+            await send("REG_MISSING_FACTION", ctx, e.faction)
             return
         except CharAlreadyExists as e:
-            await send("REG_ALREADY_EXIST",ctx,e.char, f"<@{e.id}>")
+            await send("REG_ALREADY_EXIST", ctx, e.char, f"<@{e.id}>")
             return
         except ApiNotReachable:
-            await send("API_ERROR",ctx)
+            await send("API_ERROR", ctx)
             return
         except UnexpectedError as e:
-            await send("UNKNOWN_ERROR",ctx,e.reason)
+            await send("UNKNOWN_ERROR", ctx, e.reason)
             return
-    if len(args) == 2: # if 2 args, it should be "no account", if not, invalid request. Again, check if update and push db if that's the case
-        if args[0]=="no" and args[1]=="account":
+    if len(args) == 2:  # if 2 args, it should be "no account", if not, invalid request. Again, check if update and push db if that's the case
+        if args[0] == "no" and args[1] == "account":
             if not await player.register(None):
-                await send("REG_IS_REGISTERED_NOA",ctx)
+                await send("REG_IS_REGISTERED_NOA", ctx)
                 return
             await dbUpdate(player)
             if wasPlayerRegistered:
-                await send("REG_UPDATE_NOA",ctx)
+                await send("REG_UPDATE_NOA", ctx)
                 return
-            await send("REG_NO_ACCOUNT",ctx)
+            await send("REG_NO_ACCOUNT", ctx)
             return
-    await send("REG_INVALID",ctx) # if any other number of args, not valid
+    await send("REG_INVALID", ctx)  # if any other number of args, not valid
     return

@@ -21,8 +21,8 @@ import modules.config as cfg
 from modules.display import channelSend, privateSend, edit, remReaction
 from modules.exceptions import AccountsNotEnough
 
-X_OFFSET=3
-Y_OFFSET=3
+X_OFFSET = 3
+Y_OFFSET = 3
 QUIT_DELAY = 300
 
 log = getLogger(__name__)
@@ -31,6 +31,7 @@ log = getLogger(__name__)
 class Account():
     """ Account object, each of these represent one single account
     """
+
     def __init__(self, id, ident, pwd, x):
         self.__strId = id       # strId to keep the 0, example: PSBx0123 would be 0123
         self.__id = int(id)     # actual id
@@ -40,7 +41,8 @@ class Account():
         self.__aPlayer = None   # player who received the account
         self.message = None     # Message when giving the account
         self.__isValidated = False  # Has player accepted the account?
-        self.isDestroyed = False    # flag account to be destroyed (removing account info from the message)
+        # flag account to be destroyed (removing account info from the message)
+        self.isDestroyed = False
 
     @property
     def ident(self):
@@ -80,7 +82,6 @@ class Account():
         self.__aPlayer.acceptAccount()
 
 
-
 class AccountHander():
     """ AccountHander object, interface for giving accounts
     """
@@ -90,7 +91,7 @@ class AccountHander():
     _secretFile = ""    # gspread ident file
 
     @classmethod
-    def init(cls, secretFile): # global init: retrieving data once, will work in memory afterwards
+    def init(cls, secretFile):  # global init: retrieving data once, will work in memory afterwards
         cls._secretFile = secretFile
         gc = service_account(filename=secretFile)
         sh = gc.open_by_key(cfg.database["accounts"])
@@ -103,7 +104,7 @@ class AccountHander():
         self.__yCoord = 0
         self.__xMax = 0
         self.__match = match
-        type(self)._currentNumber+=1
+        type(self)._currentNumber += 1
         self.__handingStamp = 0     # timestamp: when have these accounts been given?
         match.number = type(self)._currentNumber
 
@@ -111,10 +112,10 @@ class AccountHander():
         """ Utility method to convert number in sheet coordinate
             For example 0=A, 25=Z, 26=AA, 27=AB, etc
         """
-        lets=""
-        if num>=26:
+        lets = ""
+        if num >= 26:
             lets += chr(ord('@')+num//26)
-        lets+=chr(ord('@')+num%26+1)
+        lets += chr(ord('@')+num % 26+1)
         return lets
 
     def __getAccounts(self, stamp):
@@ -128,18 +129,21 @@ class AccountHander():
 
         # Get all accounts
         for i in range(numAccounts):
-            free = True # free by default
+            free = True  # free by default
             for j in range(numMatches):
                 endStamp = sheetTab[-j-1][2]
-                if endStamp == "" or int(endStamp) > stamp: # Check for all matches still happening
-                    if sheetTab[-j-1][i+X_OFFSET] != "": # if someone have this account
-                        free = False # it is not free
+                # Check for all matches still happening
+                if endStamp == "" or int(endStamp) > stamp:
+                    if sheetTab[-j-1][i+X_OFFSET] != "":  # if someone have this account
+                        free = False  # it is not free
                         break
             if free:
-                args = sheetTab[0][i+X_OFFSET], sheetTab[1][i+X_OFFSET], sheetTab[2][i+X_OFFSET], i+X_OFFSET
-                self.__freeAccounts.append(Account(*args)) # if free, add an account object to the list
+                args = sheetTab[0][i+X_OFFSET], sheetTab[1][i +
+                                                            X_OFFSET], sheetTab[2][i+X_OFFSET], i+X_OFFSET
+                # if free, add an account object to the list
+                self.__freeAccounts.append(Account(*args))
 
-        self.__yCoord = numMatches+Y_OFFSET+1 # coordinate for this match
+        self.__yCoord = numMatches+Y_OFFSET+1  # coordinate for this match
         self.__xMax = sheetTab.shape[1]
 
     async def doUpdate(self):
@@ -155,11 +159,13 @@ class AccountHander():
         if self.__handingStamp == 0:
             vRow[1] = "ERROR in match!"
         else:
-            vRow[1] = dt.utcfromtimestamp(self.__handingStamp).strftime("%Y-%m-%d %H:%M UTC")
-        closingStamp =  int(dt.timestamp(dt.now())) + QUIT_DELAY
+            vRow[1] = dt.utcfromtimestamp(
+                self.__handingStamp).strftime("%Y-%m-%d %H:%M UTC")
+        closingStamp = int(dt.timestamp(dt.now())) + QUIT_DELAY
         type(self)._sheetTab[self.__yCoord-1][2] = str(closingStamp)
         row[2] = str(closingStamp)
-        vRow[2] = dt.utcfromtimestamp(closingStamp).strftime("%Y-%m-%d %H:%M UTC")
+        vRow[2] = dt.utcfromtimestamp(
+            closingStamp).strftime("%Y-%m-%d %H:%M UTC")
         for acc in self.__freeAccounts:
             if acc.isValidated:
                 row[acc.x] = str(acc.aPlayer.id)
@@ -198,7 +204,6 @@ class AccountHander():
         rawSheet.update(f"A{y}:{lt}{y}", [row])
         visibleSheet.update(f"A{y}:{lt}{y}", [vRow])
 
-
     async def give_accounts(self):
         """ Find free accounts for all players needing some
         """
@@ -219,17 +224,14 @@ class AccountHander():
         for aPlayer in pList:
             if not aPlayer.hasOwnAccount:
                 if i == len(self.__freeAccounts):
-                    raise AccountsNotEnough # not enough accounts for all the player without account
+                    raise AccountsNotEnough  # not enough accounts for all the player without account
                 currentAcc = self.__freeAccounts[i]
                 currentAcc.aPlayer = aPlayer
                 newLine[currentAcc.x] = str(aPlayer.id)
                 msg = await privateSend("ACC_UPDATE", aPlayer.id, account=currentAcc)
                 await msg.add_reaction('✅')
                 currentAcc.message = msg
-                i+=1
+                i += 1
         type(self)._sheetTab = vstack((type(self)._sheetTab, array(newLine)))
         self.__handingStamp = stamp
         await channelSend("ACC_SENT", self.__match.id)
-
-
-
