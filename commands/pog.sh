@@ -45,7 +45,7 @@ function my_update
     cd "$(dirname "$0")"
     cd ..
     git clean -xdf
-    git fetch --all
+    git fetch origin master
     git reset --hard origin/master
 
     chmod a+x commands/*

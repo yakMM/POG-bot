@@ -159,6 +159,14 @@ def _addMainHandlers(client):
         await reactionHandler(reaction, player)
 
     @client.event
+    async def on_member_join(member):
+        try:
+            player = getPlayer(member.id)
+        except ElementNotFound:
+            return
+        player.updateRole()
+
+    @client.event
     async def on_member_update(before, after):
         if before.status != after.status:
             on_status_update(after)

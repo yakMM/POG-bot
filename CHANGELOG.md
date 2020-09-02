@@ -1,7 +1,9 @@
-# v1.0.11
+# v1.0.11:
 - Commands are no longer usable during init
 - Fixed a bug with @Notify being pinged after a match start
 - Staff can now remove individual players from lobby
+- Speculative fix for bot taking 5 whole minutes to start
+- Players can now see the channels on joining back the discord server
 
 # v1.0.10:
 - All players will now have accurate roles depending on their status

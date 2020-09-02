@@ -30,12 +30,27 @@ async def checkRoles(players):
         memb = _guild.get_member(p.id)
         if memb is not None:
             await onNotifyUpdate(p)
-            await memb.remove_roles(_rolesDict["info"])
+            if _rolesDict["info"] in memb.roles:
+                await memb.remove_roles(_rolesDict["info"])
+
+async def forceInfo(player):
+    global _guild
+    memb = _guild.get_member(player.id)
+    if memb is None:
+        return
+    if _rolesDict["info"] not in memb.roles:
+        await memb.add_roles(_rolesDict["info"])
+    if _rolesDict["registered"] in memb.roles:
+        await memb.remove_roles(_rolesDict["registered"])
+    if _rolesDict["notify"] in memb.roles:
+            await memb.remove_roles(_rolesDict["notify"])
 
 
 async def onNotifyUpdate(player):
     global _guild
     memb = _guild.get_member(player.id)
+    if memb is None:
+        return
     if player.status is PlayerStatus.IS_REGISTERED and player.isNotify and memb.status not in (Status.offline, Status.dnd):
         if _rolesDict["notify"] not in memb.roles:
             await memb.add_roles(_rolesDict["notify"])

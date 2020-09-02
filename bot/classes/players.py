@@ -11,6 +11,10 @@ from modules.enumerations import PlayerStatus
 from lib import tasks
 from modules.roles import onNotifyUpdate
 
+from logging import getLogger
+
+log = getLogger(__name__)
+
 WORLD_ID = 19  # Jaeger ID
 
 # temp, will be in config file later
@@ -92,11 +96,11 @@ class Player():
         self.__roles["notify"] = value
         self.updateRole()
 
-    def updateRole(self):
+    def updateRole(self, i=0):
         try:
-            self.roleTask.cancel()
             self.roleTask.start()
         except RuntimeError:  # if task is already active
+            log.warning(f"Player task conflict: {self.name}")
             pass
 
     @tasks.loop(count=1)

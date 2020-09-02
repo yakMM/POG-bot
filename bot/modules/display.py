@@ -88,16 +88,16 @@ def _registerHelp(msg):
                     inline=False)
     embed.add_field(name='If you have a Jaeger account',
                     value='`=r charName` - If your character names have faction suffixes\n'
-                          '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes\n'
+                          '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes'
                     , inline=False)
     embed.add_field(name='Notify feature',
                     value='`=notify` - To join or leave the Notify feature\n'
-                          f'When suscribed to Notify, you can be mentionned with <@&{cfg.discord_ids["notify_role"]}> by other players\n'
+                          f'When suscribed to Notify, you can be mentionned with <@&{cfg.discord_ids["notify_role"]}> by other players'
                     , inline=False)
     try:
         if isAdmin(msg.author):
             embed.add_field(name="Staff Commands",
-                            value='`=unregister @player` - Permanently remove player profile from the system'
+                            value='`=unregister @player` - Permanently remove player profile from the system\n'
                             '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                             inline=False)
     except AttributeError:
@@ -118,7 +118,7 @@ def _lobbyHelp(msg):
     if isAdmin(msg.author):
         embed.add_field(name="Staff Commands",
                         value='`=clear` - Clear the lobby\n'
-                        '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages'
+                        '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages\n'
                         '`=remove @player` - Remove player from lobby',
                         inline=False)
     return embed
@@ -146,8 +146,7 @@ def _mapHelp(ctx):
     embed.add_field(name='Map selection commands',
                     value=f'`={cmd} a base` - Display all the maps containing *a base* in their name\n'
                           f'`={cmd} 3` - Chooses the map number 3 from the selection\n'
-                          f'`={cmd}` - Display the current selection or show the help\n'
-                          ,
+                          f'`={cmd}` - Display the current selection or show the help',
                     inline=False)
     return embed
 
@@ -170,7 +169,7 @@ def _matchHelp(msg):
     if isAdmin(msg.author):
         embed.add_field(name="Staff Commands",
                         value = '`=clear` - Clear the match\n'
-                                '`=map base name` - Select a map'
+                                '`=map base name` - Select a map\n'
                                 '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                         inline=False)
     return embed
@@ -337,7 +336,7 @@ class _StringEnum(Enum):
     REG_UPDATE_OWN = _Message("You successfully updated your profile with the following Jaeger characters: `{}`, `{}`, `{}`")
     REG_UPDATE_NOA = _Message("You successfully removed your Jaeger characters from your profile.")
     REG_WITH_CHARS = _Message("You successfully registered with the following Jaeger characters: `{}`, `{}`, `{}`")
-    REG_FREEZED = _Message("You can't register while you're playing a match")
+    REG_FROZEN = _Message("You can't register while you're playing a match")
     REG_RULES = _Message("{} You have accepted the rules, you may now register", embed=_registerHelp)
     REG_NO_RULE = _Message("You have to accept the rules before registering! Check <#{}>")
 
@@ -399,8 +398,8 @@ class _StringEnum(Enum):
     BOT_IS_LOCKED = _Message("Bot is locked!")
     BOT_ALREADY = _Message("Already {}!")
     BOT_VERSION = _Message("Version `{}`, locked: `{}`")
-    BOT_FREEZED = _Message("Channel freezed!")
-    BOT_UNFREEZED = _Message("Channel unfreezed!")
+    BOT_FROZEN = _Message("Channel frozen!")
+    BOT_UNFROZEN = _Message("Channel unfrozen!")
 
     MATCH_INIT = _Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player",embed=_teamUpdate)

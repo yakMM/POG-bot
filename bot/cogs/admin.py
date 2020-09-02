@@ -8,7 +8,7 @@ from modules.exceptions import ElementNotFound, DatabaseError
 from modules.tools import isAdmin
 from modules.database import removePlayer as dbRemove
 from modules.loader import lockAll, unlockAll, isAllLocked
-from modules.roles import getRole
+from modules.roles import getRole, forceInfo
 
 from classes.players import removePlayer, getPlayer
 
@@ -96,13 +96,8 @@ class AdminCog(commands.Cog, name='admin'):
                 await dbRemove(player)
             except DatabaseError:
                 pass  # ignored if not yet in db
-            memb = ctx.author.guild.get_member(player.id)
             removePlayer(player)
-            registered = getRole("registered")
-            notify = getRole("notify")
-            if memb is not None:
-                await memb.remove_roles(notify)
-                await memb.remove_roles(registered)
+            forceInfo(player)
             await send("RM_OK", ctx)
             return
         await send("RM_IN_MATCH", ctx)
@@ -117,6 +112,31 @@ class AdminCog(commands.Cog, name='admin'):
             removeFromLobby(player)
             await channelSend("RM_LOBBY", cfg.discord_ids["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
         await send("RM_NOT_LOBBIED", ctx)
+
+    # WIP
+    # @commands.command()
+    # @commands.guild_only()
+    # async def timeout(self, ctx, *args):
+    #     if len(ctx.message.mentions) != 1:
+    #         await send("RM_MENTION_ONE", ctx)
+    #         return
+    #     try:
+    #         player = getPlayer(ctx.message.mentions[0].id)
+    #     except ElementNotFound:
+    #         # player isn't even registered in the system...
+    #         await send("RM_NOT_IN_DB", ctx)
+    #         return
+    #     if player.status is PlayerStatus.IS_LOBBIED:
+    #         removeFromLobby(player)
+    #         await channelSend("RM_LOBBY", cfg.discord_ids["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
+    #     if player.status not in (PlayerStatus.IS_REGISTERED, PlayerStatus.IS_NOT_REGISTERED):
+    #         await send("RM_IN_MATCH", ctx)
+    #         return
+        
+    #     player.addTimeout
+    #     forceInfo(player)
+
+
 
     @commands.command()
     @commands.guild_only()
