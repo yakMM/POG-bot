@@ -1,3 +1,8 @@
+# v1.0.11
+- Commands are no longer usable during init
+- Fixed a bug with @Notify being pinged after a match start
+- Staff can now remove individual players from lobby
+
 # v1.0.10:
 - All players will now have accurate roles depending on their status
 - Notify role should now reflect more accurately players ready to queue
@@ -61,6 +66,7 @@
 - Last player is now pinged when automatically assigned to a team
 - Matches are now constituted of 2 rounds
 - Round number is now displayed
+
 
 # v1.0.1:
 - Rules acceptance feature

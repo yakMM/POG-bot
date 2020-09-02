@@ -172,7 +172,7 @@ class AccountHander():
                 vRow[acc.x] = acc.aPlayer.name
         self._updateSheet.start(row, vRow)
         for acc in self.__freeAccounts:
-            if acc.message != None:
+            if acc.message is not None:
                 acc.isDestroyed = True
                 await edit("ACC_UPDATE", acc.message, account=acc)
                 if acc.isValidated:

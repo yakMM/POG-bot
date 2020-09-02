@@ -6,7 +6,7 @@ from modules.enumerations import SelStatus, MatchStatus, PlayerStatus
 from modules.display import send, channelSend
 from modules.exceptions import ElementNotFound, DatabaseError
 from modules.tools import isAdmin
-from modules.database import remove
+from modules.database import removePlayer as dbRemove
 from modules.loader import lockAll, unlockAll, isAllLocked
 from modules.roles import getRole
 
@@ -85,24 +85,15 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def unregister(self, ctx):
-        if ctx.channel.id != cfg.discord_ids["register"]:
-            await send("WRONG_CHANNEL", ctx, ctx.command.name, f"<#{cfg.discord_ids['register']}>")
-            return
-        if len(ctx.message.mentions) != 1:
-            await send("RM_MENTION_ONE", ctx)
-            return
-        try:
-            player = getPlayer(ctx.message.mentions[0].id)
-        except ElementNotFound:
-            # player isn't even registered in the system...
-            await send("RM_NOT_IN_DB", ctx)
+        player = await _removeChecks(ctx, "register")
+        if player is None:
             return
         if player.status is PlayerStatus.IS_LOBBIED:
             removeFromLobby(player)
             await channelSend("RM_LOBBY", cfg.discord_ids["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
         if player.status in (PlayerStatus.IS_REGISTERED, PlayerStatus.IS_NOT_REGISTERED):
             try:
-                await remove(player)
+                await dbRemove(player)
             except DatabaseError:
                 pass  # ignored if not yet in db
             memb = ctx.author.guild.get_member(player.id)
@@ -115,6 +106,17 @@ class AdminCog(commands.Cog, name='admin'):
             await send("RM_OK", ctx)
             return
         await send("RM_IN_MATCH", ctx)
+    
+    @commands.command()
+    @commands.guild_only()
+    async def remove(self, ctx):
+        player = await _removeChecks(ctx, "lobby")
+        if player is None:
+            return
+        if player.status is PlayerStatus.IS_LOBBIED:
+            removeFromLobby(player)
+            await channelSend("RM_LOBBY", cfg.discord_ids["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
+        await send("RM_NOT_LOBBIED", ctx)
 
     @commands.command()
     @commands.guild_only()
@@ -172,3 +174,18 @@ class AdminCog(commands.Cog, name='admin'):
 
 def setup(client):
     client.add_cog(AdminCog(client))
+
+async def _removeChecks(ctx, channel):
+    if ctx.channel.id != cfg.discord_ids[channel]:
+        await send("WRONG_CHANNEL", ctx, ctx.command.name, f"<#{cfg.discord_ids[channel]}>")
+        return
+    if len(ctx.message.mentions) != 1:
+        await send("RM_MENTION_ONE", ctx)
+        return
+    try:
+        player = getPlayer(ctx.message.mentions[0].id)
+    except ElementNotFound:
+        # player isn't even registered in the system...
+        await send("RM_NOT_IN_DB", ctx)
+        return
+    return player

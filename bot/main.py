@@ -19,8 +19,7 @@ from logging.handlers import RotatingFileHandler
 
 # Custom modules
 import modules.config as cfg
-from modules.display import send, channelSend, edit
-from modules.display import init as displayInit
+from modules.display import send, channelSend, edit, init as displayInit
 from modules.spam import isSpam, unlock
 from modules.exceptions import ElementNotFound, UnexpectedError
 from modules.database import init as dbInit, getAllPlayers, getAllMaps
@@ -28,11 +27,13 @@ from modules.enumerations import PlayerStatus
 from modules.tools import isAdmin
 from modules.loader import init as cogInit, isAllLocked, unlockAll
 from modules.roles import getRole, init as rolesInit, checkRoles, onNotifyUpdate
+from modules.reactions import reactionHandler
 
 # Modules for the custom classes
 from matches import onInactiveConfirmed, init as matchesInit
 from classes.players import Player, getPlayer, getAllPlayersList
 from classes.accounts import AccountHander
+from classes.maps import Map
 
 
 def _addMainHandlers(client):
@@ -62,7 +63,7 @@ def _addMainHandlers(client):
         if isinstance(message.channel, DMChannel):
             logging.info(message.author.name + ": " + message.content)
             return
-        if message.channel.id not in (cfg.discord_ids["lobby"], cfg.discord_ids["register"], *cfg.discord_ids["matches"]):
+        if message.channel.id not in (cfg.discord_ids["lobby"], cfg.discord_ids["register"], cfg.discord_ids["staff"], *cfg.discord_ids["matches"]):
             return
         if isAllLocked():
             if not isAdmin(message.author):
@@ -74,22 +75,6 @@ def _addMainHandlers(client):
         await client.process_commands(message)  # if not spam, process
         await sleep(0.5)
         unlock(message.author.id)  # call finished, we can release user
-
-    # on ready
-    @client.event
-    async def on_ready():
-        rolesInit(client)
-
-        # fetch rule message, remove all reaction but the bot's
-        global rulesMsg
-        rulesMsg = await client.get_channel(cfg.discord_ids["rules"]).fetch_message(cfg.discord_ids["rules_msg"])
-        await rulesMsg.clear_reactions()
-        await sleep(0.2)
-        await rulesMsg.add_reaction('✅')
-
-        await checkRoles(getAllPlayersList())
-        unlockAll(client)
-        logging.info('Client is ready!')
 
     # Global command error handler
     @client.event
@@ -137,7 +122,7 @@ def _addMainHandlers(client):
     @client.event
     # Has to be on_raw cause the message already exists when the bot starts
     async def on_raw_reaction_add(payload):
-        if payload.member == None or payload.member.bot:  # If bot, do nothing
+        if payload.member is None or payload.member.bot:  # If bot, do nothing
             return
         if isAllLocked():
             if not isAdmin(payload.member):
@@ -171,22 +156,7 @@ def _addMainHandlers(client):
             player = getPlayer(user.id)
         except ElementNotFound:
             return
-        if player.hasOwnAccount:
-            return
-        if player.status is not PlayerStatus.IS_PLAYING:
-            return
-        if player.active.account == None:
-            return
-        # If we reach this point, we know player has been given an account
-        account = player.active.account
-        if reaction.message.id != account.message.id:  # chack if it's the right message
-            return
-        if account.isValidated:  # Check if user didn't already react
-            return
-        if str(reaction.emoji) == "✅":  # If everything is fine, account is validated
-            account.validate()
-            await edit("ACC_UPDATE", account.message, account=account)
-            await account.message.remove_reaction(reaction.emoji, client.user)
+        await reactionHandler(reaction, player)
 
     @client.event
     async def on_member_update(before, after):
@@ -204,6 +174,29 @@ def _addMainHandlers(client):
         else:
             player.onActive()
         player.updateRole()
+
+def _addInitHandlers(client):
+
+    @client.event
+    async def on_ready():
+        rolesInit(client)
+
+        # fetch rule message, remove all reaction but the bot's
+        global rulesMsg
+        rulesMsg = await client.get_channel(cfg.discord_ids["rules"]).fetch_message(cfg.discord_ids["rules_msg"])
+        await rulesMsg.clear_reactions()
+        await sleep(0.2)
+        await rulesMsg.add_reaction('✅')
+
+        # Update all players roles
+        await checkRoles(getAllPlayersList())
+        _addMainHandlers(client)
+        unlockAll(client)
+        logging.info('Client is ready!')
+
+    @client.event
+    async def on_message(message):
+        return
 
 
 # TODO: testing, to be removed
@@ -240,8 +233,8 @@ def main(launchStr=""):
 
     # Initialise db and get all t=xhe registered users and all maps from it
     dbInit(cfg.database)
-    getAllPlayers()
-    getAllMaps()
+    getAllPlayers(Player)
+    getAllMaps(Map)
 
     # Get Account sheet from drive
     AccountHander.init(f"client_secret{launchStr}.json")
@@ -253,12 +246,14 @@ def main(launchStr=""):
     displayInit(client)
 
     # Add main handlers
-    _addMainHandlers(client)
+    _addInitHandlers(client)
     if launchStr == "_test":
         _test(client)
 
     # Add all cogs
     cogInit(client)
+
+
 
     # Run server
     client.run(cfg.general["token"])

@@ -8,49 +8,44 @@ from asyncio import get_event_loop
 # Custom modules:
 from modules.exceptions import DatabaseError
 
-# Modules for the custom classes
-# Circular import disclaimer: database.py is only imported by main.py, so it's fine to import the following:
-from classes.players import Player  # ok
-from classes.maps import Map  # ok
-
 # dict for the collections
 collections = dict()
 
 # Public
 
 
-def getAllPlayers():
+def getAllPlayers(PlayerClass):
     """ Get all players from db to memory
     """
     users = collections["users"].find()
     # Adding them
     try:
         for result in users:
-            Player.newFromData(result)
+            PlayerClass.newFromData(result)
     except KeyError:
         raise DatabaseError("KeyError when retrieving players")
 
 
-def getAllMaps():
+def getAllMaps(MapClass):
     """ Get all maps from db to memory
     """
     maps = collections["sBases"].find()
     # Adding them
     try:
         for result in maps:
-            Map(result)
+            MapClass(result)
     except KeyError:
         raise DatabaseError("KeyError when retrieving maps")
 
 
-async def update(p):
+async def updatePlayer(p):
     """ Launch the task updating player p in database
     """
     loop = get_event_loop()
     await loop.run_in_executor(None, _updatePlayer, p)
 
 
-async def remove(p):
+async def removePlayer(p):
     """ Launch the task updating player p in database
     """
     loop = get_event_loop()

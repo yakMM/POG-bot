@@ -55,6 +55,8 @@ def addToLobby(player):
 
 @tasks.loop(minutes=3, delay=1, count=2)
 async def _autoPing():
+    if _findSpotForMatch() is None:
+        return
     await channelSend("LB_NOTIFY", cfg.discord_ids["lobby"], f'<@&{cfg.discord_ids["notify_role"]}>')
 _autoPing.already = False
 
@@ -75,6 +77,7 @@ def removeFromLobby(player):
 
 
 def _onMatchFree():
+    _autoPing.already = True
     if len(_lobbyList) == cfg.general["lobby_size"]:
         startMatchFromFullLobby.start()
 
@@ -90,9 +93,9 @@ def _onLobbyRemove():
 async def startMatchFromFullLobby():
     global _lobbyStuck
     match = _findSpotForMatch()
-    if match == None:
+    _autoPingCancel()
+    if match is None:
         _lobbyStuck = True
-        _autoPingCancel()
         await channelSend("LB_STUCK", cfg.discord_ids["lobby"])
         return
     _lobbyStuck = False
@@ -239,7 +242,7 @@ class Match():
         for p in team.players:
             if p.hasOwnAccount:
                 continue
-            if p.account == None:
+            if p.account is None:
                 log.error(f"Debug: {p.name} has no account")
             if p.account.isValidated:
                 continue

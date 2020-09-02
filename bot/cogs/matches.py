@@ -44,7 +44,7 @@ class MatchesCog(commands.Cog, name='matches'):
             await send("PK_HELP", ctx)  # =p help shows the help
             return
         player = await _testPlayer(ctx, match)
-        if player == None:
+        if player is None:
             return
         if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
             # Edge case, will happen very rarely if not never
@@ -89,7 +89,7 @@ class MatchesCog(commands.Cog, name='matches'):
     async def ready(self, ctx):  # when ready
         match = getMatch(ctx.channel.id)
         player = await _testPlayer(ctx, match)
-        if player == None:
+        if player is None:
             return
         if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
             # match not ready for this command
@@ -104,7 +104,7 @@ class MatchesCog(commands.Cog, name='matches'):
         if isinstance(aPlayer, TeamCaptain):
             if aPlayer.isTurn:
                 result = aPlayer.match.onTeamReady(aPlayer.team)
-                if result != None:
+                if result is not None:
                     await send("MATCH_PLAYERS_NOT_READY", ctx, aPlayer.team.name, " ".join(result))
                     return
                 await send("MATCH_TEAM_READY", ctx, aPlayer.team.name, match=match)

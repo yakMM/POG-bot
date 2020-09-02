@@ -66,7 +66,7 @@ async def edit(stringName, ctx, *args, **kwargs):
     return await _StringEnum[stringName].value.display(ctx, True,  *args, **kwargs)
 
 async def remReaction(message, user=None):
-    if user == None:
+    if user is None:
         global _client
         user = _client.user
     await message.remove_reaction("✅", user)
@@ -97,7 +97,8 @@ def _registerHelp(msg):
     try:
         if isAdmin(msg.author):
             embed.add_field(name="Staff Commands",
-                            value='`=unregister @player` - Permanently remove player profile from the system',
+                            value='`=unregister @player` - Permanently remove player profile from the system'
+                            '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                             inline=False)
     except AttributeError:
         pass # if msg is from bot
@@ -117,7 +118,8 @@ def _lobbyHelp(msg):
     if isAdmin(msg.author):
         embed.add_field(name="Staff Commands",
                         value='`=clear` - Clear the lobby\n'
-                        '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
+                        '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages'
+                        '`=remove @player` - Remove player from lobby',
                         inline=False)
     return embed
 
@@ -168,7 +170,8 @@ def _matchHelp(msg):
     if isAdmin(msg.author):
         embed.add_field(name="Staff Commands",
                         value = '`=clear` - Clear the match\n'
-                                '`=map base name` - Select a map',
+                                '`=map base name` - Select a map'
+                                '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                         inline=False)
     return embed
 
@@ -242,7 +245,7 @@ def _teamUpdate(arg, match):
     else:
         title = f"Match {match.number}"
     embed = Embed(colour=Color.blue(), title=title, description = match.statusString)
-    if match.map != None:
+    if match.map is not None:
         embed.add_field(name = "Map",value = match.map.name,inline=False)
     for tm in match.teams:
         value = ""
@@ -312,7 +315,7 @@ class _Message():
             except AttributeError:
                 sendFct = _client.get_channel(ctx.channel.id).send
 
-        if self.__ping and not author == None:
+        if self.__ping and not author is None:
             msg = await sendFct(content=f'{author.mention} {string}', embed=embed)
         else:
             msg = await sendFct(content=string, embed=embed)
@@ -447,3 +450,4 @@ class _StringEnum(Enum):
     RM_OK = _Message("Player successfully removed from the system!")
     RM_IN_MATCH = _Message("Can't remove a player who is in match!")
     RM_LOBBY = _Message("{} have been removed by staff!",embed=_lobbyList)
+    RM_NOT_LOBBIED = _Message("This player is not in queue!")

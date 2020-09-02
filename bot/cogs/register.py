@@ -11,7 +11,7 @@ from modules.enumerations import PlayerStatus
 from modules.display import channelSend, send
 from modules.tools import isAlNum
 from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
-from modules.database import update as dbUpdate
+from modules.database import updatePlayer as dbUpdate
 from modules.roles import getRole
 
 log = getLogger(__name__)

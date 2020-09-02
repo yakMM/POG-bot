@@ -10,7 +10,7 @@ _guild = None
 
 def getRole(key):
     role = _rolesDict.get(key)
-    if role == None:
+    if role is None:
         raise ElementNotFound(key)
     return role
 

@@ -17,7 +17,7 @@ _mapSelectionsDict = dict()
 
 def getMapSelection(id):
     sel = _mapSelectionsDict.get(id)
-    if sel == None:
+    if sel is None:
         raise ElementNotFound(id)
     return sel
 

@@ -27,7 +27,7 @@ _namesChecking = [dict(), dict(), dict()]
 
 def getPlayer(id):
     player = _allPlayers.get(id)
-    if player == None:
+    if player is None:
         raise ElementNotFound(id)
     return player
 
@@ -196,7 +196,7 @@ class Player():
             Returns wether player data was updated or not
         """
         updated = False
-        if charList == None:
+        if charList is None:
             if(self.__status is PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount):
                 updated = True
             self._igIds = [0, 0, 0]
@@ -308,7 +308,7 @@ class ActivePlayer:
     def acceptAccount(self):
         accountId = self.__account.id
         fakePlayer = getPlayer(accountId)
-        if fakePlayer == None:
+        if fakePlayer is None:
             raise AccountNotFound(accountId)
         self.__player._igNames = fakePlayer.igNames.copy()
         self.__player._igIds = fakePlayer.igIds.copy()
