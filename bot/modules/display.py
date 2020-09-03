@@ -24,6 +24,7 @@ from datetime import timezone as tz
 
 # Others
 from enum import Enum
+from string import capwords
 
 # Custom modules
 import modules.config as cfg
@@ -208,8 +209,7 @@ def _account(msg, account):
 
 
 def _autoHelp(msg):
-    """ Return help embed depending on current channel
-    """
+    """ Return help embed depending on current channel """
     if msg.channel.id == cfg.discord_ids['register']:
         return _registerHelp(msg)
     if msg.channel.id == cfg.discord_ids['lobby']:
@@ -220,8 +220,7 @@ def _autoHelp(msg):
 
 
 def _lobbyList(msg, namesInLobby):
-    """ Returns the lobby list
-    """
+    """ Returns the lobby list """
     embed = Embed(colour=Color.blue())
     listOfNames = "\n".join(namesInLobby)
     if listOfNames == "":
@@ -231,7 +230,7 @@ def _lobbyList(msg, namesInLobby):
 
 
 def _selectedMaps(msg, sel):
-    """ Returns a list of maps currently selected
+    """ Returns a list of maps after a search selected
     """
     embed = Embed(colour=Color.blue())
     embed.add_field(name=f"{len(sel.selection)} maps found", value=sel.toString(), inline=False)
@@ -280,6 +279,8 @@ def _teamUpdate(arg, match):
 
 
 def _jaegerCalendar(arg):
+    """ Returns an embedded link to the formatted Jaeger Calendar
+    """
     embed = Embed(colour=Color.blue(), title="Jaeger Calendar",
                   url="https://docs.google.com/spreadsheets/d/1eA4ybkAiz-nv_mPxu_laL504nwTDmc-9GnsojnTiSRE",
                   description="Pick a base currently available in the calendar!")
@@ -287,6 +288,14 @@ def _jaegerCalendar(arg):
     embed.add_field(name="Current UTC time",
                     value=date.strftime("%Y-%m-%d %H:%M UTC"),
                     inline=False)
+    return embed
+
+
+def _availableMaps(maps):
+    """ Returns a list of maps to embed in the available maps message
+    """
+    embed = Embed(colour=Color.blue())
+    embed.add_field(name=f"{len(maps)} maps are currently available", value=maps.toString(), inline=False)
     return embed
 
 
@@ -336,8 +345,7 @@ class _StringEnum(Enum):
     """ List of different message strings available
     """
     REG_NOT_REGISTERED = _Message("You are not registered!", embed=_registerHelp)
-    REG_IS_REGISTERED_OWN = _Message(
-        "You are already registered with the following Jaeger characters: `{}`, `{}`, `{}`")
+    REG_IS_REGISTERED_OWN = _Message("You are already registered with the following Jaeger characters: `{}`, `{}`, `{}`")
     REG_IS_REGISTERED_NOA = _Message("You are already registered without a Jaeger account! If you have your own account, please re-register with your Jaeger characters.")
     REG_HELP = _Message("Registration help:", embed=_registerHelp)
     REG_NO_ACCOUNT = _Message("You successfully registered without a Jaeger account!")
@@ -389,8 +397,11 @@ class _StringEnum(Enum):
     PK_FACTION_ALREADY = _Message("Faction already picked by the other team!")
     PK_FACTION_OK_NEXT = _Message("{} chose {}! {} pick a faction!", ping=False)
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
-    PK_WAIT_MAP = _Message("{} {} Pick an available map with `=p base name`!", ping=False, embed=_jaegerCalendar)
-    PK_MAP_OK_CONFIRM = _Message("Picked {}! {} confirm with `=p confirm` if you agree")
+    # PK_WAIT_MAP = _Message("{} {} Pick a map from the list of available maps below using `=p #`. To choose a map not on the list use `=p base name`",
+    #     ping=False, embed=_selectedMaps)
+    PK_WAIT_MAP = _Message("{} {} Pick a map from the list using `=p #`. To choose a map not on the list use `=p base name`",
+        ping=False, embed=_selectedMaps)
+    PK_MAP_OK_CONFIRM = _Message("Picked **{}**! {} confirm with `=p confirm` if you agree")
     PK_NO_MAP = _Message("No map selected!")
 
     EXT_NOT_REGISTERED = _Message("You are not registered! Check <#{}>")
@@ -417,7 +428,8 @@ class _StringEnum(Enum):
     MATCH_INIT = _Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player", embed=_teamUpdate)
     MATCH_MAP_AUTO = _Message("Match will be on **{}**", ping=False)
-    MATCH_CONFIRM = _Message("{} {} Type `=ready` when your team is inside their sundy, ready to start", embed=_teamUpdate)
+    MATCH_CONFIRM = _Message("{} {} Type `=ready` when your team is inside their sundy, ready to start",
+                             embed=_teamUpdate)
     MATCH_NOT_READY = _Message("You can't use command {}, the match is not ready to start!")
     MATCH_TEAM_READY = _Message("{} is now ready!", embed=_teamUpdate)
     MATCH_TEAM_UNREADY = _Message("{} is no longer ready!", embed=_teamUpdate)
@@ -438,8 +450,10 @@ class _StringEnum(Enum):
     MAP_HELP = _Message("Here is how to choose a map:", embed=_mapHelp)
     MAP_TOO_MUCH = _Message("Too many maps found! Try to be more precise")
     MAP_NOT_FOUND = _Message("Couldn't find a result for your search!")
-    MAP_DISPLAY_LIST = _Message("Here are the maps found:", embed=_selectedMaps)
+    MAP_DISPLAY_LIST = _Message("", embed=_selectedMaps)
     MAP_SELECTED = _Message("The current map is **{}**")
+    MAP_BOOKED = _Message("WARNING: **{}** is currently reserved in the Jaeger Calendar. Please check availability before confirming this map.",
+        embed=_jaegerCalendar)
 
     MP_ADDED = _Message("Added {} to the map pool")
     MP_REMOVED = _Message("Removed {} from the map pool")

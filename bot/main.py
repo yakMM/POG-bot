@@ -33,6 +33,7 @@ from modules.loader import init as cogInit, isAllLocked, unlockAll
 from matches import onPlayerInactive, onPlayerActive, init as matchesInit
 from classes.players import Player, getPlayer
 from classes.accounts import AccountHander
+from classes.maps import createJeagerCalObj
 
 
 def _addMainHandlers(client):
@@ -61,7 +62,6 @@ def _addMainHandlers(client):
 
         if isinstance(message.channel, DMChannel):  # if dm, print in console and ignore the message
             logging.info(message.author.name + ": " + message.content)
-
             return
         if message.channel.id not in (cfg.discord_ids["lobby"], cfg.discord_ids["register"], *cfg.discord_ids["matches"]):
             return
@@ -217,6 +217,7 @@ def main(launchStr=""):
     # Set up command prefix
     client = commands.Bot(command_prefix=cfg.general["command_prefix"])
 
+
     # Remove default help
     client.remove_command('help')
 
@@ -226,7 +227,10 @@ def main(launchStr=""):
     getAllMaps()
 
     # Get Account sheet from drive
-    AccountHander.init(f"client_secret{launchStr}.json")
+    AccountHander.init(f"gspread_client_secret{launchStr}.json")
+
+    # Establish connection with Jaeger Calendar and create a global object
+    createJeagerCalObj(f"gspread_client_secret{launchStr}.json")
 
     # Initialise matches channels
     matchesInit(cfg.discord_ids["matches"])

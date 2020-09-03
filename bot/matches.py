@@ -306,18 +306,6 @@ class Match:
 
     @tasks.loop(count=1)
     async def __findMap(self):
-        # LEGACY CODE
-        # Disabling map at random:
-        # if self.__map == None:
-        #     try:
-        #         sel = getMapSelection(self.__id)
-        #     except ElementNotFound:
-        #         sel = MapSelection(self.__id)
-        #     sel.selectFromIdList(cfg.PIL_MAPS_IDS)
-        #     if sel.status not in (SelStatus.IS_SELECTED, SelStatus.IS_SELECTION):
-        #         await channelSend("UNKNOWN_ERROR", self.__id, "Can't find a map at random!")
-        #         return
-        #     self.__map = randomChoice(sel.selection)
         ts3bot = which_bot(self.__id)
         for tm in self.__teams:
             tm.captain.isTurn = True
@@ -335,9 +323,8 @@ class Match:
         pick_channel = which_pick_channels(self.__id)
         ts3bot.move(pick_channel)
         await sleep(1)  # prevents playing this before faction announce
-        # await sleep(ts3bot.get_duration(cfg.audio_ids["team_2_tr"]))  # prevents playing this before faction announce
         ts3bot.enqueue(cfg.audio_ids["select_map"])
-        await channelSend("PK_WAIT_MAP", self.__id, *captainPings)
+        await channelSend("PK_WAIT_MAP", self.__id, sel=self.__mapSelector, *captainPings)
 
     @tasks.loop(count=1)
     async def __ready(self):
