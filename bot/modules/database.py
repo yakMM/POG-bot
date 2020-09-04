@@ -22,8 +22,8 @@ def getAllPlayers(PlayerClass):
     try:
         for result in users:
             PlayerClass.newFromData(result)
-    except KeyError:
-        raise DatabaseError("KeyError when retrieving players")
+    except KeyError as e:
+        raise DatabaseError(f"KeyError when retrieving players: {e}")
 
 
 def getAllMaps(MapClass):
@@ -34,15 +34,15 @@ def getAllMaps(MapClass):
     try:
         for result in maps:
             MapClass(result)
-    except KeyError:
-        raise DatabaseError("KeyError when retrieving maps")
+    except KeyError as e:
+        raise DatabaseError(f"KeyError when retrieving maps: {e}")
 
 
-async def updatePlayer(p):
+async def updatePlayer(p, doc):
     """ Launch the task updating player p in database
     """
     loop = get_event_loop()
-    await loop.run_in_executor(None, _updatePlayer, p)
+    await loop.run_in_executor(None, _updatePlayer, p, doc)
 
 
 async def removePlayer(p):
@@ -61,19 +61,28 @@ def init(config):
         collections[collec] = db[config["collections"][collec]]
 
 
-def forceBasesUpdate(bases):
+def forceUpdate(db_name, elements):
     """ This is only called from external script for db maintenance
     """
-    collections["sBases"].delete_many({})
-    collections["sBases"].insert_many(bases)
+    collections[db_name].delete_many({})
+    collections[db_name].insert_many(elements)
 
 
 # Private
-def _updatePlayer(p):
+def _updatePlayer(p, doc):
     """ Update player p into db
     """
     if collections["users"].count_documents({"_id": p.id}) != 0:
-        collections["users"].update_one({"_id": p.id}, {"$set": p.getData()})
+        collections["users"].update_one({"_id": p.id}, {"$set": doc})
+    else:
+        collections["users"].insert_one(p.getData())
+
+
+def _replacePlayer(p):
+    """ Update player p into db
+    """
+    if collections["users"].count_documents({"_id": p.id}) != 0:
+        collections["users"].replace_one({"_id": p.id}, p.getData())
     else:
         collections["users"].insert_one(p.getData())
 

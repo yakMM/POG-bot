@@ -3,39 +3,32 @@ from modules.exceptions import ElementNotFound
 from modules.enumerations import PlayerStatus
 
 from discord import Status
+from discord import PermissionOverwrite
 
 _rolesDict = dict()
 _guild = None
 
 
-def getRole(key):
-    role = _rolesDict.get(key)
-    if role is None:
-        raise ElementNotFound(key)
-    return role
-
-
 def init(client):
     global _guild
-    _guild = client.get_channel(cfg.discord_ids["rules"]).guild
-    _rolesDict["registered"] = _guild.get_role(
-        cfg.discord_ids["registered_role"])
-    _rolesDict["notify"] = _guild.get_role(cfg.discord_ids["notify_role"])
-    _rolesDict["info"] = _guild.get_role(cfg.discord_ids["info_role"])
+    _guild = client.get_channel(cfg.channels["rules"]).guild
+    _rolesDict["registered"] = _guild.get_role(cfg.roles["registered"])
+    _rolesDict["notify"] = _guild.get_role(cfg.roles["notify"])
+    _rolesDict["info"] = _guild.get_role(cfg.roles["info"])
+    _rolesDict["admin"] = _guild.get_role(cfg.roles["admin"])
 
 
-async def checkRoles(players):
+def isAdmin(member):
+    """ Check if user is admin
+    """
+    if member is None:
+        return False
+    return _rolesDict["admin"] in member.roles
+
+
+async def forceInfo(pId):
     global _guild
-    for p in players:
-        memb = _guild.get_member(p.id)
-        if memb is not None:
-            await onNotifyUpdate(p)
-            if _rolesDict["info"] in memb.roles:
-                await memb.remove_roles(_rolesDict["info"])
-
-async def forceInfo(player):
-    global _guild
-    memb = _guild.get_member(player.id)
+    memb = _guild.get_member(pId)
     if memb is None:
         return
     if _rolesDict["info"] not in memb.roles:
@@ -43,10 +36,13 @@ async def forceInfo(player):
     if _rolesDict["registered"] in memb.roles:
         await memb.remove_roles(_rolesDict["registered"])
     if _rolesDict["notify"] in memb.roles:
-            await memb.remove_roles(_rolesDict["notify"])
+        await memb.remove_roles(_rolesDict["notify"])
 
 
-async def onNotifyUpdate(player):
+async def roleUpdate(player):
+    if player.isTimeout:
+        await forceInfo(player.id)
+        return
     global _guild
     memb = _guild.get_member(player.id)
     if memb is None:
@@ -61,3 +57,30 @@ async def onNotifyUpdate(player):
             await memb.add_roles(_rolesDict["registered"])
         if _rolesDict["notify"] in memb.roles:
             await memb.remove_roles(_rolesDict["notify"])
+    if _rolesDict["info"] in memb.roles:
+        await memb.remove_roles(_rolesDict["info"])
+
+async def permsMuted(value, pId):
+    global _guild
+    memb = _guild.get_member(pId)
+    if memb is None:
+        return
+    channel = _guild.get_channel(cfg.channels["muted"])
+    if value:
+        over = _guild.get_channel(cfg.channels["lobby"]).overwrites_for(_rolesDict["registered"])
+        if memb not in channel.overwrites:
+            await channel.set_permissions(memb, overwrite=over)
+    else:
+        if memb in channel.overwrites:
+            await channel.set_permissions(memb, overwrite=None)
+
+
+async def channelFreeze(value, id):
+    global _guild
+    channel = _guild.get_channel(id)
+    ov_notify = channel.overwrites_for(_rolesDict["notify"])
+    ov_registered = channel.overwrites_for(_rolesDict["registered"])
+    ov_notify.send_messages = not value
+    ov_registered.send_messages = not value
+    await channel.set_permissions(_rolesDict["notify"], overwrite=ov_notify)
+    await channel.set_permissions(_rolesDict["registered"], overwrite=ov_registered)

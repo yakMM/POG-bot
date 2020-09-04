@@ -1,3 +1,7 @@
+# v1.0.12:
+- Added timeout functionality for admins
+- Modifications in how players are stored in database
+
 # v1.0.11:
 - Commands are no longer usable during init
 - Fixed a bug with @Notify being pinged after a match start

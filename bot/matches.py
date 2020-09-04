@@ -57,7 +57,7 @@ def addToLobby(player):
 async def _autoPing():
     if _findSpotForMatch() is None:
         return
-    await channelSend("LB_NOTIFY", cfg.discord_ids["lobby"], f'<@&{cfg.discord_ids["notify_role"]}>')
+    await channelSend("LB_NOTIFY", cfg.channels["lobby"], f'<@&{cfg.roles["notify"]}>')
 _autoPing.already = False
 
 
@@ -96,7 +96,7 @@ async def startMatchFromFullLobby():
     _autoPingCancel()
     if match is None:
         _lobbyStuck = True
-        await channelSend("LB_STUCK", cfg.discord_ids["lobby"])
+        await channelSend("LB_STUCK", cfg.channels["lobby"])
         return
     _lobbyStuck = False
     match._setPlayerList(_lobbyList)
@@ -105,12 +105,12 @@ async def startMatchFromFullLobby():
         p.onMatchSelected(match)
     _lobbyList.clear()
     match._launch.start()
-    await channelSend("LB_MATCH_STARTING", cfg.discord_ids["lobby"], match.id)
+    await channelSend("LB_MATCH_STARTING", cfg.channels["lobby"], match.id)
 
 
 async def onInactiveConfirmed(player):
     removeFromLobby(player)
-    await channelSend("LB_WENT_INACTIVE", cfg.discord_ids["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
+    await channelSend("LB_WENT_INACTIVE", cfg.channels["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
 
 
 def clearLobby():

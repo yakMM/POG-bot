@@ -9,9 +9,11 @@ from modules.asynchttp import request as httpRequest
 from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
 from modules.enumerations import PlayerStatus
 from lib import tasks
-from modules.roles import onNotifyUpdate
+from modules.roles import roleUpdate
+from modules.database import updatePlayer
 
 from logging import getLogger
+from datetime import datetime as dt
 
 log = getLogger(__name__)
 
@@ -56,10 +58,11 @@ class Player():
     def __init__(self, name, id):
         self.__name = name
         self.__id = id
-        self._rank = 0
+        self.__rank = 0
         self._igNames = ["N/A", "N/A", "N/A"]
         self._igIds = [0, 0, 0]
-        self.__roles = {"notify": False}
+        self.__notify = False
+        self.__timeout = {"time" : 0, "reason" :""}
         self.__status = PlayerStatus.IS_NOT_REGISTERED
         self._hasOwnAccount = False
         self._active = None
@@ -69,15 +72,28 @@ class Player():
     @classmethod
     def newFromData(cls, data):  # make a new Player object from database data
         obj = cls(data["name"], data["_id"])
-        obj.__status = PlayerStatus.IS_REGISTERED
-        obj._rank = data["rank"]
-        obj.__roles = data["roles"]
+        obj.__rank = data["rank"]
+        if obj.__rank == 0:
+            obj.__status = PlayerStatus.IS_NOT_REGISTERED
+        else:
+            obj.__status = PlayerStatus.IS_REGISTERED
+        obj.__notify = data["notify"]
+        obj.__timeout = data["timeout"]
         obj._igNames = data["igNames"]
         obj._igIds = data["igIds"]
         obj._hasOwnAccount = data["hasOwnAccount"]
         for i in range(len(obj._igIds)):
             _namesChecking[i][obj._igIds[i]] = obj
         return obj
+
+    async def dbUpdate(self, arg):
+        if arg == "notify":
+            await updatePlayer(self, {"notify": self.__notify})
+        elif arg == "register":
+            await updatePlayer(self, {"igNames": self._igNames, "igIds": self._igIds,
+                                      "rank": self.__rank, "hasOwnAccount": self._hasOwnAccount})
+        elif arg == "timeout":
+            await updatePlayer(self, {"timeout": self.__timeout})
 
     @property
     def active(self):  # "Active player" object, when player is in a match, contains more info
@@ -88,12 +104,25 @@ class Player():
         return self.__name
 
     @property
+    def timeout(self):
+        return self.__timeout["time"]
+
+    @timeout.setter
+    def timeout(self, time, reason=""):
+        self.__timeout["time"] = time
+        self.__timeout["reason"] = reason
+
+    @property
+    def isTimeout(self):
+        return self.__timeout["time"] > int(dt.timestamp(dt.now()))
+
+    @property
     def isNotify(self):
-        return self.__roles["notify"]
+        return self.__notify
 
     @isNotify.setter
     def isNotify(self, value):
-        self.__roles["notify"] = value
+        self.__notify = value
         self.updateRole()
 
     def updateRole(self, i=0):
@@ -105,7 +134,7 @@ class Player():
 
     @tasks.loop(count=1)
     async def roleTask(self):
-        await onNotifyUpdate(self)
+        await roleUpdate(self)
 
     def onLobbyLeave(self):
         self.__status = PlayerStatus.IS_REGISTERED
@@ -158,11 +187,11 @@ class Player():
 
     @property
     def rank(self):
-        return self._rank
+        return self.__rank
 
     @rank.setter
     def rank(self, rank):
-        self._rank = rank
+        self.__rank = rank
 
     @property
     def igNames(self):
@@ -187,8 +216,9 @@ class Player():
     def getData(self):  # get data for database push
         data = {"_id": self.__id,
                 "name": self.__name,
-                "rank": self._rank,
-                "roles": self.__roles,
+                "rank": self.__rank,
+                "notify": self.__notify,
+                "timeout": self.__timeout,
                 "igNames": self._igNames,
                 "igIds": self._igIds,
                 "hasOwnAccount": self._hasOwnAccount
@@ -207,12 +237,14 @@ class Player():
             self._igNames = ["N/A", "N/A", "N/A"]
             if self.__status is PlayerStatus.IS_NOT_REGISTERED:
                 self.__status = PlayerStatus.IS_REGISTERED
+                self.__rank = 1
             self._hasOwnAccount = False
             return updated
         updated = await self._addCharacters(charList)
         if updated:
             if self.__status is PlayerStatus.IS_NOT_REGISTERED:
                 self.__status = PlayerStatus.IS_REGISTERED
+                self.__rank = 1
             self._hasOwnAccount = True
         return updated
 

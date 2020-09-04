@@ -8,18 +8,23 @@ from modules.exceptions import ConfigError
 
 # DiscordIds
 
-discord_ids = {
+channels = {
     "lobby": 0,
     "register": 0,
     "matches": list(),
     "results": 0,
     "rules": 0,
     "staff": 0,
-    "rules_msg": 0,
-    "admin_role": 0,
-    "info_role": 0,
-    "registered_role": 0,
-    "notify_role": 0
+    "muted": 0
+}
+
+channelsList = list()
+
+roles = {
+    "admin": 0,
+    "info": 0,
+    "registered": 0,
+    "notify": 0
 }
 
 # General
@@ -28,7 +33,8 @@ general = {
     "token": "",
     "api_key": "",
     "command_prefix": "",
-    "lobby_size": 0
+    "lobby_size": 0,
+    "rules_msg_id": 0
 }
 
 AFK_TIME = 15  # minutes
@@ -68,7 +74,8 @@ facilitiy_suffix = {
 
 _collections = {
     "users": "",
-    "sBases": ""
+    "sBases": "",
+    "sWeapons" : ""
 }
 
 database = {
@@ -109,22 +116,34 @@ def getConfig(file):
         raise ConfigError(
             f"Incorrect api key: {general['api_key']} in '{file}'")
 
-    # Discord_Ids section
-    _checkSection(config, "Discord_Ids", file)
+    # Channels section
+    _checkSection(config, "Channels", file)
 
-    for key in discord_ids:
+    for key in channels:
         try:
             if key == "matches":
-                tmp = config['Discord_Ids'][key].split(',')
-                discord_ids[key].clear()
+                tmp = config['Channels'][key].split(',')
+                channels[key].clear()
                 for m in tmp:
-                    discord_ids[key].append(int(m))
+                    channels[key].append(int(m))
+                    channelsList.append(channels[key])
             else:
-                discord_ids[key] = int(config['Discord_Ids'][key])
+                channels[key] = int(config['Channels'][key])
+                channelsList.append(channels[key])
         except KeyError:
-            _errorMissing(key, 'Discord_Ids', file)
+            _errorMissing(key, 'Channels', file)
         except ValueError:
-            _errorIncorrect(key, 'Discord_Ids', file)
+            _errorIncorrect(key, 'Channels', file)
+
+    # Roles section
+    _checkSection(config, "Roles", file)
+    for key in roles:
+        try:
+            roles[key] = int(config['Roles'][key])
+        except KeyError:
+            _errorMissing(key, 'Roles', file)
+        except ValueError:
+            _errorIncorrect(key, 'Roles', file)
 
     # Database section
     _checkSection(config, "Database", file)

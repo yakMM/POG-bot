@@ -24,9 +24,8 @@ from modules.spam import isSpam, unlock
 from modules.exceptions import ElementNotFound, UnexpectedError
 from modules.database import init as dbInit, getAllPlayers, getAllMaps
 from modules.enumerations import PlayerStatus
-from modules.tools import isAdmin
 from modules.loader import init as cogInit, isAllLocked, unlockAll
-from modules.roles import getRole, init as rolesInit, checkRoles, onNotifyUpdate
+from modules.roles import init as rolesInit, roleUpdate, isAdmin
 from modules.reactions import reactionHandler
 
 # Modules for the custom classes
@@ -63,7 +62,7 @@ def _addMainHandlers(client):
         if isinstance(message.channel, DMChannel):
             logging.info(message.author.name + ": " + message.content)
             return
-        if message.channel.id not in (cfg.discord_ids["lobby"], cfg.discord_ids["register"], cfg.discord_ids["staff"], *cfg.discord_ids["matches"]):
+        if message.channel.id not in cfg.channelsList:
             return
         if isAllLocked():
             if not isAdmin(message.author):
@@ -91,7 +90,7 @@ def _addMainHandlers(client):
                 await send("NO_PERMISSION", ctx, ctx.command.name)
                 return
             try:
-                channelId = cfg.discord_ids[cogName]
+                channelId = cfg.channels[cogName]
                 channelStr = ""
                 if isinstance(channelId, list):
                     channelStr = "channels " + \
@@ -125,10 +124,9 @@ def _addMainHandlers(client):
         if payload.member is None or payload.member.bot:  # If bot, do nothing
             return
         if isAllLocked():
-            if not isAdmin(payload.member):
-                return
+            return
         # reaction to the rule message?
-        if payload.message_id == cfg.discord_ids["rules_msg"]:
+        if payload.message_id == cfg.general["rules_msg_id"]:
             global rulesMsg
             if str(payload.emoji) == "✅":
                 try:
@@ -136,16 +134,10 @@ def _addMainHandlers(client):
                 except ElementNotFound:  # if new player
                     # create a new profile
                     p = Player(payload.member.name, payload.member.id)
-                registered = getRole("registered")
-                info = getRole("info")
-                notify = getRole("notify")
-                if notify not in payload.member.roles and registered not in payload.member.roles:
-                    await payload.member.add_roles(registered)
-                    if p.status is PlayerStatus.IS_NOT_REGISTERED:
+                await roleUpdate(p)
+                if p.status is PlayerStatus.IS_NOT_REGISTERED:
                         # they can now register
-                        await channelSend("REG_RULES", cfg.discord_ids["register"], payload.member.mention)
-                await payload.member.remove_roles(info)
-
+                        await channelSend("REG_RULES", cfg.channels["register"], payload.member.mention)
             # In any case remove the reaction, message is to stay clean
             await rulesMsg.remove_reaction(payload.emoji, payload.member)
 
@@ -164,15 +156,15 @@ def _addMainHandlers(client):
             player = getPlayer(member.id)
         except ElementNotFound:
             return
-        player.updateRole()
+        await roleUpdate(player)
 
     @client.event
     async def on_member_update(before, after):
         if before.status != after.status:
-            on_status_update(after)
+            await on_status_update(after)
 
     # Status update handler (for inactivity)
-    def on_status_update(user):
+    async def on_status_update(user):
         try:
             player = getPlayer(user.id)
         except ElementNotFound:
@@ -181,7 +173,8 @@ def _addMainHandlers(client):
             player.onInactive(onInactiveConfirmed)
         else:
             player.onActive()
-        player.updateRole()
+        await roleUpdate(player)
+
 
 def _addInitHandlers(client):
 
@@ -191,13 +184,14 @@ def _addInitHandlers(client):
 
         # fetch rule message, remove all reaction but the bot's
         global rulesMsg
-        rulesMsg = await client.get_channel(cfg.discord_ids["rules"]).fetch_message(cfg.discord_ids["rules_msg"])
+        rulesMsg = await client.get_channel(cfg.channels["rules"]).fetch_message(cfg.general["rules_msg_id"])
         await rulesMsg.clear_reactions()
         await sleep(0.2)
         await rulesMsg.add_reaction('✅')
 
         # Update all players roles
-        await checkRoles(getAllPlayersList())
+        for p in getAllPlayersList():
+            await roleUpdate(p)
         _addMainHandlers(client)
         unlockAll(client)
         logging.info('Client is ready!')
@@ -248,7 +242,7 @@ def main(launchStr=""):
     AccountHander.init(f"client_secret{launchStr}.json")
 
     # Initialise matches channels
-    matchesInit(cfg.discord_ids["matches"])
+    matchesInit(cfg.channels["matches"])
 
     # Initialise display module
     displayInit(client)
@@ -271,5 +265,5 @@ if __name__ == "__main__":
     # execute only if run as a script
     # Use main() for production
 
-    # main("_test")
-    main()
+    main("_test")
+    # main()

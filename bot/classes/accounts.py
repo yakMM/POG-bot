@@ -159,13 +159,11 @@ class AccountHander():
         if self.__handingStamp == 0:
             vRow[1] = "ERROR in match!"
         else:
-            vRow[1] = dt.utcfromtimestamp(
-                self.__handingStamp).strftime("%Y-%m-%d %H:%M UTC")
+            vRow[1] = dt.utcfromtimestamp(self.__handingStamp).strftime("%Y-%m-%d %H:%M UTC")
         closingStamp = int(dt.timestamp(dt.now())) + QUIT_DELAY
         type(self)._sheetTab[self.__yCoord-1][2] = str(closingStamp)
         row[2] = str(closingStamp)
-        vRow[2] = dt.utcfromtimestamp(
-            closingStamp).strftime("%Y-%m-%d %H:%M UTC")
+        vRow[2] = dt.utcfromtimestamp(closingStamp).strftime("%Y-%m-%d %H:%M UTC")
         for acc in self.__freeAccounts:
             if acc.isValidated:
                 row[acc.x] = str(acc.aPlayer.id)

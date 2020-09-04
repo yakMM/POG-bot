@@ -25,7 +25,7 @@ class MatchesCog(commands.Cog, name='matches'):
         self.client = client
 
     async def cog_check(self, ctx):  # Check if right channel
-        return ctx.channel.id in cfg.discord_ids['matches']
+        return ctx.channel.id in cfg.channels['matches']
 
     """
     Commands:
@@ -128,11 +128,11 @@ async def _testPlayer(ctx, match):
         player = getPlayer(ctx.author.id)
     except ElementNotFound:
         # player not registered
-        await send("EXT_NOT_REGISTERED", ctx,  cfg.discord_ids["register"])
+        await send("EXT_NOT_REGISTERED", ctx,  cfg.channels["register"])
         return
     if player.status in (PlayerStatus.IS_NOT_REGISTERED, PlayerStatus.IS_REGISTERED, PlayerStatus.IS_LOBBIED):
         # if player not in match
-        await send("PK_NO_LOBBIED", ctx,  cfg.discord_ids["lobby"])
+        await send("PK_NO_LOBBIED", ctx,  cfg.channels["lobby"])
         return
     if player.match.id != match.id:
         # if player not in the right match channel

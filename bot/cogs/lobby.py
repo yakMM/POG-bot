@@ -22,7 +22,7 @@ class LobbyCog(commands.Cog, name='lobby'):
         self.client = client
 
     async def cog_check(self, ctx):
-        return ctx.channel.id == cfg.discord_ids['lobby']
+        return ctx.channel.id == cfg.channels['lobby']
 
     """
     Commands:
@@ -44,10 +44,10 @@ class LobbyCog(commands.Cog, name='lobby'):
         try:
             player = getPlayer(ctx.message.author.id)
         except ElementNotFound:
-            await send("EXT_NOT_REGISTERED", ctx,  cfg.discord_ids["register"])
+            await send("EXT_NOT_REGISTERED", ctx,  cfg.channels["register"])
             return
         if player.status is PlayerStatus.IS_NOT_REGISTERED:
-            await send("EXT_NOT_REGISTERED", ctx, cfg.discord_ids["register"])
+            await send("EXT_NOT_REGISTERED", ctx, cfg.channels["register"])
             return
         if ctx.author.status == discordStatus.offline:
             await send("LB_OFFLINE", ctx)

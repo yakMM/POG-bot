@@ -28,7 +28,8 @@ from enum import Enum
 # Custom modules
 import modules.config as cfg
 from modules.enumerations import MatchStatus
-from modules.tools import isAdmin, isAlNum
+from modules.tools import isAlNum
+from modules.roles import isAdmin
 
 _client = None
 
@@ -81,7 +82,7 @@ def _registerHelp(msg):
     embed = Embed(
         colour=Color.blurple(),
         title='How to register?',
-        description=f'You have to accept the rules in <#{cfg.discord_ids["rules"]}> to register'
+        description=f'You have to accept the rules in <#{cfg.channels["rules"]}> to register'
     )
     embed.add_field(name='If you don\'t have a Jaeger account',
                     value='`=r no account`\n',
@@ -92,7 +93,7 @@ def _registerHelp(msg):
                     , inline=False)
     embed.add_field(name='Notify feature',
                     value='`=notify` - To join or leave the Notify feature\n'
-                          f'When suscribed to Notify, you can be mentionned with <@&{cfg.discord_ids["notify_role"]}> by other players'
+                          f'When suscribed to Notify, you can be mentionned with <@&{cfg.roles["notify"]}> when the queue is almost full'
                     , inline=False)
     try:
         if isAdmin(msg.author):
@@ -150,6 +151,32 @@ def _mapHelp(ctx):
                     inline=False)
     return embed
 
+def _timeoutHelp(ctx):
+    """ Returns timeout help embed
+    """
+    embed = Embed(
+        colour=Color.blurple()
+    )
+    embed.add_field(name='Timeout command',
+                    value='`=timeout @player 10 days` - Mute @player from POG for 10 days\n'
+                          '`=timeout @player 10 hours` - Mute @player from POG for 10 hours\n'
+                          '`=timeout @player 10 minutes` - Mute @player from POG for 10 minutes\n'
+                          '`=timeout @player remove` - Unmute @player from POG\n'
+                          '`=timeout @player` - Get info on current timeout for @player',
+                    inline=False)
+    return embed
+
+def _mutedHelp(ctx):
+    """ Returns help for muted players embed
+    """
+    embed = Embed(
+        colour=Color.blurple()
+    )
+    embed.add_field(name='You are currently muted!',
+                    value='`=escape` See how long you are muted for, give back permissions if no longer muted',
+                    inline=False)
+    return embed
+
 def _matchHelp(msg):
     """ Returns match help embed
     """
@@ -203,12 +230,14 @@ def _account(msg, account):
 def _autoHelp(msg):
     """ Return help embed depending on current channel
     """
-    if msg.channel.id == cfg.discord_ids['register']:
+    if msg.channel.id == cfg.channels['register']:
         return _registerHelp(msg)
-    if msg.channel.id == cfg.discord_ids['lobby']:
+    if msg.channel.id == cfg.channels['lobby']:
         return _lobbyHelp(msg)
-    if msg.channel.id in cfg.discord_ids['matches']:
+    if msg.channel.id in cfg.channels['matches']:
         return _matchHelp(msg)
+    if msg.channel.id == cfg.channels['muted']:
+        return _mutedHelp(msg)
     return _defaultHelp(msg)
 
 def _lobbyList(msg, namesInLobby):
@@ -450,3 +479,13 @@ class _StringEnum(Enum):
     RM_IN_MATCH = _Message("Can't remove a player who is in match!")
     RM_LOBBY = _Message("{} have been removed by staff!",embed=_lobbyList)
     RM_NOT_LOBBIED = _Message("This player is not in queue!")
+    RM_TIMEOUT = _Message("{} will be muted from POG until {}!", ping=False)
+    RM_TIMEOUT_FREE = _Message("{} is no longer muted!", ping=False)
+    RM_TIMEOUT_ALREADY = _Message("Can't do that, player is not muted!")
+    RM_TIMEOUT_HELP = _Message("Command usage:", embed=_timeoutHelp)
+    RM_TIMEOUT_INVALID = _Message("Invalid use of the command!", embed=_timeoutHelp)
+    RM_TIMEOUT_INFO = _Message("Player is muted until {}!")
+    RM_TIMEOUT_NO = _Message("Player is not muted!")
+
+    MUTE_SHOW = _Message("You are muted from POG until {}!")
+    MUTE_FREED = _Message("You are no longer muted from POG!")
