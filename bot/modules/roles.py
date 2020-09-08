@@ -43,6 +43,7 @@ async def roleUpdate(player):
     if player.isTimeout:
         await forceInfo(player.id)
         return
+    await permsMuted(False, player.id)
     global _guild
     memb = _guild.get_member(player.id)
     if memb is None:

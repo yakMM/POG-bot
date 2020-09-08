@@ -111,6 +111,7 @@ class AdminCog(commands.Cog, name='admin'):
         if player.status is PlayerStatus.IS_LOBBIED:
             removeFromLobby(player)
             await channelSend("RM_LOBBY", cfg.channels["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
+            return
         await send("RM_NOT_LOBBIED", ctx)
 
     @commands.command()
@@ -215,6 +216,9 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def channel(self, ctx, *args):
+        if ctx.channel.id not in [cfg.channels["register"], cfg.channels["lobby"], *cfg.channels["matches"]]:
+            await send("WRONG_CHANNEL_2", ctx, ctx.command.name, f"<#{ctx.channel.id}>")
+            return
         if len(args) == 1:
             arg = args[0]
             if arg == "freeze":

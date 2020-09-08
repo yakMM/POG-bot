@@ -173,6 +173,10 @@ class Player():
         if self.status is PlayerStatus.IS_LOBBIED:
             self.inactiveTask.cancel()
 
+    def onResign(self):
+        self._active = None
+        self.__status = PlayerStatus.IS_MATCHED
+
     @tasks.loop(minutes=cfg.AFK_TIME, delay=1, count=2)
     async def inactiveTask(self, fct):  # when inactive for cfg.AFK_TIME, execute fct
         await fct(self)
@@ -351,6 +355,10 @@ class ActivePlayer:
 
     def onMatchReady(self):
         self.__player.onMatchReady()
+
+    def onResign(self):
+        self.__player.onResign()
+        return self.__player
 
     @property
     def mention(self):

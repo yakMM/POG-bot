@@ -387,7 +387,7 @@ class _StringEnum(Enum):
 
     PK_OVER = _Message("The teams are already made. You can't pick!")
     PK_NO_LOBBIED = _Message("You must first queue and wait for a match to begin. Check <#{}>")
-    PK_WAIT_FOR_PICK = _Message("You can't pick! Wait for a Team Captain to pick you")
+    PK_WAIT_FOR_PICK = _Message("You can't do that! Wait for a Team Captain to pick you!")
     PK_WRONG_CHANNEL = _Message("You are in the wrong channel! Check <#{}> instead")
     PK_NOT_TURN = _Message("It's not your turn!")
     PK_NOT_CAPTAIN = _Message("You are not Team Captain!")
@@ -408,6 +408,8 @@ class _StringEnum(Enum):
     PK_WAIT_MAP = _Message("{} {} Pick an available map!", ping=False, embed=_jaegerCalendar)
     PK_MAP_OK_CONFIRM = _Message("Picked {}! {} confirm with `=p confirm` if you agree")
     PK_NO_MAP = _Message("No map selected!")
+    PK_RESIGNED = _Message("Successfully resigned! {} is the new captain for {}!")
+    PK_PICK_STARTED = _Message("Can't do that, you already picked a player!")
 
     EXT_NOT_REGISTERED = _Message("You are not registered! Check <#{}>")
     UNKNOWN_ERROR = _Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\nDetails: *{}*")

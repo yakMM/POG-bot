@@ -215,6 +215,19 @@ class Match():
             return other.captain
         return captain
 
+    def resign(self, captain):
+        team = captain.team
+        if team.isPlayers:
+            return False
+        else:
+            player = captain.onResign()
+            key = randomChoice(list(self.__players))
+            self.__players[player.id] = player
+            team.clear()
+            team.addPlayer(TeamCaptain, self.__players.pop(key))
+            team.captain.isTurn = captain.isTurn
+            return True
+
     @tasks.loop(count=1)
     async def __pingLastPlayer(self, team, p):
         await channelSend("PK_LAST", self.__id, p.mention, team.name)

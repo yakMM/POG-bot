@@ -126,7 +126,7 @@ def getConfig(file):
                 channels[key].clear()
                 for m in tmp:
                     channels[key].append(int(m))
-                    channelsList.append(channels[key])
+                    channelsList.append(int(m))
             else:
                 channels[key] = int(config['Channels'][key])
                 channelsList.append(channels[key])

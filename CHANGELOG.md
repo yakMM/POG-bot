@@ -1,6 +1,12 @@
 # v1.0.12:
 - Added timeout functionality for admins
 - Modifications in how players are stored in database
+- Bot is now active in all channels listed in the config file
+- Fixed a bug with muted permissions
+- Fixed a bug with some staff commands being usable in wrong channels
+- Fixed a bug when removing players from lobby
+- Bot no longer ignore commands sent from match channels
+- Added command for team captains to resign
 
 # v1.0.11:
 - Commands are no longer usable during init

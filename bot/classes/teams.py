@@ -61,6 +61,13 @@ class Team:
     def captain(self):
         return self.__players[0]
 
+    @property
+    def isPlayers(self):
+        return len(self.__players) > 1
+    
+    def clear(self):
+        self.__players.clear()
+
     def addCap(self, points):
         self.__cap += points
         self.__score += points

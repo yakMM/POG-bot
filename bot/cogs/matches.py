@@ -86,6 +86,32 @@ class MatchesCog(commands.Cog, name='matches'):
 
     @commands.command()
     @commands.guild_only()
+    async def resign(self,ctx):
+        match = getMatch(ctx.channel.id)
+        player = await _testPlayer(ctx, match)
+        if player is None:
+            return
+        if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
+            await send("MATCH_NOT_READY", ctx, ctx.command.name)
+            return
+        if match.status is not MatchStatus.IS_PICKING:
+            await send("MATCH_NO_COMMAND", ctx, ctx.command.name)
+            return
+        if player.status is PlayerStatus.IS_MATCHED:
+            await send("PK_WAIT_FOR_PICK", ctx)
+            return
+        aPlayer = player.active
+        if not isinstance(aPlayer, TeamCaptain):
+            await send("PK_NOT_CAPTAIN", ctx)
+            return
+        team = aPlayer.team
+        if match.resign(aPlayer):
+            await send("PK_RESIGNED", ctx, team.captain.mention, team.name)
+        else:
+            await send("PK_PICK_STARTED", ctx)
+
+    @commands.command()
+    @commands.guild_only()
     async def ready(self, ctx):  # when ready
         match = getMatch(ctx.channel.id)
         player = await _testPlayer(ctx, match)

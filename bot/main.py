@@ -265,5 +265,5 @@ if __name__ == "__main__":
     # execute only if run as a script
     # Use main() for production
 
-    main("_test")
-    # main()
+    # main("_test")
+    main()
