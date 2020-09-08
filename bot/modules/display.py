@@ -190,6 +190,7 @@ def _matchHelp(msg):
                     value = '`=p @player` - Pick a player in your team\n'
                             '`=p VS`/`NC`/`TR` - Pick a faction\n'
                             '`=p base name` - Pick the map *base name*\n'
+                            '`=resign` - Resign from Team Captain position\n'
                             '`=ready` - To toggle the ready status of your team'
                             ,
                     inline=False)
@@ -197,6 +198,7 @@ def _matchHelp(msg):
         embed.add_field(name="Staff Commands",
                         value = '`=clear` - Clear the match\n'
                                 '`=map base name` - Select a map\n'
+                                '`=demote @player` - Remove Team Captain position from player\n'
                                 '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                         inline=False)
     return embed
@@ -475,7 +477,7 @@ class _StringEnum(Enum):
 
     NOT_CODED = _Message("The rest is not yet coded, work in progress. Clearing match...")
 
-    RM_MENTION_ONE = _Message("Invalid request! Mention one player to be removed!")
+    RM_MENTION_ONE = _Message("Invalid request! @ mention one player!")
     RM_NOT_IN_DB = _Message("Can't find this player in the database!")
     RM_OK = _Message("Player successfully removed from the system!")
     RM_IN_MATCH = _Message("Can't remove a player who is in match!")
@@ -488,6 +490,9 @@ class _StringEnum(Enum):
     RM_TIMEOUT_INVALID = _Message("Invalid use of the command!", embed=_timeoutHelp)
     RM_TIMEOUT_INFO = _Message("Player is muted until {}!")
     RM_TIMEOUT_NO = _Message("Player is not muted!")
+    RM_DEMOTE_NO = _Message("Can't demote this player!")
+    RM_DEMOTE_OK = _Message("Successfully demoted! {} is the new captain for {}!", ping=False)
+    RM_DEMOTE_PICKING = _Message("Can't demote a captain who has already started picking!")
 
     MUTE_SHOW = _Message("You are muted from POG until {}!")
     MUTE_FREED = _Message("You are no longer muted from POG!")

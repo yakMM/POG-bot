@@ -10,7 +10,7 @@ from modules.database import removePlayer as dbRemove
 from modules.loader import lockAll, unlockAll, isAllLocked
 from modules.roles import forceInfo, roleUpdate, isAdmin, permsMuted, channelFreeze
 
-from classes.players import removePlayer, getPlayer, Player
+from classes.players import removePlayer, getPlayer, Player, TeamCaptain
 
 from matches import clearLobby, getMatch, getAllNamesInLobby, removeFromLobby
 
@@ -85,7 +85,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def unregister(self, ctx):
-        player = await _removeChecks(ctx, "register")
+        player = await _removeChecks(ctx, cfg.channels["register"])
         if player is None:
             return
         if player.status is PlayerStatus.IS_LOBBIED:
@@ -105,7 +105,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def remove(self, ctx):
-        player = await _removeChecks(ctx, "lobby")
+        player = await _removeChecks(ctx, cfg.channels["lobby"])
         if player is None:
             return
         if player.status is PlayerStatus.IS_LOBBIED:
@@ -113,6 +113,29 @@ class AdminCog(commands.Cog, name='admin'):
             await channelSend("RM_LOBBY", cfg.channels["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
             return
         await send("RM_NOT_LOBBIED", ctx)
+    
+    @commands.command()
+    @commands.guild_only()
+    async def demote(self, ctx):
+        player = await _removeChecks(ctx, cfg.channels["matches"])
+        if player is None:
+            return
+        if player.status is not PlayerStatus.IS_PICKED:
+            await send("RM_DEMOTE_NO", ctx)
+            return
+        match = getMatch(ctx.channel.id)
+        if player.match.id != match.id:
+            await send("PK_WRONG_CHANNEL", ctx,  player.match.id)
+            return
+        aPlayer = player.active
+        if not isinstance(aPlayer, TeamCaptain):
+            await send("RM_DEMOTE_NO", ctx)
+            return
+        team = aPlayer.team
+        if match.resign(aPlayer):
+            await send("RM_DEMOTE_OK", ctx, team.captain.mention, team.name)
+        else:
+            await send("RM_DEMOTE_PICKING", ctx)
 
     @commands.command()
     @commands.guild_only()
@@ -235,9 +258,11 @@ class AdminCog(commands.Cog, name='admin'):
 def setup(client):
     client.add_cog(AdminCog(client))
 
-async def _removeChecks(ctx, channel):
-    if ctx.channel.id != cfg.channels[channel]:
-        await send("WRONG_CHANNEL", ctx, ctx.command.name, f"<#{cfg.channels[channel]}>")
+async def _removeChecks(ctx, channels):
+    if not isinstance(channels, list):
+        channels = [channels]
+    if ctx.channel.id not in channels:
+        await send("WRONG_CHANNEL", ctx, ctx.command.name, ", ".join(f"<#{cId}>" for cId in channels))
         return
     if len(ctx.message.mentions) != 1:
         await send("RM_MENTION_ONE", ctx)

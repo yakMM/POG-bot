@@ -7,6 +7,7 @@
 - Fixed a bug when removing players from lobby
 - Bot no longer ignore commands sent from match channels
 - Added command for team captains to resign
+- Staff can now demote team captains
 
 # v1.0.11:
 - Commands are no longer usable during init
