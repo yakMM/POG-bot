@@ -13,7 +13,6 @@ from asyncio import sleep
 from random import seed
 from datetime import datetime as dt
 import logging
-from modules import ts3
 from time import gmtime
 from logging.handlers import RotatingFileHandler
 import re
@@ -28,6 +27,7 @@ from modules.database import init as dbInit, getAllPlayers, getAllMaps
 from modules.enumerations import PlayerStatus
 from modules.tools import isAdmin
 from modules.loader import init as cogInit, isAllLocked, unlockAll
+from modules.ts3 import init as ts3Init
 
 # Modules for the custom classes
 from matches import onPlayerInactive, onPlayerActive, init as matchesInit, getMatch
@@ -237,7 +237,7 @@ def main(launchStr=""):
     cfg.getConfig(f"config{launchStr}.cfg")
 
     # Initialize teamspeak bots
-    ts3.init()
+    ts3Init()
 
     # Set up command prefix
     client = commands.Bot(command_prefix=cfg.general["command_prefix"])

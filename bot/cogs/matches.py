@@ -5,7 +5,7 @@ from logging import getLogger
 from asyncio import sleep
 
 import modules.config as cfg
-from modules import ts3
+from modules.ts3 import getTs3Bots
 from modules.display import send, channelSend
 from modules.tools import isAlNum
 from modules.exceptions import ElementNotFound
@@ -16,12 +16,6 @@ from matches import getMatch, which_bot, which_team_channels
 from modules.enumerations import MatchStatus, SelStatus
 
 log = getLogger(__name__)
-
-global bot1, bot2
-bot1 = ts3.Ts3Bot('http://localhost:8087/api/v1/bot', "bot1",
-                  username=cfg.general["sinusbot_user"], password=cfg.general["sinusbot_pass"])
-bot2 = ts3.Ts3Bot('http://localhost:8087/api/v1/bot', "bot2",
-                  username=cfg.general["sinusbot_user"], password=cfg.general["sinusbot_pass"])
 
 
 class MatchesCog(commands.Cog, name='matches'):
@@ -240,8 +234,8 @@ async def _map(ctx, captain, args):
         # ts3: move bots to team channels:
         await sleep(ts3bot.get_duration(cfg.audio_ids["players_drop_channel"]))
         team_channels = which_team_channels(ctx.channel.id)
-        bot1.move(team_channels[0])
-        bot2.move(team_channels[1])
+        getTs3Bots()[0].move(team_channels[0])
+        getTs3Bots()[1].move(team_channels[1])
         return
     await sel.doSelectionProcess(ctx, args)  # Handle the actual map selection
     newPicker = match.pickMap(captain)
