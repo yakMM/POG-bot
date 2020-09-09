@@ -24,7 +24,6 @@ from datetime import timezone as tz
 
 # Others
 from enum import Enum
-from string import capwords
 
 # Custom modules
 import modules.config as cfg
@@ -76,6 +75,18 @@ async def remReaction(message, user=None):
         global _client
         user = _client.user
     await message.remove_reaction("✅", user)
+
+
+class Emoji:
+    def __init__(self):
+        self.numeric = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+        self.escape = ['↩']
+
+
+def getMapPoolEmojis():
+    _emoji_list = Emoji().numeric[:len(cfg.map_pool_images)]
+    _emoji_list.extend(Emoji().escape)
+    return _emoji_list
 
 
 # PRIVATE:
@@ -233,7 +244,8 @@ def _selectedMaps(msg, sel):
     """ Returns a list of maps after a search selected
     """
     embed = Embed(colour=Color.blue())
-    embed.add_field(name=f"{len(sel.selection)} maps found", value=sel.toString(), inline=False)
+    embed_text = sel.toString() + f"\n⤾ - Back to Maps"
+    embed.add_field(name=f"{len(sel.selection)} maps found", value=embed_text, inline=False)
     return embed
 
 
@@ -291,11 +303,14 @@ def _jaegerCalendar(arg):
     return embed
 
 
-def _availableMaps(maps):
-    """ Returns a list of maps to embed in the available maps message
-    """
-    embed = Embed(colour=Color.blue())
-    embed.add_field(name=f"{len(maps)} maps are currently available", value=maps.toString(), inline=False)
+def _mapPool(msg, map):
+    if map.name in cfg.map_pool_images:
+        embed = Embed(colour=Color.blue(), title=map.name)
+        embed.set_author(name="Map pool document",
+                         url="https://docs.google.com/presentation/d/1KEDlqHxbpG2zXxuEZetAM9IpUHIisWTnrtybn3Kq-Is/edit?usp=sharing")
+        embed.set_image(url=cfg.map_pool_images[map.name])
+    else:
+        embed = Embed(colour=Color.red(), title="No map image available")
     return embed
 
 
@@ -303,10 +318,11 @@ class _Message:
     """ Class for the enum to use
     """
 
-    def __init__(self, str, ping=True, embed=None):
+    def __init__(self, str, ping=True, embed=None, emojis=None):
         self.__str = str
         self.__embedFct = embed
         self.__ping = ping
+        self.__emojis = emojis
 
     async def display(self, ctx, edit, *args, **kwargs):
         # If is Context instead of a Message, get the Message:
@@ -338,12 +354,20 @@ class _Message:
             msg = await sendFct(content=f'{author.mention} {string}', embed=embed)
         else:
             msg = await sendFct(content=string, embed=embed)
+
+        if self.__emojis and msg:
+            if isinstance(self.__emojis, list):
+                for emoji in self.__emojis:
+                    await msg.add_reaction(emoji)
+            else:
+                await msg.add_reaction(self.__emojis)
         return msg
 
 
 class _StringEnum(Enum):
     """ List of different message strings available
     """
+
     REG_NOT_REGISTERED = _Message("You are not registered!", embed=_registerHelp)
     REG_IS_REGISTERED_OWN = _Message("You are already registered with the following Jaeger characters: `{}`, `{}`, `{}`")
     REG_IS_REGISTERED_NOA = _Message("You are already registered without a Jaeger account! If you have your own account, please re-register with your Jaeger characters.")
@@ -397,12 +421,16 @@ class _StringEnum(Enum):
     PK_FACTION_ALREADY = _Message("Faction already picked by the other team!")
     PK_FACTION_OK_NEXT = _Message("{} chose {}! {} pick a faction!", ping=False)
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
-    # PK_WAIT_MAP = _Message("{} {} Pick a map from the list of available maps below using `=p #`. To choose a map not on the list use `=p base name`",
-    #     ping=False, embed=_selectedMaps)
     PK_WAIT_MAP = _Message("{} {} Pick a map from the list using `=p #`. To choose a map not on the list use `=p base name`",
-        ping=False, embed=_selectedMaps)
+                           ping=False,
+                           embed=_selectedMaps,
+                           emojis=getMapPoolEmojis())
     PK_MAP_OK_CONFIRM = _Message("Picked **{}**! {} confirm with `=p confirm` if you agree")
     PK_NO_MAP = _Message("No map selected!")
+    PK_SHOW_REACT_MAP = _Message("React with ⤾ to go back to map list",
+                                 embed=_mapPool,
+                                 ping=False,
+                                 emojis=getMapPoolEmojis())
 
     EXT_NOT_REGISTERED = _Message("You are not registered! Check <#{}>")
     UNKNOWN_ERROR = _Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\nDetails: *{}*")
@@ -453,7 +481,7 @@ class _StringEnum(Enum):
     MAP_DISPLAY_LIST = _Message("", embed=_selectedMaps)
     MAP_SELECTED = _Message("The current map is **{}**")
     MAP_BOOKED = _Message("WARNING: **{}** is currently reserved in the Jaeger Calendar. Please check availability before confirming this map.",
-        embed=_jaegerCalendar)
+                          embed=_jaegerCalendar)
 
     MP_ADDED = _Message("Added {} to the map pool")
     MP_REMOVED = _Message("Removed {} from the map pool")

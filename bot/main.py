@@ -17,10 +17,11 @@ import logging
 from modules import ts3
 from time import gmtime
 from logging.handlers import RotatingFileHandler
+import re
 
 # Custom modules
 import modules.config as cfg
-from modules.display import send, channelSend, edit
+from modules.display import send, channelSend, edit, _StringEnum, Emoji
 from modules.display import init as displayInit
 from modules.spam import isSpam, unlock
 from modules.exceptions import ElementNotFound, UnexpectedError
@@ -30,7 +31,7 @@ from modules.tools import isAdmin
 from modules.loader import init as cogInit, isAllLocked, unlockAll
 
 # Modules for the custom classes
-from matches import onPlayerInactive, onPlayerActive, init as matchesInit
+from matches import onPlayerInactive, onPlayerActive, init as matchesInit, getMatch
 from classes.players import Player, getPlayer
 from classes.accounts import AccountHander
 from classes.maps import createJeagerCalObj
@@ -159,6 +160,29 @@ def _addMainHandlers(client):
     # Reaction update handler (for accounts)
     @client.event
     async def on_reaction_add(reaction, user):
+        # below is for map selection
+        cleaned_reaction_message = re.sub("<.+?>", "", reaction.message.content)
+        cleaned_PK_SHOW_REACT_MAP = _StringEnum.PK_SHOW_REACT_MAP.value._Message__str
+        cleaned_PK_WAIT_MAP = _StringEnum.PK_WAIT_MAP.value._Message__str.replace("{", "").replace("}", "")
+        emoji_obj = Emoji()
+        if reaction.message.author.bot and not user.bot:
+            if cleaned_reaction_message in cleaned_PK_WAIT_MAP or cleaned_reaction_message in cleaned_PK_SHOW_REACT_MAP:
+                value = None
+                if reaction.emoji in emoji_obj.escape:
+                    value = 27  # using the keycode value for escape but really it can be anything unique
+                elif reaction.emoji in emoji_obj.numeric:
+                    value = emoji_obj.numeric.index(reaction.emoji) + 1  # offset because list starts at 1
+
+                currentMatch = getMatch(reaction.message.channel.id)
+                await reaction.remove(user)
+
+                if 1 <= value <= 9 and (value - 1) <= len(currentMatch.mapSelector.selection):
+                    await edit("PK_SHOW_REACT_MAP", reaction.message, map=currentMatch.mapSelector.selection[value - 1])
+                elif value == 27:
+                    captainPings = [tm.captain.mention for tm in currentMatch.teams]
+                    await edit("PK_WAIT_MAP", reaction.message, sel=currentMatch.mapSelector, *captainPings)
+
+        # below is for player account acceptance
         try:
             player = getPlayer(user.id)
         except ElementNotFound:
@@ -179,6 +203,8 @@ def _addMainHandlers(client):
             account.validate()
             await edit("ACC_UPDATE", account.message, account=account)
             await account.message.remove_reaction(reaction.emoji, client.user)
+
+
 
     # Status update handler (for inactivity)
     @client.event
