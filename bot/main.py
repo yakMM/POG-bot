@@ -6,7 +6,6 @@ The application should be launched from this file
 
 # discord.py
 from discord.ext import commands
-from discord.ext.commands import Bot
 from discord import Status, DMChannel
 
 # Other modules
@@ -140,6 +139,7 @@ def _addMainHandlers(client):
                 return
         if payload.message_id == cfg.discord_ids["rules_msg"]:  # reaction to the rule message?
             global rulesMsg
+            rulesMsg = await client.get_channel(cfg.discord_ids["rules"]).fetch_message(cfg.discord_ids["rules_msg"])
             if str(payload.emoji) == "✅":
                 try:
                     p = getPlayer(payload.member.id)
@@ -204,8 +204,6 @@ def _addMainHandlers(client):
             await edit("ACC_UPDATE", account.message, account=account)
             await account.message.remove_reaction(reaction.emoji, client.user)
 
-
-
     # Status update handler (for inactivity)
     @client.event
     async def on_member_update(before, after):
@@ -243,7 +241,6 @@ def main(launchStr=""):
 
     # Set up command prefix
     client = commands.Bot(command_prefix=cfg.general["command_prefix"])
-
 
     # Remove default help
     client.remove_command('help')

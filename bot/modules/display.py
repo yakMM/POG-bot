@@ -381,7 +381,7 @@ class _StringEnum(Enum):
     REG_UPDATE_OWN = _Message("You successfully updated your profile with the following Jaeger characters: `{}`, `{}`, `{}`")
     REG_UPDATE_NOA = _Message("You successfully removed your Jaeger characters from your profile.")
     REG_WITH_CHARS = _Message("You successfully registered with the following Jaeger characters: `{}`, `{}`, `{}`")
-    REG_FREEZED = _Message("You can't register while you're playing a match")
+    REG_FROZEN = _Message("You can't register while you're playing a match")
     REG_RULES = _Message("{} You have accepted the rules, you may now register", embed=_registerHelp)
     REG_NO_RULE = _Message("You have to accept the rules before registering! Check <#{}>")
 
@@ -442,7 +442,7 @@ class _StringEnum(Enum):
     WRONG_CHANNEL_2 = _Message("The command `={}` can't be used in {}")
     NO_PERMISSION = _Message("The command `={}` can only be used by staff members!")
     CHANNEL_INIT = _Message("`Bot init`: Correctly hooked in channel <#{}>")
-    INVALID_STR = _Message("You entered an invalid caracter! `{}`")
+    INVALID_STR = _Message("You entered an invalid character! `{}`")
     API_ERROR = _Message("Could not reach Planetside2 API, try again later!")
 
     BOT_UNLOCKED = _Message("Unlocked!")
@@ -450,8 +450,8 @@ class _StringEnum(Enum):
     BOT_IS_LOCKED = _Message("Unlock the bot before using this command!")
     BOT_ALREADY = _Message("Already {}!")
     BOT_VERSION = _Message("Version `{}`, locked: `{}`")
-    BOT_FREEZED = _Message("Channel frozen!")
-    BOT_UNFREEZED = _Message("Channel unfrozen!")
+    BOT_FROZEN = _Message("Channel frozen!")
+    BOT_UNFROZEN = _Message("Channel unfrozen!")
 
     MATCH_INIT = _Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player", embed=_teamUpdate)

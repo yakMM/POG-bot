@@ -154,14 +154,14 @@ class AdminCog(commands.Cog, name='admin'):
                 ov_registered.send_messages = False
                 await ctx.channel.set_permissions(notify, overwrite=ov_notify)
                 await ctx.channel.set_permissions(registered, overwrite=ov_registered)
-                await send("BOT_FREEZED", ctx)
+                await send("BOT_FROZEN", ctx)
                 return
             if arg == "unfreeze":
                 ov_notify.send_messages = True
                 ov_registered.send_messages = True
                 await ctx.channel.set_permissions(notify, overwrite=ov_notify)
                 await ctx.channel.set_permissions(registered, overwrite=ov_registered)
-                await send("BOT_UNFREEZED", ctx)
+                await send("BOT_UNFROZEN", ctx)
                 return
         await send("WRONG_USAGE", ctx, ctx.command.name)
 

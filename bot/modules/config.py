@@ -96,7 +96,7 @@ zones = {
 }
 
 # http://census.daybreakgames.com/get/ps2:v2/facility_type?c:limit=100
-facilitiy_suffix = {
+facility_suffix = {
     2: "Amp Station",
     3: "Bio Lab",
     4: "Tech Plant"

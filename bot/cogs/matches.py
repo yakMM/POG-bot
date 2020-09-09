@@ -11,12 +11,17 @@ from modules.tools import isAlNum
 from modules.exceptions import ElementNotFound
 
 from classes.players import TeamCaptain, ActivePlayer, PlayerStatus, getPlayer
-from classes.maps import MapSelection
 
 from matches import getMatch, which_bot, which_team_channels
 from modules.enumerations import MatchStatus, SelStatus
 
 log = getLogger(__name__)
+
+global bot1, bot2
+bot1 = ts3.Ts3Bot('http://localhost:8087/api/v1/bot', "bot1",
+                  username=cfg.general["sinusbot_user"], password=cfg.general["sinusbot_pass"])
+bot2 = ts3.Ts3Bot('http://localhost:8087/api/v1/bot', "bot2",
+                  username=cfg.general["sinusbot_user"], password=cfg.general["sinusbot_pass"])
 
 
 class MatchesCog(commands.Cog, name='matches'):
@@ -235,8 +240,8 @@ async def _map(ctx, captain, args):
         # ts3: move bots to team channels:
         await sleep(ts3bot.get_duration(cfg.audio_ids["players_drop_channel"]))
         team_channels = which_team_channels(ctx.channel.id)
-        ts3.bot1.move(team_channels[0])
-        ts3.bot2.move(team_channels[1])
+        bot1.move(team_channels[0])
+        bot2.move(team_channels[1])
         return
     await sel.doSelectionProcess(ctx, args)  # Handle the actual map selection
     newPicker = match.pickMap(captain)

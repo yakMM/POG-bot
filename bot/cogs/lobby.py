@@ -25,6 +25,7 @@ class LobbyCog(commands.Cog, name='lobby'):
     async def on_ready(self):
         log.info('Lobby Cog is online')
         return  # we don't display a message on each restart
+        # code below is unreachable:
         try:
             await channelSend("CHANNEL_INIT", cfg.discord_ids["lobby"], cfg.discord_ids["lobby"])
         except AttributeError:

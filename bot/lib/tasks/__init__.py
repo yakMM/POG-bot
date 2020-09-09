@@ -16,11 +16,13 @@ from discord.backoff import ExponentialBackoff
 
 log = logging.getLogger(__name__)
 
+
 class Loop:
     """A background task helper that abstracts the loop and reconnection logic for you.
 
     The main interface to create this is through :func:`loop`.
     """
+
     def __init__(self, coro, seconds, hours, minutes, delay, count, reconnect, loop):
         self.coro = coro
         self.reconnect = reconnect
@@ -47,10 +49,10 @@ class Loop:
 
         if self.count is not None and self.count <= 0:
             raise ValueError('count must be greater than 0 or None.')
-        
+
         if self.delay is None:
             raise ValueError('delay can not be None.')
-    
+
         if self.delay < 0 or self.delay >= self.count:
             raise ValueError('delay must be positive and lower than count.')
 
@@ -77,7 +79,7 @@ class Loop:
         sleep_until = discord.utils.sleep_until
         self._next_iteration = datetime.datetime.now(datetime.timezone.utc)
         try:
-            await asyncio.sleep(0) # allows canceling in before_loop
+            await asyncio.sleep(0)  # allows canceling in before_loop
             while True:
                 self._last_iteration = self._next_iteration
                 self._next_iteration = self._get_next_sleep_time()
@@ -118,7 +120,7 @@ class Loop:
             return self
 
         copy = Loop(self.coro, seconds=self.seconds, hours=self.hours, minutes=self.minutes,
-                               delay=self.delay, count=self.count, reconnect=self.reconnect, loop=self.loop)
+                    delay=self.delay, count=self.count, reconnect=self.reconnect, loop=self.loop)
         copy._injected = obj
         copy._before_loop = self._before_loop
         copy._after_loop = self._after_loop
@@ -424,6 +426,7 @@ class Loop:
         self.hours = hours
         self.minutes = minutes
 
+
 def loop(*, seconds=0, minutes=0, hours=0, delay=0, count=None, reconnect=True, loop=None):
     """A decorator that schedules a task in the background for you with
     optional reconnect logic. The decorator returns a :class:`Loop`.
@@ -456,15 +459,17 @@ def loop(*, seconds=0, minutes=0, hours=0, delay=0, count=None, reconnect=True, 
     TypeError
         The function was not a coroutine.
     """
+
     def decorator(func):
         kwargs = {
             'seconds': seconds,
             'minutes': minutes,
             'hours': hours,
-            'delay' : delay,
+            'delay': delay,
             'count': count,
             'reconnect': reconnect,
             'loop': loop
         }
         return Loop(func, **kwargs)
+
     return decorator

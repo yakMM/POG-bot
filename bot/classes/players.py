@@ -6,8 +6,7 @@ import enum
 # Custom modules
 import modules.config as cfg
 from modules.asynchttp import request as httpRequest
-from modules.exceptions import UnexpectedError, ElementNotFound, StatusNotAllowed, CharNotFound, CharInvalidWorld, \
-    CharMissingFaction, CharAlreadyExists
+from modules.exceptions import UnexpectedError, ElementNotFound, StatusNotAllowed, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, AccountNotFound, ApiNotReachable
 from modules.enumerations import PlayerStatus
 from lib import tasks
 
@@ -26,7 +25,7 @@ _namesChecking = [dict(), dict(), dict()]  # to store VS, NC and TR names to che
 
 def getPlayer(id):
     player = _allPlayers.get(id)
-    if player == None:
+    if player is None:
         raise ElementNotFound(id)
     return player
 
@@ -146,11 +145,11 @@ class Player:
 
     async def register(self, charList):
         """ Called when player is trying to register
-            Returns wether player data was updated or not
+            Returns whether player data was updated or not
         """
         updated = False
-        if charList == None:
-            if (self._status == PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount):
+        if charList is None:
+            if self._status == PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount:
                 updated = True
             self._igIds = [0, 0, 0]
             self._igNames = ["N/A", "N/A", "N/A"]
@@ -178,12 +177,12 @@ class Player:
         newNames = ["N/A", "N/A", "N/A"]
         for iName in charList:
             url = 'http://census.daybreakgames.com/s:' + cfg.general['api_key'] + \
-                  '/get/ps2:v2/character/?name.first_lower=' + iName.lower() +\
+                  '/get/ps2:v2/character/?name.first_lower=' + iName.lower() + \
                   '&c:show=character_id,faction_id,name&c:resolve=world'
             jdata = await httpRequest(url)
-            
+
             try:
-                if jdata["returned"]==0:
+                if jdata["returned"] == 0:
                     raise CharNotFound(iName)
             except KeyError:
                 raise ApiNotReachable(url)
@@ -195,17 +194,19 @@ class Player:
                     faction = int(jdata["character_list"][0]["faction_id"])
                     currId = jdata["character_list"][0]["character_id"]
                     currName = jdata["character_list"][0]["name"]["first"]
-                    if currId in _namesChecking[faction-1]:
-                        p = _namesChecking[faction-1][currId]
+                    if currId in _namesChecking[faction - 1]:
+                        p = _namesChecking[faction - 1][currId]
                         if p != self:
                             raise CharAlreadyExists(currName, p.id)
-                    newIds[faction-1] = currId
-                    updated = updated or newIds[faction-1] != self._igIds[faction-1]
-                    newNames[faction-1] = jdata["character_list"][0]["name"]["first"]
+                    newIds[faction - 1] = currId
+                    updated = updated or newIds[faction - 1] != self._igIds[faction - 1]
+                    newNames[faction - 1] = jdata["character_list"][0]["name"]["first"]
             except IndexError:
-                raise UnexpectedError("IndexError when setting player name: "+iName) # Should not happen, we checked earlier
+                raise UnexpectedError(
+                    "IndexError when setting player name: " + iName)  # Should not happen, we checked earlier
             except KeyError:
-                raise UnexpectedError("KeyError when setting player name: "+iName) # Don't know when this should happen either
+                raise UnexpectedError(
+                    "KeyError when setting player name: " + iName)  # Don't know when this should happen either
 
         for i in range(len(newIds)):
             if newIds[i] == 0:
@@ -262,7 +263,7 @@ class ActivePlayer:
     def acceptAccount(self):
         accountId = self.__account.id
         fakePlayer = getPlayer(accountId)
-        if fakePlayer == None:
+        if fakePlayer is None:
             raise AccountNotFound(accountId)
         self.__player._igNames = fakePlayer.igNames.copy()
         self.__player._igIds = fakePlayer.igIds.copy()
