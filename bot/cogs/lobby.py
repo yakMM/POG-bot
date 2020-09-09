@@ -12,7 +12,6 @@ from matches import getLobbyLen, isLobbyStuck, removeFromLobby, addToLobby, getA
 
 log = getLogger(__name__)
 
-
 class LobbyCog(commands.Cog, name='lobby'):
     """
     Lobby cog, handle the commands from lobby channel

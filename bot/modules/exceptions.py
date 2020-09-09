@@ -8,7 +8,6 @@ from logging import getLogger
 
 log = getLogger(__name__)
 
-
 class CharNotFound(Exception):
     def __init__(self, char):
         self.char = char
@@ -92,7 +91,6 @@ class AlreadyExists(Exception):
 class LobbyStuck(Exception):
     def __init__(self):
         super().__init__(f"Lobby stuck!")
-
 
 class ApiNotReachable(Exception):
     def __init__(self, url):

@@ -47,13 +47,11 @@ async def update(p):
     loop = get_event_loop()
     await loop.run_in_executor(None, _update, p)
 
-
 async def remove(p):
     """ Launch the task updating player p in database
     """
     loop = get_event_loop()
     await loop.run_in_executor(None, _remove, p)
-
 
 def init(config):
     """ Init"""

@@ -205,9 +205,8 @@ class Player:
                 raise UnexpectedError(
                     "IndexError when setting player name: " + iName)  # Should not happen, we checked earlier
             except KeyError:
-                raise UnexpectedError(
-                    "KeyError when setting player name: " + iName)  # Don't know when this should happen either
-
+                raise UnexpectedError("KeyError when setting player name: " + iName)  # Don't know when this should happen either
+                
         for i in range(len(newIds)):
             if newIds[i] == 0:
                 raise CharMissingFaction(cfg.factions[i + 1])

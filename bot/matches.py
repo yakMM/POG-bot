@@ -74,6 +74,11 @@ def _onMatchFree():
     if len(_lobbyList) == cfg.general["lobby_size"]:
         startMatchFromFullLobby.start()
 
+def _onLobbyRemove():
+    global _lobbyStuck
+    _lobbyStuck = False
+    if len(_lobbyList) < cfg.general["lobby_size"]-4:
+        _autoPing.cancel()
 
 def _onLobbyRemove():
     global _lobbyStuck

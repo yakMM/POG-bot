@@ -108,7 +108,6 @@ def _addMainHandlers(client):
                 if isinstance(channelId, list):
                     channelStr = "channels " + ", ".join(f'<#{id}>' for id in channelId)
                 else:
-
                     channelStr = f'channel <#{channelId}>'
                 await send("WRONG_CHANNEL", ctx, ctx.command.name, channelStr)  # Send the use back to the right channel
             except KeyError:  # Should not happen

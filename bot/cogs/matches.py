@@ -2,8 +2,6 @@ from discord.ext import commands
 import discord
 from logging import getLogger
 
-from asyncio import sleep
-
 import modules.config as cfg
 from modules import ts3
 from modules.display import send, channelSend
@@ -34,7 +32,6 @@ class MatchesCog(commands.Cog, name='matches'):
 
     @commands.Cog.listener()
     async def on_ready(self):
-
         log.info('Matches Cog is online')
         return  # we don't display a message on each restart
         try:

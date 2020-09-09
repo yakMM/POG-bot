@@ -14,7 +14,6 @@ from matches import clearLobby, getMatch, getAllNamesInLobby, removeFromLobby
 
 log = getLogger(__name__)
 
-
 class AdminCog(commands.Cog, name='admin'):
     """
     Register cog, handle the admin commands
