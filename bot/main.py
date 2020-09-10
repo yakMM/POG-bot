@@ -6,7 +6,6 @@ The application should be launched from this file
 
 # discord.py
 from discord.ext import commands
-from discord.ext.commands import Bot
 from discord import Status, DMChannel
 
 # Other modules
@@ -14,23 +13,27 @@ from asyncio import sleep
 from random import seed
 from datetime import datetime as dt
 import logging
-from modules import ts3
 from time import gmtime
 from logging.handlers import RotatingFileHandler
+import re
 
 # Custom modules
 import modules.config as cfg
-from modules.display import send, channelSend, edit, init as displayInit
+from modules.display import send, channelSend, edit, _StringEnum, Emoji, cleanStringEnum, init as displayInit
 from modules.spam import isSpam, unlock
+from modules.enumerations import MatchStatus
 from modules.exceptions import ElementNotFound, UnexpectedError
 from modules.database import init as dbInit, getAllItems
 from modules.enumerations import PlayerStatus
 from modules.loader import init as cogInit, isAllLocked, unlockAll
+from modules.ts3 import init as ts3Init
+
+# Modules for the custom classes
 from modules.roles import init as rolesInit, roleUpdate, isAdmin
 from modules.reactions import reactionHandler
 
 # Modules for the custom classes
-from matches import onInactiveConfirmed, init as matchesInit
+from matches import onInactiveConfirmed, init as matchesInit, getMatch
 from classes.players import Player, getPlayer, getAllPlayersList
 from classes.accounts import AccountHander
 from classes.maps import Map, createJeagerCalObj
@@ -131,6 +134,7 @@ def _addMainHandlers(client):
         # reaction to the rule message?
         if payload.message_id == cfg.general["rules_msg_id"]:
             global rulesMsg
+            rulesMsg = await client.get_channel(cfg.discord_ids["rules"]).fetch_message(cfg.discord_ids["rules_msg"])
             if str(payload.emoji) == "✅":
                 try:
                     p = getPlayer(payload.member.id)
@@ -147,6 +151,46 @@ def _addMainHandlers(client):
     # Reaction update handler (for accounts)
     @client.event
     async def on_reaction_add(reaction, user):
+        if reaction.message.author.bot and not user.bot and reaction.message.channel.id in cfg.discord_ids["matches"]:
+            cleaned_reaction_message = re.sub("<.+?>", "", reaction.message.content)
+            emoji_obj = Emoji()
+            currentMatch = getMatch(reaction.message.channel.id)
+
+            # todo: WIP -- below is for team selection -- should be moved out of main.py to the correct module @yak
+            # if currentMatch.status == MatchStatus.IS_PICKING:
+            #     if user.id in [tm.captain.id for tm in currentMatch.teams]:
+            #         if cleaned_reaction_message in cleanStringEnum(_StringEnum.MATCH_SHOW_PICKS):
+            #             value = -1
+            #             if reaction.emoji in emoji_obj.numeric:
+            #                 value = emoji_obj.numeric.index(reaction.emoji)
+            #
+            #             await reaction.remove(user)
+            #
+            #             if 0 <= value <= 9:
+            #                 await edit("MATCH_SHOW_PICKS", currentMatch.id, currentMatch.teams[0].captain.mention, match=currentMatch)
+            #                 # could also be PK_OK or PK_OK_2
+
+            # todo: below is for map selection -- should be moved out of main.py to the correct module @yak
+            if currentMatch.status == MatchStatus.IS_MAPPING:
+                if cleaned_reaction_message in cleanStringEnum(_StringEnum.PK_SHOW_REACT_MAP) or \
+                        cleaned_reaction_message in cleanStringEnum(_StringEnum.PK_WAIT_MAP):
+                    value = -1
+                    if reaction.emoji in emoji_obj.escape:
+                        value = 27  # using the keycode value for escape but really it can be anything unique
+                    elif reaction.emoji in emoji_obj.numeric:
+                        value = emoji_obj.numeric.index(reaction.emoji)
+
+                    await reaction.remove(user)
+
+                    if 1 <= value <= len(currentMatch.mapSelector.selection):
+                        await edit("PK_SHOW_REACT_MAP", reaction.message, map=currentMatch.mapSelector.selection[value - 1])
+                    elif value == 27:
+                        captainPings = [tm.captain.mention for tm in currentMatch.teams]
+                        await edit("PK_WAIT_MAP", reaction.message, sel=currentMatch.mapSelector, *captainPings)
+
+
+
+        # below is for player account acceptance
         try:
             player = getPlayer(user.id)
         except ElementNotFound:
@@ -230,11 +274,10 @@ def main(launchStr=""):
     cfg.getConfig(f"config{launchStr}.cfg")
 
     # Initialize teamspeak bots
-    ts3.init()
+    ts3Init()
 
     # Set up command prefix
     client = commands.Bot(command_prefix=cfg.general["command_prefix"])
-
 
     # Remove default help
     client.remove_command('help')

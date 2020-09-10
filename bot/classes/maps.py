@@ -64,8 +64,8 @@ class Map():
     @property
     def name(self):
         name = self.__name
-        if self.__typeId in cfg.facilitiy_suffix:
-            name += f" {cfg.facilitiy_suffix[self.__typeId]}"
+        if self.__typeId in cfg.facility_suffix:
+            name += f" {cfg.facility_suffix[self.__typeId]}"
         return name
 
 

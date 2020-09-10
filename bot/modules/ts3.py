@@ -45,7 +45,7 @@ class Ts3Bot:
 
             instances_endpoint = '/instances'
             instances_response = requests.get(self.main_url + instances_endpoint,
-                                    headers={"Authorization": "Bearer " + self.auth_token}).json()
+                                              headers={"Authorization": "Bearer " + self.auth_token}).json()
 
             self.instanceId = None
             try:
@@ -60,7 +60,7 @@ class Ts3Bot:
             # load song ids and durations into memory
             songlist_endpoint = "/files"
             songlist_response = requests.get(self.main_url + songlist_endpoint,
-                                    headers={"Authorization": "Bearer " + self.auth_token}).json()
+                                             headers={"Authorization": "Bearer " + self.auth_token}).json()
             self.track_durations = {}
             for track in songlist_response:
                 if track['uuid'] in cfg.audio_ids.values():
@@ -87,7 +87,7 @@ class Ts3Bot:
         if self.check_initialized():
             pad = 400  # extra time in ms to extend past duration
             try:
-                return (self.track_durations[songId] + pad)/1000
+                return (self.track_durations[songId] + pad) / 1000
             except KeyError:
                 logging.warning("Track uuid does not exist!")
                 return 0
@@ -168,16 +168,16 @@ def init():
         global bot1, bot2
         bot1 = Ts3Bot(None, None)
         bot2 = Ts3Bot(None, None)
-
         bot1 = Ts3Bot('http://localhost:8087/api/v1/bot', "bot1",
                       username=cfg.general["sinusbot_user"], password=cfg.general["sinusbot_pass"])
         bot2 = Ts3Bot('http://localhost:8087/api/v1/bot', "bot2",
                       username=cfg.general["sinusbot_user"], password=cfg.general["sinusbot_pass"])
 
         if bot1.initialized and bot2.initialized:
-            # test if webapi.js extension is enabled by moving bots to a nonexistant channel and checking http response
+            # test if webapi.js extension is enabled by moving bots to a nonexistent channel and checking http response
             if bot1.move("").status_code != 500 and bot2.move("").status_code != 500:
                 log.info("TS3 bots are online")
+                # return bot1, bot2
             else:
                 bot1.initialized = False
                 bot2.initialized = False
@@ -187,10 +187,14 @@ def init():
     except ConnectionError as ce:
         log.warning(f"Unable to initialize TS3 bots! Continuing script without bots functioning...\n{ce}")
     except Ts3Bot.WebapiError as we:
-        log.warning(f"Unable to send 'move' command to TS3 bots! Is the webapi extension enabled for Sinusbot? "
+        log.warning(f"Unable to send 'move' command to TS3 bots! Is the webapi.js extension enabled for Sinusbot? "
                     f"Continuing script without bots functioning...\n{we}")
     except Exception as e:
         log.error(f"Uncaught exception starting ts3 bots! Continuing script without bots functioning... {type(e).__name__}\n{e}")
+
+
+def getTs3Bots():
+    return bot1, bot2
 
 
 # FOR TESTING:

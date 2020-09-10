@@ -112,11 +112,20 @@ zones = {
 }
 
 # http://census.daybreakgames.com/get/ps2:v2/facility_type?c:limit=100
-facilitiy_suffix = {
+facility_suffix = {
     2: "Amp Station",
     3: "Bio Lab",
     4: "Tech Plant"
 }
+
+# PIL map images, these should be added to config file I think
+map_pool_images = {"Acan Southern Labs": "https://i.imgur.com/IhF9wQN.png",
+                   "Chac Fusion Lab": "https://i.imgur.com/XQ5YERh.jpeg",
+                   "Ghanan Southern Crossing": "https://i.imgur.com/3GEEcx7.png",
+                   "Pale Canyon Chemical": "https://i.imgur.com/JuRQrQm.png",
+                   "Peris Eastern Grove": "https://i.imgur.com/2yoMxU2.jpeg",
+                   "Rashnu Watchtower": "https://i.imgur.com/9RkkmFQ.jpeg",
+                   "XenoTech Labs": "https://i.imgur.com/uIc2NJH.png"}
 
 
 # Database

@@ -3,13 +3,12 @@ import discord
 from logging import getLogger
 
 import modules.config as cfg
-from modules import ts3
+from modules.ts3 import getTs3Bots
 from modules.display import send, channelSend
 from modules.tools import isAlNum
 from modules.exceptions import ElementNotFound
 
 from classes.players import TeamCaptain, ActivePlayer, PlayerStatus, getPlayer
-from classes.maps import MapSelection
 
 from matches import getMatch, which_bot, which_team_channels
 from modules.enumerations import MatchStatus, SelStatus
@@ -260,8 +259,8 @@ async def _map(ctx, captain, args):
         # ts3: move bots to team channels:
         await sleep(ts3bot.get_duration(cfg.audio_ids["players_drop_channel"]))
         team_channels = which_team_channels(ctx.channel.id)
-        ts3.bot1.move(team_channels[0])
-        ts3.bot2.move(team_channels[1])
+        getTs3Bots()[0].move(team_channels[0])
+        getTs3Bots()[1].move(team_channels[1])
         return
     # Handle the actual map selection
     map = await sel.doSelectionProcess(ctx, args)

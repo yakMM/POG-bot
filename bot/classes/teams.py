@@ -40,6 +40,9 @@ class Team:
     def score(self):
         return self.__score
 
+    def addScore(self, points):
+        self.__score += points
+
     @property
     def cap(self):
         return self.__cap

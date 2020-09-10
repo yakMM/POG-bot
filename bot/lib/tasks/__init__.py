@@ -465,6 +465,7 @@ def loop(*, seconds=0, minutes=0, hours=0, delay=0, count=None, reconnect=True, 
     TypeError
         The function was not a coroutine.
     """
+
     def decorator(func):
         kwargs = {
             'seconds': seconds,
@@ -476,4 +477,5 @@ def loop(*, seconds=0, minutes=0, hours=0, delay=0, count=None, reconnect=True, 
             'loop': loop
         }
         return Loop(func, **kwargs)
+
     return decorator
