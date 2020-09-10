@@ -10,29 +10,18 @@ import modules.config as cfg
 from modules.enumerations import PlayerStatus
 from modules.display import channelSend, send
 from modules.tools import isAlNum
-from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, \
-    CharAlreadyExists, ApiNotReachable
-from modules.database import update as dbUpdate
+from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
 
 log = getLogger(__name__)
 
 
-class RegisterCog(commands.Cog, name='register'):
+class registerCog(commands.Cog, name='register'):
     """
     Register cog, handle the commands from register channel
     """
 
     def __init__(self, client):
         self.client = client
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        log.info('Register Cog is online')
-        return  # we don't display a message on each restart
-        try:
-            await channelSend("CHANNEL_INIT", cfg.discord_ids["register"], cfg.discord_ids["register"])
-        except AttributeError:
-            raise UnexpectedError("Invalid channel id!")
 
     """
     Registered Commands:
@@ -41,7 +30,7 @@ class RegisterCog(commands.Cog, name='register'):
     """
 
     async def cog_check(self, ctx):  # Check if right channel
-        return ctx.channel.id == cfg.discord_ids['register']
+        return ctx.channel.id == cfg.channels['register']
 
     @commands.command(aliases=['r'])
     @commands.guild_only()
@@ -52,7 +41,7 @@ class RegisterCog(commands.Cog, name='register'):
         try:
             player = getPlayer(ctx.author.id)
         except ElementNotFound:
-            await send("REG_NO_RULE", ctx, cfg.discord_ids["rules"])
+            await send("REG_NO_RULE", ctx, cfg.channels["rules"])
             return
 
         msg = await _register(player, ctx, args)
@@ -60,21 +49,24 @@ class RegisterCog(commands.Cog, name='register'):
     @commands.command()
     @commands.guild_only()
     async def notify(self, ctx):
-        member = ctx.author
-        notify = member.guild.get_role(cfg.discord_ids["notify_role"])
-        registered = member.guild.get_role(cfg.discord_ids["registered_role"])
-        if notify in member.roles:
-            await member.add_roles(registered)
-            await member.remove_roles(notify)
+        try:
+            player = getPlayer(ctx.author.id)
+        except ElementNotFound:
+            await send("REG_NO_RULE", ctx, cfg.channels["rules"])
+            return
+        if player.isNotify:
+            player.isNotify = False
             await send("NOTIFY_REMOVED", ctx)
         else:
-            await member.add_roles(notify)
-            await member.remove_roles(registered)
+            player.isNotify = True
             await send("NOTIFY_ADDED", ctx)
+        await player.dbUpdate("notify")
+
 
 
 def setup(client):
     client.add_cog(RegisterCog(client))
+
 
 
 async def _register(player, ctx, args):
@@ -88,15 +80,15 @@ async def _register(player, ctx, args):
     ingameNames (str, list of str): If a list, will add each name one by one.
     If a string, will add the faction suffixes automatically.
     """
-    if player.status == PlayerStatus.IS_PLAYING:  # Can't register if already playing
-        await send("REG_FREEZED", ctx)
+    if player.status is PlayerStatus.IS_PLAYING:  # Can't register if already playing
+        await send("REG_FROZEN", ctx)
         return
     for name in args:
         if not isAlNum(name):  # Char names are only alphanum names
             await send("INVALID_STR", ctx, name)
             return
     if len(args) == 0:  # If user did not input any arg, display their current registration status
-        if player.status == PlayerStatus.IS_NOT_REGISTERED:
+        if player.status is PlayerStatus.IS_NOT_REGISTERED:
             await send("REG_NOT_REGISTERED", ctx)
             return
         if player.hasOwnAccount:
@@ -104,17 +96,19 @@ async def _register(player, ctx, args):
             return
         await send("REG_IS_REGISTERED_NOA", ctx)
         return
-    wasPlayerRegistered = player.status != PlayerStatus.IS_NOT_REGISTERED  # store previous status
+    # store previous status
+    wasPlayerRegistered = player.status is not PlayerStatus.IS_NOT_REGISTERED
     if len(args) == 1 or len(args) == 3:  # if 1 or 3 args
         if len(args) == 1 and args[0] == "help":  # =r help displays hel^p
             await send("REG_HELP", ctx)
             return
         try:
-            if not await player.register(args):  # player.register return a boolean: hasTheProfileBeenUpdated
-                await send("REG_IS_REGISTERED_OWN", ctx,
-                           *player.igNames)  # if no update, say "you are already registered etc"
+            # player.register return a boolean: hasTheProfileBeenUpdated
+            if not await player.register(args):
+                # if no update, say "you are already registered etc"
+                await send("REG_IS_REGISTERED_OWN", ctx, *player.igNames)
                 return
-            await dbUpdate(player)  # push update to db
+            await player.dbUpdate("register")  # push update to db
             if wasPlayerRegistered:
                 await send("REG_UPDATE_OWN", ctx, *player.igNames)
                 return
@@ -138,13 +132,12 @@ async def _register(player, ctx, args):
         except UnexpectedError as e:
             await send("UNKNOWN_ERROR", ctx, e.reason)
             return
-    if len(args) == 2:
-        # if 2 args, it should be "no account", if not, invalid request. Again, check if update and push db if that's the case
+    if len(args) == 2:  # if 2 args, it should be "no account", if not, invalid request. Again, check if update and push db if that's the case
         if args[0] == "no" and args[1] == "account":
             if not await player.register(None):
                 await send("REG_IS_REGISTERED_NOA", ctx)
                 return
-            await dbUpdate(player)
+            await player.dbUpdate("register")
             if wasPlayerRegistered:
                 await send("REG_UPDATE_NOA", ctx)
                 return

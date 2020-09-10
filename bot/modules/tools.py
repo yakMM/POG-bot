@@ -1,15 +1,5 @@
 import modules.config as cfg
 
-
-def isAdmin(user):
-    """ Check if user is admin
-    """
-    for role in user.roles:
-        if role.id == cfg.discord_ids["admin_role"]:
-            return True
-    return False
-
-
 def isAlNum(string):
     """ Little utility to check if a string contains only letters and numbers (a-z,A-Z,0-9)
         Parameters

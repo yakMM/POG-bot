@@ -33,6 +33,7 @@ function my_start
     else
         touch running
         mkdir -p ../logging
+        mkdir -p ../matches
         cd ../bot/
         nohup python3 -u main.py > ../logging/bot_console.out 2>&1 &
         echo "Bot started..."
@@ -45,7 +46,7 @@ function my_update
     cd "$(dirname "$0")"
     cd ..
     git clean -xdf
-    git fetch --all
+    git fetch origin master
     git reset --hard origin/master
 
     chmod a+x commands/*

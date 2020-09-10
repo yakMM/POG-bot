@@ -8,50 +8,34 @@ from asyncio import get_event_loop
 # Custom modules:
 from modules.exceptions import DatabaseError
 
-# Modules for the custom classes
-# Circular import disclaimer: database.py is only imported by main.py, so it's fine to import the following:
-from classes.players import Player  # ok
-from classes.maps import Map  # ok
-
 # dict for the collections
 collections = dict()
 
-
 # Public
-def getAllPlayers():
-    """ Get all players from db to memory"""
-    users = collections["users"].find()
-    # Adding them
 
-    try:
-        for result in users:
-            if type(result["_id"]) == int:
-                Player.newFromData(result)
-    except KeyError:
-        raise DatabaseError("KeyError when retrieving players")
-
-
-def getAllMaps():
-    """ Get all maps from db to memory"""
-    maps = collections["sBases"].find()
+def getAllItems(initClassMethod, dbName):
+    items = collections[dbName].find()
     # Adding them
     try:
-        for result in maps:
-            Map(result)
-    except KeyError:
-        raise DatabaseError("KeyError when retrieving maps")
+        for result in items:
+            initClassMethod(result)
+    except KeyError as e:
+        raise DatabaseError(f"KeyError when retrieving {dbName} from database: {e}")
 
 
-async def update(p):
-    """ Launch the task updating player p in database"""
+async def updatePlayer(p, doc):
+    """ Launch the task updating player p in database
+    """
     loop = get_event_loop()
-    await loop.run_in_executor(None, _update, p)
+    await loop.run_in_executor(None, _updatePlayer, p, doc)
 
-async def remove(p):
+
+async def removePlayer(p):
     """ Launch the task updating player p in database
     """
     loop = get_event_loop()
     await loop.run_in_executor(None, _remove, p)
+
 
 def init(config):
     """ Init"""
@@ -61,19 +45,39 @@ def init(config):
         collections[collec] = db[config["collections"][collec]]
 
 
-def forceBasesUpdate(bases):
-    """ This is only called from external script for db maintenance"""
-    collections["sBases"].delete_many({})
-    collections["sBases"].insert_many(bases)
+def forceUpdate(db_name, elements):
+    """ This is only called from external script for db maintenance
+    """
+    collections[db_name].delete_many({})
+    collections[db_name].insert_many(elements)
 
 
 # Private
-def _update(p):
-    """ Update player p into db"""
+def _updatePlayer(p, doc):
+    """ Update player p into db
+    """
     if collections["users"].count_documents({"_id": p.id}) != 0:
-        collections["users"].update_one({"_id": p.id}, {"$set": p.getData()})
+        collections["users"].update_one({"_id": p.id}, {"$set": doc})
     else:
         collections["users"].insert_one(p.getData())
+
+
+def _replacePlayer(p):
+    """ Update player p into db
+    """
+    if collections["users"].count_documents({"_id": p.id}) != 0:
+        collections["users"].replace_one({"_id": p.id}, p.getData())
+    else:
+        collections["users"].insert_one(p.getData())
+
+
+def _updateMap(m):
+    """ Update map m into db
+    """
+    if collections["sBases"].count_documents({"_id": m.id}) != 0:
+        collections["sBases"].update_one({"_id": m.id}, {"$set": m.getData()})
+    else:
+        raise DatabaseError(f"Map {m.id} not in database")
 
 
 def _remove(p):

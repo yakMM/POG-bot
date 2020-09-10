@@ -12,6 +12,7 @@ from matches import getLobbyLen, isLobbyStuck, removeFromLobby, addToLobby, getA
 
 log = getLogger(__name__)
 
+
 class LobbyCog(commands.Cog, name='lobby'):
     """
     Lobby cog, handle the commands from lobby channel
@@ -20,17 +21,8 @@ class LobbyCog(commands.Cog, name='lobby'):
     def __init__(self, client):
         self.client = client
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        log.info('Lobby Cog is online')
-        return  # we don't display a message on each restart
-        try:
-            await channelSend("CHANNEL_INIT", cfg.discord_ids["lobby"], cfg.discord_ids["lobby"])
-        except AttributeError:
-            raise UnexpectedError("Invalid channel id!")
-
     async def cog_check(self, ctx):
-        return ctx.channel.id == cfg.discord_ids['lobby']
+        return ctx.channel.id == cfg.channels['lobby']
 
     """
     Commands:
@@ -52,18 +44,18 @@ class LobbyCog(commands.Cog, name='lobby'):
         try:
             player = getPlayer(ctx.message.author.id)
         except ElementNotFound:
-            await send("EXT_NOT_REGISTERED", ctx, cfg.discord_ids["register"])
+            await send("EXT_NOT_REGISTERED", ctx,  cfg.channels["register"])
             return
-        if player.status == PlayerStatus.IS_NOT_REGISTERED:
-            await send("EXT_NOT_REGISTERED", ctx, cfg.discord_ids["register"])
+        if player.status is PlayerStatus.IS_NOT_REGISTERED:
+            await send("EXT_NOT_REGISTERED", ctx, cfg.channels["register"])
             return
         if ctx.author.status == discordStatus.offline:
             await send("LB_OFFLINE", ctx)
             return
-        if player.status == PlayerStatus.IS_LOBBIED:
+        if player.status is PlayerStatus.IS_LOBBIED:
             await send("LB_ALREADY_IN", ctx)
             return
-        if player.status != PlayerStatus.IS_REGISTERED:
+        if player.status is not PlayerStatus.IS_REGISTERED:
             await send("LB_IN_MATCH", ctx)
             return
         if isLobbyStuck():
@@ -83,7 +75,7 @@ class LobbyCog(commands.Cog, name='lobby'):
         except ElementNotFound:
             await send("LB_NOT_IN", ctx)
             return
-        if player.status == PlayerStatus.IS_LOBBIED:
+        if player.status is PlayerStatus.IS_LOBBIED:
             removeFromLobby(player)
             await send("LB_REMOVED", ctx, namesInLobby=getAllNamesInLobby())
             return

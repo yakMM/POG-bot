@@ -1,9 +1,9 @@
 from gspread import service_account
 from numpy import array
 import modules.config as cfg
-from modules.database import _update, init as dbInit
-from classes.players import Player
-from modules.database import forceBasesUpdate
+from classes.players import Player, _allPlayers
+from modules.database import forceUpdate, getAllPlayers, _replacePlayer, _updateMap, getAllMaps, init as dbInit
+from classes.maps import _allMapsList
 import requests
 import json
 import asyncio
@@ -13,6 +13,21 @@ LAUNCHSTR = ""  # this should be empty if your files are config.cfg and client_s
 cfg.getConfig(f"config{LAUNCHSTR}.cfg")
 dbInit(cfg.database)
 
+
+
+class DbPlayer(Player):
+    @classmethod
+    def newFromData(cls, data):
+        newData=dict()
+        newData["name"] = data["name"]
+        newData["_id"] = data["_id"]
+        newData["rank"] = 1
+        newData["notify"] = data["roles"]["notify"]
+        newData["timeout"] = {"time" : 0, "reason" :""}
+        newData["igIds"] = data["igIds"]
+        newData["igNames"] = data["igNames"]
+        newData["hasOwnAccount"] = data["hasOwnAccount"]
+        super().newFromData(newData)
 
 def pushAccounts():
     # Get all accounts
@@ -39,7 +54,7 @@ def pushAccounts():
         charList = [f"PSBx{acc}VS", f"PSBx{acc}TR", f"PSBx{acc}NC"]
         p._hasOwnAccount = True
         loop.run_until_complete(p._addCharacters(charList))
-        _update(p)
+        _replacePlayer(p)
     loop.close()
 
 
@@ -52,13 +67,19 @@ def getAllMapsFromApi():
         print("Error")
         return
 
+    ids = [302030, 239000, 305010, 230, 3430, 3620, 307010]
+    # acan,pale,ghanan,xenotech,peris,rashnu,chac
+
     for mp in jdata["map_region_list"]:
         print(mp)
         mp["_id"] = int(mp.pop("facility_id"))
+        mp["in_map_pool"] = mp["_id"] in ids
         mp["zone_id"] = int(mp.pop("zone_id"))
         mp["type_id"] = int(mp.pop("facility_type_id"))
-    forceBasesUpdate(jdata["map_region_list"])
+    forceUpdate("sBases", jdata["map_region_list"])
 
 
-pushAccounts()
-getAllMapsFromApi()
+def playersDbUpdate():
+    getAllPlayers(DbPlayer)
+    for p in _allPlayers.values():
+        _replacePlayer(p)

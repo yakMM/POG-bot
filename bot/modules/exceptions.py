@@ -8,6 +8,7 @@ from logging import getLogger
 
 log = getLogger(__name__)
 
+
 class CharNotFound(Exception):
     def __init__(self, char):
         self.char = char
@@ -59,13 +60,6 @@ class DatabaseError(Exception):
         super().__init__(message)
 
 
-class StatusNotAllowed(Exception):
-    def __init__(self, name):
-        self.name = name
-        message = "This status is not allowed: " + name
-        super().__init__(message)
-
-
 class AccountsNotEnough(Exception):
     pass
 
@@ -91,6 +85,7 @@ class AlreadyExists(Exception):
 class LobbyStuck(Exception):
     def __init__(self):
         super().__init__(f"Lobby stuck!")
+
 
 class ApiNotReachable(Exception):
     def __init__(self, url):
