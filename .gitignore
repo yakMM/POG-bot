@@ -10,3 +10,4 @@ bot/client_secret.json
 secret/
 logging/
 matches/
+.vscode/

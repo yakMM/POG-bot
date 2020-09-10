@@ -187,7 +187,7 @@ class AccountHander():
         try:
             await loop.run_in_executor(None, self.__pushUpdateToSheet, row, vRow)
         except APIError as e:
-            log.info(f"GSpread APIError on match: {self.__match.number}\n{e}")
+            log.warning(f"GSpread APIError on match: {self.__match.number}\n{e}")
             return
         log.info(f"GSpread ok on match: {self.__match.number}")
         self._updateSheet.cancel()

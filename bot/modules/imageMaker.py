@@ -3,11 +3,6 @@ from asyncio import get_event_loop
 from modules.display import imageSend
 import modules.config as cfg
 
-
-img = Image.new('RGB', (2600, 2500), color = (255, 255, 255))
-#img = Image.open("pil_template.png")
-draw = ImageDraw.Draw(img)
-#font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", fontsize, encoding="unic")
 bigFont = ImageFont.truetype("../fonts/PlanetSide2.ttf", 50)
 font = ImageFont.truetype("../fonts/PlanetSide2.ttf", 40)
 fill = (0,0,0)
@@ -45,22 +40,39 @@ def _teamDisplay(draw, team, yOffset):
         _drawScoreLine(draw, X_OFFSET+1000, 200+100*i+yOffset, scores, font)
 
         # Names:
-        # TODO: WIP
-        draw.text((X_OFFSET,200+100*i+yOffset), aPlayer.name, font=font, fill=fill)
-        draw.text((X_OFFSET+500,200+100*i+yOffset), aPlayer.igName, font=font, fill=fill)
+        name = aPlayer.name
+        igName = aPlayer.igName
+
+        if len(name) > 24:
+            name = name[:22] + "..."
+
+        if len(igName) > 24:
+            igName = igName[:22] + "..."
+
+        draw.text((X_OFFSET,200+100*i+yOffset), name, font=font, fill=fill)
+        draw.text((X_OFFSET+500,200+100*i+yOffset), igName, font=font, fill=fill)
 
 
 
 
 
 def _makeImage(match):
+    img = Image.new('RGB', (2600, 2500), color = (255, 255, 255))
+    draw = ImageDraw.Draw(img)
     draw.text((1150,150), f"MATCH {match.number}", font=bigFont, fill=fill)
     for tm in match.teams:
         _teamDisplay(draw, tm, 400+1100*tm.id)
     img.save(f'../matches/match_{match.number}.png')
 
 
-async def publishMatchImage(match):
+async def publishMatchImage(match, channel=None):
     loop = get_event_loop()
     await loop.run_in_executor(None, _makeImage, match)
     await imageSend(cfg.channels["staff"], f'../matches/match_{match.number}.png')
+    # Once ready, disply in actual channels:
+    # await imageSend(match.id, f'../matches/match_{match.number}.png')
+    # for channel is not None:
+    #     await imageSend(channel, f'../matches/match_{match.number}.png')
+
+PassivityRehabilitationCentreVS
+namenBARSxRoundNON

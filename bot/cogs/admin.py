@@ -12,7 +12,7 @@ from modules.roles import forceInfo, roleUpdate, isAdmin, permsMuted, channelFre
 
 from classes.players import removePlayer, getPlayer, Player, TeamCaptain
 
-from matches import clearLobby, getMatch, getAllNamesInLobby, removeFromLobby
+from matches import clearLobby, getMatch, getAllNamesInLobby, removeFromLobby, isLobbyStuck, addToLobby
 
 
 log = getLogger(__name__)
@@ -136,6 +136,27 @@ class AdminCog(commands.Cog, name='admin'):
             await send("RM_DEMOTE_OK", ctx, team.captain.mention, team.name)
         else:
             await send("RM_DEMOTE_PICKING", ctx)
+
+    @commands.command()
+    @commands.guild_only()
+    async def lobby(self, ctx, *args):
+        if ctx.channel.id != cfg.channels["lobby"]:
+            await send("WRONG_CHANNEL", ctx, ctx.command.name, f'<#{cfg.channels["lobby"]}>')
+            return
+        if len(args)>0 and args[0] == "restore":
+            for pId in args[1:]:
+                try:
+                    player = getPlayer(int(pId))
+                    if not isLobbyStuck() and player.status is PlayerStatus.IS_REGISTERED:
+                        addToLobby(player)
+                except (ElementNotFound, ValueError):
+                    pass
+            await send("LB_QUEUE", ctx, namesInLobby=getAllNamesInLobby())
+            return
+        if len(args)>0 and args[0] == "get":
+            await send("LB_GET", ctx, " ".join(getAllIdsInLobby()))
+            return
+        await send("WRONG_USAGE", ctx, ctx.command.name)
 
     @commands.command()
     @commands.guild_only()

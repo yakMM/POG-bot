@@ -390,6 +390,7 @@ class _StringEnum(Enum):
     LB_CLEARED = _Message("Lobby has been cleared!", embed=_lobbyList)
     LB_EMPTY = _Message("Lobby is already empty!")
     LB_NOTIFY = _Message("{} queue is almost full, join to start a match!")
+    LB_GET = _Message("Restore the lobby with `=lobby restore {}`")
 
     PK_OVER = _Message("The teams are already made. You can't pick!")
     PK_NO_LOBBIED = _Message("You must first queue and wait for a match to begin. Check <#{}>")
@@ -410,6 +411,7 @@ class _StringEnum(Enum):
     PK_FACTION_OK = _Message("{} chose {}!", ping=False)
     PK_FACTION_ALREADY = _Message("Faction already picked by the other team!")
     PK_FACTION_OK_NEXT = _Message("{} chose {}! {} pick a faction!", ping=False)
+    PK_FACTION_CHANGED = _Message("{} changed to {}!")
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
     PK_WAIT_MAP = _Message("{} {} Pick an available map!", ping=False, embed=_jaegerCalendar)
     PK_MAP_OK_CONFIRM = _Message("Picked {}! {} confirm with `=p confirm` if you agree")

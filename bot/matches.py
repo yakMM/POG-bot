@@ -1,5 +1,6 @@
 import modules.config as cfg
-from modules.exceptions import UnexpectedError, AccountsNotEnough, ElementNotFound
+from modules.exceptions import UnexpectedError, AccountsNotEnough, \
+    ElementNotFound
 from modules.display import channelSend, edit
 from modules.enumerations import PlayerStatus, MatchStatus, SelStatus
 from modules.imageMaker import publishMatchImage
@@ -70,6 +71,11 @@ def getLobbyLen():
 def getAllNamesInLobby():
     names = [p.mention for p in _lobbyList]
     return names
+
+
+def getAllIdsInLobby():
+    ids = [str(p.id) for p in _lobbyList]
+    return ids
 
 
 def removeFromLobby(player):
@@ -252,6 +258,14 @@ class Match():
             other.captain.isTurn = True
         return other.captain
 
+    def factionChange(self, team, str):
+        faction = cfg.i_factions[str]
+        other = self.__teams[team.id-1]
+        if other.faction == faction:
+            return False
+        team.faction = faction
+        return True
+
     def onTeamReady(self, team):
         notReady = list()
         for p in team.players:
@@ -306,7 +320,6 @@ class Match():
     async def _onMatchOver(self):
         playerPings = [" ".join(tm.allPings) for tm in self.__teams]
         await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
-        self._scoreCalculation.start()
         for tm in self.__teams:
             tm.captain.isTurn = True
         if self.roundNo < 2:
@@ -314,9 +327,15 @@ class Match():
             self.__status = MatchStatus.IS_WAITING
             captainPings = [tm.captain.mention for tm in self.__teams]
             await channelSend("MATCH_CONFIRM", self.__id, *captainPings, match=self)
+            self._scoreCalculation.start()
             return
         await channelSend("MATCH_OVER", self.__id)
         self.__status = MatchStatus.IS_RUNNING
+        try:
+            await processScore(self)
+            await publishMatchImage(self, cfg.channels["results"])
+        except Exception as e:
+            log.error(f"Error in score or publish function!\n{e}")
         await self.clear()
 
     @tasks.loop(count=1)

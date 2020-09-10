@@ -5,7 +5,7 @@ import enum
 
 # Custom modules
 import modules.config as cfg
-from modules.asynchttp import request as httpRequest
+from modules.asynchttp import apiRequestAndRetry as httpRequest
 from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
 from modules.enumerations import PlayerStatus
 from lib import tasks
@@ -280,9 +280,7 @@ class Player():
                     if currId in _namesChecking[faction-1]:
                         p = _namesChecking[faction-1][currId]
                         if p != self:
-                            # TODO: add
-                            pass
-                            # raise CharAlreadyExists(currName, p.id)
+                            raise CharAlreadyExists(currName, p.id)
                     newIds[faction-1] = currId
                     updated = updated or newIds[faction -
                                                 1] != self._igIds[faction-1]

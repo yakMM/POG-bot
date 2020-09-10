@@ -50,7 +50,7 @@ class MatchesCog(commands.Cog, name='matches'):
             # Edge case, will happen very rarely if not never
             await send("MATCH_NOT_READY", ctx, ctx.command.name)
             return
-        if match.status in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
+        if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
             await send("PK_OVER", ctx)  # Picking process is over
             return
         if player.status is PlayerStatus.IS_MATCHED:
@@ -61,6 +61,9 @@ class MatchesCog(commands.Cog, name='matches'):
             if match.status is MatchStatus.IS_MAPPING:
                 await _map(ctx, aPlayer, args)  # map picking function
                 return
+            if match.status is MatchStatus.IS_WAITING:
+                await _factionChange(ctx, aPlayer, args[0])
+                return
             if aPlayer.isTurn:
                 if match.status is MatchStatus.IS_PICKING:
                     await _pick(ctx, aPlayer, args)  # player picking function
@@ -69,7 +72,7 @@ class MatchesCog(commands.Cog, name='matches'):
                     # faction picking function
                     await _faction(ctx, aPlayer, args)
                     return
-                await send("UNKNOWN_ERROR", ctx, "Unknown match state")
+                await send("UNKNOWN_ERROR", ctx, "Unknown match state")  # Should never happen
                 return
             await send("PK_NOT_TURN", ctx)
             return
@@ -199,17 +202,8 @@ async def _pick(ctx, captain, args):
 async def _faction(ctx, captain, args):
     """ Actual faction pick function
     """
-    if len(args) != 1:
-        # no faction is in two words...
-        await send("PK_NOT_VALID_FACTION", ctx)
-        return
-    if len(ctx.message.mentions) != 0:
-        # Don't want a mentioned player
-        await send("PK_FACTION_NOT_PLAYER", ctx)
-        return
-    if not isAlNum(args[0]):
-        # needs to be only alphanum chars
-        await send("INVALID_STR", ctx, args[0])
+    isFaction = await _factionCheck(ctx, args)
+    if not isFaction:
         return
     try:
         team = captain.team
@@ -220,12 +214,25 @@ async def _faction(ctx, captain, args):
             return
         if newPicker == captain:
             # faction already picked
-            await send("PK_FACTION_ALREADY", ctx, newPicker.mention)
+            await send("PK_FACTION_ALREADY", ctx)
             return
         await send("PK_FACTION_OK_NEXT", ctx, team.name, cfg.factions[team.faction], newPicker.mention)
     except KeyError:
         await send("PK_NOT_VALID_FACTION", ctx)
 
+async def _factionChange(ctx, captain, args):
+    isFaction = await _factionCheck(ctx, args)
+    if not isFaction:
+        return
+    team = captain.team
+    try:
+        if captain.match.factionChange(team, arg):
+            await send("PK_FACTION_CHANGED", ctx, team.name, cfg.factions[team.faction])
+            return
+        await send("PK_FACTION_ALREADY", ctx)
+        return
+    except KeyError:
+        await send("PK_NOT_VALID_FACTION", ctx)
 
 async def _map(ctx, captain, args):
     sel = captain.match.mapSelector
@@ -246,3 +253,18 @@ async def _map(ctx, captain, args):
         newPicker = match.pickMap(captain)
         if newPicker != captain:
             await send("PK_MAP_OK_CONFIRM", ctx, sel.map.name, newPicker.mention)
+
+async def _factionCheck(ctx, args):
+    if len(args) != 1:
+        # no faction is in two words...
+        await send("PK_NOT_VALID_FACTION", ctx)
+        return False
+    if len(ctx.message.mentions) != 0:
+        # Don't want a mentioned player
+        await send("PK_FACTION_NOT_PLAYER", ctx)
+        return False
+    if not isAlNum(args[0]):
+        # needs to be only alphanum chars
+        await send("INVALID_STR", ctx, args[0])
+        return False
+    return True

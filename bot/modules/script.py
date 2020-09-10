@@ -1,4 +1,4 @@
-from modules.asynchttp import request
+from modules.asynchttp import apiRequestAndRetry as httpRequest
 from modules.exceptions import ApiNotReachable, ElementNotFound
 from classes.weapons import getWeapon
 from modules.display import channelSend
@@ -17,14 +17,11 @@ async def processScore(match):
     for aPlayer in igDict.values():
         url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_event/?character_id=' + \
         f'{aPlayer.igId}&type=KILL&after={start}&before={end}&c:limit=500'
-        jdata = await request(url)
-        try:
-            if jdata["returned"] == 0:
-                log.error(f'No kill found for player: id={aPlayer.igName} (url={url})')
-                #raise ApiEmptyAnswer(url)
-        except KeyError:
-            raise ApiNotReachable(url)
-        
+        jdata = await httpRequest(url)
+        if jdata["returned"] == 0:
+            log.error(f'No kill found for player: id={aPlayer.igName} (url={url})')
+            continue
+
         # Loop through all events
         event_list = jdata["characters_event_list"]
         for event in event_list:
@@ -60,15 +57,12 @@ async def getCaptures(match, start, end):
         factionDict[tm.faction] = tm
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/world_event/' + \
             f'?world_id=19&after={start}&before={end}&c:limit=500'
-    jdata = await request(url)
-    try:
-        if jdata["returned"] == 0:
-            log.error(f'No event found for map! (url={url})')
-            # raise ApiEmptyAnswer(url)
-    except KeyError:
-        raise ApiNotReachable(url)
-    event_list = jdata["world_event_list"]
+    jdata = await httpRequest(url)
+    if jdata["returned"] == 0:
+        log.warning(f'No event found for map! (url={url})')
+        return
 
+    event_list = jdata["world_event_list"]
     baseOwner = None
     # Loop through all events from older to newer
     for event in event_list[::-1]:
@@ -76,7 +70,10 @@ async def getCaptures(match, start, end):
         if baseId != match.map.id:
             # Not match base, to be ignored
             continue
-        capper = factionDict[int(event["faction_new"])]
+        faction = int(event["faction_new"])
+        if faction not in factionDict:
+            continue
+        capper = factionDict[faction]
         if baseOwner is None:
             # First cap
             capper.addCap(cfg.scores["capture"])

@@ -8,21 +8,32 @@ Usage:
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientOSError
 from json import loads
+from logging import getLogger
 
 # Custom modules
 from modules.exceptions import UnexpectedError, ApiNotReachable
 
+log = getLogger(__name__)
 
 # PUBLIC:
 
 async def request(url):
     async with ClientSession() as client:
-        try:
-            result = await _fetch(client, url)
-        except ClientOSError:
-            raise ApiNotReachable(url)
+        result = await _fetch(client, url)
         return loads(result)
 
+async def apiRequestAndRetry(url):
+    for i in range(5):
+        try:
+            jdata = await request(url)
+        except ClientOsError:
+            log.warn(f"ClienOsError on try {i} for {url}")
+            continue  # Try again
+        if "returned" in jdata:
+            return jdata
+        else:
+            log.warn(f"Nothing returned on try {i} for {url}")
+    raise ApiNotRecheable(url)
 
 # PRIVATE:
 
