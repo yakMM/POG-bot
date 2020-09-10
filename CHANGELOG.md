@@ -1,3 +1,6 @@
+# v.1.1.0:
+- Added match score tracking (BETA)
+
 # v1.0.12:
 - Added timeout functionality for admins
 - Modifications in how players are stored in database

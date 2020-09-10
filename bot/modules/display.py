@@ -16,7 +16,7 @@ Import this module and use only the following public function:
 """
 
 # discord.py
-from discord import Embed, Color, TextChannel, Message, User
+from discord import Embed, Color, TextChannel, Message, User, File
 from discord.ext.commands import Context
 
 from datetime import datetime as dt
@@ -71,6 +71,10 @@ async def remReaction(message, user=None):
         global _client
         user = _client.user
     await message.remove_reaction("✅", user)
+
+async def imageSend(channelId, imagePath):
+    channel = _client.get_channel(channelId)
+    await channel.send(file=File(imagePath))
 
 ## PRIVATE:
 
@@ -496,3 +500,5 @@ class _StringEnum(Enum):
 
     MUTE_SHOW = _Message("You are muted from POG until {}!")
     MUTE_FREED = _Message("You are no longer muted from POG!")
+
+    SC_ILLEGAL_WE = _Message("Alert: {} used {} during match {}!")

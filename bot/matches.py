@@ -2,6 +2,8 @@ import modules.config as cfg
 from modules.exceptions import UnexpectedError, AccountsNotEnough, ElementNotFound
 from modules.display import channelSend, edit
 from modules.enumerations import PlayerStatus, MatchStatus, SelStatus
+from modules.imageMaker import publishMatchImage
+from modules.script import processScore
 from datetime import datetime as dt
 
 from classes.teams import Team  # ok
@@ -304,6 +306,7 @@ class Match():
     async def _onMatchOver(self):
         playerPings = [" ".join(tm.allPings) for tm in self.__teams]
         await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
+        self._scoreCalculation.start()
         for tm in self.__teams:
             tm.captain.isTurn = True
         if self.roundNo < 2:
@@ -315,6 +318,12 @@ class Match():
         await channelSend("MATCH_OVER", self.__id)
         self.__status = MatchStatus.IS_RUNNING
         await self.clear()
+
+    @tasks.loop(count=1)
+    async def _scoreCalculation(self):
+        await processScore(self)
+        await publishMatchImage(self)
+
 
     @tasks.loop(count=1)
     async def __startMatch(self):
@@ -397,5 +406,24 @@ class Match():
         return 0
 
     @property
+    def startStamp(self):
+        return self.__roundsStamps[-1]
+
+    @property
     def mapSelector(self):
         return self.__mapSelector
+
+    # TODO: DEV
+    @teams.setter
+    def teams(self, tms):
+        self.__teams=tms
+    
+    # TODO: DEV
+    @startStamp.setter
+    def startStamp(self, st):
+        self.__roundsStamps = st
+    
+    # TODO: DEV
+    @mapSelector.setter
+    def mapSelector(self, ms):
+        self.__mapSelector = ms

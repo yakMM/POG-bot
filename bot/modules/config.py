@@ -6,7 +6,12 @@ from requests import get
 from configparser import ConfigParser, ParsingError
 from modules.exceptions import ConfigError
 
-# DiscordIds
+## STATIC PARAMETERS:
+AFK_TIME = 15  # minutes
+ROUND_LENGHT = 10  # minutes
+
+## DYNAMIC PARAMETERS:
+# (pulled from the config file)
 
 channels = {
     "lobby": 0,
@@ -37,8 +42,13 @@ general = {
     "rules_msg_id": 0
 }
 
-AFK_TIME = 15  # minutes
-ROUND_LENGHT = 10  # minutes
+scores = {
+    "teamkill" : 0,
+    "suicide" : 0,
+    "capture" : 0,
+    "recapture" : 0
+}
+
 VERSION = "0"
 
 factions = {
@@ -144,6 +154,16 @@ def getConfig(file):
             _errorMissing(key, 'Roles', file)
         except ValueError:
             _errorIncorrect(key, 'Roles', file)
+    
+    # Scores section
+    _checkSection(config, "Scores", file)
+    for key in scores:
+        try:
+            scores[key] = int(config['Scores'][key])
+        except KeyError:
+            _errorMissing(key, 'Scores', file)
+        except ValueError:
+            _errorIncorrect(key, 'Scores', file)
 
     # Database section
     _checkSection(config, "Database", file)

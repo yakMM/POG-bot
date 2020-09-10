@@ -33,6 +33,7 @@ function my_start
     else
         touch running
         mkdir -p ../logging
+        mkdir -p ../matches
         cd ../bot/
         nohup python3 -u main.py > ../logging/bot_console.out 2>&1 &
         echo "Bot started..."

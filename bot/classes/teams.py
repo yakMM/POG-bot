@@ -10,6 +10,8 @@ class Team:
         self.__name = name
         self.__players = list()
         self.__score = 0
+        self.__deaths = 0
+        self.__kills = 0
         self.__faction = 0
         self.__cap = 0
         self.__match = match
@@ -38,12 +40,17 @@ class Team:
     def score(self):
         return self.__score
 
-    def addScore(self, points):
-        self.__score += points
-
     @property
     def cap(self):
         return self.__cap
+    
+    @property
+    def kills(self):
+        return self.__kills
+    
+    @property
+    def deaths(self):
+        return self.__deaths
 
     @property
     def playerPings(self):
@@ -71,6 +78,15 @@ class Team:
     def addCap(self, points):
         self.__cap += points
         self.__score += points
+
+    def addScore(self, points):
+        self.__score += points
+
+    def addOneKill(self):
+        self.__kills +=1
+
+    def addOneDeath(self):
+        self.__deaths +=1
 
     def addPlayer(self, cls, player):
         active = cls(player, self)

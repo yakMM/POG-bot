@@ -22,7 +22,7 @@ import modules.config as cfg
 from modules.display import send, channelSend, edit, init as displayInit
 from modules.spam import isSpam, unlock
 from modules.exceptions import ElementNotFound, UnexpectedError
-from modules.database import init as dbInit, getAllPlayers, getAllMaps
+from modules.database import init as dbInit, getAllItems
 from modules.enumerations import PlayerStatus
 from modules.loader import init as cogInit, isAllLocked, unlockAll
 from modules.roles import init as rolesInit, roleUpdate, isAdmin
@@ -33,6 +33,7 @@ from matches import onInactiveConfirmed, init as matchesInit
 from classes.players import Player, getPlayer, getAllPlayersList
 from classes.accounts import AccountHander
 from classes.maps import Map
+from classes.weapons import Weapon
 
 
 def _addMainHandlers(client):
@@ -235,8 +236,9 @@ def main(launchStr=""):
 
     # Initialise db and get all t=xhe registered users and all maps from it
     dbInit(cfg.database)
-    getAllPlayers(Player)
-    getAllMaps(Map)
+    getAllItems(Player.newFromData, "users")
+    getAllItems(Map, "sBases")
+    getAllItems(Weapon, "sWeapons")
 
     # Get Account sheet from drive
     AccountHander.init(f"client_secret{launchStr}.json")

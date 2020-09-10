@@ -19,12 +19,6 @@ log = getLogger(__name__)
 
 WORLD_ID = 19  # Jaeger ID
 
-# temp, will be in config file later
-scoring = {
-    "tk": -2,
-    "suicide": -2,
-    "kill": 1
-}
 
 _allPlayers = dict()
 # to store VS, NC and TR names to check for duplicates
@@ -286,7 +280,9 @@ class Player():
                     if currId in _namesChecking[faction-1]:
                         p = _namesChecking[faction-1][currId]
                         if p != self:
-                            raise CharAlreadyExists(currName, p.id)
+                            # TODO: add
+                            pass
+                            # raise CharAlreadyExists(currName, p.id)
                     newIds[faction-1] = currId
                     updated = updated or newIds[faction -
                                                 1] != self._igIds[faction-1]
@@ -378,7 +374,7 @@ class ActivePlayer:
     def igName(self):
         faction = self.__team.faction
         if faction != 0:
-            return self.__player._igIds[faction-1]
+            return self.__player._igNames[faction-1]
 
     @property
     def account(self):
@@ -414,22 +410,26 @@ class ActivePlayer:
 
     def addOneKill(self, points):
         self.__kills += 1
+        self.__team.addOneKill()
         self.__addPoints(points)
 
     def addOneDeath(self, points):
         self.__deaths += 1
+        self.__team.addOneDeath()
         self.__net -= points
 
     def addOneTK(self):
-        self.__addPoints(scoring["tk"])
+        self.__addPoints(cfg.scores["teamkill"])
 
     def addOneSuicide(self):
         self.__deaths += 1
-        self.__addPoints(scoring["suicide"])
+        self.__team.addOneDeath()
+        self.__addPoints(cfg.scores["suicide"])
 
     def __addPoints(self, points):
         self.__net += points
         self.__score += points
+        self.__team.addScore(points)
 
 
 class TeamCaptain(ActivePlayer):

@@ -8,45 +8,12 @@ import requests
 import json
 import asyncio
 
-LAUNCHSTR = "_test"  # this should be empty if your files are config.cfg and client_secret.json
+LAUNCHSTR = ""  # this should be empty if your files are config.cfg and client_secret.json
 
 cfg.getConfig(f"config{LAUNCHSTR}.cfg")
 dbInit(cfg.database)
 
 
-we_cats ={
-    2: 'Knife',#
-    3: 'Pistol',#
-    8: 'Carbine',#
-    7: 'Assault Rifle',#
-    139: 'Infantry Abilities', #
-    4: 'Shotgun',#
-    6: 'LMG',#
-    13: 'Rocket Launcher',#
-    11: 'Sniper Rifle',#
-    18: 'Explosive',#
-    17: 'Grenade',#
-    5: 'SMG',#
-    19: 'Battle Rifle',#
-    24: 'Crossbow',#
-    12: 'Scout Rifle',#
-    10: 'AI MAX (Left)',#
-    14: 'Heavy Weapon',
-    21: 'AV MAX (Right)',#
-    20: 'AA MAX (Right)',#
-    22: 'AI MAX (Right)',#
-    9: 'AV MAX (Left)',#
-    23: 'AA MAX (Left)',#
-    147: 'Aerial Combat Weapon',#
-    104: 'Vehicle Weapons',#
-    211: 'Colossus Primary Weapon',#○
-    144: 'ANT Top Turret',#
-    157: 'Hybrid Rifle',#
-    126: 'Reaver Wing Mount',#
-    208: 'Bastion Point Defense',#
-    209: 'Bastion Bombard',#
-    210: 'Bastion Weapon System'#
- }
 
 class DbPlayer(Player):
     @classmethod
@@ -112,62 +79,7 @@ def getAllMapsFromApi():
     forceUpdate("sBases", jdata["map_region_list"])
 
 
-def getAllWeaponsFromApi(cat=0):
-    url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/item/?item_type_id=26&is_vehicle_weapon=0&item_category_id={cat}&c:limit=5000&c:show=item_id,item_category_id,name'
-    response = requests.get(url)
-    jdata = json.loads(response.content)
-    cats = dict()
-    if jdata["returned"] == 0:
-        print("Error")
-        return
-
-    for we in jdata["item_list"]:
-        we["_id"] = int(we.pop("item_id"))
-        try:
-            we["name"] = we.pop("name")["en"]
-            print(f'{we["_id"]};{we["name"]}')
-        except KeyError:
-            print(f'Key on name of id {we["_id"]}')
-        try:
-            we["cat_id"] = int(we.pop("item_category_id"))
-            if we["cat_id"] not in cats:
-                cats[we["cat_id"]] = all_cats[we["cat_id"]]
-                #print(all_cats[we["cat_id"]])
-        except KeyError:
-            print(f'Key on cat of id {we["_id"]}')
-
-    #forceUpdate("sWeapons", jdata["item_list"])
-    #return jdata["item_list"]
-    #return cats
-
-def getAllCategories():
-    url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/item_category/?c:limit=500'
-    response = requests.get(url)
-    jdata = json.loads(response.content)
-
-    if jdata["returned"] == 0:
-        print("Error")
-        return
-
-    di = dict()
-    for  cat in jdata["item_category_list"]:
-        di[int(cat["item_category_id"])] = cat["name"]["en"]
-    return di
-
 def playersDbUpdate():
     getAllPlayers(DbPlayer)
     for p in _allPlayers.values():
         _replacePlayer(p)
-
-
-def mapDbUpdate():
-    getAllMaps()
-    for m in _allMapsList:
-        print(str(m.id))
-        _updateMap(m)
-
-item_type_id = 26 #weapon
-
-
-
-#caregories:

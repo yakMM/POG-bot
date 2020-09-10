@@ -13,29 +13,14 @@ collections = dict()
 
 # Public
 
-
-def getAllPlayers(PlayerClass):
-    """ Get all players from db to memory
-    """
-    users = collections["users"].find()
+def getAllItems(initClassMethod, dbName):
+    items = collections[dbName].find()
     # Adding them
     try:
-        for result in users:
-            PlayerClass.newFromData(result)
+        for result in items:
+            initClassMethod(result)
     except KeyError as e:
-        raise DatabaseError(f"KeyError when retrieving players: {e}")
-
-
-def getAllMaps(MapClass):
-    """ Get all maps from db to memory
-    """
-    maps = collections["sBases"].find()
-    # Adding them
-    try:
-        for result in maps:
-            MapClass(result)
-    except KeyError as e:
-        raise DatabaseError(f"KeyError when retrieving maps: {e}")
+        raise DatabaseError(f"KeyError when retrieving {dbName} from database: {e}")
 
 
 async def updatePlayer(p, doc):
