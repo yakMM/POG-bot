@@ -166,6 +166,20 @@ def _addMainHandlers(client):
             emoji_obj = Emoji()
             currentMatch = getMatch(reaction.message.channel.id)
 
+            # # todo: below is for team selection -- should be moved out of main.py to the correct module @yak
+            # if currentMatch.status == MatchStatus.IS_PICKING:
+            #     if user.id in [tm.captain.id for tm in currentMatch.teams]:
+            #         if cleaned_reaction_message in cleanStringEnum(_StringEnum.MATCH_SHOW_PICKS):
+            #             value = -1
+            #             if reaction.emoji in emoji_obj.numeric:
+            #                 value = emoji_obj.numeric.index(reaction.emoji)
+            #
+            #             await reaction.remove(user)
+            #
+            #             if 0 <= value <= 9:
+            #                 await edit("MATCH_SHOW_PICKS", currentMatch.id, currentMatch.teams[0].captain.mention, match=currentMatch)
+            #                 # could also be PK_OK or PK_OK_2
+
             # todo: below is for map selection -- should be moved out of main.py to the correct module @yak
             if currentMatch.status == MatchStatus.IS_MAPPING:
                 if cleaned_reaction_message in cleanStringEnum(_StringEnum.PK_SHOW_REACT_MAP) or \
