@@ -61,6 +61,7 @@ async def roleUpdate(player):
     if _rolesDict["info"] in memb.roles:
         await memb.remove_roles(_rolesDict["info"])
 
+
 async def permsMuted(value, pId):
     global _guild
     memb = _guild.get_member(pId)

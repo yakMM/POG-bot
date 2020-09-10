@@ -8,7 +8,6 @@ from modules.exceptions import ElementNotFound
 from modules.display import send
 from logging import getLogger
 from gspread import service_account
-from gspread.exceptions import APIError
 import datetime as dt
 import numpy as np
 
@@ -69,7 +68,7 @@ class Map():
         return name
 
 
-def createJeagerCalObj(secretFile):
+def createJaegerCalObj(secretFile):
     global jaeger_cal_obj
     jaeger_cal_obj = JaegerCalendarHandler(secretFile)
 
@@ -81,7 +80,7 @@ class JaegerCalendarHandler:
         self.sh = self.gc.open_by_key(cfg.database["jaeger_cal"])
 
 
-class MapSelection():
+class MapSelection:
     def __init__(self, id, mapList=_allMapsList):
         self.__id = id
         self.booked = list()

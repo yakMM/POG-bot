@@ -6,11 +6,11 @@ from requests import get
 from configparser import ConfigParser, ParsingError
 from modules.exceptions import ConfigError
 
-## STATIC PARAMETERS:
+# STATIC PARAMETERS:
 AFK_TIME = 15  # minutes
-ROUND_LENGHT = 10  # minutes
+ROUND_LENGTH = 10  # minutes
 
-## DYNAMIC PARAMETERS:
+# DYNAMIC PARAMETERS:
 # (pulled from the config file)
 
 channels = {
@@ -82,10 +82,10 @@ general = {
 }
 
 scores = {
-    "teamkill" : 0,
-    "suicide" : 0,
-    "capture" : 0,
-    "recapture" : 0
+    "teamkill": 0,
+    "suicide": 0,
+    "capture": 0,
+    "recapture": 0
 }
 
 VERSION = "0"
@@ -127,13 +127,12 @@ map_pool_images = {"Acan Southern Labs": "https://i.imgur.com/IhF9wQN.png",
                    "Rashnu Watchtower": "https://i.imgur.com/9RkkmFQ.jpeg",
                    "XenoTech Labs": "https://i.imgur.com/uIc2NJH.png"}
 
-
 # Database
 
 _collections = {
     "users": "",
     "sBases": "",
-    "sWeapons" : ""
+    "sWeapons": ""
 }
 
 database = {
@@ -143,6 +142,7 @@ database = {
     "jaeger_cal": "",
     "collections": _collections
 }
+
 
 # Methods
 
@@ -225,7 +225,7 @@ def getConfig(file):
             _errorMissing(key, 'Roles', file)
         except ValueError:
             _errorIncorrect(key, 'Roles', file)
-    
+
     # Scores section
     _checkSection(config, "Scores", file)
     for key in scores:

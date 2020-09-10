@@ -11,8 +11,8 @@ from modules.exceptions import DatabaseError
 # dict for the collections
 collections = dict()
 
-# Public
 
+# Public
 def getAllItems(initClassMethod, dbName):
     items = collections[dbName].find()
     # Adding them

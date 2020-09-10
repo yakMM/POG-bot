@@ -1,12 +1,11 @@
 """Contains player classes
 """
 # Others
-import enum
 
 # Custom modules
 import modules.config as cfg
 from modules.asynchttp import request as httpRequest
-from modules.exceptions import UnexpectedError, ElementNotFound, StatusNotAllowed, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, AccountNotFound, ApiNotReachable
+from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, AccountNotFound, ApiNotReachable
 from modules.enumerations import PlayerStatus
 from lib import tasks
 from modules.roles import roleUpdate
@@ -45,7 +44,7 @@ def getAllPlayersList():
     return _allPlayers.values()
 
 
-class Player():
+class Player:
     """ Basic player class, every registered user matches a Player object contained in the dictionary
     """
 
@@ -56,7 +55,7 @@ class Player():
         self._igNames = ["N/A", "N/A", "N/A"]
         self._igIds = [0, 0, 0]
         self.__notify = False
-        self.__timeout = {"time" : 0, "reason" :""}
+        self.__timeout = {"time": 0, "reason": ""}
         self.__status = PlayerStatus.IS_NOT_REGISTERED
         self._hasOwnAccount = False
         self._active = None

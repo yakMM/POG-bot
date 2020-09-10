@@ -2,32 +2,32 @@ from gspread import service_account
 from numpy import array
 import modules.config as cfg
 from classes.players import Player, _allPlayers
-from modules.database import forceUpdate, getAllPlayers, _replacePlayer, _updateMap, getAllMaps, init as dbInit
+from modules.database import forceUpdate, _replacePlayer, _updateMap, init as dbInit
 from classes.maps import _allMapsList
 import requests
 import json
 import asyncio
 
-LAUNCHSTR = ""  # this should be empty if your files are config.cfg and client_secret.json
+LAUNCHSTR = ""  # this should be empty if your files are config.cfg and gspread_client_secret.json
 
 cfg.getConfig(f"config{LAUNCHSTR}.cfg")
 dbInit(cfg.database)
 
 
-
 class DbPlayer(Player):
     @classmethod
     def newFromData(cls, data):
-        newData=dict()
+        newData = dict()
         newData["name"] = data["name"]
         newData["_id"] = data["_id"]
         newData["rank"] = 1
         newData["notify"] = data["roles"]["notify"]
-        newData["timeout"] = {"time" : 0, "reason" :""}
+        newData["timeout"] = {"time": 0, "reason": ""}
         newData["igIds"] = data["igIds"]
         newData["igNames"] = data["igNames"]
         newData["hasOwnAccount"] = data["hasOwnAccount"]
         super().newFromData(newData)
+
 
 def pushAccounts():
     # Get all accounts
@@ -67,19 +67,15 @@ def getAllMapsFromApi():
         print("Error")
         return
 
-    ids = [302030, 239000, 305010, 230, 3430, 3620, 307010]
-    # acan,pale,ghanan,xenotech,peris,rashnu,chac
-
     for mp in jdata["map_region_list"]:
         print(mp)
         mp["_id"] = int(mp.pop("facility_id"))
-        mp["in_map_pool"] = mp["_id"] in ids
         mp["zone_id"] = int(mp.pop("zone_id"))
         mp["type_id"] = int(mp.pop("facility_type_id"))
     forceUpdate("sBases", jdata["map_region_list"])
 
-
-def playersDbUpdate():
-    getAllPlayers(DbPlayer)
-    for p in _allPlayers.values():
-        _replacePlayer(p)
+#
+# def playersDbUpdate():
+#     getAllPlayers(DbPlayer)
+#     for p in _allPlayers.values():
+#         _replacePlayer(p)

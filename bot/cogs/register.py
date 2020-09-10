@@ -15,7 +15,7 @@ from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, C
 log = getLogger(__name__)
 
 
-class registerCog(commands.Cog, name='register'):
+class RegisterCog(commands.Cog, name='register'):
     """
     Register cog, handle the commands from register channel
     """
@@ -63,10 +63,8 @@ class registerCog(commands.Cog, name='register'):
         await player.dbUpdate("notify")
 
 
-
 def setup(client):
     client.add_cog(RegisterCog(client))
-
 
 
 async def _register(player, ctx, args):
