@@ -16,7 +16,7 @@ Import this module and use only the following public function:
 """
 
 # discord.py
-from discord import Embed, Color, TextChannel, Message, User
+from discord import Embed, Color, TextChannel, Message, User, File
 from discord.ext.commands import Context
 
 from datetime import datetime as dt
@@ -28,7 +28,8 @@ from enum import Enum
 # Custom modules
 import modules.config as cfg
 from modules.enumerations import MatchStatus
-from modules.tools import isAdmin, isAlNum
+from modules.tools import isAlNum
+from modules.roles import isAdmin
 
 _client = None
 
@@ -76,6 +77,11 @@ async def remReaction(message, user=None):
         user = _client.user
     await message.remove_reaction("✅", user)
 
+async def imageSend(channelId, imagePath):
+    channel = _client.get_channel(channelId)
+    await channel.send(file=File(imagePath))
+
+## PRIVATE:
 
 class Emoji:
     def __init__(self):
@@ -102,23 +108,24 @@ def _registerHelp(msg):
     embed = Embed(
         colour=Color.blurple(),
         title='How to register?',
-        description=f'You have to accept the rules in <#{cfg.discord_ids["rules"]}> to register'
+        description=f'You have to accept the rules in <#{cfg.channels["rules"]}> to register'
     )
     embed.add_field(name='If you don\'t have a Jaeger account',
                     value='`=r no account`\n',
                     inline=False)
     embed.add_field(name='If you have a Jaeger account',
                     value='`=r charName` - If your character names have faction suffixes\n'
-                          '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes\n',
-                    inline=False)
+                          '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes'
+                    , inline=False)
     embed.add_field(name='Notify feature',
                     value='`=notify` - To join or leave the Notify feature\n'
-                          f'When subscribed to Notify, you can be mentioned with <@&{cfg.discord_ids["notify_role"]}> by other players\n',
-                    inline=False)
+                          f'When suscribed to Notify, you can be mentionned with <@&{cfg.roles["notify"]}> when the queue is almost full'
+                    , inline=False)
     try:
         if isAdmin(msg.author):
             embed.add_field(name="Staff Commands",
-                            value='`=unregister @player` - Permanently remove player profile from the system',
+                            value='`=unregister @player` - Permanently remove player profile from the system\n'
+                            '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                             inline=False)
     except AttributeError:
         pass  # if msg is from bot
@@ -139,7 +146,8 @@ def _lobbyHelp(msg):
     if isAdmin(msg.author):
         embed.add_field(name="Staff Commands",
                         value='`=clear` - Clear the lobby\n'
-                              '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
+                        '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages\n'
+                        '`=remove @player` - Remove player from lobby',
                         inline=False)
     return embed
 
@@ -168,7 +176,33 @@ def _mapHelp(ctx):
     embed.add_field(name='Map selection commands',
                     value=f'`={cmd} a base` - Display all the maps containing *a base* in their name\n'
                           f'`={cmd} 3` - Chooses the map number 3 from the selection\n'
-                          f'`={cmd}` - Display the current selection or show the help\n',
+                          f'`={cmd}` - Display the current selection or show the help',
+                    inline=False)
+    return embed
+
+def _timeoutHelp(ctx):
+    """ Returns timeout help embed
+    """
+    embed = Embed(
+        colour=Color.blurple()
+    )
+    embed.add_field(name='Timeout command',
+                    value='`=timeout @player 10 days` - Mute @player from POG for 10 days\n'
+                          '`=timeout @player 10 hours` - Mute @player from POG for 10 hours\n'
+                          '`=timeout @player 10 minutes` - Mute @player from POG for 10 minutes\n'
+                          '`=timeout @player remove` - Unmute @player from POG\n'
+                          '`=timeout @player` - Get info on current timeout for @player',
+                    inline=False)
+    return embed
+
+def _mutedHelp(ctx):
+    """ Returns help for muted players embed
+    """
+    embed = Embed(
+        colour=Color.blurple()
+    )
+    embed.add_field(name='You are currently muted!',
+                    value='`=escape` See how long you are muted for, give back permissions if no longer muted',
                     inline=False)
     return embed
 
@@ -183,15 +217,19 @@ def _matchHelp(msg):
                     value='`=m` - Display the match status and team composition\n',
                     inline=False)
     embed.add_field(name='Team Captain commands',
-                    value='`=p @player` - Pick a player in your team\n'
-                          '`=p VS`/`NC`/`TR` - Pick a faction\n'
-                          '`=p base name` - Pick the map *base name*\n'
-                          '`=ready` - To toggle the ready status of your team',
+                    value = '`=p @player` - Pick a player in your team\n'
+                            '`=p VS`/`NC`/`TR` - Pick a faction\n'
+                            '`=p base name` - Pick the map *base name*\n'
+                            '`=resign` - Resign from Team Captain position\n'
+                            '`=ready` - To toggle the ready status of your team'
+                            ,
                     inline=False)
     if isAdmin(msg.author):
         embed.add_field(name="Staff Commands",
-                        value='`=clear` - Clear the match\n'
-                              '`=map base name` - Select a map',
+                        value = '`=clear` - Clear the match\n'
+                                '`=map base name` - Select a map\n'
+                                '`=demote @player` - Remove Team Captain position from player\n'
+                                '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                         inline=False)
     return embed
 
@@ -225,12 +263,14 @@ def _account(msg, account):
 
 def _autoHelp(msg):
     """ Return help embed depending on current channel """
-    if msg.channel.id == cfg.discord_ids['register']:
+    if msg.channel.id == cfg.channels['register']:
         return _registerHelp(msg)
-    if msg.channel.id == cfg.discord_ids['lobby']:
+    if msg.channel.id == cfg.channels['lobby']:
         return _lobbyHelp(msg)
-    if msg.channel.id in cfg.discord_ids['matches']:
+    if msg.channel.id in cfg.channels['matches']:
         return _matchHelp(msg)
+    if msg.channel.id == cfg.channels['muted']:
+        return _mutedHelp(msg)
     return _defaultHelp(msg)
 
 
@@ -277,7 +317,7 @@ def _teamUpdate(arg, match):
         else:
             value = f"Captain: {tm.captain.mention}\n"
         value += "Players:\n" + '\n'.join(tm.playerPings)
-        if match.status == MatchStatus.IS_WAITING:
+        if match.status is MatchStatus.IS_WAITING:
             if tm.captain.isTurn:
                 name = f"{tm.name} [{cfg.factions[tm.faction]}] - not ready"
             else:
@@ -289,7 +329,7 @@ def _teamUpdate(arg, match):
         embed.add_field(name=name,
                         value=value,
                         inline=False)
-    if match.status == MatchStatus.IS_PICKING:
+    if match.status is MatchStatus.IS_PICKING:
         embed.add_field(name=f'Remaining', value="\n".join(match.playerPings), inline=False)
     return embed
 
@@ -411,7 +451,7 @@ class _StringEnum(Enum):
 
     PK_OVER = _Message("The teams are already made. You can't pick!")
     PK_NO_LOBBIED = _Message("You must first queue and wait for a match to begin. Check <#{}>")
-    PK_WAIT_FOR_PICK = _Message("You can't pick! Wait for a Team Captain to pick you")
+    PK_WAIT_FOR_PICK = _Message("You can't do that! Wait for a Team Captain to pick you!")
     PK_WRONG_CHANNEL = _Message("You are in the wrong channel! Check <#{}> instead")
     PK_NOT_TURN = _Message("It's not your turn!")
     PK_NOT_CAPTAIN = _Message("You are not Team Captain!")
@@ -439,6 +479,8 @@ class _StringEnum(Enum):
                                  embed=_mapPool,
                                  ping=False,
                                  emojis=getMapPoolEmojis())
+    PK_RESIGNED = _Message("Successfully resigned! {} is the new captain for {}!")
+    PK_PICK_STARTED = _Message("Can't do that, you already picked a player!")
 
     EXT_NOT_REGISTERED = _Message("You are not registered! Check <#{}>")
     UNKNOWN_ERROR = _Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\nDetails: *{}*")
@@ -455,7 +497,7 @@ class _StringEnum(Enum):
 
     BOT_UNLOCKED = _Message("Unlocked!")
     BOT_LOCKED = _Message("Locked!")
-    BOT_IS_LOCKED = _Message("Unlock the bot before using this command!")
+    BOT_IS_LOCKED = _Message("Bot is locked!")
     BOT_ALREADY = _Message("Already {}!")
     BOT_VERSION = _Message("Version `{}`, locked: `{}`")
     BOT_FROZEN = _Message("Channel frozen!")
@@ -473,7 +515,7 @@ class _StringEnum(Enum):
     MATCH_STARTING_2 = _Message("Round {} is starting in {} seconds!")
     MATCH_STARTED = _Message("{}\n{}\nRound {} is starting now!")
     MATCH_NO_MATCH = _Message("Can't use command `={}`, no match is happening here!")
-    MATCH_ALREADY_STARTED = _Message("Can't use command `={}` now!")
+    MATCH_NO_COMMAND = _Message("Can't use command `={}` now!")
     MATCH_CLEARED = _Message("Successfully cleared!")
     MATCH_PLAYERS_NOT_READY = _Message("Can't get {} ready, {} did not accept their Jaeger accounts", ping=False)
     MATCH_CLEAR = _Message("Clearing match...", ping=False)
@@ -486,7 +528,8 @@ class _StringEnum(Enum):
     MAP_HELP = _Message("Here is how to choose a map:", embed=_mapHelp)
     MAP_TOO_MUCH = _Message("Too many maps found! Try to be more precise")
     MAP_NOT_FOUND = _Message("Couldn't find a result for your search!")
-    MAP_DISPLAY_LIST = _Message("", embed=_selectedMaps)
+    MAP_DISPLAY_LIST = _Message("Here are the maps found:", embed=_selectedMaps)
+    MAP_SHOW_POOL = _Message("Map list:", embed=_selectedMaps)
     MAP_SELECTED = _Message("The current map is **{}**")
     MAP_BOOKED = _Message("WARNING: **{}** is currently reserved in the Jaeger Calendar. Please check availability before confirming this map.",
                           embed=_jaegerCalendar)
@@ -506,8 +549,24 @@ class _StringEnum(Enum):
 
     NOT_CODED = _Message("The rest is not yet coded, work in progress. Clearing match...")
 
-    RM_MENTION_ONE = _Message("Invalid request! Mention one player to be removed!")
+    RM_MENTION_ONE = _Message("Invalid request! @ mention one player!")
     RM_NOT_IN_DB = _Message("Can't find this player in the database!")
     RM_OK = _Message("Player successfully removed from the system!")
     RM_IN_MATCH = _Message("Can't remove a player who is in match!")
-    RM_LOBBY = _Message("{} have been removed by staff!", embed=_lobbyList)
+    RM_LOBBY = _Message("{} have been removed by staff!",embed=_lobbyList)
+    RM_NOT_LOBBIED = _Message("This player is not in queue!")
+    RM_TIMEOUT = _Message("{} will be muted from POG until {}!", ping=False)
+    RM_TIMEOUT_FREE = _Message("{} is no longer muted!", ping=False)
+    RM_TIMEOUT_ALREADY = _Message("Can't do that, player is not muted!")
+    RM_TIMEOUT_HELP = _Message("Command usage:", embed=_timeoutHelp)
+    RM_TIMEOUT_INVALID = _Message("Invalid use of the command!", embed=_timeoutHelp)
+    RM_TIMEOUT_INFO = _Message("Player is muted until {}!")
+    RM_TIMEOUT_NO = _Message("Player is not muted!")
+    RM_DEMOTE_NO = _Message("Can't demote this player!")
+    RM_DEMOTE_OK = _Message("Successfully demoted! {} is the new captain for {}!", ping=False)
+    RM_DEMOTE_PICKING = _Message("Can't demote a captain who has already started picking!")
+
+    MUTE_SHOW = _Message("You are muted from POG until {}!")
+    MUTE_FREED = _Message("You are no longer muted from POG!")
+
+    SC_ILLEGAL_WE = _Message("Alert: {} used {} during match {}!")

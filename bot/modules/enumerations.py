@@ -25,6 +25,7 @@ class SelStatus(Enum):
     IS_BOOKED = 5
 
 
+
 class PlayerStatus(Enum):
     IS_NOT_REGISTERED = 0
     IS_REGISTERED = 1

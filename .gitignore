@@ -1,17 +1,12 @@
 __pycache__/
 */__pycache__/
 permissions.txt
+bot/test*.py
+bot/others/
 bot/config_test.cfg
 bot/client_secret_test.json
-bot/gspread_client_secret.json
-secret/*
-bot/.idea/*
 bot/config.cfg
-logging/*
-bot/test.py	
-bot/test2.py	
-bot/others/	
-bot/secret/
-bot/config - local.cfg
-bot/config - local.cfg
-bot/config - dev hosted.cfg
+bot/client_secret.json
+secret/
+logging/
+matches/

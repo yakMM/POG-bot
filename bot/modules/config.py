@@ -6,18 +6,30 @@ from requests import get
 from configparser import ConfigParser, ParsingError
 from modules.exceptions import ConfigError
 
-# DiscordIds
-discord_ids = {
+## STATIC PARAMETERS:
+AFK_TIME = 15  # minutes
+ROUND_LENGHT = 10  # minutes
+
+## DYNAMIC PARAMETERS:
+# (pulled from the config file)
+
+channels = {
     "lobby": 0,
     "register": 0,
     "matches": list(),
     "results": 0,
     "rules": 0,
-    "rules_msg": 0,
-    "admin_role": 0,
-    "info_role": 0,
-    "registered_role": 0,
-    "notify_role": 0
+    "staff": 0,
+    "muted": 0
+}
+
+channelsList = list()
+
+roles = {
+    "admin": 0,
+    "info": 0,
+    "registered": 0,
+    "notify": 0
 }
 
 # TeamspeakIds
@@ -66,12 +78,16 @@ general = {
     "lobby_size": 0,
     "sinusbot_user": "",
     "sinusbot_pass": "",
-    "jaeger_cal": "",
-    "map_pool": list()
+    "rules_msg_id": 0
 }
 
-AFK_TIME = 20  # minutes
-ROUND_LENGTH = 1  # minutes
+scores = {
+    "teamkill" : 0,
+    "suicide" : 0,
+    "capture" : 0,
+    "recapture" : 0
+}
+
 VERSION = "0"
 
 factions = {
@@ -102,8 +118,6 @@ facility_suffix = {
     4: "Tech Plant"
 }
 
-# PIL_MAPS_IDS -- no longer used -- = [3430, 302030, 239000, 305010, 230, 307010]  # peris, acan, pale, ghanan, xeno, chac
-
 # PIL map images, these should be added to config file I think
 map_pool_images = {"Acan Southern Labs": "https://i.imgur.com/IhF9wQN.png",
                    "Chac Fusion Lab": "https://i.imgur.com/XQ5YERh.jpeg",
@@ -113,22 +127,25 @@ map_pool_images = {"Acan Southern Labs": "https://i.imgur.com/IhF9wQN.png",
                    "Rashnu Watchtower": "https://i.imgur.com/9RkkmFQ.jpeg",
                    "XenoTech Labs": "https://i.imgur.com/uIc2NJH.png"}
 
+
 # Database
 
 _collections = {
     "users": "",
-    "sBases": ""
+    "sBases": "",
+    "sWeapons" : ""
 }
 
 database = {
     "url": "",
     "cluster": "",
     "accounts": "",
+    "jaeger_cal": "",
     "collections": _collections
 }
 
-
 # Methods
+
 
 def getConfig(file):
     config = ConfigParser()
@@ -142,16 +159,10 @@ def getConfig(file):
 
     for key in general:
         try:
-            if key == "map_pool":
-                tmp = config['General'][key].split(',')
-                general[key].clear()
-                for map in tmp:
-                    general[key].append(map)
+            if isinstance(general[key], int):
+                general[key] = int(config['General'][key])
             else:
-                if isinstance(general[key], int):
-                    general[key] = int(config['General'][key])
-                else:
-                    general[key] = config['General'][key]
+                general[key] = config['General'][key]
         except KeyError:
             _errorMissing(key, 'General', file)
         except ValueError:
@@ -161,24 +172,27 @@ def getConfig(file):
     url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
     jdata = loads(get(url).content)
     if 'error' in jdata:
-        raise ConfigError(f"Incorrect api key: {general['api_key']} in '{file}'")
+        raise ConfigError(
+            f"Incorrect api key: {general['api_key']} in '{file}'")
 
-    # Discord_Ids section
-    _checkSection(config, "Discord_Ids", file)
+    # Channels section
+    _checkSection(config, "Channels", file)
 
-    for key in discord_ids:
+    for key in channels:
         try:
             if key == "matches":
-                tmp = config['Discord_Ids'][key].split(',')
-                discord_ids[key].clear()
+                tmp = config['Channels'][key].split(',')
+                channels[key].clear()
                 for m in tmp:
-                    discord_ids[key].append(int(m))
+                    channels[key].append(int(m))
+                    channelsList.append(int(m))
             else:
-                discord_ids[key] = int(config['Discord_Ids'][key])
+                channels[key] = int(config['Channels'][key])
+                channelsList.append(channels[key])
         except KeyError:
-            _errorMissing(key, 'Discord_Ids', file)
+            _errorMissing(key, 'Channels', file)
         except ValueError:
-            _errorIncorrect(key, 'Discord_Ids', file)
+            _errorIncorrect(key, 'Channels', file)
 
     # Teamspeak_Ids section
     _checkSection(config, "Teamspeak_Ids", file)
@@ -201,6 +215,26 @@ def getConfig(file):
             _errorMissing(key, 'Audio_Ids', file)
         except ValueError:
             _errorIncorrect(key, 'Audio_Ids', file)
+
+    # Roles section
+    _checkSection(config, "Roles", file)
+    for key in roles:
+        try:
+            roles[key] = int(config['Roles'][key])
+        except KeyError:
+            _errorMissing(key, 'Roles', file)
+        except ValueError:
+            _errorIncorrect(key, 'Roles', file)
+    
+    # Scores section
+    _checkSection(config, "Scores", file)
+    for key in scores:
+        try:
+            scores[key] = int(config['Scores'][key])
+        except KeyError:
+            _errorMissing(key, 'Scores', file)
+        except ValueError:
+            _errorIncorrect(key, 'Scores', file)
 
     # Database section
     _checkSection(config, "Database", file)
@@ -225,7 +259,8 @@ def getConfig(file):
     with open('../CHANGELOG.md', 'r', encoding='utf-8') as txt:
         txt_str = txt.readline()
     global VERSION
-    VERSION = txt_str[3:-2]  # Extracts "X.X.X" from string "# vX.X.X:" in a lazy way
+    # Extracts "X.X.X" from string "# vX.X.X:" in a lazy way
+    VERSION = txt_str[3:-2]
 
 
 def _checkSection(config, section, file):

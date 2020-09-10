@@ -43,7 +43,7 @@ token = RetrievedDiscordApiBotToken
 ##### Create channels and roles
 To retrieve discord channel, message and role-ids you have to enable Discord Developer Mode which can be toggled at appearance.
 `Copy ID` will then appear at the right click menu for channels, messages and roles.
-At that point you can populate the `[Discord_Ids]` section of the configuration.
+At that point you can populate the `[channels]` section of the configuration.
 
 #### Preparing MongoDB Component
 Pymongo is used for interaction with the mongodb. As of now, the database should contain two collections: one for the bases and one for the user data. Check `script.py` to populate the databases.

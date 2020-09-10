@@ -60,13 +60,6 @@ class DatabaseError(Exception):
         super().__init__(message)
 
 
-class StatusNotAllowed(Exception):
-    def __init__(self, name):
-        self.name = name
-        message = "This status is not allowed: " + name
-        super().__init__(message)
-
-
 class AccountsNotEnough(Exception):
     pass
 

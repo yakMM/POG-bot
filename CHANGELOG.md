@@ -1,3 +1,33 @@
+# v.1.1.0:
+- Added match score tracking (BETA)
+
+# v1.0.12:
+- Added timeout functionality for admins
+- Modifications in how players are stored in database
+- Bot is now active in all channels listed in the config file
+- Fixed a bug with muted permissions
+- Fixed a bug with some staff commands being usable in wrong channels
+- Fixed a bug when removing players from lobby
+- Bot no longer ignore commands sent from match channels
+- Added command for team captains to resign
+- Staff can now demote team captains
+
+# v1.0.11:
+- Commands are no longer usable during init
+- Fixed a bug with @Notify being pinged after a match start
+- Staff can now remove individual players from lobby
+- Speculative fix for bot taking 5 whole minutes to start
+- Players can now see the channels on joining back the discord server
+
+# v1.0.10:
+- All players will now have accurate roles depending on their status
+- Notify role should now reflect more accurately players ready to queue
+- Fixed a bug with afk players in queue
+- Overhauled player status code
+- Tweaked the conditions for the bot to ping @Notify
+- Fixed a bug allowing the one captain to choose a map and confirm it
+- Added default map pool: players can't choose any map in the game anymore
+
 # v1.0.9:
 - Updated Jaeger Calendar Link
 - Current UTC time is now displayed along Jaeger Calendar link
@@ -52,6 +82,7 @@
 - Last player is now pinged when automatically assigned to a team
 - Matches are now constituted of 2 rounds
 - Round number is now displayed
+
 
 # v1.0.1:
 - Rules acceptance feature

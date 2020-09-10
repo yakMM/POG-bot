@@ -15,6 +15,7 @@ import numpy as np
 log = getLogger(__name__)
 
 _allMapsList = list()
+mainMapPool = list()
 
 MAX_SELECTED = 15
 
@@ -28,24 +29,33 @@ def getMapSelection(id):
     return sel
 
 
-def names_to_maps(map_names):  # returns a list of map objects from a list of map names
-    formatted = list()
-    for map_name in map_names:
-        for map in _allMapsList:
-            if map_name.lower() in map.name.lower():
-                formatted.append(map)
-            else:
-                log.debug(f"Map named '{map_name}' could not be found and is being omitted from the formatted list")
-    return formatted
-
-
-class Map:
+class Map():
     def __init__(self, data):
         self.__id = data["_id"]
         self.__name = data["facility_name"]
         self.__zoneId = data["zone_id"]
         self.__typeId = data["type_id"]
+        self.__inPool = data["in_map_pool"]
+        if self.__inPool:
+            mainMapPool.append(self)
         _allMapsList.append(self)
+
+    def getData(self):  # get data for database push
+        data = {"_id": self.__id,
+                "facility_name": self.__name,
+                "zone_id": self.__zoneId,
+                "type_id": self.__typeId,
+                "in_map_pool": self.__inPool
+                }
+        return data
+
+    @property
+    def pool(self):
+        return self.__inPool
+
+    @pool.setter
+    def pool(self, bl):
+        self.__inPool = bl
 
     @property
     def id(self):
@@ -68,17 +78,18 @@ class JaegerCalendarHandler:
     def __init__(self, secretFile):
         self._secretFile = secretFile
         self.gc = service_account(filename=secretFile)
-        self.sh = self.gc.open_by_key(cfg.general["jaeger_cal"])
+        self.sh = self.gc.open_by_key(cfg.database["jaeger_cal"])
 
 
-class MapSelection:
-    def __init__(self, id):
+class MapSelection():
+    def __init__(self, id, mapList=_allMapsList):
         self.__id = id
         self.booked = list()
-        self.get_booked(_allMapsList)
-        self.__selection = self.select_available(names_to_maps(cfg.general["map_pool"]))
+        self.get_booked(mapList)
+        self.__selection = list()
         self.__selected = None
-        self.__status = SelStatus.IS_SELECTION
+        self.__allMaps = mapList
+        self.__status = SelStatus.IS_EMPTY
         _mapSelectionsDict[self.__id] = self
 
     def selectFromIdList(self, ids):
@@ -150,7 +161,7 @@ class MapSelection:
         return
 
     def __doSelection(self, args):
-        if self.__status == SelStatus.IS_SELECTION and len(args) == 1 and args[0].isnumeric():
+        if self.__status is SelStatus.IS_SELECTION and len(args) == 1 and args[0].isnumeric():
             index = int(args[0])
             if 0 < index <= len(self.__selection):
                 self.__selected = self.__selection[index - 1]
@@ -158,7 +169,7 @@ class MapSelection:
             return
         arg = " ".join(args)
         self.__selection.clear()
-        for map in _allMapsList:
+        for map in self.__allMaps:
             if len(self.__selection) > MAX_SELECTED:
                 self.__status = SelStatus.IS_TOO_MUCH
                 return
@@ -178,11 +189,14 @@ class MapSelection:
         self.__status = SelStatus.IS_SELECTION
 
     async def doSelectionProcess(self, ctx, args):
+        if self.__status is SelStatus.IS_EMPTY and self.isSmallPool:
+            self.__status = SelStatus.IS_SELECTION
+            self.__selection = self.__allMaps.copy()
         if len(args) == 0:
-            if self.__status == SelStatus.IS_SELECTION:
+            if self.__status is SelStatus.IS_SELECTION:
                 await send("MAP_DISPLAY_LIST", ctx, sel=self)
                 return
-            if self.__status == SelStatus.IS_SELECTED:
+            if self.__status is SelStatus.IS_SELECTED:
                 await send("MAP_SELECTED", ctx, self.__selected.name)
                 return
             await send("MAP_HELP", ctx)
@@ -191,10 +205,10 @@ class MapSelection:
             await send("MAP_HELP", ctx)
             return
         self.__doSelection(args)
-        if self.__status == SelStatus.IS_EMPTY:
+        if self.__status is SelStatus.IS_EMPTY:
             await send("MAP_NOT_FOUND", ctx)
             return
-        if self.__status == SelStatus.IS_TOO_MUCH:
+        if self.__status is SelStatus.IS_TOO_MUCH:
             await send("MAP_TOO_MUCH", ctx)
             return
         if self.__status == SelStatus.IS_BOOKED:
@@ -204,14 +218,27 @@ class MapSelection:
         if self.__status == SelStatus.IS_SELECTION:
             await send("MAP_DISPLAY_LIST", ctx, sel=self)
             return
+        # If successfully selected:
+        return self.__selected
+
+    @property
+    def stringList(self):
+        result = list()
+        if len(self.__selection) > 0:
+            for i in range(len(self.__selection)):
+                result.append(f"**{str(i+1)}**: " + self.__selection[i].name)
+        elif self.isSmallPool:
+            for i in range(len(self.__allMaps)):
+                result.append(f"**{str(i+1)}**: " + self.__allMaps[i].name)
+        return result
+
+    @property
+    def isSmallPool(self):
+        return len(self.__allMaps) <= MAX_SELECTED
 
     @property
     def map(self):
         return self.__selected
-
-    @property
-    def selection(self):
-        return self.__selection
 
     @property
     def id(self):
@@ -222,15 +249,10 @@ class MapSelection:
         return self.__status
 
     def confirm(self):
-        if self.__status == SelStatus.IS_SELECTED:
+        if self.__status is SelStatus.IS_SELECTED:
             self.__status = SelStatus.IS_CONFIRMED
             return True
         return False
 
     def clean(self):
         del _mapSelectionsDict[self.__id]
-
-
-class MapPool(MapSelection):
-    def __init__(self, id, mapList):
-        super().__init__(id)

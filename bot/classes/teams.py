@@ -10,6 +10,8 @@ class Team:
         self.__name = name
         self.__players = list()
         self.__score = 0
+        self.__deaths = 0
+        self.__kills = 0
         self.__faction = 0
         self.__cap = 0
         self.__match = match
@@ -44,30 +46,55 @@ class Team:
     @property
     def cap(self):
         return self.__cap
+    
+    @property
+    def kills(self):
+        return self.__kills
+    
+    @property
+    def deaths(self):
+        return self.__deaths
 
     @property
     def playerPings(self):
+        # Excluding captain
         pings = [p.mention for p in self.__players[1:]]
         return pings
 
     @property
     def allPings(self):
+        # All players with captain
         pings = [p.mention for p in self.__players]
-        return " ".join(pings)
+        return pings
 
     @property
     def captain(self):
         return self.__players[0]
 
+    @property
+    def isPlayers(self):
+        return len(self.__players) > 1
+    
+    def clear(self):
+        self.__players.clear()
+
     def addCap(self, points):
         self.__cap += points
         self.__score += points
 
+    def addScore(self, points):
+        self.__score += points
+
+    def addOneKill(self):
+        self.__kills +=1
+
+    def addOneDeath(self):
+        self.__deaths +=1
+
     def addPlayer(self, cls, player):
         active = cls(player, self)
         self.__players.append(active)
-        active.status = PlayerStatus.IS_PICKED
 
-    def matchReady(self):
+    def onMatchReady(self):
         for p in self.__players:
-            p.status = PlayerStatus.IS_PLAYING
+            p.onMatchReady()
