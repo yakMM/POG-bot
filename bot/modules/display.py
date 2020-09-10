@@ -84,7 +84,7 @@ class Emoji:
 
 
 def getMapPoolEmojis():
-    _emoji_list = Emoji().numeric[:len(cfg.map_pool_images)]
+    _emoji_list = Emoji().numeric[1:len(cfg.map_pool_images) + 1]
     _emoji_list.extend(Emoji().escape)
     return _emoji_list
 
@@ -310,7 +310,7 @@ def _jaegerCalendar(arg):
 def _mapPool(msg, map):
     if map.name in cfg.map_pool_images:
         embed = Embed(colour=Color.blue(), title=map.name)
-        embed.set_author(name="Map pool document",
+        embed.set_author(name="Click here for the map pool document",
                          url="https://docs.google.com/presentation/d/1KEDlqHxbpG2zXxuEZetAM9IpUHIisWTnrtybn3Kq-Is/edit?usp=sharing")
         embed.set_image(url=cfg.map_pool_images[map.name])
     else:
@@ -369,7 +369,7 @@ class _Message:
 
 
 def cleanStringEnum(enum):
-    return _StringEnum.enum.value._Message__str.replace("{", "").replace("}", "")
+    return enum.value._Message__str.replace("{", "").replace("}", "")
 
 
 class _StringEnum(Enum):
