@@ -79,7 +79,7 @@ async def remReaction(message, user=None):
 
 class Emoji:
     def __init__(self):
-        self.numeric = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+        self.numeric = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
         self.escape = ['↩']
 
 
@@ -88,6 +88,10 @@ def getMapPoolEmojis():
     _emoji_list.extend(Emoji().escape)
     return _emoji_list
 
+
+def getNumericEmojis():
+    _emoji_list = Emoji().numeric
+    return _emoji_list
 
 # PRIVATE:
 
@@ -364,6 +368,10 @@ class _Message:
         return msg
 
 
+def cleanStringEnum(enum):
+    return _StringEnum.enum.value._Message__str.replace("{", "").replace("}", "")
+
+
 class _StringEnum(Enum):
     """ List of different message strings available
     """
@@ -454,7 +462,7 @@ class _StringEnum(Enum):
     BOT_UNFROZEN = _Message("Channel unfrozen!")
 
     MATCH_INIT = _Message("{}\nMatch is ready, starting team selection...")
-    MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player", embed=_teamUpdate)
+    MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player", embed=_teamUpdate, emojis=getNumericEmojis())
     MATCH_MAP_AUTO = _Message("Match will be on **{}**", ping=False)
     MATCH_CONFIRM = _Message("{} {} Type `=ready` when your team is inside their sundy, ready to start",
                              embed=_teamUpdate)

@@ -19,9 +19,10 @@ import re
 
 # Custom modules
 import modules.config as cfg
-from modules.display import send, channelSend, edit, _StringEnum, Emoji
+from modules.display import send, channelSend, edit, _StringEnum, Emoji, cleanStringEnum
 from modules.display import init as displayInit
 from modules.spam import isSpam, unlock
+from modules.enumerations import MatchStatus
 from modules.exceptions import ElementNotFound, UnexpectedError
 from modules.database import init as dbInit, getAllPlayers, getAllMaps
 from modules.enumerations import PlayerStatus
@@ -160,27 +161,30 @@ def _addMainHandlers(client):
     # Reaction update handler (for accounts)
     @client.event
     async def on_reaction_add(reaction, user):
-        # below is for map selection
-        cleaned_reaction_message = re.sub("<.+?>", "", reaction.message.content)
-        cleaned_PK_SHOW_REACT_MAP = _StringEnum.PK_SHOW_REACT_MAP.value._Message__str
-        cleaned_PK_WAIT_MAP = _StringEnum.PK_WAIT_MAP.value._Message__str.replace("{", "").replace("}", "")
-        emoji_obj = Emoji()
-        if reaction.message.author.bot and not user.bot:
-            if cleaned_reaction_message in cleaned_PK_WAIT_MAP or cleaned_reaction_message in cleaned_PK_SHOW_REACT_MAP:
-                value = None
-                if reaction.emoji in emoji_obj.escape:
-                    value = 27  # using the keycode value for escape but really it can be anything unique
-                elif reaction.emoji in emoji_obj.numeric:
-                    value = emoji_obj.numeric.index(reaction.emoji) + 1  # offset because list starts at 1
+        if reaction.message.author.bot and not user.bot and reaction.message.channel.id in cfg.discord_ids["matches"]:
+            cleaned_reaction_message = re.sub("<.+?>", "", reaction.message.content)
+            emoji_obj = Emoji()
+            currentMatch = getMatch(reaction.message.channel.id)
 
-                currentMatch = getMatch(reaction.message.channel.id)
-                await reaction.remove(user)
+            # todo: below is for map selection -- should be moved out of main.py to the correct module @yak
+            if currentMatch.status == MatchStatus.IS_MAPPING:
+                if cleaned_reaction_message in cleanStringEnum(_StringEnum.PK_SHOW_REACT_MAP) or \
+                        cleaned_reaction_message in cleanStringEnum(_StringEnum.PK_WAIT_MAP):
+                    value = -1
+                    if reaction.emoji in emoji_obj.escape:
+                        value = 27  # using the keycode value for escape but really it can be anything unique
+                    elif reaction.emoji in emoji_obj.numeric:
+                        value = emoji_obj.numeric.index(reaction.emoji)
 
-                if 1 <= value <= 9 and (value - 1) <= len(currentMatch.mapSelector.selection):
-                    await edit("PK_SHOW_REACT_MAP", reaction.message, map=currentMatch.mapSelector.selection[value - 1])
-                elif value == 27:
-                    captainPings = [tm.captain.mention for tm in currentMatch.teams]
-                    await edit("PK_WAIT_MAP", reaction.message, sel=currentMatch.mapSelector, *captainPings)
+                    await reaction.remove(user)
+
+                    if 1 <= value <= len(currentMatch.mapSelector.selection):
+                        await edit("PK_SHOW_REACT_MAP", reaction.message, map=currentMatch.mapSelector.selection[value - 1])
+                    elif value == 27:
+                        captainPings = [tm.captain.mention for tm in currentMatch.teams]
+                        await edit("PK_WAIT_MAP", reaction.message, sel=currentMatch.mapSelector, *captainPings)
+
+
 
         # below is for player account acceptance
         try:
