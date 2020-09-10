@@ -462,7 +462,7 @@ class _StringEnum(Enum):
     BOT_UNFROZEN = _Message("Channel unfrozen!")
 
     MATCH_INIT = _Message("{}\nMatch is ready, starting team selection...")
-    MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player", embed=_teamUpdate, emojis=getNumericEmojis())
+    MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player", embed=_teamUpdate)
     MATCH_MAP_AUTO = _Message("Match will be on **{}**", ping=False)
     MATCH_CONFIRM = _Message("{} {} Type `=ready` when your team is inside their sundy, ready to start",
                              embed=_teamUpdate)
