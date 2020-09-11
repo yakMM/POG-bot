@@ -228,7 +228,7 @@ class Player:
         """
         updated = False
         if charList is None:
-            if self._status == PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount:
+            if self.__status == PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount:
                 updated = True
             self._igIds = [0, 0, 0]
             self._igNames = ["N/A", "N/A", "N/A"]

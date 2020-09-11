@@ -134,7 +134,7 @@ def _addMainHandlers(client):
         # reaction to the rule message?
         if payload.message_id == cfg.general["rules_msg_id"]:
             global rulesMsg
-            rulesMsg = await client.get_channel(cfg.channels["rules"]).fetch_message(cfg.channels["rules_msg"])
+            rulesMsg = await client.get_channel(cfg.channels["rules"]).fetch_message(cfg.general["rules_msg_id"])
             if str(payload.emoji) == "✅":
                 try:
                     p = getPlayer(payload.member.id)
@@ -182,8 +182,8 @@ def _addMainHandlers(client):
 
                     await reaction.remove(user)
 
-                    if 1 <= value <= len(currentMatch.mapSelector.selection):
-                        await edit("PK_SHOW_REACT_MAP", reaction.message, map=currentMatch.mapSelector.selection[value - 1])
+                    if 1 <= value <= len(currentMatch.mapSelector.getSelection()):
+                        await edit("PK_SHOW_REACT_MAP", reaction.message, map=currentMatch.mapSelector.getSelection()[value - 1])
                     elif value == 27:
                         captainPings = [tm.captain.mention for tm in currentMatch.teams]
                         await edit("PK_WAIT_MAP", reaction.message, sel=currentMatch.mapSelector, *captainPings)

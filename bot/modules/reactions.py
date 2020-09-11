@@ -18,4 +18,3 @@ async def reactionHandler(reaction, player):
     if str(reaction.emoji) == "✅":  # If everything is fine, account is validated
         account.validate()
         await edit("ACC_UPDATE", account.message, account=account)
-        await account.message.remove_reaction(reaction.emoji, player)

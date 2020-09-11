@@ -291,7 +291,7 @@ def _selectedMaps(msg, sel):
     """
     embed = Embed(colour=Color.blue())
     embed_text = sel.toString() + f"\n⤾ - Back to Maps"
-    embed.add_field(name=f"{len(sel.selection)} maps found", value=embed_text, inline=False)
+    embed.add_field(name=f"{len(sel.getSelection())} maps found", value=embed_text, inline=False)
     return embed
 
 
@@ -506,7 +506,7 @@ class _StringEnum(Enum):
     BOT_UNFROZEN = _Message("Channel unfrozen!")
 
     MATCH_INIT = _Message("{}\nMatch is ready, starting team selection...")
-    MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player", embed=_teamUpdate)
+    MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player", embed=_teamUpdate, ping=False)
     MATCH_MAP_AUTO = _Message("Match will be on **{}**", ping=False)
     MATCH_CONFIRM = _Message("{} {} Type `=ready` when your team is inside their sundy, ready to start",
                              embed=_teamUpdate)

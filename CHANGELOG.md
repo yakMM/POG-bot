@@ -1,3 +1,15 @@
+# v2.0.1:
+Major feature implementations!
+- Added jaeger calendar integration, now suggested bases to choose from in the map pool will not include those booked in the jaeger calendar
+- Improved map selection process, showing only maps in map pool but allowing others to be chosen
+- Added a warning if a chosen map is currently reserved in the jaeger calendar
+- Added/improved map pool and map selection process
+- Added react-based image previews of map pool maps using a new emoji handler
+- Implemented a teamspeak bot:
+  - New requirements include installing and configuring Sinusbot for developers to run the ts3 bot
+  - Bot announces match start and end, and informs captains on steps during pre-match
+- Various code viewability enhancements, PEP8 formatting, and typo fixes
+
 # v.1.1.0:
 - Added match score tracking (BETA)
 

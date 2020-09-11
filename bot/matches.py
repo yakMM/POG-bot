@@ -2,14 +2,14 @@ import modules.config as cfg
 from modules.exceptions import UnexpectedError, AccountsNotEnough, ElementNotFound
 from modules.display import channelSend, edit
 from modules.enumerations import PlayerStatus, MatchStatus, SelStatus
-from modules.imageMaker import publishMatchImage
+# from modules.imageMaker import publishMatchImage
 from modules.script import processScore
 from datetime import datetime as dt
 from modules.ts3 import getTs3Bots
 
 from classes.teams import Team  # ok
 from classes.players import TeamCaptain, ActivePlayer  # ok
-from classes.maps import MapSelection, mainMapPool  # ok
+from classes.maps import MapSelection, mainMapPool, _allMapsList  # ok
 from classes.accounts import AccountHander  # ok
 
 from random import choice as randomChoice
@@ -337,7 +337,7 @@ class Match:
         ts3bot.move(pick_channel)
         await sleep(1)  # prevents playing this before faction announce
         ts3bot.enqueue(cfg.audio_ids["select_map"])
-        await channelSend("PK_WAIT_MAP", self.__id, *captainPings)
+        await channelSend("PK_WAIT_MAP", self.__id, sel=self.__mapSelector, *captainPings)
 
     @tasks.loop(count=1)
     async def __ready(self):
@@ -398,7 +398,7 @@ class Match:
     @tasks.loop(count=1)
     async def _scoreCalculation(self):
         await processScore(self)
-        await publishMatchImage(self)
+        # await publishMatchImage(self)
 
     @tasks.loop(count=1)
     async def __startMatch(self):
@@ -439,7 +439,7 @@ class Match:
     async def _launch(self):
         await channelSend("MATCH_INIT", self.__id, " ".join(self.playerPings))
         self.__accounts = AccountHander(self)
-        self.__mapSelector = MapSelection(self, mainMapPool)
+        self.__mapSelector = MapSelection(self, _allMapsList)
         for i in range(len(self.__teams)):
             self.__teams[i] = Team(i, f"Team {i + 1}", self)
             key = randomChoice(list(self.__players))

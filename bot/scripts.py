@@ -2,8 +2,8 @@ from gspread import service_account
 from numpy import array
 import modules.config as cfg
 from classes.players import Player, _allPlayers
-from modules.database import forceUpdate, _replacePlayer, _updateMap, init as dbInit
-from classes.maps import _allMapsList
+from modules.database import forceUpdate, _replacePlayer, _updateMap, init as dbInit, getAllItems
+from classes.maps import _allMapsList, Map
 import requests
 import json
 import asyncio
@@ -31,7 +31,7 @@ class DbPlayer(Player):
 
 def pushAccounts():
     # Get all accounts
-    gc = service_account(filename=f'client_secret{LAUNCHSTR}.json')
+    gc = service_account(filename=f'gspread_client_secret{LAUNCHSTR}.json')
     sh = gc.open_by_key(cfg.database["accounts"])
     rawSheet = sh.get_worksheet(1)
     visibleSheet = sh.get_worksheet(0)
@@ -67,15 +67,24 @@ def getAllMapsFromApi():
         print("Error")
         return
 
+    ids = [302030, 239000, 305010, 230, 3430, 3620, 307010]
+    # acan,pale,ghanan,xenotech,peris,rashnu,chac
+
     for mp in jdata["map_region_list"]:
-        print(mp)
         mp["_id"] = int(mp.pop("facility_id"))
+        mp["in_map_pool"] = mp["_id"] in ids
         mp["zone_id"] = int(mp.pop("zone_id"))
         mp["type_id"] = int(mp.pop("facility_type_id"))
     forceUpdate("sBases", jdata["map_region_list"])
 
-#
-# def playersDbUpdate():
-#     getAllPlayers(DbPlayer)
-#     for p in _allPlayers.values():
-#         _replacePlayer(p)
+
+def playersDbUpdate():
+    getAllItems(Player.newFromData, "users")
+    getAllItems(Map, "sBases")
+    for p in _allPlayers.values():
+        _replacePlayer(p)
+
+
+pushAccounts()
+getAllMapsFromApi()
+playersDbUpdate()
