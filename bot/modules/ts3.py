@@ -197,7 +197,8 @@ def getTs3Bots():
     return bot1, bot2
 
 
-# FOR TESTING:
+# FOR TESTING/GETTING SONG IDS:
 if __name__ == "__main__":
     cfg.getConfig(f"config{''}.cfg")
     init()
+    print(getTs3Bots()[0].get_list())
