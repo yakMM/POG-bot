@@ -188,7 +188,7 @@ class AdminCog(commands.Cog, name='admin'):
             time = 86400
         elif args[2] in ['h', 'hour', 'hours']:
             time = 3600
-        elif args[2] in ['m', 'min', 'mins', 'minute', 'minutes'] :
+        elif args[2] in ['m', 'min', 'mins', 'minute', 'minutes']:
             time = 60
         else:
             await send("RM_TIMEOUT_INVALID", ctx)
@@ -206,9 +206,6 @@ class AdminCog(commands.Cog, name='admin'):
         await player.dbUpdate("timeout")
         await permsMuted(True, player.id)
         await send("RM_TIMEOUT", ctx, player.mention, dt.utcfromtimestamp(endTime).strftime("%Y-%m-%d %H:%M UTC"))
-        
-
-
 
     @commands.command()
     @commands.guild_only()
@@ -257,6 +254,7 @@ class AdminCog(commands.Cog, name='admin'):
 
 def setup(client):
     client.add_cog(AdminCog(client))
+
 
 async def _removeChecks(ctx, channels):
     if not isinstance(channels, list):

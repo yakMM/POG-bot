@@ -7,21 +7,22 @@ from logging import getLogger
 
 log = getLogger(__name__)
 
+
 async def processScore(match):
     igDict = dict()
     start = match.startStamp
-    end = start+cfg.ROUND_LENGHT*60
+    end = start + cfg.ROUND_LENGTH * 60
     for tm in match.teams:
         for aPlayer in tm.players:
             igDict[aPlayer.igId] = aPlayer
     for aPlayer in igDict.values():
         url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_event/?character_id=' + \
-        f'{aPlayer.igId}&type=KILL&after={start}&before={end}&c:limit=500'
+              f'{aPlayer.igId}&type=KILL&after={start}&before={end}&c:limit=500'
         jdata = await request(url)
         try:
             if jdata["returned"] == 0:
                 log.error(f'No kill found for player: id={aPlayer.igName} (url={url})')
-                #raise ApiEmptyAnswer(url)
+                # raise ApiEmptyAnswer(url)
         except KeyError:
             raise ApiNotReachable(url)
         
@@ -54,12 +55,13 @@ async def processScore(match):
                     # TODO: Should we add penalty?
     await getCaptures(match, start, end)
 
+
 async def getCaptures(match, start, end):
     factionDict = dict()
     for tm in match.teams:
         factionDict[tm.faction] = tm
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/world_event/' + \
-            f'?world_id=19&after={start}&before={end}&c:limit=500'
+          f'?world_id=19&after={start}&before={end}&c:limit=500'
     jdata = await request(url)
     try:
         if jdata["returned"] == 0:
@@ -85,4 +87,3 @@ async def getCaptures(match, start, end):
             # Re cap
             capper.addCap(cfg.scores["recapture"])
             baseOwner = capper
-

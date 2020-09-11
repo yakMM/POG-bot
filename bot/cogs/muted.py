@@ -10,18 +10,18 @@ from classes.players import getPlayer
 import modules.config as cfg
 from modules.roles import permsMuted, forceInfo, roleUpdate
 from modules.display import send
+from modules.exceptions import ElementNotFound
 
 log = getLogger(__name__)
 
 
-class registerCog(commands.Cog, name='muted'):
+class RegisterCog(commands.Cog, name='muted'):
     """
     Muted cog, handle the commands from register channel
     """
 
     def __init__(self, client):
         self.client = client
-
 
     async def cog_check(self, ctx):  # Check if right channel
         return ctx.channel.id == cfg.channels['muted']
@@ -44,5 +44,4 @@ class registerCog(commands.Cog, name='muted'):
 
 
 def setup(client):
-    client.add_cog(registerCog(client))
-
+    client.add_cog(RegisterCog(client))

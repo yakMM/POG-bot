@@ -17,7 +17,6 @@ Import this module and use only the following public function:
 
 # discord.py
 from discord import Embed, Color, TextChannel, Message, User, File
-from discord.ext.commands import Context
 
 from datetime import datetime as dt
 from datetime import timezone as tz
@@ -77,12 +76,13 @@ async def remReaction(message, user=None):
         user = _client.user
     await message.remove_reaction("✅", user)
 
+
 async def imageSend(channelId, imagePath):
     channel = _client.get_channel(channelId)
     await channel.send(file=File(imagePath))
 
-## PRIVATE:
 
+# PRIVATE:
 class Emoji:
     def __init__(self):
         self.numeric = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
@@ -98,6 +98,7 @@ def getMapPoolEmojis():
 def getNumericEmojis():
     _emoji_list = Emoji().numeric
     return _emoji_list
+
 
 # PRIVATE:
 
@@ -115,12 +116,12 @@ def _registerHelp(msg):
                     inline=False)
     embed.add_field(name='If you have a Jaeger account',
                     value='`=r charName` - If your character names have faction suffixes\n'
-                          '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes'
-                    , inline=False)
+                          '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes',
+                    inline=False)
     embed.add_field(name='Notify feature',
                     value='`=notify` - To join or leave the Notify feature\n'
-                          f'When suscribed to Notify, you can be mentionned with <@&{cfg.roles["notify"]}> when the queue is almost full'
-                    , inline=False)
+                          f'When subscribed to Notify, you can be mentioned with <@&{cfg.roles["notify"]}> when the queue is almost full',
+                    inline=False)
     try:
         if isAdmin(msg.author):
             embed.add_field(name="Staff Commands",
@@ -180,6 +181,7 @@ def _mapHelp(ctx):
                     inline=False)
     return embed
 
+
 def _timeoutHelp(ctx):
     """ Returns timeout help embed
     """
@@ -194,6 +196,7 @@ def _timeoutHelp(ctx):
                           '`=timeout @player` - Get info on current timeout for @player',
                     inline=False)
     return embed
+
 
 def _mutedHelp(ctx):
     """ Returns help for muted players embed
@@ -217,19 +220,18 @@ def _matchHelp(msg):
                     value='`=m` - Display the match status and team composition\n',
                     inline=False)
     embed.add_field(name='Team Captain commands',
-                    value = '`=p @player` - Pick a player in your team\n'
-                            '`=p VS`/`NC`/`TR` - Pick a faction\n'
-                            '`=p base name` - Pick the map *base name*\n'
-                            '`=resign` - Resign from Team Captain position\n'
-                            '`=ready` - To toggle the ready status of your team'
-                            ,
+                    value='`=p @player` - Pick a player in your team\n'
+                          '`=p VS`/`NC`/`TR` - Pick a faction\n'
+                          '`=p base name` - Pick the map *base name*\n'
+                          '`=resign` - Resign from Team Captain position\n'
+                          '`=ready` - To toggle the ready status of your team',
                     inline=False)
     if isAdmin(msg.author):
         embed.add_field(name="Staff Commands",
-                        value = '`=clear` - Clear the match\n'
-                                '`=map base name` - Select a map\n'
-                                '`=demote @player` - Remove Team Captain position from player\n'
-                                '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
+                        value='`=clear` - Clear the match\n'
+                              '`=map base name` - Select a map\n'
+                              '`=demote @player` - Remove Team Captain position from player\n'
+                              '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                         inline=False)
     return embed
 
@@ -289,7 +291,7 @@ def _selectedMaps(msg, sel):
     """
     embed = Embed(colour=Color.blue())
     embed_text = sel.toString() + f"\n⤾ - Back to Maps"
-    embed.add_field(name=f"{len(sel.selection)} maps found", value=embed_text, inline=False)
+    embed.add_field(name=f"{len(sel.getSelection())} maps found", value=embed_text, inline=False)
     return embed
 
 
@@ -504,7 +506,7 @@ class _StringEnum(Enum):
     BOT_UNFROZEN = _Message("Channel unfrozen!")
 
     MATCH_INIT = _Message("{}\nMatch is ready, starting team selection...")
-    MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player", embed=_teamUpdate)
+    MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player", embed=_teamUpdate, ping=False)
     MATCH_MAP_AUTO = _Message("Match will be on **{}**", ping=False)
     MATCH_CONFIRM = _Message("{} {} Type `=ready` when your team is inside their sundy, ready to start",
                              embed=_teamUpdate)
@@ -553,7 +555,7 @@ class _StringEnum(Enum):
     RM_NOT_IN_DB = _Message("Can't find this player in the database!")
     RM_OK = _Message("Player successfully removed from the system!")
     RM_IN_MATCH = _Message("Can't remove a player who is in match!")
-    RM_LOBBY = _Message("{} have been removed by staff!",embed=_lobbyList)
+    RM_LOBBY = _Message("{} have been removed by staff!", embed=_lobbyList)
     RM_NOT_LOBBIED = _Message("This player is not in queue!")
     RM_TIMEOUT = _Message("{} will be muted from POG until {}!", ping=False)
     RM_TIMEOUT_FREE = _Message("{} is no longer muted!", ping=False)

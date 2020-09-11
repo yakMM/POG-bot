@@ -1,5 +1,5 @@
 from discord.ext import commands
-import discord
+from asyncio import sleep
 from logging import getLogger
 
 import modules.config as cfg
@@ -86,7 +86,7 @@ class MatchesCog(commands.Cog, name='matches'):
 
     @commands.command()
     @commands.guild_only()
-    async def resign(self,ctx):
+    async def resign(self, ctx):
         match = getMatch(ctx.channel.id)
         player = await _testPlayer(ctx, match)
         if player is None:
@@ -107,6 +107,7 @@ class MatchesCog(commands.Cog, name='matches'):
         team = aPlayer.team
         if match.resign(aPlayer):
             await send("PK_RESIGNED", ctx, team.captain.mention, team.name)
+            await send("MATCH_SHOW_PICKS", ctx, match.teams[0].captain.mention, match=match)
         else:
             await send("PK_PICK_STARTED", ctx)
 

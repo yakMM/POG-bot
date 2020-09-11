@@ -2,6 +2,7 @@ from modules.exceptions import ElementNotFound
 
 _allWeapons = dict()
 
+
 def getWeapon(id):
     we = _allWeapons.get(id)
     if we is None:
@@ -9,7 +10,7 @@ def getWeapon(id):
     return we
 
 
-class Weapon():
+class Weapon:
     def __init__(self, data):
         self.__id = data["_id"]
         self.__name = data["name"]

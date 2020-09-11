@@ -5,12 +5,13 @@ from json import loads
 from requests import get
 from configparser import ConfigParser, ParsingError
 from modules.exceptions import ConfigError
+import logging
 
-## STATIC PARAMETERS:
+# STATIC PARAMETERS:
 AFK_TIME = 15  # minutes
-ROUND_LENGHT = 10  # minutes
+ROUND_LENGTH = 0.09  # minutes
 
-## DYNAMIC PARAMETERS:
+# DYNAMIC PARAMETERS:
 # (pulled from the config file)
 
 channels = {
@@ -66,7 +67,8 @@ audio_ids = {
     "factions_selected": "",
     "gelos_in_prison": "",
     "map_selected": "",
-    "players_drop_channel": ""
+    "players_drop_channel": "",
+    "switch_sides": ""
 }
 
 # General
@@ -78,14 +80,15 @@ general = {
     "lobby_size": 0,
     "sinusbot_user": "",
     "sinusbot_pass": "",
+    "map_pool": list(),
     "rules_msg_id": 0
 }
 
 scores = {
-    "teamkill" : 0,
-    "suicide" : 0,
-    "capture" : 0,
-    "recapture" : 0
+    "teamkill": 0,
+    "suicide": 0,
+    "capture": 0,
+    "recapture": 0
 }
 
 VERSION = "0"
@@ -127,13 +130,12 @@ map_pool_images = {"Acan Southern Labs": "https://i.imgur.com/IhF9wQN.png",
                    "Rashnu Watchtower": "https://i.imgur.com/9RkkmFQ.jpeg",
                    "XenoTech Labs": "https://i.imgur.com/uIc2NJH.png"}
 
-
 # Database
 
 _collections = {
     "users": "",
     "sBases": "",
-    "sWeapons" : ""
+    "sWeapons": ""
 }
 
 database = {
@@ -143,6 +145,7 @@ database = {
     "jaeger_cal": "",
     "collections": _collections
 }
+
 
 # Methods
 
@@ -159,10 +162,16 @@ def getConfig(file):
 
     for key in general:
         try:
-            if isinstance(general[key], int):
-                general[key] = int(config['General'][key])
+            if key == "map_pool":
+                tmp = config['General'][key].split(',')
+                general[key].clear()
+                for map in tmp:
+                    general[key].append(map)
             else:
-                general[key] = config['General'][key]
+                if isinstance(general[key], int):
+                    general[key] = int(config['General'][key])
+                else:
+                    general[key] = config['General'][key]
         except KeyError:
             _errorMissing(key, 'General', file)
         except ValueError:
@@ -225,7 +234,7 @@ def getConfig(file):
             _errorMissing(key, 'Roles', file)
         except ValueError:
             _errorIncorrect(key, 'Roles', file)
-    
+
     # Scores section
     _checkSection(config, "Scores", file)
     for key in scores:
@@ -256,11 +265,15 @@ def getConfig(file):
             _errorMissing(key, 'Collections', file)
 
     # Version
-    with open('../CHANGELOG.md', 'r', encoding='utf-8') as txt:
-        txt_str = txt.readline()
-    global VERSION
-    # Extracts "X.X.X" from string "# vX.X.X:" in a lazy way
-    VERSION = txt_str[3:-2]
+    try:
+        with open('../CHANGELOG.md', 'r', encoding='utf-8') as txt:
+            txt_str = txt.readline()
+        global VERSION
+        # Extracts "X.X.X" from string "# vX.X.X:" in a lazy way
+        VERSION = txt_str[3:-2]
+    except Exception as e:
+        logging.warning(f"Error readying CHANGELOG.md. Did you remember to call this module from the root level?\n{e}\n"
+                        f"If you ran ts3.py just ignore this error...")
 
 
 def _checkSection(config, section, file):

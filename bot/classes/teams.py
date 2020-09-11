@@ -1,8 +1,6 @@
 """ Basic team object, should be explicit
 """
 
-from modules.enumerations import PlayerStatus
-
 
 class Team:
     def __init__(self, id, name, match):
@@ -82,14 +80,11 @@ class Team:
         self.__cap += points
         self.__score += points
 
-    def addScore(self, points):
-        self.__score += points
-
     def addOneKill(self):
-        self.__kills +=1
+        self.__kills += 1
 
     def addOneDeath(self):
-        self.__deaths +=1
+        self.__deaths += 1
 
     def addPlayer(self, cls, player):
         active = cls(player, self)

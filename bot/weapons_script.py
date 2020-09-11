@@ -54,35 +54,35 @@ detailled = [2,3,5,11,12]
 def getBannedPerCategorie(cat, id):
     # Knife
     if cat == 2:
-        d={
-        271:"Carver",
-        285:"Ripper",
-        286:"Lumine Edge",
-        1082	:"MAX Punch",
-        1083	:"MAX Punch",
-        1084	:"MAX Punch",
-        804795:"NSX Amaterasu",
-        6005451:"Lumine Edge AE",
-        6005452:"Ripper AE",
-        6005453:"Carver AE"
+        d = {
+        271:        "Carver",
+        285:        "Ripper",
+        286:        "Lumine Edge",
+        1082:       "MAX Punch",
+        1083:       "MAX Punch",
+        1084:       "MAX Punch",
+        804795:     "NSX Amaterasu",
+        6005451:    "Lumine Edge AE",
+        6005452:    "Ripper AE",
+        6005453:    "Carver AE"
         }
     # Pistol
     elif cat == 3:
         d={
-        7390:"NC08 Mag-Scatter"
+        7390:       "NC08 Mag-Scatter"
         }
     # SMG
     elif cat == 5:
         d={
-        1899:	"Tempest",
-        1944	:   "Shuriken",
-        1949	:   "Skorpios",
-        27000:	"AF-4 Cyclone",
-        27005:	"AF-4G Cyclone",
-        28000:	"SMG-46 Armistice",
-        28005:	"SMG-46G Armistice",
-        29000:	"Eridani SX5",
-        29005:	"Eridani SX5G",
+        1899:	    "Tempest",
+        1944:       "Shuriken",
+        1949:       "Skorpios",
+        27000:	    "AF-4 Cyclone",
+        27005:	    "AF-4G Cyclone",
+        28000:	    "SMG-46 Armistice",
+        28005:	    "SMG-46G Armistice",
+        29000:	    "Eridani SX5",
+        29005:	    "Eridani SX5G",
         6002772:	"Eridani SX5-AE",
         6002800:	"SMG-46AE Armistice",
         6002824:	"AF-4AE Cyclone",
@@ -94,18 +94,18 @@ def getBannedPerCategorie(cat, id):
     # Sniper Rifle
     elif cat == 11:
         d={
-        88:	    "99SV",
-        89:	    "VA39 Spectre",
-        7316:	"TRAP-M1",
-        7337	:   "Phaseshift VX-S",
-        24000:	"Gauss SPR",
-        24002:	"Impetus",
-        25002:	"KSR-35",
-        26002:	"Phantom VA23",
-        802771:	"NS-AM7 Archer",
-        802910:	"NS-AM7B Archer",
-        802921:	"NS-AM7G Archer",
-        804255:	"NSX Daimyo",
+        88:	        "99SV",
+        89:	        "VA39 Spectre",
+        7316:	    "TRAP-M1",
+        7337:       "Phaseshift VX-S",
+        24000:  	"Gauss SPR",
+        24002:  	"Impetus",
+        25002:	    "KSR-35",
+        26002:	    "Phantom VA23",
+        802771: 	"NS-AM7 Archer",
+        802910:	    "NS-AM7B Archer",
+        802921: 	"NS-AM7G Archer",
+        804255:	    "NSX Daimyo",
         6002918:	"NS-AM7 VS/AE Archer",
         6002930:	"NS-AM7 AE/TR Archer",
         6002943:	"NS-AM7 AE/NC Archer",
@@ -118,13 +118,13 @@ def getBannedPerCategorie(cat, id):
     # Scout Rifle
     elif cat == 12:
         d={
-        2311	:   "NS-30 Vandal",
-        2312	:   "NS-30B Vandal",
-        2313	:   "NS-30G Vandal",
-        24007:	"AF-6 Shadow",
-        25007:	"HSR-1",
-        26007:	"Nyx VX31",
-        6004198:"Mystery Weapon"
+        2311:       "NS-30 Vandal",
+        2312:       "NS-30B Vandal",
+        2313:       "NS-30G Vandal",
+        24007:	    "AF-6 Shadow",
+        25007:	    "HSR-1",
+        26007:	    "Nyx VX31",
+        6004198:    "Mystery Weapon"
         }
     return id in d.keys()
 
@@ -157,7 +157,7 @@ def getUnknownWeapon():
     nData["name"] = "Unknown"
     nData["points"] = 1
     nData["banned"] = False
-    nData["faction"]  = 0
+    nData["faction"] = 0
     nData["cat_id"] = 0
     return nData
 
@@ -201,7 +201,7 @@ def pushAllWeapons():
                 nData["faction"] = int(we["faction_id"])
             except KeyError:
                 nData["faction"]  = 0
-                #print("illegal faction:" + nData["name"])
+                # print("illegal faction:" + nData["name"])
             gigaList.append(nData)
     gigaList.append(getUnknownWeapon())
     forceUpdate("sWeapons", gigaList)
@@ -216,7 +216,7 @@ def getAllCategories():
         return
 
     di = dict()
-    for  cat in jdata["item_category_list"]:
+    for cat in jdata["item_category_list"]:
         di[int(cat["item_category_id"])] = cat["name"]["en"]
     return di
 

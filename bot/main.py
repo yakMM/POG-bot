@@ -36,7 +36,7 @@ from modules.reactions import reactionHandler
 from matches import onInactiveConfirmed, init as matchesInit, getMatch
 from classes.players import Player, getPlayer, getAllPlayersList
 from classes.accounts import AccountHander
-from classes.maps import Map, createJeagerCalObj
+from classes.maps import Map, createJaegerCalObj
 from classes.weapons import Weapon
 
 
@@ -134,7 +134,7 @@ def _addMainHandlers(client):
         # reaction to the rule message?
         if payload.message_id == cfg.general["rules_msg_id"]:
             global rulesMsg
-            rulesMsg = await client.get_channel(cfg.discord_ids["rules"]).fetch_message(cfg.discord_ids["rules_msg"])
+            rulesMsg = await client.get_channel(cfg.channels["rules"]).fetch_message(cfg.general["rules_msg_id"])
             if str(payload.emoji) == "✅":
                 try:
                     p = getPlayer(payload.member.id)
@@ -143,15 +143,15 @@ def _addMainHandlers(client):
                     p = Player(payload.member.name, payload.member.id)
                 await roleUpdate(p)
                 if p.status is PlayerStatus.IS_NOT_REGISTERED:
-                        # they can now register
-                        await channelSend("REG_RULES", cfg.channels["register"], payload.member.mention)
+                    # they can now register
+                    await channelSend("REG_RULES", cfg.channels["register"], payload.member.mention)
             # In any case remove the reaction, message is to stay clean
             await rulesMsg.remove_reaction(payload.emoji, payload.member)
 
     # Reaction update handler (for accounts)
     @client.event
     async def on_reaction_add(reaction, user):
-        if reaction.message.author.bot and not user.bot and reaction.message.channel.id in cfg.discord_ids["matches"]:
+        if reaction.message.author.bot and not user.bot and reaction.message.channel.id in cfg.channels["matches"]:
             cleaned_reaction_message = re.sub("<.+?>", "", reaction.message.content)
             emoji_obj = Emoji()
             currentMatch = getMatch(reaction.message.channel.id)
@@ -182,13 +182,11 @@ def _addMainHandlers(client):
 
                     await reaction.remove(user)
 
-                    if 1 <= value <= len(currentMatch.mapSelector.selection):
-                        await edit("PK_SHOW_REACT_MAP", reaction.message, map=currentMatch.mapSelector.selection[value - 1])
+                    if 1 <= value <= len(currentMatch.mapSelector.getSelection()):
+                        await edit("PK_SHOW_REACT_MAP", reaction.message, map=currentMatch.mapSelector.getSelection()[value - 1])
                     elif value == 27:
                         captainPings = [tm.captain.mention for tm in currentMatch.teams]
                         await edit("PK_WAIT_MAP", reaction.message, sel=currentMatch.mapSelector, *captainPings)
-
-
 
         # below is for player account acceptance
         try:
@@ -248,12 +246,6 @@ def _addInitHandlers(client):
         return
 
 
-# TODO: testing, to be removed
-def _test(client):
-    from test2 import testHand
-    testHand(client)
-
-
 def main(launchStr=""):
     # Logging config
     logger = logging.getLogger()
@@ -292,7 +284,7 @@ def main(launchStr=""):
     AccountHander.init(f"gspread_client_secret{launchStr}.json")
 
     # Establish connection with Jaeger Calendar and create a global object
-    createJeagerCalObj(f"gspread_client_secret{launchStr}.json")
+    createJaegerCalObj(f"gspread_client_secret{launchStr}.json")
 
     # Initialise matches channels
     matchesInit(cfg.channels["matches"])
@@ -302,13 +294,9 @@ def main(launchStr=""):
 
     # Add main handlers
     _addInitHandlers(client)
-    if launchStr == "_test":
-        _test(client)
 
     # Add all cogs
     cogInit(client)
-
-
 
     # Run server
     client.run(cfg.general["token"])

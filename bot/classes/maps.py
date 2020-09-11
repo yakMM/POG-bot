@@ -8,7 +8,6 @@ from modules.exceptions import ElementNotFound
 from modules.display import send
 from logging import getLogger
 from gspread import service_account
-from gspread.exceptions import APIError
 import datetime as dt
 import numpy as np
 
@@ -22,6 +21,17 @@ MAX_SELECTED = 15
 _mapSelectionsDict = dict()
 
 
+def names_to_maps(map_names):  # returns a list of map objects from a list of map names
+    formatted = list()
+    for map_name in map_names:
+        for map in _allMapsList:
+            if map_name.lower() in map.name.lower():
+                formatted.append(map)
+            else:
+                log.debug(f"Map named '{map_name}' could not be found and is being omitted from the formatted list")
+    return formatted
+
+
 def getMapSelection(id):
     sel = _mapSelectionsDict.get(id)
     if sel is None:
@@ -29,7 +39,7 @@ def getMapSelection(id):
     return sel
 
 
-class Map():
+class Map:
     def __init__(self, data):
         self.__id = data["_id"]
         self.__name = data["facility_name"]
@@ -69,7 +79,7 @@ class Map():
         return name
 
 
-def createJeagerCalObj(secretFile):
+def createJaegerCalObj(secretFile):
     global jaeger_cal_obj
     jaeger_cal_obj = JaegerCalendarHandler(secretFile)
 
@@ -81,15 +91,16 @@ class JaegerCalendarHandler:
         self.sh = self.gc.open_by_key(cfg.database["jaeger_cal"])
 
 
-class MapSelection():
+class MapSelection:
     def __init__(self, id, mapList=_allMapsList):
         self.__id = id
         self.booked = list()
         self.get_booked(mapList)
-        self.__selection = list()
+        self.__selection = self.select_available(names_to_maps(cfg.general["map_pool"]))
+        # todo: use this as the map pool, remove yak's way
         self.__selected = None
         self.__allMaps = mapList
-        self.__status = SelStatus.IS_EMPTY
+        self.__status = SelStatus.IS_SELECTION
         _mapSelectionsDict[self.__id] = self
 
     def selectFromIdList(self, ids):
@@ -103,6 +114,9 @@ class MapSelection():
                     self.__selection.append(map)
                     break
         self.__status = SelStatus.IS_SELECTION
+
+    def getSelection(self):  # used to access protected class object __selection in other modules
+        return self.__selection
 
     def toString(self):
         result = ""

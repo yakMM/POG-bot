@@ -2,36 +2,36 @@ from gspread import service_account
 from numpy import array
 import modules.config as cfg
 from classes.players import Player, _allPlayers
-from modules.database import forceUpdate, getAllPlayers, _replacePlayer, _updateMap, getAllMaps, init as dbInit
-from classes.maps import _allMapsList
+from modules.database import forceUpdate, _replacePlayer, _updateMap, init as dbInit, getAllItems
+from classes.maps import _allMapsList, Map
 import requests
 import json
 import asyncio
 
-LAUNCHSTR = ""  # this should be empty if your files are config.cfg and client_secret.json
+LAUNCHSTR = ""  # this should be empty if your files are config.cfg and gspread_client_secret.json
 
 cfg.getConfig(f"config{LAUNCHSTR}.cfg")
 dbInit(cfg.database)
 
 
-
 class DbPlayer(Player):
     @classmethod
     def newFromData(cls, data):
-        newData=dict()
+        newData = dict()
         newData["name"] = data["name"]
         newData["_id"] = data["_id"]
         newData["rank"] = 1
         newData["notify"] = data["roles"]["notify"]
-        newData["timeout"] = {"time" : 0, "reason" :""}
+        newData["timeout"] = {"time": 0, "reason": ""}
         newData["igIds"] = data["igIds"]
         newData["igNames"] = data["igNames"]
         newData["hasOwnAccount"] = data["hasOwnAccount"]
         super().newFromData(newData)
 
+
 def pushAccounts():
     # Get all accounts
-    gc = service_account(filename=f'client_secret{LAUNCHSTR}.json')
+    gc = service_account(filename=f'gspread_client_secret{LAUNCHSTR}.json')
     sh = gc.open_by_key(cfg.database["accounts"])
     rawSheet = sh.get_worksheet(1)
     visibleSheet = sh.get_worksheet(0)
@@ -71,7 +71,6 @@ def getAllMapsFromApi():
     # acan,pale,ghanan,xenotech,peris,rashnu,chac
 
     for mp in jdata["map_region_list"]:
-        print(mp)
         mp["_id"] = int(mp.pop("facility_id"))
         mp["in_map_pool"] = mp["_id"] in ids
         mp["zone_id"] = int(mp.pop("zone_id"))
@@ -80,6 +79,12 @@ def getAllMapsFromApi():
 
 
 def playersDbUpdate():
-    getAllPlayers(DbPlayer)
+    getAllItems(Player.newFromData, "users")
+    getAllItems(Map, "sBases")
     for p in _allPlayers.values():
         _replacePlayer(p)
+
+
+pushAccounts()
+getAllMapsFromApi()
+playersDbUpdate()

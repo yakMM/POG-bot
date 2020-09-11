@@ -2,14 +2,14 @@ import modules.config as cfg
 from modules.exceptions import UnexpectedError, AccountsNotEnough, ElementNotFound
 from modules.display import channelSend, edit
 from modules.enumerations import PlayerStatus, MatchStatus, SelStatus
-from modules.imageMaker import publishMatchImage
+# from modules.imageMaker import publishMatchImage
 from modules.script import processScore
 from datetime import datetime as dt
 from modules.ts3 import getTs3Bots
 
 from classes.teams import Team  # ok
 from classes.players import TeamCaptain, ActivePlayer  # ok
-from classes.maps import MapSelection, mainMapPool  # ok
+from classes.maps import MapSelection, mainMapPool, _allMapsList  # ok
 from classes.accounts import AccountHander  # ok
 
 from random import choice as randomChoice
@@ -35,9 +35,9 @@ def isLobbyStuck():
     return _lobbyStuck
 
 
-def _autoPingTreshold():
-    tresh = cfg.general["lobby_size"] - cfg.general["lobby_size"] // 3
-    return tresh
+def _autoPingThreshold():
+    thresh = cfg.general["lobby_size"] - cfg.general["lobby_size"] // 3
+    return thresh
 
 
 def _autoPingCancel():
@@ -50,7 +50,7 @@ def addToLobby(player):
     player.onLobbyAdd()
     if len(_lobbyList) == cfg.general["lobby_size"]:
         startMatchFromFullLobby.start()
-    elif len(_lobbyList) >= _autoPingTreshold():
+    elif len(_lobbyList) >= _autoPingThreshold():
         if not _autoPing.is_running() and not _autoPing.already:
             _autoPing.start()
             _autoPing.already = True
@@ -62,7 +62,6 @@ async def _autoPing():
         return
     await channelSend("LB_NOTIFY", cfg.channels["lobby"], f'<@&{cfg.roles["notify"]}>')
 _autoPing.already = False
-
 
 
 def getLobbyLen():
@@ -80,7 +79,6 @@ def removeFromLobby(player):
     player.onLobbyLeave()
 
 
-
 def _onMatchFree():
     _autoPing.already = True
     if len(_lobbyList) == cfg.general["lobby_size"]:
@@ -90,15 +88,8 @@ def _onMatchFree():
 def _onLobbyRemove():
     global _lobbyStuck
     _lobbyStuck = False
-    if len(_lobbyList) < _autoPingTreshold():
+    if len(_lobbyList) < _autoPingThreshold():
         _autoPingCancel()
-
-
-def _onLobbyRemove():
-    global _lobbyStuck
-    _lobbyStuck = False
-    if len(_lobbyList) < cfg.general["lobby_size"]-4:
-        _autoPing.cancel()
 
 
 @tasks.loop(count=1)
@@ -118,21 +109,22 @@ async def startMatchFromFullLobby():
     match._launch.start()
     await channelSend("LB_MATCH_STARTING", cfg.channels["lobby"], match.id)
     # ts3: lobby full
-    if match.id == cfg.discord_ids["matches"][0]:  # if match 1
+    if match.id == cfg.channels["matches"][0]:  # if match 1
         getTs3Bots()[0].move(cfg.teamspeak_ids["ts_lobby"])  # IF IT HANGS HERE MAKE SURE webapi.js IS ENABLED FOR SINUSBOT
         getTs3Bots()[0].enqueue(cfg.audio_ids["drop_match_1_picks"])
         await sleep(getTs3Bots()[0].get_duration(cfg.audio_ids["drop_match_1_picks"]))
         getTs3Bots()[0].move(cfg.teamspeak_ids["ts_match_1_picks"])
-    elif match.id == cfg.discord_ids["matches"][1]:  # if match 2
+    elif match.id == cfg.channels["matches"][1]:  # if match 2
         getTs3Bots()[1].move(cfg.teamspeak_ids["ts_lobby"])
         getTs3Bots()[1].enqueue(cfg.audio_ids["drop_match_2_picks"])
         await sleep(getTs3Bots()[1].get_duration(cfg.audio_ids["drop_match_2_picks"]))
         getTs3Bots()[1].move(cfg.teamspeak_ids["ts_match_2_picks"])
-    elif match.id == cfg.discord_ids["matches"][2]:  # if match 3
+    elif match.id == cfg.channels["matches"][2]:  # if match 3
         getTs3Bots()[1].move(cfg.teamspeak_ids["ts_lobby"])
         getTs3Bots()[1].enqueue(cfg.audio_ids["drop_match_3_picks"])
         await sleep(getTs3Bots()[1].get_duration(cfg.audio_ids["drop_match_3_picks"]))
         getTs3Bots()[1].move(cfg.teamspeak_ids["ts_match_3_picks"])
+
 
 async def onInactiveConfirmed(player):
     removeFromLobby(player)
@@ -157,9 +149,9 @@ def _findSpotForMatch():
 
 
 def which_bot(match_id):
-    if match_id == cfg.discord_ids["matches"][0]:
+    if match_id == cfg.channels["matches"][0]:
         ts3bot = getTs3Bots()[0]
-    elif match_id == cfg.discord_ids["matches"][1] or match_id == cfg.discord_ids["matches"][2]:
+    elif match_id == cfg.channels["matches"][1] or match_id == cfg.channels["matches"][2]:
         ts3bot = getTs3Bots()[1]
     return ts3bot
 
@@ -185,8 +177,7 @@ def init(list):
         Match(id)
 
 
-class Match():
-
+class Match:
     def __init__(self, id):
         self.__id = id
         self.__players = dict()
@@ -346,7 +337,7 @@ class Match():
         ts3bot.move(pick_channel)
         await sleep(1)  # prevents playing this before faction announce
         ts3bot.enqueue(cfg.audio_ids["select_map"])
-        await channelSend("PK_WAIT_MAP", self.__id, *captainPings)
+        await channelSend("PK_WAIT_MAP", self.__id, sel=self.__mapSelector, *captainPings)
 
     @tasks.loop(count=1)
     async def __ready(self):
@@ -372,9 +363,6 @@ class Match():
         getTs3Bots()[1].enqueue(cfg.audio_ids["type_ready"])
 
     @tasks.loop(minutes=cfg.ROUND_LENGTH, delay=1, count=2)
-    async def __onMatchOver(self):
-
-    @tasks.loop(minutes=cfg.ROUND_LENGHT, delay=1, count=2)
     async def _onMatchOver(self):
         playerPings = [" ".join(tm.allPings) for tm in self.__teams]
         await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
@@ -410,8 +398,7 @@ class Match():
     @tasks.loop(count=1)
     async def _scoreCalculation(self):
         await processScore(self)
-        await publishMatchImage(self)
-
+        # await publishMatchImage(self)
 
     @tasks.loop(count=1)
     async def __startMatch(self):
@@ -452,7 +439,7 @@ class Match():
     async def _launch(self):
         await channelSend("MATCH_INIT", self.__id, " ".join(self.playerPings))
         self.__accounts = AccountHander(self)
-        self.__mapSelector = MapSelection(self, mainMapPool)
+        self.__mapSelector = MapSelection(self, _allMapsList)
         for i in range(len(self.__teams)):
             self.__teams[i] = Team(i, f"Team {i + 1}", self)
             key = randomChoice(list(self.__players))
@@ -541,7 +528,7 @@ class Match():
     # TODO: DEV
     @teams.setter
     def teams(self, tms):
-        self.__teams=tms
+        self.__teams = tms
     
     # TODO: DEV
     @startStamp.setter
