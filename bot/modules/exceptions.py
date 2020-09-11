@@ -93,3 +93,13 @@ class ApiNotReachable(Exception):
         message = f"Cannot reach Api ({url})!"
         log.error(message)
         super().__init__(message)
+
+
+class WebapiError(Exception):
+    def __init__(self):
+        super().__init__(f"Unable to send 'move' command to TS3 bots! Is the webapi.js extension enabled for Sinusbot?")
+
+
+class SinusbotAuthError(Exception):
+    def __init__(self):
+        super().__init__(f"Bad sinusbot username or password. Unable to connect!")

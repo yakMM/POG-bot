@@ -5,6 +5,7 @@ from json import loads
 from requests import get
 from configparser import ConfigParser, ParsingError
 from modules.exceptions import ConfigError
+import logging
 
 # STATIC PARAMETERS:
 AFK_TIME = 15  # minutes
@@ -264,11 +265,15 @@ def getConfig(file):
             _errorMissing(key, 'Collections', file)
 
     # Version
-    with open('../CHANGELOG.md', 'r', encoding='utf-8') as txt:
-        txt_str = txt.readline()
-    global VERSION
-    # Extracts "X.X.X" from string "# vX.X.X:" in a lazy way
-    VERSION = txt_str[3:-2]
+    try:
+        with open('../CHANGELOG.md', 'r', encoding='utf-8') as txt:
+            txt_str = txt.readline()
+        global VERSION
+        # Extracts "X.X.X" from string "# vX.X.X:" in a lazy way
+        VERSION = txt_str[3:-2]
+    except Exception as e:
+        logging.warning(f"Error readying CHANGELOG.md. Did you remember to call this module from the root level?\n{e}\n"
+                        f"If you ran ts3.py just ignore this error...")
 
 
 def _checkSection(config, section, file):

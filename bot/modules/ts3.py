@@ -2,6 +2,7 @@ import logging
 import requests
 import json
 from logging import getLogger
+from modules.exceptions import SinusbotAuthError, WebapiError
 import modules.config as cfg
 
 log = getLogger(__name__)
@@ -17,15 +18,8 @@ log = getLogger(__name__)
 
 
 class Ts3Bot:
-    class WebapiError(Exception):
-        pass
-
-    class SinusbotAuthError(Exception):
-        pass
-
     def __init__(self, main_url, instance_name, username="admin", password=""):
         self.initialized = None
-
         if main_url and instance_name:
             self.main_url = main_url
             botID_endpoint = "Id"
@@ -37,11 +31,11 @@ class Ts3Bot:
             try:
                 login_response = requests.post(self.main_url + login_endpoint, data=data)
                 if login_response.status_code == 401:
-                    raise self.SinusbotAuthError
+                    raise SinusbotAuthError
                 else:
                     self.auth_token = login_response.json()["token"]
-            except self.SinusbotAuthError as sae:
-                log.error(f"Bad sinusbot username or password. Unable to connect.\n{sae}")
+            except SinusbotAuthError as sae:
+                log.error(f"{sae}\nURL: '{main_url}\nInstance Name: {instance_name}\nUsername: '{username}'\nPassword: '{password}'")
 
             instances_endpoint = '/instances'
             instances_response = requests.get(self.main_url + instances_endpoint,
@@ -181,14 +175,13 @@ def init():
             else:
                 bot1.initialized = False
                 bot2.initialized = False
-                raise Ts3Bot.WebapiError
+                raise WebapiError
         else:
             raise ConnectionError
     except ConnectionError as ce:
         log.warning(f"Unable to initialize TS3 bots! Continuing script without bots functioning...\n{ce}")
-    except Ts3Bot.WebapiError as we:
-        log.warning(f"Unable to send 'move' command to TS3 bots! Is the webapi.js extension enabled for Sinusbot? "
-                    f"Continuing script without bots functioning...\n{we}")
+    except WebapiError as we:
+        log.warning(f"{we}\nContinuing script without bots functioning...")
     except Exception as e:
         log.error(f"Uncaught exception starting ts3 bots! Continuing script without bots functioning... {type(e).__name__}\n{e}")
 
@@ -199,6 +192,8 @@ def getTs3Bots():
 
 # FOR TESTING/GETTING SONG IDS:
 if __name__ == "__main__":
-    cfg.getConfig(f"config{''}.cfg")
+    launchStr = ""
+    cfg.getConfig(f"../config{launchStr}.cfg")
     init()
-    print(getTs3Bots()[0].get_list())
+    for song in getTs3Bots()[0].get_list():
+        print(song)
