@@ -8,7 +8,7 @@ from modules.exceptions import ConfigError
 
 # STATIC PARAMETERS:
 AFK_TIME = 15  # minutes
-ROUND_LENGTH = 10  # minutes
+ROUND_LENGTH = 0.09  # minutes
 
 # DYNAMIC PARAMETERS:
 # (pulled from the config file)
@@ -66,7 +66,8 @@ audio_ids = {
     "factions_selected": "",
     "gelos_in_prison": "",
     "map_selected": "",
-    "players_drop_channel": ""
+    "players_drop_channel": "",
+    "switch_sides": ""
 }
 
 # General
