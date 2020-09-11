@@ -195,5 +195,6 @@ if __name__ == "__main__":
     launchStr = ""
     cfg.getConfig(f"../config{launchStr}.cfg")
     init()
+    print("(<song id>, <song name>, <duration (ms)>)")
     for song in getTs3Bots()[0].get_list():
         print(song)
