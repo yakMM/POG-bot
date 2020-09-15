@@ -10,6 +10,7 @@ from gspread import service_account
 from gspread.exceptions import APIError
 from numpy import array, vstack
 from datetime import datetime as dt
+from discord.errors import Forbidden
 
 #from discord.ext import tasks
 from lib import tasks
@@ -236,8 +237,11 @@ class AccountHander():
                 currentAcc = self.__freeAccounts[i]
                 currentAcc.aPlayer = aPlayer
                 newLine[currentAcc.x] = str(aPlayer.id)
-                msg = await privateSend("ACC_UPDATE", aPlayer.id, account=currentAcc)
-                await msg.add_reaction('✅')
+                try:
+                    msg = await privateSend("ACC_UPDATE", aPlayer.id, account=currentAcc)
+                    await msg.add_reaction('✅')
+                except Forbidden:
+                    msg = await channelSend("ACC_CLOSED", self.__match.id, aPlayer.mention)
                 currentAcc.message = msg
                 i += 1
         type(self)._sheetTab = vstack((type(self)._sheetTab, array(newLine)))

@@ -313,7 +313,7 @@ class Match():
         self.__status = MatchStatus.IS_WAITING
         await channelSend("MATCH_CONFIRM", self.__id, *captainPings, match=self)
 
-    @tasks.loop(seconds=1, delay=1, count=2)
+    @tasks.loop(minutes=cfg.ROUND_LENGHT, delay=1, count=2)
     async def _onMatchOver(self):
         playerPings = [" ".join(tm.allPings) for tm in self.__teams]
         await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)

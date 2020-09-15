@@ -9,6 +9,7 @@ from modules.exceptions import ElementNotFound, DatabaseError
 from modules.database import removePlayer as dbRemove
 from modules.loader import lockAll, unlockAll, isAllLocked
 from modules.roles import forceInfo, roleUpdate, isAdmin, permsMuted, channelFreeze
+from modules.census import getOfflinePlayers
 
 from classes.players import removePlayer, getPlayer, Player, TeamCaptain
 
@@ -227,8 +228,6 @@ class AdminCog(commands.Cog, name='admin'):
         await player.dbUpdate("timeout")
         await permsMuted(True, player.id)
         await send("RM_TIMEOUT", ctx, player.mention, dt.utcfromtimestamp(endTime).strftime("%Y-%m-%d %H:%M UTC"))
-        
-
 
 
     @commands.command()
@@ -254,6 +253,14 @@ class AdminCog(commands.Cog, name='admin'):
                 return
             unlockAll(self.client)
             await send("BOT_UNLOCKED", ctx)
+            return
+        if arg == "ingame":
+            if getOfflinePlayers.bypass:
+                getOfflinePlayers.bypass = False
+                await send("BOT_BP_OFF", ctx)
+            else:
+                getOfflinePlayers.bypass = True
+                await send("BOT_BP_ON", ctx)
             return
         await send("WRONG_USAGE", ctx, ctx.command.name)
 

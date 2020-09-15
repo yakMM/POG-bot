@@ -84,6 +84,8 @@ async def getCaptures(match, start, end):
             baseOwner = capper
 
 async def getOfflinePlayers(team):
+    if getOfflinePlayers.bypass:
+        return list()
     igDict = dict()
     for p in team.players:
         igDict[p.igId] = p
@@ -102,3 +104,5 @@ async def getOfflinePlayers(team):
             offlinePlayers.append(igDict[int(char["character_id"])])
 
     return offlinePlayers
+
+getOfflinePlayers.bypass = False

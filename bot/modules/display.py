@@ -453,6 +453,8 @@ class _StringEnum(Enum):
     BOT_VERSION = _Message("Version `{}`, locked: `{}`")
     BOT_FROZEN = _Message("Channel frozen!")
     BOT_UNFROZEN = _Message("Channel unfrozen!")
+    BOT_BP_OFF = _Message("Ingame status check is now enabled!")
+    BOT_BP_ON = _Message("Ingame status check is now disabled!")
 
     MATCH_INIT = _Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player",embed=_teamUpdate)
@@ -492,6 +494,7 @@ class _StringEnum(Enum):
     ACC_SENT = _Message("**Successfully sent jaeger accounts  in DMs!**")
     ACC_SENDING = _Message("Loading Jaeger accounts...")
     ACC_OVER = _Message("Match is over, please log out of your Jaeger account!")
+    ACC_CLOSED = _Message("{}'s DMS are locked, can't send them a Jaeger account!")
 
     NOTIFY_REMOVED = _Message("You left Notify!")
     NOTIFY_ADDED = _Message("You joined Notify!")

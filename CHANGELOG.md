@@ -6,7 +6,7 @@
 - Added a lobby restore command
 - Api calls are now retried if they fail
 - Factions can now be modified again before the match start
-- Added logging to understand account sending infinite loop
+- Fixed account sending infinite loop by handling error if a player has its DMs closed
 - Now checking if players are online in game before allowing match to start
 
 # v1.12:
