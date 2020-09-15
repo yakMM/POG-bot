@@ -6,7 +6,7 @@ Usage:
 
 # Others
 from aiohttp import ClientSession
-from aiohttp.client_exceptions import ClientOSError
+from aiohttp.client_exceptions import ClientOSError, ClientConnectorError
 from json import loads
 from logging import getLogger
 
@@ -26,8 +26,8 @@ async def apiRequestAndRetry(url):
     for i in range(5):
         try:
             jdata = await request(url)
-        except ClientOsError:
-            log.warn(f"ClienOsError on try {i} for {url}")
+        except (ClientOSError, ClientConnectorError):
+            log.warn(f"ClientError on try {i} for {url}")
             continue  # Try again
         if "returned" in jdata:
             return jdata

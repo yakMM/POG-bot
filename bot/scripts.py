@@ -2,7 +2,7 @@ from gspread import service_account
 from numpy import array
 import modules.config as cfg
 from classes.players import Player, _allPlayers
-from modules.database import forceUpdate, getAllPlayers, _replacePlayer, _updateMap, getAllMaps, init as dbInit
+from modules.database import forceUpdate, getAllItems, _replacePlayer, _updateMap, init as dbInit
 from classes.maps import _allMapsList
 import requests
 import json
@@ -21,10 +21,10 @@ class DbPlayer(Player):
         newData=dict()
         newData["name"] = data["name"]
         newData["_id"] = data["_id"]
-        newData["rank"] = 1
-        newData["notify"] = data["roles"]["notify"]
-        newData["timeout"] = {"time" : 0, "reason" :""}
-        newData["igIds"] = data["igIds"]
+        newData["rank"] = data["rank"]
+        newData["notify"] = data["notify"]
+        newData["timeout"] = data["timeout"]
+        newData["igIds"] = [int(pId) for pId in data["igIds"]]
         newData["igNames"] = data["igNames"]
         newData["hasOwnAccount"] = data["hasOwnAccount"]
         super().newFromData(newData)
@@ -80,6 +80,6 @@ def getAllMapsFromApi():
 
 
 def playersDbUpdate():
-    getAllPlayers(DbPlayer)
+    getAllItems(DbPlayer.newFromData, "users")
     for p in _allPlayers.values():
         _replacePlayer(p)

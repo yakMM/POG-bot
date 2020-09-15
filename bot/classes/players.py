@@ -6,7 +6,7 @@ import enum
 # Custom modules
 import modules.config as cfg
 from modules.asynchttp import apiRequestAndRetry as httpRequest
-from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
+from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable, AccountNotFound
 from modules.enumerations import PlayerStatus
 from lib import tasks
 from modules.roles import roleUpdate
@@ -140,6 +140,9 @@ class Player():
         self.updateRole()
 
     def onMatchReady(self):
+        self.__status = PlayerStatus.IS_WAITING
+
+    def onTeamReady(self):
         self.__status = PlayerStatus.IS_PLAYING
 
     def onPlayerClean(self):
@@ -275,17 +278,15 @@ class Player():
                         jdata["character_list"][0]["name"]["first"])
                 else:
                     faction = int(jdata["character_list"][0]["faction_id"])
-                    currId = jdata["character_list"][0]["character_id"]
+                    currId = int(jdata["character_list"][0]["character_id"])
                     currName = jdata["character_list"][0]["name"]["first"]
                     if currId in _namesChecking[faction-1]:
                         p = _namesChecking[faction-1][currId]
                         if p != self:
                             raise CharAlreadyExists(currName, p.id)
                     newIds[faction-1] = currId
-                    updated = updated or newIds[faction -
-                                                1] != self._igIds[faction-1]
-                    newNames[faction -
-                             1] = jdata["character_list"][0]["name"]["first"]
+                    updated = updated or newIds[faction - 1] != self._igIds[faction-1]
+                    newNames[faction - 1] = jdata["character_list"][0]["name"]["first"]
             except IndexError:
                 # Should not happen, we checked earlier
                 raise UnexpectedError(
@@ -353,6 +354,9 @@ class ActivePlayer:
     def onResign(self):
         self.__player.onResign()
         return self.__player
+    
+    def onTeamReady(self):
+        self.__player.onTeamReady()
 
     @property
     def mention(self):

@@ -73,6 +73,3 @@ async def publishMatchImage(match, channel=None):
     # await imageSend(match.id, f'../matches/match_{match.number}.png')
     # for channel is not None:
     #     await imageSend(channel, f'../matches/match_{match.number}.png')
-
-PassivityRehabilitationCentreVS
-namenBARSxRoundNON

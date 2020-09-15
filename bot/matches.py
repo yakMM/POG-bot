@@ -4,7 +4,7 @@ from modules.exceptions import UnexpectedError, AccountsNotEnough, \
 from modules.display import channelSend, edit
 from modules.enumerations import PlayerStatus, MatchStatus, SelStatus
 from modules.imageMaker import publishMatchImage
-from modules.script import processScore
+from modules.census import processScore, getOfflinePlayers
 from datetime import datetime as dt
 
 from classes.teams import Team  # ok
@@ -244,8 +244,8 @@ class Match():
     async def __playerPickOver(self, picker):
         await channelSend("PK_OK_FACTION", self.__id, picker.mention, match=self)
 
-    def factionPick(self, team, str):
-        faction = cfg.i_factions[str]
+    def factionPick(self, team, arg):
+        faction = cfg.i_factions[arg.upper()]
         other = self.__teams[team.id-1]
         if other.faction == faction:
             return team.captain
@@ -258,27 +258,18 @@ class Match():
             other.captain.isTurn = True
         return other.captain
 
-    def factionChange(self, team, str):
-        faction = cfg.i_factions[str]
+    def factionChange(self, team, arg):
+        faction = cfg.i_factions[arg.upper()]
         other = self.__teams[team.id-1]
         if other.faction == faction:
             return False
         team.faction = faction
         return True
 
+
     def onTeamReady(self, team):
-        notReady = list()
-        for p in team.players:
-            if p.hasOwnAccount:
-                continue
-            if p.account is None:
-                log.error(f"Debug: {p.name} has no account")
-            if p.account.isValidated:
-                continue
-            notReady.append(p.mention)
-        if len(notReady) != 0:
-            return notReady
         team.captain.isTurn = False
+        team.onTeamReady()
         other = self.__teams[team.id-1]
         # If other isTurn, then not ready
         # Else everyone ready
@@ -313,10 +304,16 @@ class Match():
             await channelSend("ACC_NOT_ENOUGH", self.__id)
             await self.clear()
             return
+        except Exception as e:
+            log.error(f"Error in account giving function!\n{e}")
+            await channelSend("ACC_ERROR", self.__id)
+            await self.clear()
+            return
+
         self.__status = MatchStatus.IS_WAITING
         await channelSend("MATCH_CONFIRM", self.__id, *captainPings, match=self)
 
-    @tasks.loop(minutes=cfg.ROUND_LENGHT, delay=1, count=2)
+    @tasks.loop(seconds=1, delay=1, count=2)
     async def _onMatchOver(self):
         playerPings = [" ".join(tm.allPings) for tm in self.__teams]
         await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)

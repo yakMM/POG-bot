@@ -265,6 +265,18 @@ def _selectedMaps(msg, sel):
     embed.add_field(name=f"{len(maps)} maps found",value="\n".join(maps),inline=False)
     return embed
 
+def _offlineList(msg, pList):
+    embed = Embed(
+        colour=Color.red(),
+        title='Offline Players',
+        description=f'If your character info is incorrect, re-register using `=r` in <#{cfg.channels["register"]}>!'
+    )
+    embed.add_field(name="The following players are not online ingame:",
+                    value = "\n".join(f"{p.igName} ({p.mention})" for p in pList),
+                    inline=False)
+
+    return embed
+
 def _teamUpdate(arg, match):
     """ Returns the current teams
     """
@@ -374,6 +386,7 @@ class _StringEnum(Enum):
     REG_FROZEN = _Message("You can't register while you're playing a match")
     REG_RULES = _Message("{} You have accepted the rules, you may now register", embed=_registerHelp)
     REG_NO_RULE = _Message("You have to accept the rules before registering! Check <#{}>")
+    REG_FROZEN_2 = _Message("You can't remove your account while being in a match!")
 
     LB_OFFLINE = _Message("You can't queue if your Discord status is offline/invisible!")
     LB_ALREADY_IN = _Message("You are already in queue!")
@@ -413,6 +426,7 @@ class _StringEnum(Enum):
     PK_FACTION_OK_NEXT = _Message("{} chose {}! {} pick a faction!", ping=False)
     PK_FACTION_CHANGED = _Message("{} changed to {}!")
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
+    PK_OVER_READY = _Message("Can't do that if your team is ready!")
     PK_WAIT_MAP = _Message("{} {} Pick an available map!", ping=False, embed=_jaegerCalendar)
     PK_MAP_OK_CONFIRM = _Message("Picked {}! {} confirm with `=p confirm` if you agree")
     PK_NO_MAP = _Message("No map selected!")
@@ -454,6 +468,7 @@ class _StringEnum(Enum):
     MATCH_NO_COMMAND = _Message("Can't use command `={}` now!")
     MATCH_CLEARED = _Message("Successfully cleared!")
     MATCH_PLAYERS_NOT_READY = _Message("Can't get {} ready, {} did not accept their Jaeger accounts", ping=False)
+    MATCH_PLAYERS_OFFLINE = _Message("Can't get {} ready, {} are not online in game!", ping=False, embed=_offlineList)
     MATCH_CLEAR = _Message("Clearing match...",ping=False)
     MATCH_MAP_SELECTED = _Message("Successfully selected **{}**")
     MATCH_ROUND_OVER = _Message("{}\n{}\nRound {} is over!")
@@ -472,8 +487,8 @@ class _StringEnum(Enum):
     MP_REMOVED = _Message("Removed {} from the map pool")
 
     ACC_NOT_ENOUGH = _Message("Not enough accounts are available for this match!\n**Match has been canceled!**")
+    ACC_ERROR = _Message("Error when giving out Jaeger accounts!\n**Match has been canceled!**")
     ACC_UPDATE = _Message("", ping=False,embed=_account)
-    ACC_ERROR = _Message("One of the PIL pug accounts is invalid: `{}`")
     ACC_SENT = _Message("**Successfully sent jaeger accounts  in DMs!**")
     ACC_SENDING = _Message("Loading Jaeger accounts...")
     ACC_OVER = _Message("Match is over, please log out of your Jaeger account!")

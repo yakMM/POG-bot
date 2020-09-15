@@ -12,7 +12,7 @@ from modules.roles import forceInfo, roleUpdate, isAdmin, permsMuted, channelFre
 
 from classes.players import removePlayer, getPlayer, Player, TeamCaptain
 
-from matches import clearLobby, getMatch, getAllNamesInLobby, removeFromLobby, isLobbyStuck, addToLobby
+from matches import clearLobby, getMatch, getAllNamesInLobby, removeFromLobby, isLobbyStuck, addToLobby, getAllIdsInLobby
 
 
 log = getLogger(__name__)

@@ -131,6 +131,9 @@ async def _register(player, ctx, args):
             return
     if len(args) == 2:  # if 2 args, it should be "no account", if not, invalid request. Again, check if update and push db if that's the case
         if args[0] == "no" and args[1] == "account":
+            if player.status is PlayerStatus.IS_WAITING:  # Can't register if already playing
+                await send("REG_FROZEN_2", ctx)
+                return
             if not await player.register(None):
                 await send("REG_IS_REGISTERED_NOA", ctx)
                 return

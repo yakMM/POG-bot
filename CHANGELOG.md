@@ -5,7 +5,9 @@
 - Match should not hang anymore in case of an error in score calculation
 - Added a lobby restore command
 - Api calls are now retried if they fail
-- Factions can now be modified before the match start
+- Factions can now be modified again before the match start
+- Added logging to understand account sending infinite loop
+- Now checking if players are online in game before allowing match to start
 
 # v1.12:
 - Added timeout functionality for admins

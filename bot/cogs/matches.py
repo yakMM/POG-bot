@@ -12,6 +12,8 @@ from classes.maps import MapSelection
 
 from matches import getMatch
 from modules.enumerations import MatchStatus, SelStatus
+from modules.census import getOfflinePlayers
+from classes.accounts import getNotReadyPlayers
 
 log = getLogger(__name__)
 
@@ -62,7 +64,10 @@ class MatchesCog(commands.Cog, name='matches'):
                 await _map(ctx, aPlayer, args)  # map picking function
                 return
             if match.status is MatchStatus.IS_WAITING:
-                await _factionChange(ctx, aPlayer, args[0])
+                if match.roundNo == 1:
+                    await _factionChange(ctx, aPlayer, args)
+                    return
+                await send("PK_OVER", ctx)  # Picking process is over
                 return
             if aPlayer.isTurn:
                 if match.status is MatchStatus.IS_PICKING:
@@ -132,10 +137,15 @@ class MatchesCog(commands.Cog, name='matches'):
         aPlayer = player.active
         if isinstance(aPlayer, TeamCaptain):
             if aPlayer.isTurn:
-                result = aPlayer.match.onTeamReady(aPlayer.team)
-                if result is not None:
-                    await send("MATCH_PLAYERS_NOT_READY", ctx, aPlayer.team.name, " ".join(result))
+                result = getNotReadyPlayers(aPlayer.team)
+                if len(result) != 0:
+                    await send("MATCH_PLAYERS_NOT_READY", ctx, aPlayer.team.name, " ".join(p.mention for p in result))
                     return
+                result = await getOfflinePlayers(aPlayer.team)
+                if len(result) != 0:
+                    await send("MATCH_PLAYERS_OFFLINE", ctx, aPlayer.team.name, " ".join(p.mention for p in result), pList=result)
+                    return
+                match.onTeamReady(aPlayer.team)
                 await send("MATCH_TEAM_READY", ctx, aPlayer.team.name, match=match)
                 return
             aPlayer.isTurn = True
@@ -207,7 +217,7 @@ async def _faction(ctx, captain, args):
         return
     try:
         team = captain.team
-        newPicker = captain.match.factionPick(team, args[0].upper())
+        newPicker = captain.match.factionPick(team, args[0])
         if captain.match.status is not MatchStatus.IS_FACTION:
             # faction picked
             await send("PK_FACTION_OK", ctx, team.name, cfg.factions[team.faction])
@@ -225,8 +235,11 @@ async def _factionChange(ctx, captain, args):
     if not isFaction:
         return
     team = captain.team
+    if not captain.isTurn:
+        await send("PK_OVER_READY", ctx)
+        return
     try:
-        if captain.match.factionChange(team, arg):
+        if captain.match.factionChange(team, args[0]):
             await send("PK_FACTION_CHANGED", ctx, team.name, cfg.factions[team.faction])
             return
         await send("PK_FACTION_ALREADY", ctx)

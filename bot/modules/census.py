@@ -25,7 +25,7 @@ async def processScore(match):
         # Loop through all events
         event_list = jdata["characters_event_list"]
         for event in event_list:
-            opoId = event["character_id"]
+            opoId = int(event["character_id"])
             if opoId not in igDict:
                 # interaction with outside player, to be ignored
                 continue
@@ -83,3 +83,22 @@ async def getCaptures(match, start, end):
             capper.addCap(cfg.scores["recapture"])
             baseOwner = capper
 
+async def getOfflinePlayers(team):
+    igDict = dict()
+    for p in team.players:
+        igDict[p.igId] = p
+    idString = ",".join(str(igId) for igId in igDict.keys())
+    url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_online_status/?character_id={idString}'
+    jdata = await httpRequest(url)
+    if jdata["returned"] == 0:
+        raise ApiNotReachable(f"Empty answer on online_status call (url={url})")
+
+    charList = jdata["characters_online_status_list"]
+
+    offlinePlayers = list()
+
+    for char in charList:
+        if char["online_status"] == "0":
+            offlinePlayers.append(igDict[int(char["character_id"])])
+
+    return offlinePlayers

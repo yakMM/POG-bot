@@ -2,10 +2,10 @@ from modules.enumerations import PlayerStatus
 from modules.display import edit
 
 
-async def reactionHandler(reaction, player):
+async def reactionHandler(client, reaction, player):
     if player.hasOwnAccount:
         return
-    if player.status is not PlayerStatus.IS_PLAYING:
+    if player.status is not PlayerStatus.IS_WAITING:
         return
     if player.active.account is None:
         return

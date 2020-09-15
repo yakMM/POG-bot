@@ -35,6 +35,7 @@ from classes.accounts import AccountHander
 from classes.maps import Map
 from classes.weapons import Weapon
 
+rulesMsg = None  # Will contain message object representing the rules message, global variable
 
 def _addMainHandlers(client):
     """_addMainHandlers, private function
@@ -43,8 +44,6 @@ def _addMainHandlers(client):
         client : discord.py bot
             Our bot object
     """
-
-    rulesMsg = None  # Will contain message object representing the rules message, global variable
 
     # help command, works in all channels
     @client.command(aliases=['h'])
@@ -149,7 +148,7 @@ def _addMainHandlers(client):
             player = getPlayer(user.id)
         except ElementNotFound:
             return
-        await reactionHandler(reaction, player)
+        await reactionHandler(client, reaction, player)
 
     @client.event
     async def on_member_join(member):

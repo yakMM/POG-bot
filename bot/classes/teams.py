@@ -91,6 +91,10 @@ class Team:
     def addPlayer(self, cls, player):
         active = cls(player, self)
         self.__players.append(active)
+    
+    def onTeamReady(self):
+        for aP in self.__players:
+            aP.onTeamReady()
 
     def onMatchReady(self):
         for p in self.__players:

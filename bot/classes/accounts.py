@@ -27,6 +27,16 @@ QUIT_DELAY = 300
 
 log = getLogger(__name__)
 
+def getNotReadyPlayers(team):
+    notReady = list()
+    for p in team.players:
+        if p.hasOwnAccount:
+            continue
+        if p.account is None:
+            log.error(f"Debug: {p.name} has no account")  # Should not happen
+        if not p.account.isValidated:
+            notReady.append(p)
+    return notReady
 
 class Account():
     """ Account object, each of these represent one single account
