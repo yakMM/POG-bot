@@ -26,7 +26,7 @@ from modules.exceptions import ElementNotFound, UnexpectedError
 from modules.database import init as dbInit, getAllItems
 from modules.enumerations import PlayerStatus
 from modules.loader import init as cogInit, isAllLocked, unlockAll
-from modules.ts3 import init as ts3Init
+from modules.ts3 import init as ts3Init, getTs3Bots
 
 # Modules for the custom classes
 from modules.roles import init as rolesInit, roleUpdate, isAdmin
@@ -300,6 +300,9 @@ def main(launchStr=""):
 
     # Run server
     client.run(cfg.general["token"])
+
+    # TESTING:
+    # print(getTs3Bots()[0].get_list())
 
 
 if __name__ == "__main__":
