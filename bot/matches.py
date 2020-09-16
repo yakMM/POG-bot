@@ -5,7 +5,8 @@ from modules.display import channelSend, edit
 from modules.enumerations import PlayerStatus, MatchStatus, SelStatus
 from modules.imageMaker import publishMatchImage
 from modules.census import processScore, getOfflinePlayers
-from datetime import datetime as dt
+from modules.database import updateMatch
+from datetime import datetime as dt, timezone as tz
 
 from classes.teams import Team  # ok
 from classes.players import TeamCaptain, ActivePlayer  # ok
@@ -43,6 +44,14 @@ def _autoPingTreshold():
 def _autoPingCancel():
     _autoPing.cancel()
     _autoPing.already = False
+
+def _getSub():
+    if len(_lobbyList) == 0:
+        return
+    player = randomChoice(_lobbyList)
+    _lobbyList.remove(player)
+    _onLobbyRemove()
+    return player
 
 
 def addToLobby(player):
@@ -138,23 +147,34 @@ def _findSpotForMatch():
     return None
 
 
-def init(list):
-    for id in list:
-        Match(id)
+def init(client, list):
+    for mId in list:
+        ch = client.get_channel(mId)
+        Match(ch)
 
 
 class Match():
 
-    def __init__(self, id):
-        self.__id = id
+    def __init__(self, ch):
+        self.__id = ch.id
+        self.__channel = ch
         self.__players = dict()
         self.__status = MatchStatus.IS_FREE
         self.__teams = [None, None]
         self.__mapSelector = None
         self.__number = 0
-        _allMatches[id] = self
+        self.__resultMsg = None
+        _allMatches[ch.id] = self
         self.__accounts = None
         self.__roundsStamps = list()
+
+    @property
+    def channel(self):
+        return self.__channel
+
+    @property
+    def msg(self):
+        return self.__resultMsg
 
     @property
     def status(self):
@@ -184,6 +204,29 @@ class Match():
     def playerPings(self):
         pings = [p.mention for p in self.__players.values()]
         return pings
+
+    @property
+    def secondsToRoundEnd(self):
+        timeDelta = self._onMatchOver.next_iteration - dt.now(tz.utc)
+        return int(timeDelta.total_seconds())
+
+    @property
+    def formatedTimeToRoundEnd(self):
+        secs = self.secondsToRoundEnd
+        return f"{secs//60}m {secs%60}s"
+
+    def getData(self):
+        teamsData = list()
+        for tm in self.__teams:
+            teamsData.append(tm.getData())
+        data = {"_id": self.__number,
+                "round_stamps": self.__roundsStamps,
+                "round_length_min": cfg.ROUND_LENGHT,
+                "base_id": self.__mapSelector.map.id,
+                "teams": teamsData
+                }
+        return data
+
 
     def _setPlayerList(self, pList):
         self.__status = MatchStatus.IS_RUNNING
@@ -266,6 +309,21 @@ class Match():
         team.faction = faction
         return True
 
+    def onPlayerSub(self, subbed):
+        newPlayer = _getSub()
+        if newPlayer is None:
+            return
+        newPlayer.onMatchSelected(self)
+        if subbed.status is PlayerStatus.IS_MATCHED:
+            del self.__players[subbed.id]
+            self.__players[newPlayer.id] = newPlayer
+        elif subbed.status is PlayerStatus.IS_PICKED:
+            aSub = subbed.active
+            aSub.team.onPlayerSub(aSub, newPlayer)
+        subbed.onPlayerClean()
+        return newPlayer
+
+
 
     def onTeamReady(self, team):
         team.captain.isTurn = False
@@ -327,10 +385,14 @@ class Match():
             self._scoreCalculation.start()
             return
         await channelSend("MATCH_OVER", self.__id)
-        self.__status = MatchStatus.IS_RUNNING
+        self.__status = MatchStatus.IS_RESULT
+        try:
+            await updateMatch(self)
+        except Exception as e:
+            log.error(f"Error in match database push!\n{e}")
         try:
             await processScore(self)
-            await publishMatchImage(self, cfg.channels["results"])
+            self.__resultMsg = await publishMatchImage(self)
         except Exception as e:
             log.error(f"Error in score or publish function!\n{e}")
         await self.clear()
@@ -338,7 +400,7 @@ class Match():
     @tasks.loop(count=1)
     async def _scoreCalculation(self):
         await processScore(self)
-        await publishMatchImage(self)
+        self.__resultMsg = await publishMatchImage(self)
 
 
     @tasks.loop(count=1)
@@ -398,6 +460,7 @@ class Match():
         self.__mapSelector = None
         self.__teams = [None, None]
         self.__roundsStamps.clear()
+        self.__resultMsg = None
         self.__players.clear()
         await channelSend("MATCH_CLEARED", self.__id)
         self.__status = MatchStatus.IS_FREE
@@ -429,17 +492,30 @@ class Match():
     def mapSelector(self):
         return self.__mapSelector
 
-    # TODO: DEV
-    @teams.setter
-    def teams(self, tms):
-        self.__teams=tms
+    # # DEV
+    # @teams.setter
+    # def teams(self, tms):
+    #     self.__teams=tms
     
-    # TODO: DEV
-    @startStamp.setter
-    def startStamp(self, st):
-        self.__roundsStamps = st
+    # # DEV
+    # @startStamp.setter
+    # def startStamp(self, st):
+    #     self.__roundsStamps = st
     
-    # TODO: DEV
-    @mapSelector.setter
-    def mapSelector(self, ms):
-        self.__mapSelector = ms
+    # # DEV
+    # @mapSelector.setter
+    # def mapSelector(self, ms):
+    #     self.__mapSelector = ms
+
+    # # DEV
+    # @msg.setter
+    # def msg(self, msg):
+    #     self.__resultMsg = msg
+    
+    # #DEV
+    # @status.setter
+    # def status(self, bl):
+    #     if bl:
+    #         self.__status = MatchStatus.IS_RESULT
+    #     else:
+    #         self.__status = MatchStatus.IS_PLAYING

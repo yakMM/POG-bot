@@ -167,7 +167,7 @@ class Player():
             self.inactiveTask.start(fct)
 
     def onActive(self):
-        if self.status is PlayerStatus.IS_LOBBIED:
+        if self.__status is PlayerStatus.IS_LOBBIED:
             self.inactiveTask.cancel()
 
     def onResign(self):
@@ -274,8 +274,7 @@ class Player():
             try:
                 world = int(jdata["character_list"][0]["world_id"])
                 if world != WORLD_ID:
-                    raise CharInvalidWorld(
-                        jdata["character_list"][0]["name"]["first"])
+                    raise CharInvalidWorld(jdata["character_list"][0]["name"]["first"])
                 else:
                     faction = int(jdata["character_list"][0]["faction_id"])
                     currId = int(jdata["character_list"][0]["character_id"])
@@ -313,6 +312,7 @@ class ActivePlayer:
     def __init__(self, player, team):
         self.__player = player
         self.__player._active = self
+        self.__illegalWeapons = dict()
         self.__kills = 0
         self.__deaths = 0
         self.__net = 0
@@ -323,6 +323,28 @@ class ActivePlayer:
 
     def clean(self):
         self.__player.onPlayerClean()
+
+    def getData(self):
+        data = {"discord_id": self.__player.id,
+                "ig_id": self.igId,
+                "ill_weapons": self.__getIllWeaponsDoc(),
+                "score": self.__score,
+                "net": self.__net,
+                "deaths": self.__deaths,
+                "kills": self.__kills,
+                "rank": self.__player.rank
+                }
+        return data
+
+    def __getIllWeaponsDoc(self):
+        data = list()
+        for weapId in self.__illegalWeapons.keys():
+            doc =  {"weap_id": weapId,
+                    "kills": self.__illegalWeapons[weapId]
+                    }
+            data.append(doc)
+        return data
+
 
     @property
     def name(self):
@@ -410,6 +432,16 @@ class ActivePlayer:
     def net(self):
         return self.__net
 
+    @property
+    def illegalWeapons(self):
+        return self.__illegalWeapons
+
+    def addIllegalWeapon(self, weapId):
+        if weapId in self.__illegalWeapons:
+            self.__illegalWeapons[weapId] += 1
+        else:
+            self.__illegalWeapons[weapId] = 1
+
     def addOneKill(self, points):
         self.__kills += 1
         self.__team.addOneKill()
@@ -418,7 +450,9 @@ class ActivePlayer:
     def addOneDeath(self, points):
         self.__deaths += 1
         self.__team.addOneDeath()
-        self.__net -= points
+        points = -points
+        self.__net += points
+        self.__team.addNet(points)
 
     def addOneTK(self):
         self.__addPoints(cfg.scores["teamkill"])
@@ -432,6 +466,7 @@ class ActivePlayer:
         self.__net += points
         self.__score += points
         self.__team.addScore(points)
+        self.__team.addNet(points)
 
 
 class TeamCaptain(ActivePlayer):

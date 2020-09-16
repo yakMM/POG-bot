@@ -56,7 +56,8 @@ class ConfigError(Exception):
 
 class DatabaseError(Exception):
     def __init__(self, msg):
-        message = "Error in user database: "+msg
+        message = "Error in database: "+msg
+        log.error(message)
         super().__init__(message)
 
 

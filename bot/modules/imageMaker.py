@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 from asyncio import get_event_loop
 from modules.display import imageSend
+from modules.enumerations import MatchStatus
 import modules.config as cfg
 
 bigFont = ImageFont.truetype("../fonts/PlanetSide2.ttf", 50)
@@ -24,7 +25,7 @@ def _teamDisplay(draw, team, yOffset):
     _drawScoreLine(draw, X_OFFSET+1000, yOffset, ["SCORE","NET","KILLS","DEATHS"], font)
 
     # Team scores:
-    scores = [str(team.score), "0", str(team.kills), str(team.deaths)]
+    scores = [str(team.score), str(team.net), str(team.kills), str(team.deaths)]
     _drawScoreLine(draw, X_OFFSET+1000, 100+yOffset, scores, bigFont)
 
     # Cap
@@ -60,16 +61,20 @@ def _makeImage(match):
     img = Image.new('RGB', (2600, 2500), color = (255, 255, 255))
     draw = ImageDraw.Draw(img)
     draw.text((1150,150), f"MATCH {match.number}", font=bigFont, fill=fill)
+    if match.status is not MatchStatus.IS_RESULT:
+        draw.text((1150,250), f"Halftime", font=bigFont, fill=fill)
     for tm in match.teams:
         _teamDisplay(draw, tm, 400+1100*tm.id)
     img.save(f'../matches/match_{match.number}.png')
 
 
-async def publishMatchImage(match, channel=None):
+async def publishMatchImage(match):
     loop = get_event_loop()
     await loop.run_in_executor(None, _makeImage, match)
-    await imageSend(cfg.channels["staff"], f'../matches/match_{match.number}.png')
-    # Once ready, disply in actual channels:
-    # await imageSend(match.id, f'../matches/match_{match.number}.png')
-    # for channel is not None:
-    #     await imageSend(channel, f'../matches/match_{match.number}.png')
+    
+    msg = match.msg
+    if msg is not None:
+        await msg.delete()
+    msg = await imageSend(cfg.channels["results"], f'../matches/match_{match.number}.png')
+    return msg
+

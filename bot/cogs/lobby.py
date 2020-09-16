@@ -8,7 +8,7 @@ from modules.exceptions import UnexpectedError, ElementNotFound, LobbyStuck
 
 from classes.players import PlayerStatus, getPlayer
 
-from matches import getLobbyLen, isLobbyStuck, removeFromLobby, addToLobby, getAllNamesInLobby
+from matches import getLobbyLen, isLobbyStuck, removeFromLobby, addToLobby, getAllNamesInLobby, getMatch
 
 log = getLogger(__name__)
 
@@ -94,6 +94,14 @@ class LobbyCog(commands.Cog, name='lobby'):
             await send("LB_STUCK", ctx)
             return
         await send("LB_QUEUE", ctx, namesInLobby=getAllNamesInLobby())
+
+    @commands.command(aliases=['i'])
+    @commands.guild_only()
+    async def info(self, ctx):
+        matchList = list()
+        for ch in cfg.channels["matches"]:
+            matchList.append(getMatch(ch))
+        await send("GLOBAL_INFO", ctx, lobby=getAllNamesInLobby(), matchList=matchList)
 
 
 def setup(client):

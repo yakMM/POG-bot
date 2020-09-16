@@ -1,3 +1,13 @@
+# v1.14:
+- Added sub command for staff
+- Updated help embeds for all channels
+- Banned weapon usage is now reported in both match and staff channels
+- Match info now shows the remaining time for current round
+- Added rdy as alias for the ready command
+- Added global information prompt accessible with command info
+- All scores are now posted in the result channel
+- Matches are now stored in database
+
 # v1.13:
 - Added match score tracking (BETA)
 - Fixed bug with display of scores
@@ -57,7 +67,7 @@
 
 # v1.6:
 - Fixed critical bug in account distribution (every account could only be used 1 time)
-- Match lenght is now 10 minutes
+- Match length is now 10 minutes
 - ALL commands are now case insensitive (it was the case of only a few)
 - Fixed a bug when lobby is stuck but a match spot becomes available
 - "Round 2 is over" message is no longer displayed twice
@@ -90,7 +100,6 @@
 - Last player is now pinged when automatically assigned to a team
 - Matches are now constituted of 2 rounds
 - Round number is now displayed
-
 
 # v1.1:
 - Rules acceptance feature

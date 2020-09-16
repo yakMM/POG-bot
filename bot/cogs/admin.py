@@ -282,6 +282,34 @@ class AdminCog(commands.Cog, name='admin'):
                 return
         await send("WRONG_USAGE", ctx, ctx.command.name)
 
+    @commands.command()
+    @commands.guild_only()
+    async def sub(self, ctx, *args):
+        # Check for match status first maybe?
+        player = await _removeChecks(ctx, cfg.channels["matches"])
+        if player is None:
+            return
+        if player.status not in (PlayerStatus.IS_MATCHED, PlayerStatus.IS_PICKED):
+            await send("SUB_NO", ctx)
+            return
+        if player.status is PlayerStatus.IS_PICKED and isinstance(player.active, TeamCaptain):
+            await send("SUB_NO_CAPTAIN", ctx)
+            return
+        newPlayer = player.match.onPlayerSub(player)
+        if newPlayer is None:
+            await send("SUB_NO_PLAYER", ctx)
+            return
+        else:
+            await channelSend("SUB_LOBBY",  cfg.channels["lobby"], newPlayer.mention, newPlayer.match.id,
+                                            namesInLobby=getAllNamesInLobby())
+            if newPlayer.status is PlayerStatus.IS_PICKED:
+                await send("SUB_OKAY_TEAM", ctx, newPlayer.mention, player.mention,
+                                            newPlayer.active.team.name, match=newPlayer.match)
+            else:
+                await send("SUB_OKAY", ctx, newPlayer.mention, player.mention, match=newPlayer.match)
+            return
+
+
 
 def setup(client):
     client.add_cog(AdminCog(client))

@@ -118,7 +118,7 @@ class MatchesCog(commands.Cog, name='matches'):
         else:
             await send("PK_PICK_STARTED", ctx)
 
-    @commands.command()
+    @commands.command(aliases=['rdy'])
     @commands.guild_only()
     async def ready(self, ctx):  # when ready
         match = getMatch(ctx.channel.id)

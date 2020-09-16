@@ -47,8 +47,15 @@ async def processScore(match):
                     aPlayer.addOneKill(pts)
                     opo.addOneDeath(pts)
                 else:
-                    await channelSend("SC_ILLEGAL_WE", cfg.channels["staff"], aPlayer.mention, weapon.name, match.number)
+                    aPlayer.addIllegalWeapon(weapon.id)
                     # TODO: Should we add penalty?
+        for weapId in aPlayer.illegalWeapons.keys():
+            weapon = getWeapon(weapId)
+            await channelSend("SC_ILLEGAL_WE",  match.id, aPlayer.mention, weapon.name,
+                                                match.number, aPlayer.illegalWeapons[weapId])
+            await channelSend("SC_ILLEGAL_WE",  cfg.channels["staff"], aPlayer.mention, weapon.name,
+                                                match.number, aPlayer.illegalWeapons[weapId])
+
     await getCaptures(match, start, end)
 
 async def getCaptures(match, start, end):

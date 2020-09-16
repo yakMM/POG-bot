@@ -180,6 +180,9 @@ def _addInitHandlers(client):
 
     @client.event
     async def on_ready():
+        # Initialise matches channels
+        matchesInit(client, cfg.channels["matches"])
+
         rolesInit(client)
 
         # fetch rule message, remove all reaction but the bot's
@@ -242,13 +245,10 @@ def main(launchStr=""):
     # Get Account sheet from drive
     AccountHander.init(f"client_secret{launchStr}.json")
 
-    # Initialise matches channels
-    matchesInit(cfg.channels["matches"])
-
     # Initialise display module
     displayInit(client)
 
-    # Add main handlers
+    # Add init handlers
     _addInitHandlers(client)
     if launchStr == "_test":
         _test(client)

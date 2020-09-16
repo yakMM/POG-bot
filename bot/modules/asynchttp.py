@@ -33,7 +33,7 @@ async def apiRequestAndRetry(url):
             return jdata
         else:
             log.warn(f"Nothing returned on try {i} for {url}")
-    raise ApiNotRecheable(url)
+    raise ApiNotReachable(url)
 
 # PRIVATE:
 
