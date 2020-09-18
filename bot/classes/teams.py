@@ -2,6 +2,7 @@
 """
 
 from modules.enumerations import PlayerStatus
+from classes.players import ActivePlayer # ok
 
 
 class Team:
@@ -16,6 +17,19 @@ class Team:
         self.__faction = 0
         self.__cap = 0
         self.__match = match
+
+    @classmethod
+    def newFromData(cls, i, data, match):
+        obj = cls(i, data["name"], match)
+        obj.__faction = data["faction_id"]
+        obj.__score = data["score"]
+        obj.__net = data["net"]
+        obj.__deaths = data["deaths"]
+        obj.__kills = data["kills"]
+        obj.__cap = data["cap_points"]
+        for pData in data["players"]:
+            obj.__players.append(ActivePlayer.newFromData(pData, obj))
+        return obj
 
     def getData(self):
         playersData = list()
@@ -35,6 +49,11 @@ class Team:
     @property
     def id(self):
         return self.__id
+
+    @property
+    def igString(self):
+        pString = ",".join(p.igName for p in self.__players)
+        return f"{self.__name}: `{pString}`"
 
     @property
     def name(self):

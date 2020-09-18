@@ -4,9 +4,9 @@ from modules.display import imageSend
 from modules.enumerations import MatchStatus
 import modules.config as cfg
 
-bigFont = ImageFont.truetype("../fonts/PlanetSide2.ttf", 50)
-font = ImageFont.truetype("../fonts/PlanetSide2.ttf", 40)
-fill = (0,0,0)
+bigFont = ImageFont.truetype("../fonts/OpenSans2.ttf", 50)
+font = ImageFont.truetype("../fonts/OpenSans2.ttf", 40)
+fill = (255,255,255)
 
 X_OFFSET=300
 
@@ -14,6 +14,18 @@ X_OFFSET=300
 def _drawScoreLine(draw, xStart, y, values, font):
     for i in range(len(values)):
         draw.text((xStart+300*i,y), values[i], font=font, fill=fill)
+
+def _findCutOffSize(string, font, treshold):
+    def _binarySearch(i):
+        iHalf = i//2
+        half = font.getsize(string[:iHalf])[0]
+        half1 = font.getsize(string[:iHalf+1])[0]
+        if half <= treshold and half1 >= treshold:
+            return iHalf
+        if half >= treshold:
+            return _binarySearch(half)
+    _binarySearch(treshold)
+
 
 
 def _teamDisplay(draw, team, yOffset):
@@ -43,12 +55,12 @@ def _teamDisplay(draw, team, yOffset):
         # Names:
         name = aPlayer.name
         igName = aPlayer.igName
+        print(font.getsize(name))
+        if len(name) > 20:
+            name = name[:20] + "..."
 
-        if len(name) > 24:
-            name = name[:22] + "..."
-
-        if len(igName) > 24:
-            igName = igName[:22] + "..."
+        if len(igName) > 20:
+            igName = igName[:20] + "..."
 
         draw.text((X_OFFSET,200+100*i+yOffset), name, font=font, fill=fill)
         draw.text((X_OFFSET+500,200+100*i+yOffset), igName, font=font, fill=fill)
@@ -58,7 +70,8 @@ def _teamDisplay(draw, team, yOffset):
 
 
 def _makeImage(match):
-    img = Image.new('RGB', (2600, 2500), color = (255, 255, 255))
+    img = Image.new('RGB', (2600, 2500), color = (17, 0, 68))
+    #img = Image.open("pil_template.png")
     draw = ImageDraw.Draw(img)
     draw.text((1150,150), f"MATCH {match.number}", font=bigFont, fill=fill)
     if match.status is not MatchStatus.IS_RESULT:

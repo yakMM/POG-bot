@@ -7,6 +7,7 @@
 - Added global information prompt accessible with command info
 - All scores are now posted in the result channel
 - Matches are now stored in database
+- Added squittal command
 
 # v1.13:
 - Added match score tracking (BETA)

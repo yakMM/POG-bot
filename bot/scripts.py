@@ -2,16 +2,22 @@ from gspread import service_account
 from numpy import array
 import modules.config as cfg
 from classes.players import Player, _allPlayers
-from modules.database import forceUpdate, getAllItems, _replacePlayer, _updateMap, init as dbInit
-from classes.maps import _allMapsList
+from modules.database import forceUpdate, getAllItems, _replacePlayer, _updateMap, init as dbInit, getOneItem
+from classes.maps import _allMapsList, Map
+from matches import Match
 import requests
 import json
 import asyncio
+from modules.imageMaker import _makeImage
+from classes.weapons import Weapon
 
 LAUNCHSTR = ""  # this should be empty if your files are config.cfg and client_secret.json
 
 cfg.getConfig(f"config{LAUNCHSTR}.cfg")
 dbInit(cfg.database)
+getAllItems(Player.newFromData, "users")
+getAllItems(Map, "sBases")
+getAllItems(Weapon, "sWeapons")
 
 
 
@@ -48,7 +54,7 @@ def pushAccounts():
     loop = asyncio.get_event_loop()
 
     for acc in accounts:
-        p = Player(f"_POG_ACC_{acc}", int(acc))
+        p = Player(int(acc), f"_POG_ACC_{acc}")
         pList.append(p)
         print(acc)
         charList = [f"PSBx{acc}VS", f"PSBx{acc}TR", f"PSBx{acc}NC"]
@@ -82,4 +88,18 @@ def getAllMapsFromApi():
 def playersDbUpdate():
     getAllItems(DbPlayer.newFromData, "users")
     for p in _allPlayers.values():
+        _replacePlayer(p)
+
+def getMatchFromDb(mId):
+    m=getOneItem("matches", Match.newFromData, mId)
+    _makeImage(m)
+
+
+
+def addPlayer():
+    i=900
+    pList = [Player(901,"jeanlebonjambeauneau"), Player(902,"jeandlkdfjhlskdhflskdhflsdkhflsdkhf")]
+    pList[0].cheatName("JEANxebonjambeauneTR")
+    pList[1].cheatName("lsdfkjqlfmkhsdfmlkshmgflskhdngmlskdhg")
+    for p in pList:
         _replacePlayer(p)

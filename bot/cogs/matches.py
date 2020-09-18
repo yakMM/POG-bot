@@ -153,6 +153,15 @@ class MatchesCog(commands.Cog, name='matches'):
             return
         await send("PK_NOT_CAPTAIN", ctx)
 
+    @commands.command()
+    @commands.guild_only()
+    async def squittal(self, ctx):
+        match = getMatch(ctx.channel.id)
+        if match.status not in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
+            await send("MATCH_NOT_READY", ctx, ctx.command.name)
+            return
+        await send("SC_PLAYERS_STRING", ctx, "\n".join(tm.igString for tm in match.teams))
+
 
 def setup(client):
     client.add_cog(MatchesCog(client))

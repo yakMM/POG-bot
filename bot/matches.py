@@ -150,13 +150,13 @@ def _findSpotForMatch():
 def init(client, list):
     for mId in list:
         ch = client.get_channel(mId)
-        Match(ch)
+        Match(mId, ch)
 
 
 class Match():
 
-    def __init__(self, ch):
-        self.__id = ch.id
+    def __init__(self, mId, ch=None):
+        self.__id = mId
         self.__channel = ch
         self.__players = dict()
         self.__status = MatchStatus.IS_FREE
@@ -164,9 +164,18 @@ class Match():
         self.__mapSelector = None
         self.__number = 0
         self.__resultMsg = None
-        _allMatches[ch.id] = self
+        _allMatches[mId] = self
         self.__accounts = None
         self.__roundsStamps = list()
+
+    @classmethod
+    def newFromData(cls, data):
+        obj = cls(data["_id"])
+        obj.__roundsStamps = data["round_stamps"]
+        obj.__mapSelector = MapSelection.newFromId(data["_id"], data["base_id"])
+        for i in range(len(data["teams"])):
+            obj.__teams[i] = Team.newFromData(i, data["teams"][i], obj)
+        return obj
 
     @property
     def channel(self):

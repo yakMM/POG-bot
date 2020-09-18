@@ -133,7 +133,7 @@ def _addMainHandlers(client):
                     p = getPlayer(payload.member.id)
                 except ElementNotFound:  # if new player
                     # create a new profile
-                    p = Player(payload.member.name, payload.member.id)
+                    p = Player(payload.member.id, payload.member.name)
                 await roleUpdate(p)
                 if p.status is PlayerStatus.IS_NOT_REGISTERED:
                         # they can now register

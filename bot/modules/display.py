@@ -205,7 +205,8 @@ def _matchHelp(msg):
     """
     embed = Embed(colour=Color.blurple())
     embed.add_field(name  = 'Match commands',
-                    value = '`=m` - Display the match status and team composition\n',
+                    value = '`=m` - Display the match status and team composition\n'
+                            "`=squittal` - Display player data for integration in Chirtle's script",
                     inline = False)
     embed.add_field(name  = 'Team Captain commands',
                     value = '`=p @player` - Pick a player in your team\n'
@@ -510,7 +511,7 @@ class _StringEnum(Enum):
     MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player",embed=_teamUpdate)
     MATCH_MAP_AUTO = _Message("Match will be on **{}**", ping=False)
     MATCH_CONFIRM = _Message("{} {} Type `=ready` when your team is inside their sundy, ready to start", embed=_teamUpdate)
-    MATCH_NOT_READY = _Message("You can't use command {}, the match is not ready to start!")
+    MATCH_NOT_READY = _Message("You can't use command `={}`, the match is not ready!")
     MATCH_TEAM_READY = _Message("{} is now ready!", embed=_teamUpdate)
     MATCH_TEAM_UNREADY = _Message("{} is no longer ready!", embed=_teamUpdate)
     MATCH_STARTING_1 = _Message("Everyone is ready, round {} is starting in {} seconds!\nAll players will be pinged on round start")
@@ -572,6 +573,7 @@ class _StringEnum(Enum):
     MUTE_FREED = _Message("You are no longer muted from POG!")
 
     SC_ILLEGAL_WE = _Message("{} used {} during match {}! This weapon is banned! Ignoring {} kill(s)...")
+    SC_PLAYERS_STRING = _Message("Here is player data for squittal script:\n{}")
 
     SUB_NO = _Message("This player can't be subbed!")
     SUB_NO_CAPTAIN = _Message("Can't sub a Team Captain!")

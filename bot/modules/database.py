@@ -22,6 +22,13 @@ def getAllItems(initClassMethod, dbName):
     except KeyError as e:
         raise DatabaseError(f"KeyError when retrieving {dbName} from database: {e}")
 
+def getOneItem(dbName, initClassMethod, itemId):
+    item = collections[dbName].find_one({"_id": itemId})
+
+    try:
+        return initClassMethod(item)
+    except KeyError as e:
+        raise DatabaseError(f"KeyError when retrieving {dbName} from database: {e}")
 
 async def updatePlayer(p, doc):
     """ Launch the task updating player p in database
