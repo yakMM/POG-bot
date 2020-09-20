@@ -166,12 +166,12 @@ class Match():
         self.__resultMsg = None
         _allMatches[mId] = self
         self.__accounts = None
-        self.__roundsStamps = list()
+        self.__roundStamps = list()
 
     @classmethod
     def newFromData(cls, data):
         obj = cls(data["_id"])
-        obj.__roundsStamps = data["round_stamps"]
+        obj.__roundStamps = data["round_stamps"]
         obj.__mapSelector = MapSelection.newFromId(data["_id"], data["base_id"])
         for i in range(len(data["teams"])):
             obj.__teams[i] = Team.newFromData(i, data["teams"][i], obj)
@@ -229,8 +229,8 @@ class Match():
         for tm in self.__teams:
             teamsData.append(tm.getData())
         data = {"_id": self.__number,
-                "round_stamps": self.__roundsStamps,
-                "round_length_min": cfg.ROUND_LENGHT,
+                "round_stamps": self.__roundStamps,
+                "round_length_min": cfg.ROUND_LENGTH,
                 "base_id": self.__mapSelector.map.id,
                 "teams": teamsData
                 }
@@ -380,7 +380,7 @@ class Match():
         self.__status = MatchStatus.IS_WAITING
         await channelSend("MATCH_CONFIRM", self.__id, *captainPings, match=self)
 
-    @tasks.loop(minutes=cfg.ROUND_LENGHT, delay=1, count=2)
+    @tasks.loop(minutes=cfg.ROUND_LENGTH, delay=1, count=2)
     async def _onMatchOver(self):
         playerPings = [" ".join(tm.allPings) for tm in self.__teams]
         await channelSend("MATCH_ROUND_OVER", self.__id, *playerPings, self.roundNo)
@@ -422,7 +422,7 @@ class Match():
         await sleep(10)
         playerPings = [" ".join(tm.allPings) for tm in self.__teams]
         await channelSend("MATCH_STARTED", self.__id, *playerPings, self.roundNo)
-        self.__roundsStamps.append(int(dt.timestamp(dt.now())))
+        self.__roundStamps.append(int(dt.timestamp(dt.now())))
         self.__status = MatchStatus.IS_PLAYING
         self._onMatchOver.start()
 
@@ -468,7 +468,7 @@ class Match():
         self.__accounts = None
         self.__mapSelector = None
         self.__teams = [None, None]
-        self.__roundsStamps.clear()
+        self.__roundStamps.clear()
         self.__resultMsg = None
         self.__players.clear()
         await channelSend("MATCH_CLEARED", self.__id)
@@ -488,14 +488,18 @@ class Match():
     @property
     def roundNo(self):
         if self.__status is MatchStatus.IS_PLAYING:
-            return len(self.__roundsStamps)
+            return len(self.__roundStamps)
         if self.__status in (MatchStatus.IS_STARTING, MatchStatus.IS_WAITING):
-            return len(self.__roundsStamps)+1
+            return len(self.__roundStamps)+1
         return 0
 
     @property
     def startStamp(self):
-        return self.__roundsStamps[-1]
+        return self.__roundStamps[-1]
+
+    @property
+    def roundStamps(self):
+        return self.__roundStamps
 
     @property
     def mapSelector(self):
@@ -509,7 +513,7 @@ class Match():
     # # DEV
     # @startStamp.setter
     # def startStamp(self, st):
-    #     self.__roundsStamps = st
+    #     self.__roundStamps = st
     
     # # DEV
     # @mapSelector.setter

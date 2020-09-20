@@ -1,3 +1,7 @@
+# v1.15:
+- Cap points are no longer counted in team netscore
+- Updated score sheet visual
+
 # v1.14:
 - Added sub command for staff
 - Updated help embeds for all channels

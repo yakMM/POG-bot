@@ -45,26 +45,30 @@ async def channelSend(stringName, id, *args, **kwargs):
         Returns the message sent
     """
     channel = _client.get_channel(id)
-    return await _StringEnum[stringName].value.display(channel,False,  *args, **kwargs)
+    return await _StringEnum[stringName].value.display(channel, channel.send,  *args, **kwargs)
 
 async def privateSend(stringName, id, *args, **kwargs):
     """ Send the message stringName in dm to user identified with id, with aditional strings *args. Pass **kwargs to the embed function, if any
         Returns the message sent
     """
     user = _client.get_user(id)
-    return await _StringEnum[stringName].value.display(user, False, *args, **kwargs)
+    return await _StringEnum[stringName].value.display(user, user.send, *args, **kwargs)
 
 async def send(stringName, ctx, *args, **kwargs):
     """ Send the message stringName in context ctx, with aditional strings *args. Pass **kwargs to the embed function, if any
         Returns the message sent
     """
-    return await _StringEnum[stringName].value.display(ctx, False, *args, **kwargs)
+    try:
+        sendFct = ctx.send
+    except AttributeError:
+        sendFct = _client.get_channel(ctx.channel.id).send
+    return await _StringEnum[stringName].value.display(ctx, sendFct, *args, **kwargs)
 
 async def edit(stringName, ctx, *args, **kwargs):
     """ Replaces the message ctx by the message stringName, with aditional strings *args. Pass **kwargs to the embed function, if any
         Returns the message sent
     """
-    return await _StringEnum[stringName].value.display(ctx, True,  *args, **kwargs)
+    return await _StringEnum[stringName].value.display(ctx, ctx.edit,  *args, **kwargs)
 
 async def remReaction(message, user=None):
     if user is None:
@@ -72,9 +76,9 @@ async def remReaction(message, user=None):
         user = _client.user
     return await message.remove_reaction("✅", user)
 
-async def imageSend(channelId, imagePath):
+async def imageSend(stringName, channelId, imagePath, *args):
     channel = _client.get_channel(channelId)
-    return await channel.send(file=File(imagePath))
+    return await channel.send(content=_StringEnum[stringName].value.string.format(*args), file=File(imagePath))
 
 ## PRIVATE:
 
@@ -379,16 +383,18 @@ def _jaegerCalendar(arg):
 class _Message():
     """ Class for the enum to use
     """
-    def __init__(self,str,ping=True,embed=None):
-        self.__str = str
+    def __init__(self, string, ping=True, embed=None):
+        self.__str = string
         self.__embedFct = embed
         self.__ping = ping
 
+    @property
+    def string(self):
+        return self.__str
 
-    async def display(self, ctx, edit, *args, **kwargs):
+    async def display(self, ctx, sendFct, *args, **kwargs):
         # If is Context instead of a Message, get the Message:
         embed = None
-        sendFct = None
         msg = None
 
         try:
@@ -403,13 +409,6 @@ class _Message():
             embed = self.__embedFct(ctx, **kwargs)
             # Fixes the embed mobile bug but ugly af:
             #embed.set_author(name="_____________________________")
-        if edit:
-            sendFct = ctx.edit
-        else:
-            try:
-                sendFct = ctx.send
-            except AttributeError:
-                sendFct = _client.get_channel(ctx.channel.id).send
 
         if self.__ping and not author is None:
             msg = await sendFct(content=f'{author.mention} {string}', embed=embed)
@@ -574,6 +573,8 @@ class _StringEnum(Enum):
 
     SC_ILLEGAL_WE = _Message("{} used {} during match {}! This weapon is banned! Ignoring {} kill(s)...")
     SC_PLAYERS_STRING = _Message("Here is player data for squittal script:\n{}")
+    SC_RESULT_HALF = _Message("Match {} - **halftime**")
+    SC_RESULT = _Message("Match {}")
 
     SUB_NO = _Message("This player can't be subbed!")
     SUB_NO_CAPTAIN = _Message("Can't sub a Team Captain!")

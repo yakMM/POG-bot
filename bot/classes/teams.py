@@ -117,7 +117,7 @@ class Team:
     def addCap(self, points):
         self.__cap += points
         self.__score += points
-        self.__net += points
+        # self.__net += points
 
     def addScore(self, points):
         self.__score += points

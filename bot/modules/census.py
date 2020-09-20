@@ -10,7 +10,7 @@ log = getLogger(__name__)
 async def processScore(match):
     igDict = dict()
     start = match.startStamp
-    end = start+cfg.ROUND_LENGHT*60
+    end = start+cfg.ROUND_LENGTH*60
     for tm in match.teams:
         for aPlayer in tm.players:
             igDict[aPlayer.igId] = aPlayer

@@ -8,7 +8,7 @@ from modules.exceptions import ConfigError
 
 ## STATIC PARAMETERS:
 AFK_TIME = 15  # minutes
-ROUND_LENGHT = 10  # minutes
+ROUND_LENGTH = 10  # minutes
 
 ## DYNAMIC PARAMETERS:
 # (pulled from the config file)
