@@ -4,6 +4,8 @@ permissions.txt
 bot/test*.py
 bot/others/
 bot/config_test.cfg
+bot/config - PSB Discord.cfg
+bot/config - Monkeydg Discord.cfg
 bot/client_secret_test.json
 bot/gspread_client_secret.json
 secret/*
