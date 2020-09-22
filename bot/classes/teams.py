@@ -1,6 +1,9 @@
 """ Basic team object, should be explicit
 """
 
+from modules.enumerations import PlayerStatus
+from classes.players import ActivePlayer # ok
+
 
 class Team:
     def __init__(self, id, name, match):
@@ -8,15 +11,49 @@ class Team:
         self.__name = name
         self.__players = list()
         self.__score = 0
+        self.__net = 0
         self.__deaths = 0
         self.__kills = 0
         self.__faction = 0
         self.__cap = 0
         self.__match = match
 
+    @classmethod
+    def newFromData(cls, i, data, match):
+        obj = cls(i, data["name"], match)
+        obj.__faction = data["faction_id"]
+        obj.__score = data["score"]
+        obj.__net = data["net"]
+        obj.__deaths = data["deaths"]
+        obj.__kills = data["kills"]
+        obj.__cap = data["cap_points"]
+        for pData in data["players"]:
+            obj.__players.append(ActivePlayer.newFromData(pData, obj))
+        return obj
+
+    def getData(self):
+        playersData = list()
+        for p in self.__players:
+            playersData.append(p.getData())
+        data = {"name": self.__name,
+                "faction_id": self.__faction,
+                "score": self.__score,
+                "net": self.__net,
+                "deaths": self.deaths,
+                "kills": self.__kills,
+                "cap_points": self.__cap,
+                "players": playersData
+                }
+        return data
+
     @property
     def id(self):
         return self.__id
+
+    @property
+    def igString(self):
+        pString = ",".join(p.igName for p in self.__players)
+        return f"{self.__name}: `{pString}`"
 
     @property
     def name(self):
@@ -40,6 +77,10 @@ class Team:
 
     def addScore(self, points):
         self.__score += points
+
+    @property
+    def net(self):
+        return self.__net
 
     @property
     def cap(self):
@@ -79,6 +120,13 @@ class Team:
     def addCap(self, points):
         self.__cap += points
         self.__score += points
+        # self.__net += points
+
+    def addScore(self, points):
+        self.__score += points
+
+    def addNet(self, points):
+        self.__net += points
 
     def addOneKill(self):
         self.__kills += 1
@@ -89,7 +137,18 @@ class Team:
     def addPlayer(self, cls, player):
         active = cls(player, self)
         self.__players.append(active)
+    
+    def onTeamReady(self):
+        for aP in self.__players:
+            aP.onTeamReady()
 
     def onMatchReady(self):
         for p in self.__players:
             p.onMatchReady()
+
+    def onPlayerSub(self, subbed, newPlayer):
+        i = 0
+        while self.__players[i] is not subbed:
+            i+=1
+        active = type(subbed)(newPlayer, self)
+        self.__players[i] = active

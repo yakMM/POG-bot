@@ -11,6 +11,7 @@ from gspread import service_account
 from gspread.exceptions import APIError
 from numpy import array, vstack
 from datetime import datetime as dt
+from discord.errors import Forbidden
 
 # from discord.ext import tasks
 from lib import tasks
@@ -28,6 +29,16 @@ QUIT_DELAY = 300
 
 log = getLogger(__name__)
 
+def getNotReadyPlayers(team):
+    notReady = list()
+    for p in team.players:
+        if p.hasOwnAccount:
+            continue
+        if p.account is None:
+            log.error(f"Debug: {p.name} has no account")  # Should not happen
+        if not p.account.isValidated:
+            notReady.append(p)
+    return notReady
 
 class Account:
     """ Account object, each of these represent one single account"""
@@ -178,7 +189,7 @@ class AccountHander:
         try:
             await loop.run_in_executor(None, self.__pushUpdateToSheet, row, vRow)
         except APIError as e:
-            log.info(f"GSpread APIError on match: {self.__match.number}\n{e}")
+            log.warning(f"GSpread APIError on match: {self.__match.number}\n{e}")
             return
         log.info(f"GSpread ok on match: {self.__match.number}")
         self._updateSheet.cancel()
@@ -216,8 +227,11 @@ class AccountHander:
                 currentAcc = self.__freeAccounts[i]
                 currentAcc.aPlayer = aPlayer
                 newLine[currentAcc.x] = str(aPlayer.id)
-                msg = await privateSend("ACC_UPDATE", aPlayer.id, account=currentAcc)
-                await msg.add_reaction('✅')
+                try:
+                    msg = await privateSend("ACC_UPDATE", aPlayer.id, account=currentAcc)
+                    await msg.add_reaction('✅')
+                except Forbidden:
+                    msg = await channelSend("ACC_CLOSED", self.__match.id, aPlayer.mention)
                 currentAcc.message = msg
                 i += 1
         type(self)._sheetTab = vstack((type(self)._sheetTab, array(newLine)))

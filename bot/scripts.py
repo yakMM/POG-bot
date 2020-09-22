@@ -2,16 +2,22 @@ from gspread import service_account
 from numpy import array
 import modules.config as cfg
 from classes.players import Player, _allPlayers
-from modules.database import forceUpdate, _replacePlayer, _updateMap, init as dbInit, getAllItems
+from modules.database import forceUpdate, getAllItems, _replacePlayer, _updateMap, init as dbInit, getOneItem
 from classes.maps import _allMapsList, Map
+from matches import Match
 import requests
 import json
 import asyncio
+from modules.imageMaker import _makeImage
+from classes.weapons import Weapon
 
 LAUNCHSTR = ""  # this should be empty if your files are config.cfg and gspread_client_secret.json
 
 cfg.getConfig(f"config{LAUNCHSTR}.cfg")
 dbInit(cfg.database)
+getAllItems(Player.newFromData, "users")
+getAllItems(Map, "sBases")
+getAllItems(Weapon, "sWeapons")
 
 
 class DbPlayer(Player):
@@ -20,10 +26,10 @@ class DbPlayer(Player):
         newData = dict()
         newData["name"] = data["name"]
         newData["_id"] = data["_id"]
-        newData["rank"] = 1
-        newData["notify"] = data["roles"]["notify"]
-        newData["timeout"] = {"time": 0, "reason": ""}
-        newData["igIds"] = data["igIds"]
+        newData["rank"] = data["rank"]
+        newData["notify"] = data["notify"]
+        newData["timeout"] = data["timeout"]
+        newData["igIds"] = [int(pId) for pId in data["igIds"]]
         newData["igNames"] = data["igNames"]
         newData["hasOwnAccount"] = data["hasOwnAccount"]
         super().newFromData(newData)
@@ -48,7 +54,7 @@ def pushAccounts():
     loop = asyncio.get_event_loop()
 
     for acc in accounts:
-        p = Player(f"_POG_ACC_{acc}", int(acc))
+        p = Player(int(acc), f"_POG_ACC_{acc}")
         pList.append(p)
         print(acc)
         charList = [f"PSBx{acc}VS", f"PSBx{acc}TR", f"PSBx{acc}NC"]
@@ -79,12 +85,20 @@ def getAllMapsFromApi():
 
 
 def playersDbUpdate():
-    getAllItems(Player.newFromData, "users")
-    getAllItems(Map, "sBases")
+    getAllItems(DbPlayer.newFromData, "users")
     for p in _allPlayers.values():
         _replacePlayer(p)
 
+def getMatchFromDb(mId):
+    m=getOneItem("matches", Match.newFromData, mId)
+    _makeImage(m)
 
-pushAccounts()
-getAllMapsFromApi()
-playersDbUpdate()
+
+
+def addPlayer():
+    i=900
+    pList = [Player(901,"jeanlebonjambeauneau"), Player(902,"jeandlkdfjhlskdhflskdhflsdkhflsdkhf")]
+    pList[0].cheatName("JEANxebonjambeauneTR")
+    pList[1].cheatName("lsdfkjqlfmkhsdfmlkshmgflskhdngmlskdhg")
+    for p in pList:
+        _replacePlayer(p)

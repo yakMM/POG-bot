@@ -134,7 +134,8 @@ map_pool_images = {"Acan Southern Labs": "https://i.imgur.com/IhF9wQN.png",
 _collections = {
     "users": "",
     "sBases": "",
-    "sWeapons": ""
+    "sWeapons" : "",
+    "matches" : ""
 }
 
 database = {
@@ -171,11 +172,11 @@ def getConfig(file):
             _errorIncorrect(key, 'General', file)
 
     # Testing api key
-    url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
-    jdata = loads(get(url).content)
-    if 'error' in jdata:
-        raise ConfigError(
-            f"Incorrect api key: {general['api_key']} in '{file}'")
+    # url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
+    # jdata = loads(get(url).content)
+    # if 'error' in jdata:
+    #     raise ConfigError(
+    #         f"Incorrect api key: {general['api_key']} in '{file}'")
 
     # Channels section
     _checkSection(config, "Channels", file)

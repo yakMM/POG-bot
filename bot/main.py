@@ -39,6 +39,7 @@ from classes.accounts import AccountHander
 from classes.maps import Map, createJaegerCalObj
 from classes.weapons import Weapon
 
+rulesMsg = None  # Will contain message object representing the rules message, global variable
 
 def _addMainHandlers(client):
     """_addMainHandlers, private function
@@ -47,8 +48,6 @@ def _addMainHandlers(client):
         client : discord.py bot
             Our bot object
     """
-
-    rulesMsg = None  # Will contain message object representing the rules message, global variable
 
     # help command, works in all channels
     @client.command(aliases=['h'])
@@ -140,7 +139,7 @@ def _addMainHandlers(client):
                     p = getPlayer(payload.member.id)
                 except ElementNotFound:  # if new player
                     # create a new profile
-                    p = Player(payload.member.name, payload.member.id)
+                    p = Player(payload.member.id, payload.member.name)
                 await roleUpdate(p)
                 if p.status is PlayerStatus.IS_NOT_REGISTERED:
                     # they can now register
@@ -193,7 +192,7 @@ def _addMainHandlers(client):
             player = getPlayer(user.id)
         except ElementNotFound:
             return
-        await reactionHandler(reaction, player)
+        await reactionHandler(client, reaction, player)
 
     @client.event
     async def on_member_join(member):
@@ -225,6 +224,9 @@ def _addInitHandlers(client):
 
     @client.event
     async def on_ready():
+        # Initialise matches channels
+        matchesInit(client, cfg.channels["matches"])
+
         rolesInit(client)
 
         # fetch rule message, remove all reaction but the bot's
@@ -286,13 +288,10 @@ def main(launchStr=""):
     # Establish connection with Jaeger Calendar and create a global object
     createJaegerCalObj(f"client_secret{launchStr}.json")
 
-    # Initialise matches channels
-    matchesInit(cfg.channels["matches"])
-
     # Initialise display module
     displayInit(client)
 
-    # Add main handlers
+    # Add init handlers
     _addInitHandlers(client)
 
     # Add all cogs

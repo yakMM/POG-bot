@@ -1,10 +1,12 @@
 import modules.config as cfg
-from modules.exceptions import UnexpectedError, AccountsNotEnough, ElementNotFound
+from modules.exceptions import UnexpectedError, AccountsNotEnough, \
+    ElementNotFound
 from modules.display import channelSend, edit
 from modules.enumerations import PlayerStatus, MatchStatus, SelStatus
-# from modules.imageMaker import publishMatchImage
-from modules.script import processScore
-from datetime import datetime as dt
+from modules.imageMaker import publishMatchImage
+from modules.census import processScore, getOfflinePlayers
+from modules.database import updateMatch
+from datetime import datetime as dt, timezone as tz
 from modules.ts3 import getTs3Bots
 
 from classes.teams import Team  # ok
@@ -44,6 +46,14 @@ def _autoPingCancel():
     _autoPing.cancel()
     _autoPing.already = False
 
+def _getSub():
+    if len(_lobbyList) == 0:
+        return
+    player = randomChoice(_lobbyList)
+    _lobbyList.remove(player)
+    _onLobbyRemove()
+    return player
+
 
 def addToLobby(player):
     _lobbyList.append(player)
@@ -71,6 +81,11 @@ def getLobbyLen():
 def getAllNamesInLobby():
     names = [p.mention for p in _lobbyList]
     return names
+
+
+def getAllIdsInLobby():
+    ids = [str(p.id) for p in _lobbyList]
+    return ids
 
 
 def removeFromLobby(player):
@@ -172,22 +187,43 @@ def which_team_channels(match_id):
     return team_channels
 
 
-def init(list):
-    for id in list:
-        Match(id)
+def init(client, list):
+    for mId in list:
+        ch = client.get_channel(mId)
+        Match(mId, ch)
 
 
-class Match:
-    def __init__(self, id):
-        self.__id = id
+class Match():
+
+    def __init__(self, mId, ch=None):
+        self.__id = mId
+        self.__channel = ch
         self.__players = dict()
         self.__status = MatchStatus.IS_FREE
         self.__teams = [None, None]
         self.__mapSelector = None
         self.__number = 0
-        _allMatches[id] = self
+        self.__resultMsg = None
+        _allMatches[mId] = self
         self.__accounts = None
-        self.__roundsStamps = list()
+        self.__roundStamps = list()
+
+    @classmethod
+    def newFromData(cls, data):
+        obj = cls(data["_id"])
+        obj.__roundStamps = data["round_stamps"]
+        obj.__mapSelector = MapSelection.newFromId(data["_id"], data["base_id"])
+        for i in range(len(data["teams"])):
+            obj.__teams[i] = Team.newFromData(i, data["teams"][i], obj)
+        return obj
+
+    @property
+    def channel(self):
+        return self.__channel
+
+    @property
+    def msg(self):
+        return self.__resultMsg
 
     @property
     def status(self):
@@ -217,6 +253,29 @@ class Match:
     def playerPings(self):
         pings = [p.mention for p in self.__players.values()]
         return pings
+
+    @property
+    def secondsToRoundEnd(self):
+        timeDelta = self._onMatchOver.next_iteration - dt.now(tz.utc)
+        return int(timeDelta.total_seconds())
+
+    @property
+    def formatedTimeToRoundEnd(self):
+        secs = self.secondsToRoundEnd
+        return f"{secs//60}m {secs%60}s"
+
+    def getData(self):
+        teamsData = list()
+        for tm in self.__teams:
+            teamsData.append(tm.getData())
+        data = {"_id": self.__number,
+                "round_stamps": self.__roundStamps,
+                "round_length_min": cfg.ROUND_LENGTH,
+                "base_id": self.__mapSelector.map.id,
+                "teams": teamsData
+                }
+        return data
+
 
     def _setPlayerList(self, pList):
         self.__status = MatchStatus.IS_RUNNING
@@ -282,9 +341,9 @@ class Match:
         ts3bot.move(pick_channel)
         ts3bot.enqueue(cfg.audio_ids["select_factions"])
 
-    def factionPick(self, team, str):
-        faction = cfg.i_factions[str]
-        other = self.__teams[team.id - 1]
+    def factionPick(self, team, arg):
+        faction = cfg.i_factions[arg.upper()]
+        other = self.__teams[team.id-1]
         if other.faction == faction:
             return team.captain
         team.faction = faction
@@ -296,21 +355,34 @@ class Match:
             other.captain.isTurn = True
         return other.captain
 
+    def factionChange(self, team, arg):
+        faction = cfg.i_factions[arg.upper()]
+        other = self.__teams[team.id-1]
+        if other.faction == faction:
+            return False
+        team.faction = faction
+        return True
+
+    def onPlayerSub(self, subbed):
+        newPlayer = _getSub()
+        if newPlayer is None:
+            return
+        newPlayer.onMatchSelected(self)
+        if subbed.status is PlayerStatus.IS_MATCHED:
+            del self.__players[subbed.id]
+            self.__players[newPlayer.id] = newPlayer
+        elif subbed.status is PlayerStatus.IS_PICKED:
+            aSub = subbed.active
+            aSub.team.onPlayerSub(aSub, newPlayer)
+        subbed.onPlayerClean()
+        return newPlayer
+
+
+
     def onTeamReady(self, team):
-        # ts3: ready up
-        notReady = list()
-        for p in team.players:
-            if p.hasOwnAccount:
-                continue
-            if p.account is None:
-                log.error(f"Debug: {p.name} has no account")
-            if p.account.isValidated:
-                continue
-            notReady.append(p.mention)
-        if len(notReady) != 0:
-            return notReady
         team.captain.isTurn = False
-        other = self.__teams[team.id - 1]
+        team.onTeamReady()
+        other = self.__teams[team.id-1]
         # If other isTurn, then not ready
         # Else everyone ready
         if not other.captain.isTurn:
@@ -352,6 +424,12 @@ class Match:
             await channelSend("ACC_NOT_ENOUGH", self.__id)
             await self.clear()
             return
+        except Exception as e:
+            log.error(f"Error in account giving function!\n{e}")
+            await channelSend("ACC_ERROR", self.__id)
+            await self.clear()
+            return
+
         self.__status = MatchStatus.IS_WAITING
         await channelSend("MATCH_CONFIRM", self.__id, *captainPings, match=self)
         # ts3: type =ready
@@ -390,15 +468,26 @@ class Match:
             getTs3Bots()[1].move(team_channels[1])
             getTs3Bots()[0].enqueue(cfg.audio_ids["type_ready"])
             getTs3Bots()[1].enqueue(cfg.audio_ids["type_ready"])
+            self._scoreCalculation.start()
             return
         await channelSend("MATCH_OVER", self.__id)
-        self.__status = MatchStatus.IS_RUNNING
+        self.__status = MatchStatus.IS_RESULT
+        try:
+            await updateMatch(self)
+        except Exception as e:
+            log.error(f"Error in match database push!\n{e}")
+        try:
+            await processScore(self)
+            self.__resultMsg = await publishMatchImage(self)
+        except Exception as e:
+            log.error(f"Error in score or publish function!\n{e}")
         await self.clear()
 
     @tasks.loop(count=1)
     async def _scoreCalculation(self):
         await processScore(self)
-        # await publishMatchImage(self)
+        self.__resultMsg = await publishMatchImage(self)
+
 
     @tasks.loop(count=1)
     async def __startMatch(self):
@@ -431,7 +520,7 @@ class Match:
         await sleep(6.8)
         playerPings = [" ".join(tm.allPings) for tm in self.__teams]
         await channelSend("MATCH_STARTED", self.__id, *playerPings, self.roundNo)
-        self.__roundsStamps.append(int(dt.timestamp(dt.now())))
+        self.__roundStamps.append(int(dt.timestamp(dt.now())))
         self.__status = MatchStatus.IS_PLAYING
         self._onMatchOver.start()
 
@@ -490,7 +579,8 @@ class Match:
         self.__accounts = None
         self.__mapSelector = None
         self.__teams = [None, None]
-        self.__roundsStamps.clear()
+        self.__roundStamps.clear()
+        self.__resultMsg = None
         self.__players.clear()
         await channelSend("MATCH_CLEARED", self.__id)
         self.__status = MatchStatus.IS_FREE
@@ -512,30 +602,47 @@ class Match:
     @property
     def roundNo(self):
         if self.__status is MatchStatus.IS_PLAYING:
-            return len(self.__roundsStamps)
+            return len(self.__roundStamps)
         if self.__status in (MatchStatus.IS_STARTING, MatchStatus.IS_WAITING):
             return len(self.__roundsStamps) + 1
         return 0
 
     @property
     def startStamp(self):
-        return self.__roundsStamps[-1]
+        return self.__roundStamps[-1]
+
+    @property
+    def roundStamps(self):
+        return self.__roundStamps
 
     @property
     def mapSelector(self):
         return self.__mapSelector
 
-    # TODO: DEV
-    @teams.setter
-    def teams(self, tms):
-        self.__teams = tms
+    # # DEV
+    # @teams.setter
+    # def teams(self, tms):
+    #     self.__teams=tms
     
-    # TODO: DEV
-    @startStamp.setter
-    def startStamp(self, st):
-        self.__roundsStamps = st
+    # # DEV
+    # @startStamp.setter
+    # def startStamp(self, st):
+    #     self.__roundStamps = st
     
-    # TODO: DEV
-    @mapSelector.setter
-    def mapSelector(self, ms):
-        self.__mapSelector = ms
+    # # DEV
+    # @mapSelector.setter
+    # def mapSelector(self, ms):
+    #     self.__mapSelector = ms
+
+    # # DEV
+    # @msg.setter
+    # def msg(self, msg):
+    #     self.__resultMsg = msg
+    
+    # #DEV
+    # @status.setter
+    # def status(self, bl):
+    #     if bl:
+    #         self.__status = MatchStatus.IS_RESULT
+    #     else:
+    #         self.__status = MatchStatus.IS_PLAYING

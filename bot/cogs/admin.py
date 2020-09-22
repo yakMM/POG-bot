@@ -9,10 +9,11 @@ from modules.exceptions import ElementNotFound, DatabaseError
 from modules.database import removePlayer as dbRemove
 from modules.loader import lockAll, unlockAll, isAllLocked
 from modules.roles import forceInfo, roleUpdate, isAdmin, permsMuted, channelFreeze
+from modules.census import getOfflinePlayers
 
 from classes.players import removePlayer, getPlayer, Player, TeamCaptain
 
-from matches import clearLobby, getMatch, getAllNamesInLobby, removeFromLobby
+from matches import clearLobby, getMatch, getAllNamesInLobby, removeFromLobby, isLobbyStuck, addToLobby, getAllIdsInLobby
 
 
 log = getLogger(__name__)
@@ -139,6 +140,27 @@ class AdminCog(commands.Cog, name='admin'):
 
     @commands.command()
     @commands.guild_only()
+    async def lobby(self, ctx, *args):
+        if ctx.channel.id != cfg.channels["lobby"]:
+            await send("WRONG_CHANNEL", ctx, ctx.command.name, f'<#{cfg.channels["lobby"]}>')
+            return
+        if len(args)>0 and args[0] == "restore":
+            for pId in args[1:]:
+                try:
+                    player = getPlayer(int(pId))
+                    if not isLobbyStuck() and player.status is PlayerStatus.IS_REGISTERED:
+                        addToLobby(player)
+                except (ElementNotFound, ValueError):
+                    pass
+            await send("LB_QUEUE", ctx, namesInLobby=getAllNamesInLobby())
+            return
+        if len(args)>0 and args[0] == "get":
+            await send("LB_GET", ctx, " ".join(getAllIdsInLobby()))
+            return
+        await send("WRONG_USAGE", ctx, ctx.command.name)
+
+    @commands.command()
+    @commands.guild_only()
     async def timeout(self, ctx, *args):
         if len(args) == 0:
             await send("RM_TIMEOUT_HELP", ctx)
@@ -231,6 +253,14 @@ class AdminCog(commands.Cog, name='admin'):
             unlockAll(self.client)
             await send("BOT_UNLOCKED", ctx)
             return
+        if arg == "ingame":
+            if getOfflinePlayers.bypass:
+                getOfflinePlayers.bypass = False
+                await send("BOT_BP_OFF", ctx)
+            else:
+                getOfflinePlayers.bypass = True
+                await send("BOT_BP_ON", ctx)
+            return
         await send("WRONG_USAGE", ctx, ctx.command.name)
 
     @commands.command()
@@ -250,6 +280,34 @@ class AdminCog(commands.Cog, name='admin'):
                 await send("BOT_UNFROZEN", ctx)
                 return
         await send("WRONG_USAGE", ctx, ctx.command.name)
+
+    @commands.command()
+    @commands.guild_only()
+    async def sub(self, ctx, *args):
+        # Check for match status first maybe?
+        player = await _removeChecks(ctx, cfg.channels["matches"])
+        if player is None:
+            return
+        if player.status not in (PlayerStatus.IS_MATCHED, PlayerStatus.IS_PICKED):
+            await send("SUB_NO", ctx)
+            return
+        if player.status is PlayerStatus.IS_PICKED and isinstance(player.active, TeamCaptain):
+            await send("SUB_NO_CAPTAIN", ctx)
+            return
+        newPlayer = player.match.onPlayerSub(player)
+        if newPlayer is None:
+            await send("SUB_NO_PLAYER", ctx)
+            return
+        else:
+            await channelSend("SUB_LOBBY",  cfg.channels["lobby"], newPlayer.mention, newPlayer.match.id,
+                                            namesInLobby=getAllNamesInLobby())
+            if newPlayer.status is PlayerStatus.IS_PICKED:
+                await send("SUB_OKAY_TEAM", ctx, newPlayer.mention, player.mention,
+                                            newPlayer.active.team.name, match=newPlayer.match)
+            else:
+                await send("SUB_OKAY", ctx, newPlayer.mention, player.mention, match=newPlayer.match)
+            return
+
 
 
 def setup(client):

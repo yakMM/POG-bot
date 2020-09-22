@@ -162,6 +162,17 @@ class MapSelection:
         except Exception as e:
             log.error(f"Uncaught exception getting booked maps from jaeger calendar\n{str(e)}")  # delete when done testing
         return
+    @classmethod
+    def newFromId(cls, matchId, mapId):
+        obj = cls(matchId)
+        obj.__id = matchId
+        i = 0
+        while _allMapsList[i].id != mapId:
+            i+=1
+        obj.__selection = [_allMapsList[i]]
+        obj.__selected = _allMapsList[i]
+        obj.__status = SelStatus.IS_CONFIRMED
+        return obj
 
     def __doSelection(self, args):
         if self.__status is SelStatus.IS_SELECTION and len(args) == 1 and args[0].isnumeric():

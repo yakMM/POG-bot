@@ -45,41 +45,42 @@ async def channelSend(stringName, id, *args, **kwargs):
         Returns the message sent
     """
     channel = _client.get_channel(id)
-    return await _StringEnum[stringName].value.display(channel, False, *args, **kwargs)
-
+    return await _StringEnum[stringName].value.display(channel, channel.send,  *args, **kwargs)
 
 async def privateSend(stringName, id, *args, **kwargs):
     """ Send the message stringName in dm to user identified with id, with additional strings *args. Pass **kwargs to the embed function, if any
         Returns the message sent
     """
     user = _client.get_user(id)
-    return await _StringEnum[stringName].value.display(user, False, *args, **kwargs)
+    return await _StringEnum[stringName].value.display(user, user.send, *args, **kwargs)
 
 
 async def send(stringName, ctx, *args, **kwargs):
     """ Send the message stringName in context ctx, with additional strings *args. Pass **kwargs to the embed function, if any
         Returns the message sent
     """
-    return await _StringEnum[stringName].value.display(ctx, False, *args, **kwargs)
+    try:
+        sendFct = ctx.send
+    except AttributeError:
+        sendFct = _client.get_channel(ctx.channel.id).send
+    return await _StringEnum[stringName].value.display(ctx, sendFct, *args, **kwargs)
 
 
 async def edit(stringName, ctx, *args, **kwargs):
     """ Replaces the message ctx by the message stringName, with additional strings *args. Pass **kwargs to the embed function, if any
         Returns the message sent
     """
-    return await _StringEnum[stringName].value.display(ctx, True, *args, **kwargs)
-
+    return await _StringEnum[stringName].value.display(ctx, ctx.edit,  *args, **kwargs)
 
 async def remReaction(message, user=None):
     if user is None:
         global _client
         user = _client.user
-    await message.remove_reaction("✅", user)
+    return await message.remove_reaction("✅", user)
 
-
-async def imageSend(channelId, imagePath):
+async def imageSend(stringName, channelId, imagePath, *args):
     channel = _client.get_channel(channelId)
-    await channel.send(file=File(imagePath))
+    return await channel.send(content=_StringEnum[stringName].value.string.format(*args), file=File(imagePath))
 
 
 # PRIVATE:
@@ -111,23 +112,24 @@ def _registerHelp(msg):
         title='How to register?',
         description=f'You have to accept the rules in <#{cfg.channels["rules"]}> to register'
     )
-    embed.add_field(name='If you don\'t have a Jaeger account',
-                    value='`=r no account`\n',
-                    inline=False)
-    embed.add_field(name='If you have a Jaeger account',
-                    value='`=r charName` - If your character names have faction suffixes\n'
-                          '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes',
-                    inline=False)
-    embed.add_field(name='Notify feature',
-                    value='`=notify` - To join or leave the Notify feature\n'
-                          f'When subscribed to Notify, you can be mentioned with <@&{cfg.roles["notify"]}> when the queue is almost full',
-                    inline=False)
+    embed.add_field(name  = 'If you don\'t have a Jaeger account',
+                    value = '`=r no account`\n',
+                    inline = False)
+    embed.add_field(name  = 'If you have a Jaeger account',
+                    value = '`=r charName` - If your character names have faction suffixes\n'
+                            '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes',
+                    inline = False)
+    embed.add_field(name  = 'Notify feature',
+                    value = '`=notify` - To join or leave the Notify feature\n'
+                            f'When suscribed to Notify, you can be mentionned with <@&{cfg.roles["notify"]}> '
+                            'when the queue is almost full',
+                    inline = False)
     try:
         if isAdmin(msg.author):
-            embed.add_field(name="Staff Commands",
-                            value='`=unregister @player` - Permanently remove player profile from the system\n'
-                            '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
-                            inline=False)
+            embed.add_field(name  = "Staff Commands",
+                            value = '`=unregister @player` - Permanently remove player profile from the system\n'
+                                    '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
+                            inline = False)
     except AttributeError:
         pass  # if msg is from bot
     return embed
@@ -136,103 +138,121 @@ def _registerHelp(msg):
 def _lobbyHelp(msg):
     """ Returns lobby help embed
     """
-    embed = Embed(
-        colour=Color.blurple()
-    )
-    embed.add_field(name='Lobby Commands',
-                    value='`=j` - Join the lobby\n'
-                          '`=l` - Leave the lobby\n'
-                          '`=q` - See the current lobby',
-                    inline=False)
+    embed = Embed(colour=Color.blurple())
+    embed.add_field(name  = 'Lobby Commands',
+                    value = '`=j` - Join the lobby\n'
+                            '`=l` - Leave the lobby\n'
+                            '`=q` - See the current lobby\n'
+                            '`=i` - Display the global information prompt',
+                    inline = False)
     if isAdmin(msg.author):
-        embed.add_field(name="Staff Commands",
-                        value='`=clear` - Clear the lobby\n'
-                        '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages\n'
-                        '`=remove @player` - Remove player from lobby',
-                        inline=False)
+        embed.add_field(name  = "Staff Commands",
+                        value = '`=clear` - Clear the lobby\n'
+                                '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages\n'
+                                '`=remove @player` - Remove player from lobby',
+                        inline = False)
+    return embed
+
+def _adminHelp(msg):
+    """ Returns admin help embed
+    """
+    embed = Embed(colour=Color.blurple())
+    embed.add_field(name  = 'Debug Commands',
+                    value = '`=channel (un)freeze` - Prevent users from typing in a channel\n'
+                            '`=pog version` - Display current version and lock status\n'
+                            '`=pog (un)lock` - Prevent users from interacting with the bot (but admins still can)\n',
+                    inline = False)
+    embed.add_field(name  = 'Lobby Commands',
+                    value = '`=remove @player` - Remove the player from queue\n'
+                            '`=clear` - Clear queue\n'
+                            '`=lobby get` - Get all of the user IDs to restore the lobby\n'
+                            '`=lobby restore id id ...` - Re-add all the users back to the lobby',
+                    inline = False)
+    embed.add_field(name  = 'Player Management Commands',
+                    value = '`=timeout @player duration` - Mute the player from POF for a given time\n'
+                            '`=unregister @player` - Forcibly unregisters and removes a user from the system',
+                    inline = False)
+    embed.add_field(name  = 'Match Commands',
+                    value = '`=demote @player` - Force `=resign` the player\n'
+                            '`=sub @player` - Pick someone in queue to replace the player\n'
+                            '`=map name` - Force a map\n'
+                            '`=pog ingame` - Toggle the in-game player check',
+                    inline = False)
     return embed
 
 
 def _defaultHelp(msg):
     """ Returns fallback help embed
     """
-    embed = Embed(
-        colour=Color.red()
-    )
-    embed.add_field(name='No available command',
-                    value='You are not supposed to use the bot on this channel',
-                    inline=False)
+    embed = Embed(colour=Color.red())
+    embed.add_field(name  = 'No available command',
+                    value = 'You are not supposed to use the bot on this channel',
+                    inline = False)
     return embed
 
 
 def _mapHelp(ctx):
     """ Returns map help embed
     """
-    embed = Embed(
-        colour=Color.blurple()
-    )
+    embed = Embed(colour=Color.blurple())
     cmd = ctx.command.name
     if cmd == "pick":
         cmd = "p"
-    embed.add_field(name='Map selection commands',
-                    value=f'`={cmd} a base` - Display all the maps containing *a base* in their name\n'
-                          f'`={cmd} 3` - Chooses the map number 3 from the selection\n'
-                          f'`={cmd}` - Display the current selection or show the help',
-                    inline=False)
+    embed.add_field(name  = 'Map selection commands',
+                    value = f'`={cmd} a base` - Display all the maps containing *a base* in their name\n'
+                            f'`={cmd} 3` - Chooses the map number 3 from the selection\n'
+                            f'`={cmd}` - Display the current selection or show the help',
+                    inline = False)
     return embed
 
 
 def _timeoutHelp(ctx):
     """ Returns timeout help embed
     """
-    embed = Embed(
-        colour=Color.blurple()
-    )
-    embed.add_field(name='Timeout command',
-                    value='`=timeout @player 10 days` - Mute @player from POG for 10 days\n'
-                          '`=timeout @player 10 hours` - Mute @player from POG for 10 hours\n'
-                          '`=timeout @player 10 minutes` - Mute @player from POG for 10 minutes\n'
-                          '`=timeout @player remove` - Unmute @player from POG\n'
-                          '`=timeout @player` - Get info on current timeout for @player',
-                    inline=False)
+    embed = Embed(colour=Color.blurple())
+    embed.add_field(name  = 'Timeout command',
+                    value = '`=timeout @player 10 days` - Mute @player from POG for 10 days\n'
+                            '`=timeout @player 10 hours` - Mute @player from POG for 10 hours\n'
+                            '`=timeout @player 10 minutes` - Mute @player from POG for 10 minutes\n'
+                            '`=timeout @player remove` - Unmute @player from POG\n'
+                            '`=timeout @player` - Get info on current timeout for @player',
+                    inline = False)
     return embed
 
 
 def _mutedHelp(ctx):
     """ Returns help for muted players embed
     """
-    embed = Embed(
-        colour=Color.blurple()
-    )
-    embed.add_field(name='You are currently muted!',
-                    value='`=escape` See how long you are muted for, give back permissions if no longer muted',
-                    inline=False)
+    embed = Embed(colour=Color.blurple())
+    embed.add_field(name  = 'You are currently muted!',
+                    value = '`=escape` See how long you are muted for, give back permissions if no longer muted',
+                    inline = False)
     return embed
 
 
 def _matchHelp(msg):
     """ Returns match help embed
     """
-    embed = Embed(
-        colour=Color.blurple(),
-    )
-    embed.add_field(name='Match commands',
-                    value='`=m` - Display the match status and team composition\n',
-                    inline=False)
-    embed.add_field(name='Team Captain commands',
-                    value='`=p @player` - Pick a player in your team\n'
-                          '`=p VS`/`NC`/`TR` - Pick a faction\n'
-                          '`=p base name` - Pick the map *base name*\n'
-                          '`=resign` - Resign from Team Captain position\n'
-                          '`=ready` - To toggle the ready status of your team',
-                    inline=False)
+    embed = Embed(colour=Color.blurple())
+    embed.add_field(name  = 'Match commands',
+                    value = '`=m` - Display the match status and team composition\n'
+                            "`=squittal` - Display player data for integration in Chirtle's script",
+                    inline = False)
+    embed.add_field(name  = 'Team Captain commands',
+                    value = '`=p @player` - Pick a player in your team\n'
+                            '`=p VS`/`NC`/`TR` - Pick a faction\n'
+                            '`=p base name` - Pick the map *base name*\n'
+                            '`=resign` - Resign from Team Captain position\n'
+                            '`=ready` - To toggle the ready status of your team',
+                    inline = False)
     if isAdmin(msg.author):
-        embed.add_field(name="Staff Commands",
-                        value='`=clear` - Clear the match\n'
-                              '`=map base name` - Select a map\n'
-                              '`=demote @player` - Remove Team Captain position from player\n'
-                              '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
-                        inline=False)
+        embed.add_field(name  = "Staff Commands",
+                        value = '`=clear` - Clear the match\n'
+                                '`=map base name` - Force select a map\n'
+                                '`=demote @player` - Remove Team Captain position from player\n'
+                                '`=sub @player` - Pick someone in queue to replace the player\n'
+                                '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
+                        inline = False)
     return embed
 
 
@@ -255,7 +275,7 @@ def _account(msg, account):
         title='Jaeger Account',
         description=f'**MUST READ: [Account usage](https://planetsideguide.com/other/jaeger/)**'
     )
-    embed.add_field(name="Logging details", value=desc, inline=False)
+    embed.add_field(name = "Logging details",value = desc,inline = False)
     embed.set_thumbnail(
         url="https://media.discordapp.net/attachments/739231714554937455/739522071423614996/logo_png.png")
     embed.set_footer(
@@ -273,6 +293,8 @@ def _autoHelp(msg):
         return _matchHelp(msg)
     if msg.channel.id == cfg.channels['muted']:
         return _mutedHelp(msg)
+    if msg.channel.id == cfg.channels['staff']:
+        return _adminHelp(msg)
     return _defaultHelp(msg)
 
 
@@ -282,7 +304,7 @@ def _lobbyList(msg, namesInLobby):
     listOfNames = "\n".join(namesInLobby)
     if listOfNames == "":
         listOfNames = "Queue is empty"
-    embed.add_field(name=f'Lobby: {len(namesInLobby)} / {cfg.general["lobby_size"]}', value=listOfNames, inline=False)
+    embed.add_field(name=f'Lobby: {len(namesInLobby)} / {cfg.general["lobby_size"]}', value=listOfNames, sinline = False)
     return embed
 
 
@@ -292,6 +314,49 @@ def _selectedMaps(msg, sel):
     embed = Embed(colour=Color.blue())
     embed_text = sel.toString() + f"\n⤾ - Back to Maps"
     embed.add_field(name=f"{len(sel.getSelection())} maps found", value=embed_text, inline=False)
+    return embed
+
+
+    # maps = sel.stringList
+    # embed.add_field(name=f"{len(maps)} maps found",value="\n".join(maps),inline = False)
+    # return embed
+
+def _offlineList(msg, pList):
+    embed = Embed(
+        colour=Color.red(),
+        title='Offline Players',
+        description=f'If your character info is incorrect, re-register using `=r` in <#{cfg.channels["register"]}>!'
+    )
+    embed.add_field(name  = "The following players are not online ingame:",
+                    value = "\n".join(f"{p.igName} ({p.mention})" for p in pList),
+                    inline = False)
+
+    return embed
+
+
+def _globalInfo(msg, lobby, matchList):
+    embed = Embed(
+        colour=Color.greyple(),
+        title='Global Info',
+        description=f'POG bot version `{cfg.VERSION}`'
+    )
+    lbEmbed = _lobbyList(msg, namesInLobby=lobby).fields[0]
+    embed.add_field(name = lbEmbed.name, value = lbEmbed.value, inline = lbEmbed.inline)
+    for m in matchList:
+        desc = ""
+        if m.status is not MatchStatus.IS_FREE:
+            if m.roundNo != 0:
+                desc += f"*Match {m.number} - Round {m.roundNo}*"
+            else:
+                desc += f"*Match {m.number}*"
+            desc += "\n"
+        desc += f"Status: {m.statusString}"
+        if m.status in (MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
+            desc += f"\nBase: **{m.map.name}**\n"
+            desc += " / ".join(f"{tm.name}: **{cfg.factions[tm.faction]}**" for tm in m.teams)
+        if m.status is MatchStatus.IS_PLAYING:
+            desc += f"\nTime Remaining: **{m.formatedTimeToRoundEnd}**"
+        embed.add_field(name  = m.channel.name, value = desc, inline = False)
     return embed
 
 
@@ -308,9 +373,12 @@ def _teamUpdate(arg, match):
         title = f"Match {match.number} - Round {match.roundNo}"
     else:
         title = f"Match {match.number}"
-    embed = Embed(colour=Color.blue(), title=title, description=match.statusString)
+    desc = match.statusString
+    if match.status is MatchStatus.IS_PLAYING:
+        desc += f"\nTime Remaining: **{match.formatedTimeToRoundEnd}**"
+    embed = Embed(colour=Color.blue(), title=title, description = desc)
     if match.map is not None:
-        embed.add_field(name="Map", value=match.map.name, inline=False)
+        embed.add_field(name = "Map",value = match.map.name,inline = False)
     for tm in match.teams:
         value = ""
         name = ""
@@ -328,11 +396,11 @@ def _teamUpdate(arg, match):
             name = f"{tm.name} [{cfg.factions[tm.faction]}]"
         else:
             name = f"{tm.name}"
-        embed.add_field(name=name,
-                        value=value,
-                        inline=False)
+        embed.add_field(name = name,
+                        value = value,
+                        inline = False)
     if match.status is MatchStatus.IS_PICKING:
-        embed.add_field(name=f'Remaining', value="\n".join(match.playerPings), inline=False)
+        embed.add_field(name=f'Remaining', value="\n".join(match.playerPings), inline = False)
     return embed
 
 
@@ -363,17 +431,18 @@ def _mapPool(msg, map):
 class _Message:
     """ Class for the enum to use
     """
-
-    def __init__(self, str, ping=True, embed=None, emojis=None):
-        self.__str = str
+    def __init__(self, string, ping=True, embed=None):
+        self.__str = string
         self.__embedFct = embed
         self.__ping = ping
-        self.__emojis = emojis
 
-    async def display(self, ctx, edit, *args, **kwargs):
+    @property
+    def string(self):
+        return self.__str
+
+    async def display(self, ctx, sendFct, *args, **kwargs):
         # If is Context instead of a Message, get the Message:
         embed = None
-        sendFct = None
         msg = None
 
         try:
@@ -387,14 +456,7 @@ class _Message:
         if self.__embedFct is not None:
             embed = self.__embedFct(ctx, **kwargs)
             # Fixes the embed mobile bug but ugly af:
-            # embed.set_author(name="_____________________________")
-        if edit:
-            sendFct = ctx.edit
-        else:
-            try:
-                sendFct = ctx.send
-            except AttributeError:
-                sendFct = _client.get_channel(ctx.channel.id).send
+            #embed.set_author(name="_____________________________")
 
         if self.__ping and author is not None:
             msg = await sendFct(content=f'{author.mention} {string}', embed=embed)
@@ -434,6 +496,7 @@ class _StringEnum(Enum):
     REG_FROZEN = _Message("You can't register while you're playing a match")
     REG_RULES = _Message("{} You have accepted the rules, you may now register", embed=_registerHelp)
     REG_NO_RULE = _Message("You have to accept the rules before registering! Check <#{}>")
+    REG_FROZEN_2 = _Message("You can't remove your account while being in a match!")
 
     LB_OFFLINE = _Message("You can't queue if your Discord status is offline/invisible!")
     LB_ALREADY_IN = _Message("You are already in queue!")
@@ -450,6 +513,7 @@ class _StringEnum(Enum):
     LB_CLEARED = _Message("Lobby has been cleared!", embed=_lobbyList)
     LB_EMPTY = _Message("Lobby is already empty!")
     LB_NOTIFY = _Message("{} queue is almost full, join to start a match!")
+    LB_GET = _Message("Restore the lobby with `=lobby restore {}`")
 
     PK_OVER = _Message("The teams are already made. You can't pick!")
     PK_NO_LOBBIED = _Message("You must first queue and wait for a match to begin. Check <#{}>")
@@ -470,12 +534,14 @@ class _StringEnum(Enum):
     PK_FACTION_OK = _Message("{} chose {}!", ping=False)
     PK_FACTION_ALREADY = _Message("Faction already picked by the other team!")
     PK_FACTION_OK_NEXT = _Message("{} chose {}! {} pick a faction!", ping=False)
+    PK_FACTION_CHANGED = _Message("{} changed to {}!")
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
     PK_WAIT_MAP = _Message("{} {} Pick a map from the list using `=p #`. To choose a map not on the list use `=p base name`",
                            ping=False,
                            embed=_selectedMaps,
                            emojis=getMapPoolEmojis())
     PK_MAP_OK_CONFIRM = _Message("Picked **{}**! {} confirm with `=p confirm` if you agree")
+    PK_OVER_READY = _Message("Can't do that if your team is ready!")
     PK_NO_MAP = _Message("No map selected!")
     PK_SHOW_REACT_MAP = _Message("React with ⤾ to go back to map list",
                                  embed=_mapPool,
@@ -496,6 +562,7 @@ class _StringEnum(Enum):
     CHANNEL_INIT = _Message("`Bot init`: Correctly hooked in channel <#{}>")
     INVALID_STR = _Message("You entered an invalid character! `{}`")
     API_ERROR = _Message("Could not reach Planetside2 API, try again later!")
+    GLOBAL_INFO = _Message("Here is what's going on in POG at the moment:", embed=_globalInfo)
 
     BOT_UNLOCKED = _Message("Unlocked!")
     BOT_LOCKED = _Message("Locked!")
@@ -504,6 +571,8 @@ class _StringEnum(Enum):
     BOT_VERSION = _Message("Version `{}`, locked: `{}`")
     BOT_FROZEN = _Message("Channel frozen!")
     BOT_UNFROZEN = _Message("Channel unfrozen!")
+    BOT_BP_OFF = _Message("Ingame status check is now enabled!")
+    BOT_BP_ON = _Message("Ingame status check is now disabled!")
 
     MATCH_INIT = _Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = _Message("Captains have been selected, {} choose a player", embed=_teamUpdate, ping=False)
@@ -520,6 +589,7 @@ class _StringEnum(Enum):
     MATCH_NO_COMMAND = _Message("Can't use command `={}` now!")
     MATCH_CLEARED = _Message("Successfully cleared!")
     MATCH_PLAYERS_NOT_READY = _Message("Can't get {} ready, {} did not accept their Jaeger accounts", ping=False)
+    MATCH_PLAYERS_OFFLINE = _Message("Can't get {} ready, {} are not online in game!", ping=False, embed=_offlineList)
     MATCH_CLEAR = _Message("Clearing match...", ping=False)
     MATCH_MAP_SELECTED = _Message("Successfully selected **{}**")
     MATCH_ROUND_OVER = _Message("{}\n{}\nRound {} is over!")
@@ -540,11 +610,12 @@ class _StringEnum(Enum):
     MP_REMOVED = _Message("Removed {} from the map pool")
 
     ACC_NOT_ENOUGH = _Message("Not enough accounts are available for this match!\n**Match has been canceled!**")
+    ACC_ERROR = _Message("Error when giving out Jaeger accounts!\n**Match has been canceled!**")
     ACC_UPDATE = _Message("", ping=False, embed=_account)
-    ACC_ERROR = _Message("One of the PIL pug accounts is invalid: `{}`")
     ACC_SENT = _Message("**Successfully sent jaeger accounts  in DMs!**")
     ACC_SENDING = _Message("Loading Jaeger accounts...")
     ACC_OVER = _Message("Match is over, please log out of your Jaeger account!")
+    ACC_CLOSED = _Message("{}'s DMS are locked, can't send them a Jaeger account!")
 
     NOTIFY_REMOVED = _Message("You left Notify!")
     NOTIFY_ADDED = _Message("You joined Notify!")
@@ -571,4 +642,14 @@ class _StringEnum(Enum):
     MUTE_SHOW = _Message("You are muted from POG until {}!")
     MUTE_FREED = _Message("You are no longer muted from POG!")
 
-    SC_ILLEGAL_WE = _Message("Alert: {} used {} during match {}!")
+    SC_ILLEGAL_WE = _Message("{} used {} during match {}! This weapon is banned! Ignoring {} kill(s)...")
+    SC_PLAYERS_STRING = _Message("Here is player data for squittal script:\n{}")
+    SC_RESULT_HALF = _Message("Match {} - **halftime**")
+    SC_RESULT = _Message("Match {}")
+
+    SUB_NO = _Message("This player can't be subbed!")
+    SUB_NO_CAPTAIN = _Message("Can't sub a Team Captain!")
+    SUB_NO_PLAYER = _Message("No player is available to substitute!")
+    SUB_OKAY_TEAM = _Message("{} replaced {} in {}", ping=False, embed=_teamUpdate)
+    SUB_OKAY = _Message("{} replaced {}!", ping=False, embed=_teamUpdate)
+    SUB_LOBBY = _Message("{} you have been designed as a substitute, join <#{}>!", embed=_lobbyList)

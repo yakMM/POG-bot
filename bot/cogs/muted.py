@@ -9,6 +9,7 @@ from classes.players import getPlayer
 # Custom modules
 import modules.config as cfg
 from modules.roles import permsMuted, forceInfo, roleUpdate
+from modules.exceptions import ElementNotFound
 from modules.display import send
 from modules.exceptions import ElementNotFound
 

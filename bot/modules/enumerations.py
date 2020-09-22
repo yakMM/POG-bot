@@ -31,4 +31,5 @@ class PlayerStatus(Enum):
     IS_LOBBIED = 2
     IS_MATCHED = 3
     IS_PICKED = 4
-    IS_PLAYING = 5
+    IS_WAITING = 5
+    IS_PLAYING = 6

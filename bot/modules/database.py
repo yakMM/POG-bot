@@ -22,6 +22,13 @@ def getAllItems(initClassMethod, dbName):
     except KeyError as e:
         raise DatabaseError(f"KeyError when retrieving {dbName} from database: {e}")
 
+def getOneItem(dbName, initClassMethod, itemId):
+    item = collections[dbName].find_one({"_id": itemId})
+
+    try:
+        return initClassMethod(item)
+    except KeyError as e:
+        raise DatabaseError(f"KeyError when retrieving {dbName} from database: {e}")
 
 async def updatePlayer(p, doc):
     """ Launch the task updating player p in database
@@ -29,6 +36,9 @@ async def updatePlayer(p, doc):
     loop = get_event_loop()
     await loop.run_in_executor(None, _updatePlayer, p, doc)
 
+async def updateMatch(m):
+    loop = get_event_loop()
+    await loop.run_in_executor(None, _addMatch, m)
 
 async def removePlayer(p):
     """ Launch the task updating player p in database
@@ -69,6 +79,14 @@ def _replacePlayer(p):
         collections["users"].replace_one({"_id": p.id}, p.getData())
     else:
         collections["users"].insert_one(p.getData())
+
+def _addMatch(m):
+    """ Update player p into db
+    """
+    if collections["matches"].count_documents({"_id": m.number}) != 0:
+        raise DatabaseError(f"Match {m.number} already in database!")
+    else:
+        collections["matches"].insert_one(m.getData())
 
 
 def _updateMap(m):

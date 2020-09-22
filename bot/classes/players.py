@@ -4,8 +4,9 @@
 
 # Custom modules
 import modules.config as cfg
-from modules.asynchttp import request as httpRequest
-from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, AccountNotFound, ApiNotReachable
+from modules.asynchttp import apiRequestAndRetry as httpRequest
+from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound,\
+CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable, AccountNotFound
 from modules.enumerations import PlayerStatus
 from lib import tasks
 from modules.roles import roleUpdate
@@ -48,23 +49,23 @@ class Player:
     """ Basic player class, every registered user matches a Player object contained in the dictionary
     """
 
-    def __init__(self, name, id):
+    def __init__(self, id, name):
         self.__name = name
         self.__id = id
         self.__rank = 0
-        self._igNames = ["N/A", "N/A", "N/A"]
-        self._igIds = [0, 0, 0]
+        self.__igNames = ["N/A", "N/A", "N/A"]
+        self.__igIds = [0, 0, 0]
         self.__notify = False
         self.__timeout = {"time": 0, "reason": ""}
         self.__status = PlayerStatus.IS_NOT_REGISTERED
-        self._hasOwnAccount = False
-        self._active = None
-        self._match = None
+        self.__hasOwnAccount = False
+        self.__active = None
+        self.__match = None
         _allPlayers[id] = self  # Add to dictionary on creation
 
     @classmethod
     def newFromData(cls, data):  # make a new Player object from database data
-        obj = cls(data["name"], data["_id"])
+        obj = cls(data["_id"], data["name"])
         obj.__rank = data["rank"]
         if obj.__rank == 0:
             obj.__status = PlayerStatus.IS_NOT_REGISTERED
@@ -72,25 +73,25 @@ class Player:
             obj.__status = PlayerStatus.IS_REGISTERED
         obj.__notify = data["notify"]
         obj.__timeout = data["timeout"]
-        obj._igNames = data["igNames"]
-        obj._igIds = data["igIds"]
-        obj._hasOwnAccount = data["hasOwnAccount"]
-        for i in range(len(obj._igIds)):
-            _namesChecking[i][obj._igIds[i]] = obj
+        obj.__igNames = data["igNames"]
+        obj.__igIds = data["igIds"]
+        obj.__hasOwnAccount = data["hasOwnAccount"]
+        for i in range(len(obj.__igIds)):
+            _namesChecking[i][obj.__igIds[i]] = obj
         return obj
 
     async def dbUpdate(self, arg):
         if arg == "notify":
             await updatePlayer(self, {"notify": self.__notify})
         elif arg == "register":
-            await updatePlayer(self, {"igNames": self._igNames, "igIds": self._igIds,
-                                      "rank": self.__rank, "hasOwnAccount": self._hasOwnAccount})
+            await updatePlayer(self, {"igNames": self.__igNames, "igIds": self.__igIds,
+                                      "rank": self.__rank, "hasOwnAccount": self.__hasOwnAccount})
         elif arg == "timeout":
             await updatePlayer(self, {"timeout": self.__timeout})
 
     @property
     def active(self):  # "Active player" object, when player is in a match, contains more info
-        return self._active
+        return self.__active
 
     @property
     def name(self):
@@ -104,6 +105,11 @@ class Player:
     def timeout(self, time, reason=""):
         self.__timeout["time"] = time
         self.__timeout["reason"] = reason
+
+    # TODO
+    # DEV
+    def cheatName(self, name):
+        self.__igNames = [name, name, name]
 
     @property
     def isTimeout(self):
@@ -139,22 +145,26 @@ class Player:
         self.updateRole()
 
     def onMatchReady(self):
+        self.__status = PlayerStatus.IS_WAITING
+
+    def onTeamReady(self):
         self.__status = PlayerStatus.IS_PLAYING
 
     def onPlayerClean(self):
-        self._match = None
-        self._active = None
-        if not self._hasOwnAccount:
-            self._igNames = ["N/A", "N/A", "N/A"]
-            self._igIds = [0, 0, 0]
+        self.__match = None
+        self.__active = None
+        if not self.__hasOwnAccount:
+            self.__igNames = ["N/A", "N/A", "N/A"]
+            self.__igIds = [0, 0, 0]
         self.__status = PlayerStatus.IS_REGISTERED
         self.updateRole()
 
-    def onPicked(self):
+    def onPicked(self, active):
+        self.__active = active
         self.__status = PlayerStatus.IS_PICKED
 
     def onMatchSelected(self, m):
-        self._match = m
+        self.__match = m
         self.__status = PlayerStatus.IS_MATCHED
         self.inactiveTask.cancel()
 
@@ -163,11 +173,11 @@ class Player:
             self.inactiveTask.start(fct)
 
     def onActive(self):
-        if self.status is PlayerStatus.IS_LOBBIED:
+        if self.__status is PlayerStatus.IS_LOBBIED:
             self.inactiveTask.cancel()
 
     def onResign(self):
-        self._active = None
+        self.__active = None
         self.__status = PlayerStatus.IS_MATCHED
 
     @tasks.loop(minutes=cfg.AFK_TIME, delay=1, count=2)
@@ -192,11 +202,11 @@ class Player:
 
     @property
     def igNames(self):
-        return self._igNames
+        return self.__igNames
 
     @property
     def igIds(self):
-        return self._igIds
+        return self.__igIds
 
     @property
     def status(self):
@@ -204,11 +214,15 @@ class Player:
 
     @property
     def match(self):  # when in match
-        return self._match
+        return self.__match
 
     @property
     def hasOwnAccount(self):
-        return self._hasOwnAccount
+        return self.__hasOwnAccount
+
+    def copyIgInfo(self, player):
+        self.__igNames = player.igNames.copy()
+        self.__igIds = player.igIds.copy()
 
     def getData(self):  # get data for database push
         data = {"_id": self.__id,
@@ -216,9 +230,9 @@ class Player:
                 "rank": self.__rank,
                 "notify": self.__notify,
                 "timeout": self.__timeout,
-                "igNames": self._igNames,
-                "igIds": self._igIds,
-                "hasOwnAccount": self._hasOwnAccount
+                "igNames": self.__igNames,
+                "igIds": self.__igIds,
+                "hasOwnAccount": self.__hasOwnAccount
                 }
         return data
 
@@ -228,21 +242,21 @@ class Player:
         """
         updated = False
         if charList is None:
-            if self.__status == PlayerStatus.IS_NOT_REGISTERED or self._hasOwnAccount:
+            if(self.__status is PlayerStatus.IS_NOT_REGISTERED or self.__hasOwnAccount):
                 updated = True
-            self._igIds = [0, 0, 0]
-            self._igNames = ["N/A", "N/A", "N/A"]
+            self.__igIds = [0, 0, 0]
+            self.__igNames = ["N/A", "N/A", "N/A"]
             if self.__status is PlayerStatus.IS_NOT_REGISTERED:
                 self.__status = PlayerStatus.IS_REGISTERED
                 self.__rank = 1
-            self._hasOwnAccount = False
+            self.__hasOwnAccount = False
             return updated
         updated = await self._addCharacters(charList)
         if updated:
             if self.__status is PlayerStatus.IS_NOT_REGISTERED:
                 self.__status = PlayerStatus.IS_REGISTERED
                 self.__rank = 1
-            self._hasOwnAccount = True
+            self.__hasOwnAccount = True
         return updated
 
     async def _addCharacters(self, charList):
@@ -269,11 +283,10 @@ class Player:
             try:
                 world = int(jdata["character_list"][0]["world_id"])
                 if world != WORLD_ID:
-                    raise CharInvalidWorld(
-                        jdata["character_list"][0]["name"]["first"])
+                    raise CharInvalidWorld(jdata["character_list"][0]["name"]["first"])
                 else:
                     faction = int(jdata["character_list"][0]["faction_id"])
-                    currId = jdata["character_list"][0]["character_id"]
+                    currId = int(jdata["character_list"][0]["character_id"])
                     currName = jdata["character_list"][0]["name"]["first"]
                     if currId in _namesChecking[faction - 1]:
                         p = _namesChecking[faction - 1][currId]
@@ -292,10 +305,10 @@ class Player:
             if newIds[i] == 0:
                 raise CharMissingFaction(cfg.factions[i + 1])
         if updated:
-            self._igIds = newIds.copy()
-            self._igNames = newNames.copy()
-            for i in range(len(self._igIds)):
-                _namesChecking[i][self._igIds[i]] = self
+            self.__igIds = newIds.copy()
+            self.__igNames = newNames.copy()
+            for i in range(len(self.__igIds)):
+                _namesChecking[i][self.__igIds[i]] = self
         return updated
 
 
@@ -305,17 +318,66 @@ class ActivePlayer:
 
     def __init__(self, player, team):
         self.__player = player
-        self.__player._active = self
+        self.__illegalWeapons = dict()
         self.__kills = 0
         self.__deaths = 0
         self.__net = 0
         self.__score = 0
         self.__team = team
         self.__account = None
-        self.__player.onPicked()
+        self.__player.onPicked(self)
+
+    @classmethod
+    def newFromData(cls, data, team):
+        try:
+            player = getPlayer(data["discord_id"])
+        except ElementNotFound:
+            player = Player(data["discord_id"], "unknown")
+        obj = cls(player, team)
+        obj.__score = data["score"]
+        obj.__net = data["net"]
+        obj.__deaths = data["deaths"]
+        obj.__kills = data["kills"]
+        obj.rank = data["rank"]
+        obj.__illWeaponsFromData(data["ill_weapons"])
+        return obj
+
 
     def clean(self):
         self.__player.onPlayerClean()
+
+    def getData(self):
+        data = {"discord_id": self.__player.id,
+                "ig_id": self.igId,
+                "ill_weapons": self.__getIllWeaponsDoc(),
+                "score": self.__score,
+                "net": self.__net,
+                "deaths": self.__deaths,
+                "kills": self.__kills,
+                "rank": self.rank
+                }
+        return data
+
+    def __getIllWeaponsDoc(self):
+        data = list()
+        for weapId in self.__illegalWeapons.keys():
+            doc =  {"weap_id": weapId,
+                    "kills": self.__illegalWeapons[weapId]
+                    }
+            data.append(doc)
+        return data
+
+    def __illWeaponsFromData(self, data):
+        for weapDoc in data:
+            self.__illegalWeapons[weapDoc["weap_id"]] = weapDoc["kills"]
+
+    @property
+    def rank(self):
+        return self.__player.rank
+
+    @rank.setter
+    def rank(self, value):
+        self.__player.rank = value
 
     @property
     def name(self):
@@ -338,8 +400,7 @@ class ActivePlayer:
         fakePlayer = getPlayer(accountId)
         if fakePlayer is None:
             raise AccountNotFound(accountId)
-        self.__player._igNames = fakePlayer.igNames.copy()
-        self.__player._igIds = fakePlayer.igIds.copy()
+        self.__player.copyIgInfo(fakePlayer)
 
     def onMatchReady(self):
         self.__player.onMatchReady()
@@ -347,6 +408,9 @@ class ActivePlayer:
     def onResign(self):
         self.__player.onResign()
         return self.__player
+    
+    def onTeamReady(self):
+        self.__player.onTeamReady()
 
     @property
     def mention(self):
@@ -360,13 +424,13 @@ class ActivePlayer:
     def igId(self):
         faction = self.__team.faction
         if faction != 0:
-            return self.__player._igIds[faction - 1]
+            return self.__player.igIds[faction - 1]
 
     @property
     def igName(self):
         faction = self.__team.faction
         if faction != 0:
-            return self.__player._igNames[faction-1]
+            return self.__player.igNames[faction-1]
 
     @property
     def account(self):
@@ -400,6 +464,16 @@ class ActivePlayer:
     def net(self):
         return self.__net
 
+    @property
+    def illegalWeapons(self):
+        return self.__illegalWeapons
+
+    def addIllegalWeapon(self, weapId):
+        if weapId in self.__illegalWeapons:
+            self.__illegalWeapons[weapId] += 1
+        else:
+            self.__illegalWeapons[weapId] = 1
+
     def addOneKill(self, points):
         self.__kills += 1
         self.__team.addOneKill()
@@ -408,7 +482,9 @@ class ActivePlayer:
     def addOneDeath(self, points):
         self.__deaths += 1
         self.__team.addOneDeath()
-        self.__net -= points
+        points = -points
+        self.__net += points
+        self.__team.addNet(points)
 
     def addOneTK(self):
         self.__addPoints(cfg.scores["teamkill"])
@@ -422,6 +498,7 @@ class ActivePlayer:
         self.__net += points
         self.__score += points
         self.__team.addScore(points)
+        self.__team.addNet(points)
 
 
 class TeamCaptain(ActivePlayer):
