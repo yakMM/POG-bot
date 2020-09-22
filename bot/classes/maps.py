@@ -21,17 +21,6 @@ MAX_SELECTED = 15
 _mapSelectionsDict = dict()
 
 
-def names_to_maps(map_names):  # returns a list of map objects from a list of map names
-    formatted = list()
-    for map_name in map_names:
-        for map in _allMapsList:
-            if map_name.lower() in map.name.lower():
-                formatted.append(map)
-            else:
-                log.debug(f"Map named '{map_name}' could not be found and is being omitted from the formatted list")
-    return formatted
-
-
 def getMapSelection(id):
     sel = _mapSelectionsDict.get(id)
     if sel is None:
@@ -96,12 +85,12 @@ class MapSelection:
         self.__id = id
         self.booked = list()
         self.get_booked(mapList)
-        self.__selection = self.select_available(names_to_maps(cfg.general["map_pool"]))
-        # todo: use this as the map pool, remove yak's way
+        self.__selection = list()
         self.__selected = None
         self.__allMaps = mapList
-        self.__status = SelStatus.IS_SELECTION
+        self.__status = SelStatus.IS_EMPTY
         _mapSelectionsDict[self.__id] = self
+
 
     def selectFromIdList(self, ids):
         self.__selection.clear()

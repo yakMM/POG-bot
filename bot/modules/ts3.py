@@ -16,6 +16,8 @@ log = getLogger(__name__)
 # settings to enable when bot instance is configured: enable the webapi script, insert teamspeak address and port, set
 #  default channel (Lobby or Match 2 for each bot), set nickname.
 
+bot1 = None
+bot2 = None
 
 class Ts3Bot:
     def __init__(self, main_url, instance_name, username="admin", password=""):
@@ -192,7 +194,7 @@ def getTs3Bots():
 
 # FOR TESTING/GETTING SONG IDS:
 if __name__ == "__main__":
-    launchStr = ""
+    launchStr = "_test"
     cfg.getConfig(f"../config{launchStr}.cfg")
     init()
     print("(<song id>, <song name>, <duration (ms)>)")

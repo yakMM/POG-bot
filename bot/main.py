@@ -281,10 +281,10 @@ def main(launchStr=""):
     getAllItems(Weapon, "sWeapons")
 
     # Get Account sheet from drive
-    AccountHander.init(f"gspread_client_secret{launchStr}.json")
+    AccountHander.init(f"client_secret{launchStr}.json")
 
     # Establish connection with Jaeger Calendar and create a global object
-    createJaegerCalObj(f"gspread_client_secret{launchStr}.json")
+    createJaegerCalObj(f"client_secret{launchStr}.json")
 
     # Initialise matches channels
     matchesInit(cfg.channels["matches"])
@@ -309,5 +309,5 @@ if __name__ == "__main__":
     # execute only if run as a script
     # Use main() for production
 
-    # main("_test")
-    main()
+    main("_test")
+    #main()

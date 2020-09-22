@@ -80,7 +80,6 @@ general = {
     "lobby_size": 0,
     "sinusbot_user": "",
     "sinusbot_pass": "",
-    "map_pool": list(),
     "rules_msg_id": 0
 }
 
@@ -162,16 +161,10 @@ def getConfig(file):
 
     for key in general:
         try:
-            if key == "map_pool":
-                tmp = config['General'][key].split(',')
-                general[key].clear()
-                for map in tmp:
-                    general[key].append(map)
+            if isinstance(general[key], int):
+                general[key] = int(config['General'][key])
             else:
-                if isinstance(general[key], int):
-                    general[key] = int(config['General'][key])
-                else:
-                    general[key] = config['General'][key]
+                general[key] = config['General'][key]
         except KeyError:
             _errorMissing(key, 'General', file)
         except ValueError:
