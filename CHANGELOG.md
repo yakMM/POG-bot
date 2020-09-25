@@ -1,6 +1,7 @@
 # v1.15:
 - Cap points are no longer counted in team netscore
 - Updated score sheet visual
+- Added author in all embeds as workaround for discord android app bug T900 (long enbeds on mobile)
 
 # v1.14:
 - Added sub command for staff
