@@ -283,10 +283,10 @@ def main(launchStr=""):
     getAllItems(Weapon, "sWeapons")
 
     # Get Account sheet from drive
-    AccountHander.init(f"client_secret{launchStr}.json")
+    AccountHander.init(f"google_api_secret{launchStr}.json")
 
     # Establish connection with Jaeger Calendar and create a global object
-    createJaegerCalObj(f"client_secret{launchStr}.json")
+    createJaegerCalObj(f"google_api_secret{launchStr}.json")
 
     # Initialise display module
     displayInit(client)

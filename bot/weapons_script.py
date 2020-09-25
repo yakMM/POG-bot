@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 import modules.config as cfg
 from modules.database import forceUpdate, init as dbInit
 import requests
@@ -74,46 +76,46 @@ def getBannedPerCategorie(cat, id):
     # SMG
     elif cat == 5:
         d={
-        1899:	    "Tempest",
+        1899:       "Tempest",
         1944:       "Shuriken",
         1949:       "Skorpios",
-        27000:	    "AF-4 Cyclone",
-        27005:	    "AF-4G Cyclone",
-        28000:	    "SMG-46 Armistice",
-        28005:	    "SMG-46G Armistice",
-        29000:	    "Eridani SX5",
-        29005:	    "Eridani SX5G",
-        6002772:	"Eridani SX5-AE",
-        6002800:	"SMG-46AE Armistice",
-        6002824:	"AF-4AE Cyclone",
-        6003850:	"MGR-S1 Gladius",
-        6003879:	"MG-S1 Jackal",
-        6003925:	"VE-S Canis",
-        6005968:	"NSX-A Kappa"
+        27000:      "AF-4 Cyclone",
+        27005:      "AF-4G Cyclone",
+        28000:      "SMG-46 Armistice",
+        28005:      "SMG-46G Armistice",
+        29000:      "Eridani SX5",
+        29005:      "Eridani SX5G",
+        6002772:    "Eridani SX5-AE",
+        6002800:    "SMG-46AE Armistice",
+        6002824:    "AF-4AE Cyclone",
+        6003850:    "MGR-S1 Gladius",
+        6003879:    "MG-S1 Jackal",
+        6003925:    "VE-S Canis",
+        6005968:    "NSX-A Kappa"
         }
     # Sniper Rifle
     elif cat == 11:
         d={
-        88:	        "99SV",
-        89:	        "VA39 Spectre",
-        7316:	    "TRAP-M1",
+        88:         "99SV",
+        89:         "VA39 Spectre",
+        7316:       "TRAP-M1",
         7337:       "Phaseshift VX-S",
-        24000:  	"Gauss SPR",
-        24002:  	"Impetus",
-        25002:	    "KSR-35",
-        26002:	    "Phantom VA23",
-        802771: 	"NS-AM7 Archer",
-        802910:	    "NS-AM7B Archer",
-        802921: 	"NS-AM7G Archer",
-        804255:	    "NSX Daimyo",
-        6002918:	"NS-AM7 VS/AE Archer",
-        6002930:	"NS-AM7 AE/TR Archer",
-        6002943:	"NS-AM7 AE/NC Archer",
-        6004294:	"AM7-XOXO",
-        6004992:	"NS-AM8 Shortbow",
-        6008496:	"PSA-01 Hammerhead AMR",
-        6008652:	'NSX "Ivory" Daimyo',
-        6008670:	'NSX "Networked" Daimyo'
+        24000:      "Gauss SPR",
+        24002:      "Impetus",
+        25002:      "KSR-35",
+        26002:      "Phantom VA23",
+        802771:     "NS-AM7 Archer",
+        802910:     "NS-AM7B Archer",
+        802921:     "NS-AM7G Archer",
+        804255:     "NSX Daimyo",
+        6002918:    "NS-AM7 VS/AE Archer",
+        6002930:    "NS-AM7 AE/TR Archer",
+        6002943:    "NS-AM7 AE/NC Archer",
+        6004294:    "AM7-XOXO",
+        6004992:    "NS-AM8 Shortbow",
+        6008496:    "PSA-01 Hammerhead AMR",
+        6008652:    'NSX "Ivory" Daimyo',
+        6008670:    'NSX "Networked" Daimyo'
         }
     # Scout Rifle
     elif cat == 12:
@@ -121,9 +123,9 @@ def getBannedPerCategorie(cat, id):
         2311:       "NS-30 Vandal",
         2312:       "NS-30B Vandal",
         2313:       "NS-30G Vandal",
-        24007:	    "AF-6 Shadow",
-        25007:	    "HSR-1",
-        26007:	    "Nyx VX31",
+        24007:      "AF-6 Shadow",
+        25007:      "HSR-1",
+        26007:      "Nyx VX31",
         6004198:    "Mystery Weapon"
         }
     return id in d.keys()

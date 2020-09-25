@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 def isAlNum(string):
     """ Little utility to check if a string contains only letters and numbers (a-z,A-Z,0-9)
         Parameters

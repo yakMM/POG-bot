@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 from discord.ext.commands.errors import ExtensionAlreadyLoaded
 
 main_cogs = ["cogs.admin"]

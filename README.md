@@ -20,7 +20,7 @@
 - Master branch is a release branch, it will stay clean and is synced with the hosting.
 - So developments should be done on feature branches and will be then merged in.
 - Keep fork repos up to date from upstream as much as possible.
-- `client_secret.json` and `config.cfg` are not available for confidentiality reasons, templates are given instead.
+- `google_api_secret.json` and `config.cfg` are not available for confidentiality reasons, templates are given instead.
 - `cogs` folder contains cogs modules as described in discord.py. Each of them regroups a set of commands and their associated checks. The core functionalities/processes are in `classes` folder.
     - These modules are not to be imported in any way (they are only launched through the discord.py client)
     - As such, it's not a problem to import anything from the `cogs`
@@ -69,7 +69,7 @@ cluster = DatabaseName
 ```
 
 #### Preparing Google Component
-The Gspread module is used for interaction with google API. [Follow these steps to create your client_secret.json](https://gspread.readthedocs.io/en/latest/oauth2.html#for-bots-using-service-account)
+The Gspread module is used for interaction with google API. [Follow these steps to create your google_api_secret.json](https://gspread.readthedocs.io/en/latest/oauth2.html#for-bots-using-service-account)
 
 ##### Prepare Google Sheet
 An example excel sheet has been provided called `pug-accounts.xlsx`. 
@@ -79,7 +79,7 @@ The `accounts` configuration at `[Database]` has to contain the ID of the Google
 This ID can be easily retrieved from the URI of the document: `https://docs.google.com/spreadsheets/d/GOOGLE_SHEET_ID/edit#gid=0`.
 
 Finally, add the service account email to the shared users with editor permissions to the google sheet. 
-This email is also listed as `client_email` at the `client_secret.json`.
+This email is also listed as `client_email` at the `google_api_secret.json`.
 
 #### Assigning Census ID
 Communication with the Daybreak Census API is required to retrieve game information, therefore you have to supply a Service ID.

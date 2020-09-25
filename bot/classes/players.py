@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 """Contains player classes
 """
 # Others
@@ -294,7 +296,7 @@ class Player:
                             raise CharAlreadyExists(currName, p.id)
                             
                     newIds[faction - 1] = currId
-                    updated = updated or newIds[faction - 1] != self._igIds[faction - 1]
+                    updated = updated or newIds[faction - 1] != self.__igIds[faction - 1]
                     newNames[faction - 1] = jdata["character_list"][0]["name"]["first"]
             except IndexError:
                 raise UnexpectedError("IndexError when setting player name: " + iName)  # Should not happen, we checked earlier

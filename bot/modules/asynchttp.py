@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 """Handle asynchronous http requests to Census API
 
 Usage:

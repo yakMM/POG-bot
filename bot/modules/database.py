@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 """Handle mongodb interaction
 """
 
@@ -80,15 +82,6 @@ def _replacePlayer(p):
     else:
         collections["users"].insert_one(p.getData())
 
-def _addMatch(m):
-    """ Update player p into db
-    """
-    if collections["matches"].count_documents({"_id": m.number}) != 0:
-        raise DatabaseError(f"Match {m.number} already in database!")
-    else:
-        collections["matches"].insert_one(m.getData())
-
-
 def _updateMap(m):
     """ Update map m into db
     """
@@ -103,3 +96,11 @@ def _remove(p):
         collections["users"].delete_one({"_id": p.id})
     else:
         raise DatabaseError(f"Player {p.id} not in database")
+
+def _addMatch(m):
+    """ Update player p into db
+    """
+    if collections["matches"].count_documents({"_id": m.number}) != 0:
+        raise DatabaseError(f"Match {m.number} already in database!")
+    else:
+        collections["matches"].insert_one(m.getData())

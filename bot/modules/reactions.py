@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 from modules.enumerations import PlayerStatus
 from modules.display import edit
 
@@ -18,3 +20,4 @@ async def reactionHandler(client, reaction, player):
     if str(reaction.emoji) == "✅":  # If everything is fine, account is validated
         account.validate()
         await edit("ACC_UPDATE", account.message, account=account)
+        await account.message.remove_reaction(reaction.emoji, client.user)

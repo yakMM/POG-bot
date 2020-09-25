@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 from discord.ext import commands
 from discord import Status as discordStatus
 from logging import getLogger

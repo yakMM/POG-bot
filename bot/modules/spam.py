@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 """Tiny module used as a slight spam protector
 """
 

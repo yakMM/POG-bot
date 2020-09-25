@@ -3,24 +3,14 @@ __pycache__/
 permissions.txt
 bot/test*.py
 bot/others/
-bot/config_test.cfg
-bot/config - PSB Discord.cfg
-bot/config - Monkeydg Discord.cfg
-bot/client_secret_test.json
-bot/gspread_client_secret.json
-secret/*
-bot/.idea/*
-bot/client_secret.json
+bot/config_test*.cfg
 bot/config.cfg
+bot/google_api_secret_test*.json
+bot/google_api_secret.json
+secret/*
+bot/.idea/
 secret/
 logging/
 matches/
-logging/*
-bot/test.py	
-bot/test2.py	
-bot/others/	
-bot/secret/
-bot/config - local.cfg
-bot/config - local.cfg
-bot/config - dev hosted.cfg
+bot/others/
 .vscode/

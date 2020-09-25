@@ -20,6 +20,8 @@ MAX_SELECTED = 15
 
 _mapSelectionsDict = dict()
 
+jaeger_cal_obj = None
+
 
 def getMapSelection(id):
     sel = _mapSelectionsDict.get(id)

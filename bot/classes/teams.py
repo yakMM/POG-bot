@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 """ Basic team object, should be explicit
 """
 
@@ -74,9 +76,6 @@ class Team:
     @property
     def score(self):
         return self.__score
-
-    def addScore(self, points):
-        self.__score += points
 
     @property
     def net(self):

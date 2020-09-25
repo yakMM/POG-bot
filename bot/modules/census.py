@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 from modules.asynchttp import apiRequestAndRetry as httpRequest
 from modules.exceptions import ApiNotReachable, ElementNotFound
 from classes.weapons import getWeapon

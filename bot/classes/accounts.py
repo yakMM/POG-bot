@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 """ This class handles the account tracking and distribution.
     Account sheet is retrieved at bot init, and then all operations are done in memory.
     Account sheet is updated at the end of each match.
@@ -12,11 +14,10 @@ from gspread.exceptions import APIError
 from numpy import array, vstack
 from datetime import datetime as dt
 from discord.errors import Forbidden
-
-# from discord.ext import tasks
-from lib import tasks
 from asyncio import get_event_loop
 from logging import getLogger
+
+from lib import tasks
 
 # Custom modules
 import modules.config as cfg

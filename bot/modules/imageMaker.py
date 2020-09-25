@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 from PIL import Image, ImageDraw, ImageFont
 from asyncio import get_event_loop
 from modules.display import imageSend

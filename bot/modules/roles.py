@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 import modules.config as cfg
 from modules.exceptions import ElementNotFound
 from modules.enumerations import PlayerStatus

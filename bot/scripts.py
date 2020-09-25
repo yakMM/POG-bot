@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 from gspread import service_account
 from numpy import array
 import modules.config as cfg
@@ -37,7 +39,7 @@ class DbPlayer(Player):
 
 def pushAccounts():
     # Get all accounts
-    gc = service_account(filename=f'gspread_client_secret{LAUNCHSTR}.json')
+    gc = service_account(filename=f'google_api_secret{LAUNCHSTR}.json')
     sh = gc.open_by_key(cfg.database["accounts"])
     rawSheet = sh.get_worksheet(1)
     visibleSheet = sh.get_worksheet(0)

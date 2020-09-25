@@ -1,7 +1,6 @@
 # v2.1:
 Major feature implementations!
-- Added jaeger calendar integration, now suggested bases to choose from in the map pool will not include those booked in the jaeger calendar
-- Improved map selection process, showing only maps in map pool but allowing others to be chosen
+- Added jaeger calendar integration, now suggested bases to choose from the map pool will not include those booked in the jaeger calendar
 - Added a warning if a chosen map is currently reserved in the jaeger calendar
 - Added/improved map pool and map selection process
 - Added react-based image previews of map pool maps using a new emoji handler

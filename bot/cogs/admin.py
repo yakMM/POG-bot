@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 from discord.ext import commands
 from logging import getLogger
 from datetime import datetime as dt
