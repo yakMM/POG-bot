@@ -547,7 +547,7 @@ class _StringEnum(Enum):
                                  embed=_mapPool,
                                  ping=False,
                                  emojis=getMapPoolEmojis())
-    PK_RESIGNED = _Message("Successfully resigned! {} is the new captain for {}!")
+    PK_RESIGNED = _Message("Successfully resigned! {} is the new captain for {}!", embed=_teamUpdate)
     PK_PICK_STARTED = _Message("Can't do that, you already picked a player!")
 
     EXT_NOT_REGISTERED = _Message("You are not registered! Check <#{}>")

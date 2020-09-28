@@ -8,6 +8,7 @@ from modules.census import processScore, getOfflinePlayers
 from modules.database import updateMatch
 from datetime import datetime as dt, timezone as tz
 from modules.ts3 import getTs3Bots
+from modules.tsInterface import factionAudio, mapAudio
 
 from classes.teams import Team  # ok
 from classes.players import TeamCaptain, ActivePlayer  # ok
@@ -348,6 +349,7 @@ class Match():
             return team.captain
         team.faction = faction
         team.captain.isTurn = False
+        factionAudio(team)
         if other.faction != 0:
             self.__status = MatchStatus.IS_MAPPING
             self.__findMap.start()
@@ -418,6 +420,7 @@ class Match():
             tm.onMatchReady()
             tm.captain.isTurn = True
         captainPings = [tm.captain.mention for tm in self.__teams]
+        await mapAudio(self)
         try:
             await self.__accounts.give_accounts()
         except AccountsNotEnough:

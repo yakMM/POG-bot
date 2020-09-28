@@ -1,4 +1,4 @@
-# v2.1:
+# v2.0:
 Major feature implementations!
 - Added jaeger calendar integration, now suggested bases to choose from the map pool will not include those booked in the jaeger calendar
 - Added a warning if a chosen map is currently reserved in the jaeger calendar
