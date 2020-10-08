@@ -432,6 +432,10 @@ class _Message:
         # Send the string
         if self.__embedFct is not None:
             embed = self.__embedFct(ctx, **kwargs)
+            # Fixes the embed mobile:
+            embed.set_author(name="Planetside Open Games",
+            url="https://docs.google.com/document/d/13rsrWA4r16gpB-F3gvx5HWf2T974mdHLraPSjh5DO1Q/",
+            icon_url = "https://media.discordapp.net/attachments/739231714554937455/739522071423614996/logo_png.png")
 
         if self.__ping and author is not None:
             msg = await sendFct(content=f'{author.mention} {string}', embed=embed)
