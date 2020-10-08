@@ -112,6 +112,10 @@ class Team:
     @property
     def isPlayers(self):
         return len(self.__players) > 1
+
+    @property
+    def match(self):
+        return self.__match
     
     def clear(self):
         self.__players.clear()

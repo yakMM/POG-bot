@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 """main.py
 
 Initialize everything, attach the general handlers, run the client.
@@ -15,11 +17,10 @@ from datetime import datetime as dt
 import logging
 from time import gmtime
 from logging.handlers import RotatingFileHandler
-import re
 
 # Custom modules
 import modules.config as cfg
-from modules.display import send, channelSend, edit, _StringEnum, Emoji, cleanStringEnum, init as displayInit
+from modules.display import send, channelSend, edit, init as displayInit
 from modules.spam import isSpam, unlock
 from modules.enumerations import MatchStatus
 from modules.exceptions import ElementNotFound, UnexpectedError
@@ -27,17 +28,19 @@ from modules.database import init as dbInit, getAllItems
 from modules.enumerations import PlayerStatus
 from modules.loader import init as cogInit, isAllLocked, unlockAll
 from modules.ts3 import init as ts3Init, getTs3Bots
+from modules.reactions import init as reactInit, reactionHandler
 
 # Modules for the custom classes
 from modules.roles import init as rolesInit, roleUpdate, isAdmin
 from modules.reactions import reactionHandler
 
 # Modules for the custom classes
-from matches import onInactiveConfirmed, init as matchesInit, getMatch
+from matches import onInactiveConfirmed, init as matchesInit
 from classes.players import Player, getPlayer, getAllPlayersList
 from classes.accounts import AccountHander
 from classes.maps import Map, createJaegerCalObj
 from classes.weapons import Weapon
+
 
 rulesMsg = None  # Will contain message object representing the rules message, global variable
 
@@ -59,7 +62,7 @@ def _addMainHandlers(client):
     # Useful for the long processes like ps2 api, database or spreadsheet calls
     @client.event
     async def on_message(message):
-        if message.author == client.user:  # if bot, do nothing
+        if message.author is client.user:  # if bot, do nothing
             await client.process_commands(message)
             return
         # if dm, print in console and ignore the message
@@ -150,49 +153,17 @@ def _addMainHandlers(client):
     # Reaction update handler (for accounts)
     @client.event
     async def on_reaction_add(reaction, user):
-        if reaction.message.author.bot and not user.bot and reaction.message.channel.id in cfg.channels["matches"]:
-            cleaned_reaction_message = re.sub("<.+?>", "", reaction.message.content)
-            emoji_obj = Emoji()
-            currentMatch = getMatch(reaction.message.channel.id)
-
-            # todo: WIP -- below is for team selection -- should be moved out of main.py to the correct module @yak
-            # if currentMatch.status == MatchStatus.IS_PICKING:
-            #     if user.id in [tm.captain.id for tm in currentMatch.teams]:
-            #         if cleaned_reaction_message in cleanStringEnum(_StringEnum.MATCH_SHOW_PICKS):
-            #             value = -1
-            #             if reaction.emoji in emoji_obj.numeric:
-            #                 value = emoji_obj.numeric.index(reaction.emoji)
-            #
-            #             await reaction.remove(user)
-            #
-            #             if 0 <= value <= 9:
-            #                 await edit("MATCH_SHOW_PICKS", currentMatch.id, currentMatch.teams[0].captain.mention, match=currentMatch)
-            #                 # could also be PK_OK or PK_OK_2
-
-            # todo: below is for map selection -- should be moved out of main.py to the correct module @yak
-            if currentMatch.status == MatchStatus.IS_MAPPING:
-                if cleaned_reaction_message in cleanStringEnum(_StringEnum.PK_SHOW_REACT_MAP) or \
-                        cleaned_reaction_message in cleanStringEnum(_StringEnum.PK_WAIT_MAP):
-                    value = -1
-                    if reaction.emoji in emoji_obj.escape:
-                        value = 27  # using the keycode value for escape but really it can be anything unique
-                    elif reaction.emoji in emoji_obj.numeric:
-                        value = emoji_obj.numeric.index(reaction.emoji)
-
-                    await reaction.remove(user)
-
-                    if 1 <= value <= len(currentMatch.mapSelector.getSelection()):
-                        await edit("PK_SHOW_REACT_MAP", reaction.message, map=currentMatch.mapSelector.getSelection()[value - 1])
-                    elif value == 27:
-                        captainPings = [tm.captain.mention for tm in currentMatch.teams]
-                        await edit("PK_WAIT_MAP", reaction.message, sel=currentMatch.mapSelector, *captainPings)
-
-        # below is for player account acceptance
+        # If the reaction is from the bot
+        if user is client.user:
+            return
+        # If the reaction is not to a message of the bot
+        if reaction.message.author is not client.user:
+            return
         try:
             player = getPlayer(user.id)
         except ElementNotFound:
             return
-        await reactionHandler(client, reaction, player)
+        await reactionHandler(reaction, user, player)
 
     @client.event
     async def on_member_join(member):
@@ -247,6 +218,10 @@ def _addInitHandlers(client):
     async def on_message(message):
         return
 
+# TODO: testing, to be removed
+def _test(client):
+    from test2 import testHand
+    testHand(client)
 
 def main(launchStr=""):
     # Logging config
@@ -291,17 +266,20 @@ def main(launchStr=""):
     # Initialise display module
     displayInit(client)
 
+    # Initialise reaction handlers
+    reactInit(client)
+
     # Add init handlers
     _addInitHandlers(client)
+
+    if launchStr == "_test":
+        _test(client)
 
     # Add all cogs
     cogInit(client)
 
     # Run server
     client.run(cfg.general["token"])
-
-    # TESTING:
-    # print(getTs3Bots()[0].get_list())
 
 
 if __name__ == "__main__":

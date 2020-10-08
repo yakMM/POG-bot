@@ -8,7 +8,7 @@ from modules.census import processScore, getOfflinePlayers
 from modules.database import updateMatch
 from datetime import datetime as dt, timezone as tz
 from modules.ts3 import getTs3Bots
-from modules.tsInterface import factionAudio, mapAudio
+from modules.tsInterface import factionAudio, mapAudio, which_bot, which_pick_channels, which_team_channels
 
 from classes.teams import Team  # ok
 from classes.players import TeamCaptain, ActivePlayer  # ok
@@ -162,30 +162,6 @@ def _findSpotForMatch():
         if match.status is MatchStatus.IS_FREE:
             return match
     return None
-
-
-def which_bot(match_id):
-    if match_id == cfg.channels["matches"][0]:
-        ts3bot = getTs3Bots()[0]
-    elif match_id == cfg.channels["matches"][1] or match_id == cfg.channels["matches"][2]:
-        ts3bot = getTs3Bots()[1]
-    return ts3bot
-
-
-def which_pick_channels(match_id):
-    pick_channel = ""
-    for i in range(0, 3):
-        if match_id == cfg.channels["matches"][i]:
-            pick_channel = cfg.teamspeak_ids[f"ts_match_{i+1}_picks"]
-    return pick_channel
-
-
-def which_team_channels(match_id):
-    team_channels = ("", "")
-    for i in range(0, 3):
-        if match_id == cfg.channels["matches"][i]:
-            team_channels = (cfg.teamspeak_ids[f"ts_match_{i+1}_team_1"], cfg.teamspeak_ids[f"ts_match_{i+1}_team_2"])
-    return team_channels
 
 
 def init(client, list):
@@ -607,7 +583,7 @@ class Match():
         if self.__status is MatchStatus.IS_PLAYING:
             return len(self.__roundStamps)
         if self.__status in (MatchStatus.IS_STARTING, MatchStatus.IS_WAITING):
-            return len(self.__roundsStamps) + 1
+            return len(self.__roundStamps) + 1
         return 0
 
     @property

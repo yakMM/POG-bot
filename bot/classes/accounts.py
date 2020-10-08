@@ -23,6 +23,7 @@ from lib import tasks
 import modules.config as cfg
 from modules.display import channelSend, privateSend, edit, remReaction
 from modules.exceptions import AccountsNotEnough
+from modules.reactions import ReactionHandler, addHandler, remHandler
 
 X_OFFSET = 3
 Y_OFFSET = 3
@@ -117,6 +118,8 @@ class AccountHander:
         type(self)._currentNumber += 1
         self.__handingStamp = 0  # timestamp: when have these accounts been given?
         match.number = type(self)._currentNumber
+        self.__reactionHandler = ReactionHandler(remUserReact=False, remBotReact=True)
+        self.__reactionHandler.setReaction('✅', onAccountReaction)
 
     def __letterFromNumber(self, num):
         """ Utility method to convert number in sheet coordinate
@@ -175,6 +178,7 @@ class AccountHander:
         self._updateSheet.start(row, vRow)
         for acc in self.__freeAccounts:
             if acc.message is not None:
+                remHandler(acc.message.id)
                 acc.isDestroyed = True
                 await edit("ACC_UPDATE", acc.message, account=acc)
                 if acc.isValidated:
@@ -230,7 +234,8 @@ class AccountHander:
                 newLine[currentAcc.x] = str(aPlayer.id)
                 try:
                     msg = await privateSend("ACC_UPDATE", aPlayer.id, account=currentAcc)
-                    await msg.add_reaction('✅')
+                    addHandler(msg.id, self.__reactionHandler)
+                    await self.__reactionHandler.autoAddReactions(msg)
                 except Forbidden:
                     msg = await channelSend("ACC_CLOSED", self.__match.id, aPlayer.mention)
                 currentAcc.message = msg
@@ -238,3 +243,9 @@ class AccountHander:
         type(self)._sheetTab = vstack((type(self)._sheetTab, array(newLine)))
         self.__handingStamp = stamp
         await channelSend("ACC_SENT", self.__match.id)
+
+
+async def onAccountReaction(reaction, player):
+    account = player.active.account
+    account.validate()
+    await edit("ACC_UPDATE", account.message, account=account)
