@@ -27,7 +27,7 @@ from modules.exceptions import ElementNotFound, UnexpectedError
 from modules.database import init as dbInit, getAllItems
 from modules.enumerations import PlayerStatus
 from modules.loader import init as cogInit, isAllLocked, unlockAll
-from modules.ts3 import init as ts3Init, getTs3Bots
+from modules.ts3 import init as ts3Init
 from modules.reactions import init as reactInit, reactionHandler
 
 # Modules for the custom classes
@@ -135,8 +135,6 @@ def _addMainHandlers(client):
             return
         # reaction to the rule message?
         if payload.message_id == cfg.general["rules_msg_id"]:
-            global rulesMsg
-            rulesMsg = await client.get_channel(cfg.channels["rules"]).fetch_message(cfg.general["rules_msg_id"])
             if str(payload.emoji) == "✅":
                 try:
                     p = getPlayer(payload.member.id)
