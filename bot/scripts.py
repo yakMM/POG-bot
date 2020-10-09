@@ -57,7 +57,7 @@ def pushAccounts():
         p = Player(int(acc), f"_POG_ACC_{acc}")
         pList.append(p)
         print(acc)
-        charList = [f"PSBx{acc}VS", f"PSBx{acc}TR", f"PSBx{acc}NC"]
+        charList = [f"POGx{acc}VS", f"POGx{acc}TR", f"POGx{acc}NC"]
         p._hasOwnAccount = True
         loop.run_until_complete(p._addCharacters(charList))
         _replacePlayer(p)
@@ -94,12 +94,3 @@ def getMatchFromDb(mId):
     m=getOneItem("matches", Match.newFromData, mId)
     _makeImage(m)
 
-
-
-def addPlayer():
-    i=900
-    pList = [Player(901,"jeanlebonjambeauneau"), Player(902,"jeandlkdfjhlskdhflskdhflsdkhflsdkhf")]
-    pList[0].cheatName("JEANxebonjambeauneTR")
-    pList[1].cheatName("lsdfkjqlfmkhsdfmlkshmgflskhdngmlskdhg")
-    for p in pList:
-        _replacePlayer(p)

@@ -124,6 +124,15 @@ class Player():
         self.__notify = value
         self.updateRole()
 
+    @property
+    def accountsFlipped(self):
+        accs = list()
+        for ig in self.__igNames:
+            if ig[:4] == "pil_":
+                accs.append(ig[4:])
+        return accs
+
+
     def updateRole(self, i=0):
         try:
             self.roleTask.start()
@@ -352,6 +361,7 @@ class ActivePlayer:
     def getData(self):
         data = {"discord_id": self.__player.id,
                 "ig_id": self.igId,
+                "ig_name": self.igName,
                 "ill_weapons": self.__getIllWeaponsDoc(),
                 "score": self.__score,
                 "net": self.__net,
