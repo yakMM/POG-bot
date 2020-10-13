@@ -346,6 +346,17 @@ def _globalInfo(msg, lobby, matchList):
         embed.add_field(name  = m.channel.name, value = desc, inline = False)
     return embed
 
+def _pilAccounts(msg, accountNames):
+    embed = Embed(
+        colour=Color.red(),
+        title='PIL Account!',
+        description=f'The password of your PIL account have been flipped!'
+    )
+    embed.add_field(name  = "Characters affected:",
+                    value = "\n".join(iName for iName in accountNames),
+                    inline = False)
+
+    return embed
 
 def _teamUpdate(arg, match):
     """ Returns the current teams
@@ -541,6 +552,7 @@ class _StringEnum(Enum):
     INVALID_STR = _Message("You entered an invalid character! `{}`")
     API_ERROR = _Message("Could not reach Planetside2 API, try again later!")
     GLOBAL_INFO = _Message("Here is what's going on in POG at the moment:", embed=_globalInfo)
+    CHECK_ACCOUNT = _Message("PIL accounts password got changed! Re-register in <#{}> to confirm you still have access to your account!", embed=_pilAccounts)
 
     BOT_UNLOCKED = _Message("Unlocked!")
     BOT_LOCKED = _Message("Locked!")

@@ -51,6 +51,10 @@ class LobbyCog(commands.Cog, name='lobby'):
         if player.status is PlayerStatus.IS_NOT_REGISTERED:
             await send("EXT_NOT_REGISTERED", ctx, cfg.channels["register"])
             return
+        accs = player.accountsFlipped
+        if len(accs) != 0:
+            await send("CHECK_ACCOUNT", ctx, cfg.channels["register"], accountNames=accs)
+            return
         if ctx.author.status == discordStatus.offline:
             await send("LB_OFFLINE", ctx)
             return
