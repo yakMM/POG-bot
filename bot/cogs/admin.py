@@ -79,9 +79,18 @@ class AdminCog(commands.Cog, name='admin'):
             await send("MATCH_NO_COMMAND", ctx, ctx.command.name)
             return
         sel = match.mapSelector
+        if len(args) == 1 and args[0] ==  "confirm":
+            match.confirmMap()
+            await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
+            return
         # Handle the actual map selection
         await sel.doSelectionProcess(ctx, args)
-        if sel.status is SelStatus.IS_SELECTED:
+        if sel.status is not SelStatus.IS_SELECTED:
+            return
+        if sel.isBooked:
+            await send("MAP_BOOKED", ctx, sel.map.name)
+            return
+        else:
             match.confirmMap()
             await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
 

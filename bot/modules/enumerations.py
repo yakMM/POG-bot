@@ -22,7 +22,6 @@ class SelStatus(Enum):
     IS_SELECTION = 2
     IS_TOO_MUCH = 3
     IS_CONFIRMED = 4
-    IS_BOOKED = 5
 
 
 class PlayerStatus(Enum):

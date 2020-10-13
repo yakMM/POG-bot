@@ -1,4 +1,20 @@
 # @CHECK 2.0 features OK
+from datetime import datetime as dt
+import pytz
+from dateutil import parser
+from dateutil import tz
+
+TZOFFSETS = {
+"CEST": +7200,
+"BST": +3600,
+"EDT": -14400,
+"CDT": -18000,
+"MDT": -21600,
+"PDT": -25200,
+"MSK": +10800,
+"AEST": +36000,
+"CST": +28800
+}
 
 def isAlNum(string):
     """ Little utility to check if a string contains only letters and numbers (a-z,A-Z,0-9)
@@ -18,3 +34,13 @@ def isAlNum(string):
         if not cond:
             return False
     return True
+
+def dateParser(string):
+    dtx = parser.parse(string, dayfirst=False, tzinfos = TZOFFSETS)
+    try:
+        dtx = pytz.utc.localize(dtx)
+        dtx = dtx.replace(tzinfo=tz.UTC)
+    except ValueError:
+        pass
+    dtx = dtx.astimezone(pytz.timezone("UTC"))
+    return dtx

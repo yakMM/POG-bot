@@ -3,8 +3,8 @@
 from gspread import service_account
 from numpy import array
 import modules.config as cfg
-from classes.players import Player, _allPlayers
-from modules.database import forceUpdate, getAllItems, _replacePlayer, _updateMap, init as dbInit, getOneItem
+from classes.players import Player, _allPlayers, getPlayer
+from modules.database import forceUpdate, getAllItems, _replacePlayer, _updateMap, init as dbInit, getOneItem, collections, _remove
 from classes.maps import _allMapsList, Map
 from matches import Match
 import requests
@@ -13,7 +13,7 @@ import asyncio
 from modules.imageMaker import _makeImage
 from classes.weapons import Weapon
 
-LAUNCHSTR = ""  # this should be empty if your files are config.cfg and gspread_client_secret.json
+LAUNCHSTR = "_test"  # this should be empty if your files are config.cfg and gspread_client_secret.json
 
 cfg.getConfig(f"config{LAUNCHSTR}.cfg")
 dbInit(cfg.database)
@@ -32,9 +32,68 @@ class DbPlayer(Player):
         newData["notify"] = data["notify"]
         newData["timeout"] = data["timeout"]
         newData["igIds"] = [int(pId) for pId in data["igIds"]]
-        newData["igNames"] = data["igNames"]
+        newData["igNames"] = list()
+        for ig in data["igNames"]:
+            bl = ord('0') <= ord(ig[-1]) <= ord('9')
+            bl = bl and ord('0') <= ord(ig[-2]) <= ord('9')
+            bl = bl and ig[-3] == 'x'
+            if bl: # is PIL char?
+                print(ig)
+                ig = f"pil_{ig}"
+            newData["igNames"].append(ig)
+
         newData["hasOwnAccount"] = data["hasOwnAccount"]
         super().newFromData(newData)
+
+_allDbMatches = list()
+convert_dict_1 = dict()
+convert_dict_2 = dict()
+
+class DbMatch:
+    @classmethod
+    def newFromData(cls, data):
+        obj = cls(data)
+        _allDbMatches.append(obj)
+
+    def __init__(self, data):
+        self.data = data
+        self.id = data["_id"]
+
+    def do_change(self):
+        dt = self.data
+        for tm in dt["teams"]:
+            for p in tm["players"]:
+                try:
+                    i_id = p["ig_id"]
+                except KeyError:
+                    i_name = p["ig_name"]
+                    if i_name in convert_dict_2:
+                        i_id = convert_dict_2[i_name]
+                    else:
+                        url = f"http://census.daybreakgames.com/s:{cfg.general['api_key']}/get/ps2:v2/character/?name.first={i_name}&c:show=character_id"
+                        jdata = json.loads(requests.get(url).content)
+                        i_id = int(jdata["character_list"][0]["character_id"])
+                        convert_dict_2[i_name] = i_id
+                    p["ig_id"] = i_id
+                try:
+                    i_name = p["ig_name"]
+                except KeyError:
+                    if i_id in convert_dict_1:
+                        name = convert_dict_1[i_id]
+                    else:
+                        url = 'http://census.daybreakgames.com/s:' + \
+                        cfg.general['api_key']+'/get/ps2:v2/character/?character_id=' + str(i_id) + \
+                        "&c:show=name.first"
+                        jdata = json.loads(requests.get(url).content)
+                        try:
+                            name = jdata["character_list"][0]["name"]["first"]
+                        except IndexError:
+                            print(f"Error: match {dt['_id']} {i_id}")
+                            continue
+                        convert_dict_1[i_id] = name
+                    p["ig_name"] = name
+
+
 
 
 def pushAccounts():
@@ -59,7 +118,7 @@ def pushAccounts():
         p = Player(int(acc), f"_POG_ACC_{acc}")
         pList.append(p)
         print(acc)
-        charList = [f"PSBx{acc}VS", f"PSBx{acc}TR", f"PSBx{acc}NC"]
+        charList = [f"POGx{acc}VS", f"POGx{acc}TR", f"POGx{acc}NC"]
         p._hasOwnAccount = True
         loop.run_until_complete(p._addCharacters(charList))
         _replacePlayer(p)
@@ -95,12 +154,20 @@ def getMatchFromDb(mId):
     m=getOneItem("matches", Match.newFromData, mId)
     _makeImage(m)
 
+def matchesDbUpdate():
+    getAllItems(DbMatch.newFromData, "matches")
+    for m in _allDbMatches:
+        m.do_change()
+    for m in _allDbMatches:
+        collections["matches"].replace_one({"_id": m.id}, m.data)
+
+def removeOldAccounts():
+    getAllItems(DbPlayer.newFromData, "users")
+    ids = range(891, 915)
+    for pid in ids:
+        print(str(pid))
+        p = getPlayer(pid)
+        _remove(p)
 
 
-def addPlayer():
-    i=900
-    pList = [Player(901,"jeanlebonjambeauneau"), Player(902,"jeandlkdfjhlskdhflskdhflsdkhflsdkhf")]
-    pList[0].cheatName("JEANxebonjambeauneTR")
-    pList[1].cheatName("lsdfkjqlfmkhsdfmlkshmgflskhdngmlskdhg")
-    for p in pList:
-        _replacePlayer(p)
+playersDbUpdate()

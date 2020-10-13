@@ -38,7 +38,7 @@ from modules.reactions import reactionHandler
 from matches import onInactiveConfirmed, init as matchesInit
 from classes.players import Player, getPlayer, getAllPlayersList
 from classes.accounts import AccountHander
-from classes.maps import Map, createJaegerCalObj
+from classes.maps import Map, MapSelection
 from classes.weapons import Weapon
 
 
@@ -62,7 +62,7 @@ def _addMainHandlers(client):
     # Useful for the long processes like ps2 api, database or spreadsheet calls
     @client.event
     async def on_message(message):
-        if message.author is client.user:  # if bot, do nothing
+        if message.author == client.user:  # if bot, do nothing
             await client.process_commands(message)
             return
         # if dm, print in console and ignore the message
@@ -135,6 +135,7 @@ def _addMainHandlers(client):
             return
         # reaction to the rule message?
         if payload.message_id == cfg.general["rules_msg_id"]:
+            print(str(payload.emoji)) # @TODO: remove (test)
             if str(payload.emoji) == "✅":
                 try:
                     p = getPlayer(payload.member.id)
@@ -152,10 +153,10 @@ def _addMainHandlers(client):
     @client.event
     async def on_reaction_add(reaction, user):
         # If the reaction is from the bot
-        if user is client.user:
+        if user == client.user:
             return
         # If the reaction is not to a message of the bot
-        if reaction.message.author is not client.user:
+        if reaction.message.author != client.user:
             return
         try:
             player = getPlayer(user.id)
@@ -233,6 +234,7 @@ def main(launchStr=""):
     logger.addHandler(file_handler)
 
     # Init order MATTERS
+    # Init order MATTERS
 
     # Seeding random generator
     seed(dt.now())
@@ -258,8 +260,8 @@ def main(launchStr=""):
     # Get Account sheet from drive
     AccountHander.init(f"google_api_secret{launchStr}.json")
 
-    # Establish connection with Jaeger Calendar and create a global object
-    createJaegerCalObj(f"google_api_secret{launchStr}.json")
+    # Establish connection with Jaeger Calendar
+    MapSelection.init(f"google_api_secret{launchStr}.json")
 
     # Initialise display module
     displayInit(client)

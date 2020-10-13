@@ -95,6 +95,9 @@ class ApiNotReachable(Exception):
         log.error(message)
         super().__init__(message)
 
+class UserLackingPermission(Exception):
+    pass
+
 
 class WebapiError(Exception):
     def __init__(self):

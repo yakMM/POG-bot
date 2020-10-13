@@ -45,14 +45,14 @@ async def channelSend(stringName, id, *args, **kwargs):
         Returns the message sent
     """
     channel = _client.get_channel(id)
-    return await _StringEnum[stringName].value.display(channel, channel.send,  *args, **kwargs)
+    return await _StringEnum[stringName].value.send(channel, *args, **kwargs)
 
 async def privateSend(stringName, id, *args, **kwargs):
     """ Send the message stringName in dm to user identified with id, with additional strings *args. Pass **kwargs to the embed function, if any
         Returns the message sent
     """
     user = _client.get_user(id)
-    return await _StringEnum[stringName].value.display(user, user.send, *args, **kwargs)
+    return await _StringEnum[stringName].value.send(user,*args, **kwargs)
 
 
 async def send(stringName, ctx, *args, **kwargs):
@@ -60,10 +60,12 @@ async def send(stringName, ctx, *args, **kwargs):
         Returns the message sent
     """
     try:
-        sendFct = ctx.send
+        ctx.send
     except AttributeError:
-        sendFct = _client.get_channel(ctx.channel.id).send
-    return await _StringEnum[stringName].value.display(ctx, sendFct, *args, **kwargs)
+        # @TODO: remove this, it should never happen??
+        ctx = ctx.channelId
+
+    return await _StringEnum[stringName].value.send(ctx, *args, **kwargs)
 
 
 async def edit(stringName, ctx, *args, **kwargs):
@@ -73,8 +75,7 @@ async def edit(stringName, ctx, *args, **kwargs):
     return await _StringEnum[stringName].value.display(ctx, ctx.edit,  *args, **kwargs)
 
 async def remReaction(message, user=None):
-    if user is None:
-        global _client
+    if not user:
         user = _client.user
     return await message.remove_reaction("✅", user)
 
@@ -290,18 +291,22 @@ def _lobbyList(msg, namesInLobby):
     return embed
 
 
+# def _selectedMaps(msg, sel):
+#     """ Returns a list of maps after a search selected
+#     """
+#     embed = Embed(colour=Color.blue())
+#     embed_text = sel.toString() + f"\n⤾ - Back to Maps"
+#     embed.add_field(name=f"{len(sel.getSelection())} maps found", value=embed_text, inline=False)
+#     return embed
+
+
 def _selectedMaps(msg, sel):
-    """ Returns a list of maps after a search selected
+    """ Returns a list of maps currently selected
     """
     embed = Embed(colour=Color.blue())
-    embed_text = sel.toString() + f"\n⤾ - Back to Maps"
-    embed.add_field(name=f"{len(sel.getSelection())} maps found", value=embed_text, inline=False)
+    maps = sel.stringList
+    embed.add_field(name=f"{len(maps)} maps found",value="\n".join(maps),inline = False)
     return embed
-
-
-    # maps = sel.stringList
-    # embed.add_field(name=f"{len(maps)} maps found",value="\n".join(maps),inline = False)
-    # return embed
 
 def _offlineList(msg, pList):
     embed = Embed(
@@ -394,16 +399,17 @@ def _jaegerCalendar(arg):
     return embed
 
 
-def _mapPool(msg, map):
-    if map.name in cfg.map_pool_images:
-        embed = Embed(colour=Color.blue(), title=map.name)
-        embed.set_author(name="Click here for the map pool document",
-                         url="https://docs.google.com/presentation/d/1KEDlqHxbpG2zXxuEZetAM9IpUHIisWTnrtybn3Kq-Is/edit?usp=sharing")
-        embed.set_image(url=cfg.map_pool_images[map.name])
-    else:
-        embed = Embed(colour=Color.red(), title="No map image available")
+def _mapPool(msg, mapSel):
+    map = mapSel.navigator.current
+    if map is not None:
+        if map.name in cfg.map_pool_images:
+            embed = Embed(colour=Color.blue(), title=map.name)
+            embed.set_author(name="Click here for the map pool document",
+                            url="https://docs.google.com/presentation/d/1KEDlqHxbpG2zXxuEZetAM9IpUHIisWTnrtybn3Kq-Is/edit?usp=sharing")
+            embed.set_image(url=cfg.map_pool_images[map.name])
+        else:
+            embed = Embed(colour=Color.red(), title="No map image available")
     return embed
-
 
 class _Message:
     """ Class for the enum to use
@@ -417,30 +423,34 @@ class _Message:
     def string(self):
         return self.__str
 
-    async def display(self, ctx, sendFct, *args, **kwargs):
-        # If is Context instead of a Message, get the Message:
-        embed = None
-        msg = None
+    def getEmbed(self, ctx, **kwargs):
+        if self.__embedFct is None:
+            return
+        embed = self.__embedFct(ctx, **kwargs)
+        # Fixes the embed mobile bug:
+        embed.set_author(name="Planetside Open Games",
+        url="https://docs.google.com/document/d/13rsrWA4r16gpB-F3gvx5HWf2T974mdHLraPSjh5DO1Q/",
+        icon_url = "https://media.discordapp.net/attachments/739231714554937455/739522071423614996/logo_png.png")
+        return embed
 
-        try:
-            author = ctx.author
-        except AttributeError:
-            author = None
+    async def send(self, ctx, *args, **kwargs):
+        # If is Context instead of a Message, get the Message:
 
         # Format the string to be sent with added args
         string = self.__str.format(*args)
-        # Send the string
-        if self.__embedFct is not None:
-            embed = self.__embedFct(ctx, **kwargs)
-            # Fixes the embed mobile:
-            embed.set_author(name="Planetside Open Games",
-            url="https://docs.google.com/document/d/13rsrWA4r16gpB-F3gvx5HWf2T974mdHLraPSjh5DO1Q/",
-            icon_url = "https://media.discordapp.net/attachments/739231714554937455/739522071423614996/logo_png.png")
 
-        if self.__ping and author is not None:
-            msg = await sendFct(content=f'{author.mention} {string}', embed=embed)
-        else:
-            msg = await sendFct(content=string, embed=embed)
+        if self.__ping:
+            try:
+                mention = ctx.author.mention
+                string = f'{mention} {string}'
+            except AttributeError:
+                pass
+
+        # Send the string
+        embed = self.getEmbed(ctx, **kwargs)
+
+        msg = await ctx.send(content=string, embed=embed)
+
         return msg
 
 
@@ -508,9 +518,7 @@ class _StringEnum(Enum):
     PK_FACTION_OK_NEXT = _Message("{} chose {}! {} pick a faction!", ping=False)
     PK_FACTION_CHANGED = _Message("{} changed to {}!")
     PK_FACTION_NOT_PLAYER = _Message("Pick a faction, not a player!", embed=_matchHelp)
-    PK_WAIT_MAP = _Message("{} {} Pick a map from the list using `=p #`. To choose a map not on the list use `=p base name`",
-                           ping=False,
-                           embed=_selectedMaps)
+    PK_WAIT_MAP =  _Message("{} {} Pick an available map!", ping=False, embed=_mapPool)
     PK_MAP_OK_CONFIRM = _Message("Picked **{}**! {} confirm with `=p confirm` if you agree")
     PK_OVER_READY = _Message("Can't do that if your team is ready!")
     PK_NO_MAP = _Message("No map selected!")

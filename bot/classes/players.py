@@ -374,6 +374,10 @@ class ActivePlayer:
             self.__illegalWeapons[weapDoc["weap_id"]] = weapDoc["kills"]
 
     @property
+    def isCaptain(self):
+        return False
+
+    @property
     def rank(self):
         return self.__player.rank
 
@@ -510,6 +514,10 @@ class TeamCaptain(ActivePlayer):
     def __init__(self, *args):
         super().__init__(*args)
         self.__isTurn = False
+
+    @property
+    def isCaptain(self):
+        return True
 
     @property
     def isTurn(self):

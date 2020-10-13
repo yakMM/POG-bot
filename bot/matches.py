@@ -12,7 +12,7 @@ from modules.tsInterface import factionAudio, mapAudio, which_bot, which_pick_ch
 
 from classes.teams import Team  # ok
 from classes.players import TeamCaptain, ActivePlayer  # ok
-from classes.maps import MapSelection, mainMapPool, _allMapsList  # ok
+from classes.maps import MapSelection, mainMapPool  # ok
 from classes.accounts import AccountHander  # ok
 
 from random import choice as randomChoice
@@ -387,7 +387,8 @@ class Match():
         ts3bot.move(pick_channel)
         await sleep(1)  # prevents playing this before faction announce
         ts3bot.enqueue(cfg.audio_ids["select_map"])
-        await channelSend("PK_WAIT_MAP", self.__id, sel=self.__mapSelector, *captainPings)
+        msg = await channelSend("PK_WAIT_MAP", self.__id, *captainPings, mapSel=self.__mapSelector)
+        await self.__mapSelector.navigator.setMsg(msg)
 
     @tasks.loop(count=1)
     async def __ready(self):
@@ -507,7 +508,7 @@ class Match():
     async def _launch(self):
         await channelSend("MATCH_INIT", self.__id, " ".join(self.playerPings))
         self.__accounts = AccountHander(self)
-        self.__mapSelector = MapSelection(self, _allMapsList)
+        self.__mapSelector = MapSelection(self, mainMapPool)
         for i in range(len(self.__teams)):
             self.__teams[i] = Team(i, f"Team {i + 1}", self)
             key = randomChoice(list(self.__players))

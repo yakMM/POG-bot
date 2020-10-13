@@ -1,6 +1,6 @@
 from modules.enumerations import PlayerStatus
 from modules.display import edit
-from modules.exceptions import ElementNotFound
+from modules.exceptions import ElementNotFound, UserLackingPermission
 from lib import tasks
 from inspect import iscoroutinefunction as isCoroutine
 
@@ -49,17 +49,21 @@ class ReactionHandler:
         return self.__remBotReact
 
     def setReaction(self, react, *fcts):
-        self.__fDict[react] = fcts
+        self.__fDict[react] = [fct for fct in fcts]
 
     async def run(self, reaction, player):
-        fcts = self.__fDict.get(str(reaction.emoji))
-        if fcts is None:
+        try:
+            fcts = self.__fDict[str(reaction.emoji)]
+        except KeyError:
             return
-        for fct in fcts:
-            if isCoroutine(fct):
-                await fct(reaction, player)
-            else:
-                fct(reaction, player)
+        try:
+            for fct in fcts:
+                if isCoroutine(fct):
+                    await fct(reaction, player)
+                else:
+                    fct(reaction, player)
+        except UserLackingPermission:
+            return
     
     async def autoAddReactions(self, msg):
         for react in self.__fDict.keys():
@@ -106,3 +110,6 @@ class ReactionHandler:
 #                     elif value == 27:
 #                         captainPings = [tm.captain.mention for tm in currentMatch.teams]
 #                         await edit("PK_WAIT_MAP", reaction.message, sel=currentMatch.mapSelector, *captainPings)
+# ⏺️
+# ▶️
+# ◀️
