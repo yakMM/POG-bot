@@ -4,7 +4,7 @@ from discord.ext import commands
 from logging import getLogger
 
 import modules.config as cfg
-from modules.display import send, channelSend
+from display import send, channelSend
 from modules.tools import isAlNum
 from modules.exceptions import ElementNotFound
 
@@ -64,7 +64,7 @@ class MatchesCog(commands.Cog, name='matches'):
                 await _map(ctx, aPlayer, args)  # map picking function
                 return
             if match.status is MatchStatus.IS_WAITING:
-                if match.roundNo == 1:
+                if match.round_no == 1:
                     await _factionChange(ctx, aPlayer, args)
                     return
                 await send("PK_OVER", ctx)  # Picking process is over

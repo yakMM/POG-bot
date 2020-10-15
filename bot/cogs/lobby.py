@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord import Status as discordStatus
 from logging import getLogger
 
-from modules.display import send, channelSend
+from display import send, channelSend
 import modules.config as cfg
 from modules.exceptions import UnexpectedError, ElementNotFound, LobbyStuck
 
@@ -53,7 +53,7 @@ class LobbyCog(commands.Cog, name='lobby'):
             return
         accs = player.accountsFlipped
         if len(accs) != 0:
-            await send("CHECK_ACCOUNT", ctx, cfg.channels["register"], accountNames=accs)
+            await send("CHECK_ACCOUNT", ctx, cfg.channels["register"], account_names=accs)
             return
         if ctx.author.status == discordStatus.offline:
             await send("LB_OFFLINE", ctx)
@@ -104,10 +104,10 @@ class LobbyCog(commands.Cog, name='lobby'):
     @commands.command(aliases=['i'])
     @commands.guild_only()
     async def info(self, ctx):
-        matchList = list()
+        match_list = list()
         for ch in cfg.channels["matches"]:
-            matchList.append(getMatch(ch))
-        await send("GLOBAL_INFO", ctx, lobby=getAllNamesInLobby(), matchList=matchList)
+            match_list.append(getMatch(ch))
+        await send("GLOBAL_INFO", ctx, lobby=getAllNamesInLobby(), match_list=match_list)
 
 
 def setup(client):

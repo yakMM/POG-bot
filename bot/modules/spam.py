@@ -3,7 +3,7 @@
 """Tiny module used as a slight spam protector
 """
 
-from modules.display import send
+from display import send
 
 __spamList = dict()
 __SPAM_MSG_FREQUENCY = 5

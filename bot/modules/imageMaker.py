@@ -2,7 +2,7 @@
 
 from PIL import Image, ImageDraw, ImageFont
 from asyncio import get_event_loop
-from modules.display import imageSend
+from display import imageSend
 from modules.enumerations import MatchStatus
 import modules.config as cfg
 from datetime import datetime as dt

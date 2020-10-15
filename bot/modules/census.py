@@ -3,7 +3,7 @@
 from modules.asynchttp import apiRequestAndRetry as httpRequest
 from modules.exceptions import ApiNotReachable, ElementNotFound
 from classes.weapons import getWeapon
-from modules.display import channelSend
+from display import channelSend
 import modules.config as cfg
 from logging import getLogger
 

@@ -5,11 +5,11 @@
 import modules.config as cfg
 from modules.enumerations import SelStatus
 from modules.exceptions import ElementNotFound, UserLackingPermission
-from modules.display import send, _mapPool
+from display import send, _map_pool
 from modules.tools import dateParser
 from modules.reactions import ReactionHandler, addHandler, remHandler
 
-from lib import tasks
+from lib.tasks import loop
 
 from logging import getLogger
 from gspread import service_account
@@ -24,7 +24,7 @@ from random import randint
 log = getLogger(__name__)
 
 _allMapsList = list()
-mainMapPool = list()
+mainmap_pool = list()
 
 MAX_SELECTED = 15
 
@@ -63,7 +63,7 @@ class Map:
         self.__typeId = data["type_id"]
         self.__inPool = data["in_map_pool"]
         if self.__inPool:
-            mainMapPool.append(self)
+            mainmap_pool.append(self)
         _allMapsList.append(self)
 
     def getData(self):  # get data for database push
@@ -126,7 +126,7 @@ class MapSelection:
         _mapSelectionsDict[self.__id] = self
         self.__nav = MapNavigator(self)
 
-    @tasks.loop(count=1)
+    @loop(count=1)
     async def _getBookedFromCalendar(self):
         loop = get_event_loop()
         await loop.run_in_executor(None, self.__getBooked)
@@ -340,5 +340,5 @@ class MapNavigator:
         raise UserLackingPermission
 
     async def refreshMessage(self, *args):
-        await self.__msg.edit(content=self.__msg.content, embed = _mapPool(self.__msg, mapSel=self.__mapSel))
+        await self.__msg.edit(content=self.__msg.content, embed = _map_pool(self.__msg, mapSel=self.__mapSel))
 

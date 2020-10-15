@@ -17,11 +17,11 @@ from discord.errors import Forbidden
 from asyncio import get_event_loop
 from logging import getLogger
 
-from lib import tasks
+from lib.tasks import loop
 
 # Custom modules
 import modules.config as cfg
-from modules.display import channelSend, privateSend, edit, remReaction
+from display import channelSend, privateSend, edit
 from modules.exceptions import AccountsNotEnough
 from modules.reactions import ReactionHandler, addHandler, remHandler
 
@@ -184,9 +184,9 @@ class AccountHander:
                 if acc.isValidated:
                     await privateSend("ACC_OVER", acc.aPlayer.id)
                 else:
-                    await remReaction(acc.message)
+                    await self.__reactionHandler.autoRemoveReacton(acc.message)
 
-    @tasks.loop(seconds=2, count=5)
+    @loop(seconds=2, count=5)
     async def _updateSheet(self, row, vRow):
         """ Push updates to the google sheet"""
         loop = get_event_loop()

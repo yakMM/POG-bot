@@ -20,7 +20,7 @@ from logging.handlers import RotatingFileHandler
 
 # Custom modules
 import modules.config as cfg
-from modules.display import send, channelSend, edit, init as displayInit
+from display import send, channelSend, init as displayInit
 from modules.spam import isSpam, unlock
 from modules.enumerations import MatchStatus
 from modules.exceptions import ElementNotFound, UnexpectedError

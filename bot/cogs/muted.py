@@ -12,7 +12,7 @@ from classes.players import getPlayer
 import modules.config as cfg
 from modules.roles import permsMuted, forceInfo, roleUpdate
 from modules.exceptions import ElementNotFound
-from modules.display import send
+from display import send
 from modules.exceptions import ElementNotFound
 
 log = getLogger(__name__)

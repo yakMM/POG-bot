@@ -10,7 +10,7 @@ from modules.asynchttp import apiRequestAndRetry as httpRequest
 from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound,\
 CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable, AccountNotFound
 from modules.enumerations import PlayerStatus
-from lib import tasks
+from lib.tasks import loop
 from modules.roles import roleUpdate
 from modules.database import updatePlayer
 
@@ -142,7 +142,7 @@ class Player:
             log.warning(f"Player task conflict: {self.name}")
             pass
 
-    @tasks.loop(count=1)
+    @loop(count=1)
     async def roleTask(self):
         await roleUpdate(self)
 
@@ -191,7 +191,7 @@ class Player:
         self.__active = None
         self.__status = PlayerStatus.IS_MATCHED
 
-    @tasks.loop(minutes=cfg.AFK_TIME, delay=1, count=2)
+    @loop(minutes=cfg.AFK_TIME, delay=1, count=2)
     async def inactiveTask(self, fct):  # when inactive for cfg.AFK_TIME, execute fct
         await fct(self)
 
@@ -281,14 +281,14 @@ class Player:
             raise UnexpectedError("charList is not the good size!")  # Should not happen, we checked earlier
         newIds = [0, 0, 0]
         newNames = ["N/A", "N/A", "N/A"]
-        for iName in charList:
+        for i_name in charList:
             url = 'http://census.daybreakgames.com/s:' + cfg.general['api_key'] + \
-                  '/get/ps2:v2/character/?name.first_lower=' + iName.lower() + \
+                  '/get/ps2:v2/character/?name.first_lower=' + i_name.lower() + \
                   '&c:show=character_id,faction_id,name&c:resolve=world'
             jdata = await httpRequest(url)
             try:
                 if jdata["returned"] == 0:
-                    raise CharNotFound(iName)
+                    raise CharNotFound(i_name)
             except KeyError:
                 raise ApiNotReachable(url)
             try:
@@ -308,9 +308,9 @@ class Player:
                     updated = updated or newIds[faction - 1] != self.__igIds[faction - 1]
                     newNames[faction - 1] = jdata["character_list"][0]["name"]["first"]
             except IndexError:
-                raise UnexpectedError("IndexError when setting player name: " + iName)  # Should not happen, we checked earlier
+                raise UnexpectedError("IndexError when setting player name: " + i_name)  # Should not happen, we checked earlier
             except KeyError:
-                raise UnexpectedError("KeyError when setting player name: " + iName)  # Don't know when this should happen either
+                raise UnexpectedError("KeyError when setting player name: " + i_name)  # Don't know when this should happen either
 
         for i in range(len(newIds)):
             if newIds[i] == 0:

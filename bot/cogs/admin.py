@@ -6,7 +6,7 @@ from datetime import datetime as dt
 
 import modules.config as cfg
 from modules.enumerations import SelStatus, MatchStatus, PlayerStatus
-from modules.display import send, channelSend
+from display import send, channelSend
 from modules.exceptions import ElementNotFound, DatabaseError
 from modules.database import removePlayer as dbRemove
 from modules.loader import lockAll, unlockAll, isAllLocked

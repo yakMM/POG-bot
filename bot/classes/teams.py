@@ -94,7 +94,7 @@ class Team:
         return self.__deaths
 
     @property
-    def playerPings(self):
+    def player_pings(self):
         # Excluding captain
         pings = [p.mention for p in self.__players[1:]]
         return pings

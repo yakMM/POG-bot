@@ -1,7 +1,5 @@
 from modules.enumerations import PlayerStatus
-from modules.display import edit
 from modules.exceptions import ElementNotFound, UserLackingPermission
-from lib import tasks
 from inspect import iscoroutinefunction as isCoroutine
 
 _allHandlers = dict()
@@ -68,6 +66,11 @@ class ReactionHandler:
     async def autoAddReactions(self, msg):
         for react in self.__fDict.keys():
             await msg.add_reaction(react)
+
+    async def autoRemoveReactions(self, msg):
+        for mReact in msg.reactions:
+            if str(mReact) in self.__fDict.keys() and mReact.me:
+                await msg.remove_reaction(mReact, _client.user)
 
 
 
