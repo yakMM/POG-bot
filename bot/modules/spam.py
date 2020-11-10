@@ -9,7 +9,7 @@ __spamList = dict()
 __SPAM_MSG_FREQUENCY = 5
 
 
-async def isSpam(msg):
+async def is_spam(msg):
     id = msg.author.id
     if id not in __spamList:
         __spamList[id] = 1

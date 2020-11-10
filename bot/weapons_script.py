@@ -1,14 +1,14 @@
 # @CHECK 2.0 features OK
 
 import modules.config as cfg
-from modules.database import forceUpdate, init as dbInit
+from modules.database import force_update, init as db_init
 import requests
 import json
 
 LAUNCHSTR = ""  # this should be empty if your files are config.cfg and client_secret.json
 
-cfg.getConfig(f"config{LAUNCHSTR}.cfg")
-dbInit(cfg.database)
+cfg.get_config(f"config{LAUNCHSTR}.cfg")
+db_init(cfg.database)
 
 item_type_id = 26 #weapon
 
@@ -53,7 +53,7 @@ allowed_categories = [24,6,7,8]
 no_point = [13,17]
 detailled = [2,3,5,11,12]
 
-def getBannedPerCategorie(cat, id):
+def get_banned_per_categorie(cat, id):
     # Knife
     if cat == 2:
         d = {
@@ -130,7 +130,7 @@ def getBannedPerCategorie(cat, id):
         }
     return id in d.keys()
 
-def getWeaponsCategories():
+def get_weapons_categories():
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/item/?item_type_id=26&is_vehicle_weapon=0&c:limit=5000&c:show=item_id,item_category_id,name.en'
     response = requests.get(url)
     jdata = json.loads(response.content)
@@ -153,19 +153,19 @@ def getWeaponsCategories():
             print(f'Key on cat of id {we["_id"]}')
 
     return cats
-def getUnknownWeapon():
-    nData=dict()
-    nData["_id"] = 0
-    nData["name"] = "Unknown"
-    nData["points"] = 1
-    nData["banned"] = False
-    nData["faction"] = 0
-    nData["cat_id"] = 0
-    return nData
+def get_unknown_weapon():
+    n_data=dict()
+    n_data["_id"] = 0
+    n_data["name"] = "Unknown"
+    n_data["points"] = 1
+    n_data["banned"] = False
+    n_data["faction"] = 0
+    n_data["cat_id"] = 0
+    return n_data
 
 
-def pushAllWeapons():
-    gigaList=list()
+def push_all_weapons():
+    giga_list=list()
     for cat in we_cats.keys():
         if cat in ignored_categories:
             continue
@@ -177,38 +177,38 @@ def pushAllWeapons():
             print("Error")
             return
         for we in jdata["item_list"]:
-            nData = dict()
-            nData["_id"] = int(we["item_id"])
-            if nData["_id"] == 0:
+            n_data = dict()
+            n_data["_id"] = int(we["item_id"])
+            if n_data["_id"] == 0:
                 print("RAAAAA")
-            nData["name"] = we["name"]["en"]
-            nData["cat_id"] = int(we["item_category_id"])
+            n_data["name"] = we["name"]["en"]
+            n_data["cat_id"] = int(we["item_category_id"])
             if cat in banned_categories:
-                nData["points"] = 0
-                nData["banned"] = True
+                n_data["points"] = 0
+                n_data["banned"] = True
             elif cat in allowed_categories:
-                nData["points"] = 1
-                nData["banned"] = False
+                n_data["points"] = 1
+                n_data["banned"] = False
             elif cat in no_point:
-                nData["points"] = 0
-                nData["banned"] = False
+                n_data["points"] = 0
+                n_data["banned"] = False
             elif cat in detailled:
-                if getBannedPerCategorie(cat, nData["_id"]):
-                    nData["points"] = 0
-                    nData["banned"] = True
+                if get_banned_per_categorie(cat, n_data["_id"]):
+                    n_data["points"] = 0
+                    n_data["banned"] = True
                 else:
-                    nData["points"] = 1
-                    nData["banned"] = False
+                    n_data["points"] = 1
+                    n_data["banned"] = False
             try:
-                nData["faction"] = int(we["faction_id"])
+                n_data["faction"] = int(we["faction_id"])
             except KeyError:
-                nData["faction"]  = 0
-                # print("illegal faction:" + nData["name"])
-            gigaList.append(nData)
-    gigaList.append(getUnknownWeapon())
-    forceUpdate("sWeapons", gigaList)
+                n_data["faction"]  = 0
+                # print("illegal faction:" + n_data["name"])
+            giga_list.append(n_data)
+    giga_list.append(get_unknown_weapon())
+    force_update("s_weapons", giga_list)
 
-def getAllCategories():
+def get_all_categories():
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/item_category/?c:limit=500'
     response = requests.get(url)
     jdata = json.loads(response.content)
@@ -222,4 +222,4 @@ def getAllCategories():
         di[int(cat["item_category_id"])] = cat["name"]["en"]
     return di
 
-pushAllWeapons()
+push_all_weapons()

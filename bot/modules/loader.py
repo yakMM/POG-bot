@@ -12,14 +12,14 @@ def init(client):
         client.load_extension(cog)
 
 
-def lockAll(client):
+def lock_all(client):
     for cog in standard_cogs:
         client.unload_extension(cog)
     global __isGlobalLocked
     __isGlobalLocked = True
 
 
-def unlockAll(client):
+def unlock_all(client):
     for cog in standard_cogs:
         try:
             client.load_extension(cog)
@@ -29,6 +29,6 @@ def unlockAll(client):
     __isGlobalLocked = False
 
 
-def isAllLocked():
+def is_all_locked():
     global __isGlobalLocked
     return __isGlobalLocked

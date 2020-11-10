@@ -3,7 +3,7 @@
 """Handle asynchronous http requests to Census API
 
 Usage:
-    * jsonResultFile = await request(url)
+    * json_result_file = await request(url)
 """
 
 # Others
@@ -24,7 +24,7 @@ async def request(url):
         result = await _fetch(client, url)
         return loads(result)
 
-async def apiRequestAndRetry(url):
+async def api_request_and_retry(url):
     for i in range(5):
         try:
             jdata = await request(url)

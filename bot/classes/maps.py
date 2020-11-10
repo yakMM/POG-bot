@@ -5,9 +5,9 @@
 import modules.config as cfg
 from modules.enumerations import SelStatus
 from modules.exceptions import ElementNotFound, UserLackingPermission
-from display import send, _map_pool
-from modules.tools import dateParser
-from modules.reactions import ReactionHandler, addHandler, remHandler
+from display import send
+from modules.tools import date_parser
+from modules.reactions import ReactionHandler, add_handler, rem_handler
 
 from lib.tasks import loop
 
@@ -16,9 +16,9 @@ from gspread import service_account
 from datetime import datetime as dt
 from datetime import timezone as tz
 from datetime import timedelta as tdelta
-from numpy import array as npArray
+from numpy import array as np_array
 from asyncio import get_event_loop
-from re import compile as regCompile, sub as regSub
+from re import compile as reg_compile, sub as reg_sub
 from random import randint
 
 log = getLogger(__name__)
@@ -30,16 +30,16 @@ MAX_SELECTED = 15
 
 _mapSelectionsDict = dict()
 
-def getMapSelection(id):
+def get_map_selection(id):
     sel = _mapSelectionsDict.get(id)
     if sel is None:
         raise ElementNotFound(id)
     return sel
 
-def identifyMapFromName(string):
+def identify_map_from_name(string):
     # Regex magic
-    pattern = regCompile("[^a-zA-Z0-9 ]")
-    string = regSub(" {2,}", " ", pattern.sub('', string)).strip()
+    pattern = reg_compile("[^a-zA-Z0-9 ]")
+    string = reg_sub(" {2,}", " ", pattern.sub('', string)).strip()
     results = list()
     for map in _allMapsList:
         if string.lower() in map.name.lower():
@@ -66,7 +66,7 @@ class Map:
             mainmap_pool.append(self)
         _allMapsList.append(self)
 
-    def getData(self):  # get data for database push
+    def get_data(self):  # get data for database push
         data = {"_id": self.__id,
                 "facility_name": self.__name,
                 "zone_id": self.__zoneId,
@@ -100,28 +100,28 @@ class MapSelection:
     _secretFile = None
 
     @classmethod
-    def init(cls, secretFile):
-        cls._secretFile = secretFile
+    def init(cls, secret_file):
+        cls._secretFile = secret_file
 
     @classmethod
-    def newFromId(cls, matchId, mapId):
-        obj = cls(matchId)
-        obj.__id = matchId
+    def new_from_id(cls, match_id, map_id):
+        obj = cls(match_id)
+        obj.__id = match_id
         i = 0
-        while _allMapsList[i].id != mapId:
+        while _allMapsList[i].id != map_id:
             i+=1
         obj.__selection = [_allMapsList[i]]
         obj.__selected = _allMapsList[i]
         obj.__status = SelStatus.IS_CONFIRMED
         return obj
 
-    def __init__(self, id, mapList=_allMapsList):
+    def __init__(self, id, map_list=_allMapsList):
         self.__id = id
         self.__booked = list()
         self._getBookedFromCalendar.start()
         self.__selection = list()
         self.__selected = None
-        self.__allMaps = mapList
+        self.__allMaps = map_list
         self.__status = SelStatus.IS_EMPTY
         _mapSelectionsDict[self.__id] = self
         self.__nav = MapNavigator(self)
@@ -137,7 +137,7 @@ class MapSelection:
             gc = service_account(filename=type(self)._secretFile)
             sh = gc.open_by_key(cfg.database["jaeger_cal"])
             ws = sh.worksheet("Current")
-            cal_export = npArray(ws.get_all_values())
+            cal_export = np_array(ws.get_all_values())
             date_col = cal_export[:, 0]
             for index, value in enumerate(date_col):
                 if not date_rng_start and value == dt.now(tz.utc).strftime('%b-%d'):  # gets us the header for the current date section in the google sheet
@@ -152,19 +152,20 @@ class MapSelection:
 
             for booking in today_bookings:
                 try:
-                    start_time = dateParser(booking[10])  # 45 mins before start of reservation
+                    start_time = date_parser(booking[10])  # 45 mins before start of reservation
                     if booking[11] != "":
-                        end_time = dateParser(booking[11])
+                        end_time = date_parser(booking[11])
                     else:
-                        end_time = dateParser(booking[9])
+                        end_time = date_parser(booking[9])
                     if start_time <= dt.now(tz.utc) <= end_time:
                         splitting_chars = ['/', ',', '&', '(', ')']
                         booked_maps = booking[3]
                         for sc in splitting_chars:
                             booked_maps = booked_maps.replace(sc, ';')
-                        booked_maps = [identifyMapFromName(map) for map in booked_maps.split(";")]
+                        booked_maps = [identify_map_from_name(map) for map in booked_maps.split(";")]
                         for booked in booked_maps:
                             if booked is not None and booked not in self.__booked:
+                                print(booked.name)
                                 self.__booked.append(booked)
                 except ValueError as e:
                     log.warning(f"Skipping invalid line in Jaeger Calendar:\n{booking}\nError: {e}")
@@ -198,8 +199,8 @@ class MapSelection:
             return
         self.__status = SelStatus.IS_SELECTION
 
-    async def doSelectionProcess(self, ctx, args):
-        if self.__status is SelStatus.IS_EMPTY and self.isSmallPool:
+    async def do_selection_process(self, ctx, args):
+        if self.__status is SelStatus.IS_EMPTY and self.is_small_pool:
             self.__status = SelStatus.IS_SELECTION
             self.__selection = self.__allMaps.copy()
         if len(args) == 0:
@@ -227,7 +228,7 @@ class MapSelection:
         # If successfully selected:
         return self.__selected
 
-    def isMapBooked(self, map):
+    def is_map_booked(self, map):
         return map in self.__booked
 
     @property
@@ -235,35 +236,35 @@ class MapSelection:
         return self.__nav
 
     @property
-    def stringList(self):
+    def string_list(self):
         result = list()
         if len(self.__selection) > 0:
-            mapList = self.__selection
-        elif self.isSmallPool:
-            mapList = self.__allMaps
+            map_list = self.__selection
+        elif self.is_small_pool:
+            map_list = self.__allMaps
         else:
             return result
-        for i in range(len(mapList)):
-            map = mapList[i]
-            if self.isMapBooked(map):
-                sf = "~~"
+        for i in range(len(map_list)):
+            map = map_list[i]
+            if self.is_map_booked(map):
+                map_string = f"~~{map.name}~~"
             else:
-                sf = "**"
-            result.append(f"{sf}{str(i+1)}{sf}: " + map.name)
+                map_string = f"{map.name}"
+            result.append(f"**{str(i+1)}**: {map_string}")
         return result
 
     @property
-    def currentList(self):
+    def current_list(self):
         if len(self.__selection) > 0:
-            mapList = self.__selection
-        elif self.isSmallPool:
-            mapList = self.__allMaps
+            map_list = self.__selection
+        elif self.is_small_pool:
+            map_list = self.__allMaps
         else:
-            mapList = list()
-        return mapList
+            map_list = list()
+        return map_list
 
     @property
-    def isSmallPool(self):
+    def is_small_pool(self):
         return len(self.__allMaps) <= MAX_SELECTED
 
     @property
@@ -279,7 +280,7 @@ class MapSelection:
         return self.__status
 
     @property
-    def isBooked(self):
+    def is_booked(self):
         return self.__selected in self.__booked
 
     def confirm(self):
@@ -293,52 +294,53 @@ class MapSelection:
 
 
 class MapNavigator:
-    def __init__(self, mapSel):
-        self.__mapSel = mapSel
+    def __init__(self, sel):
+        self.__mapSel = sel
         try:
-            self.__index = randint(0, len(mapSel.currentList)-1)
+            self.__index = randint(0, len(sel.current_list)-1)
         except ValueError:
             self.__index = 0
         self.__reactionHandler = ReactionHandler()
-        self.__reactionHandler.setReaction("◀️", self.checkAuth, self.goLeft, self.refreshMessage)
-        self.__reactionHandler.setReaction("⏺️", self.checkAuth, self.select, self.refreshMessage)
-        self.__reactionHandler.setReaction("▶️", self.checkAuth, self.goRight, self.refreshMessage)
-        self.__reactionHandler.setReaction("🔀", self.checkAuth, self.shuffle, self.refreshMessage)
+        self.__reactionHandler.set_reaction("◀️", self.check_auth, self.go_left, self.refresh_message)
+        self.__reactionHandler.set_reaction("⏺️", self.check_auth, self.select, self.refresh_message)
+        self.__reactionHandler.set_reaction("▶️", self.check_auth, self.go_right, self.refresh_message)
+        self.__reactionHandler.set_reaction("🔀", self.check_auth, self.shuffle, self.refresh_message)
         self.__msg = None
 
     @property
     def current(self):
-        mapList = self.__mapSel.currentList
-        if len(mapList) == 0:
+        map_list = self.__mapSel.current_list
+        if len(map_list) == 0:
             return
-        self.__index = self.__index % len(mapList)
-        return mapList[self.__index]
+        self.__index = self.__index % len(map_list)
+        return map_list[self.__index]
 
     def clean(self):
-        remHandler(self.__msg.id)
+        rem_handler(self.__msg.id)
 
-    async def setMsg(self, msg):
+    async def set_msg(self, msg):
         self.__msg = msg
-        addHandler(msg.id, self.__reactionHandler)
-        await self.__reactionHandler.autoAddReactions(msg)
+        add_handler(msg.id, self.__reactionHandler)
+        await self.__reactionHandler.auto_add_reactions(msg)
 
-    def goRight(self, *args):
+    def go_right(self, *args):
         self.__index += 1
 
-    def goLeft(self, *args):
+    def go_left(self, *args):
         self.__index -= 1
 
     def shuffle(self, *args):
-        self.__index = randint(0, len(self.__mapSel.currentList)-1)
+        self.__index = randint(0, len(self.__mapSel.current_list)-1)
 
     def select(self, *args):
         pass
 
-    def checkAuth(self, reaction, player):
-        if player.active and player.active.isCaptain:
+    def check_auth(self, reaction, player):
+        if player.active and player.active.is_captain:
             return
         raise UserLackingPermission
 
-    async def refreshMessage(self, *args):
-        await self.__msg.edit(content=self.__msg.content, embed = _map_pool(self.__msg, mapSel=self.__mapSel))
+    async def refresh_message(self, *args):
+        pass
+        #await self.__msg.edit(content=self.__msg.content, embed = map_pool(self.__msg, sel=self.__mapSel))
 

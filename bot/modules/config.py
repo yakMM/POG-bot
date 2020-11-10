@@ -24,7 +24,7 @@ channels = {
     "muted": 0
 }
 
-channelsList = list()
+channels_list = list()
 
 roles = {
     "admin": 0,
@@ -127,14 +127,14 @@ map_pool_images = {"Acan Southern Labs": "https://i.imgur.com/IhF9wQN.png",
                    "Pale Canyon Chemical": "https://i.imgur.com/JuRQrQm.png",
                    "Peris Eastern Grove": "https://i.imgur.com/2yoMxU2.jpeg",
                    "Rashnu Watchtower": "https://i.imgur.com/9RkkmFQ.jpeg",
-                   "XenoTech Labs": "https://i.imgur.com/uIc2NJH.png"}
+                   "XenoTech Labs": "https://i.imgur.com/REGEX_uIc2NJH.png"}
 
 # Database
 
 _collections = {
     "users": "",
-    "sBases": "",
-    "sWeapons" : "",
+    "s_bases": "",
+    "s_weapons" : "",
     "matches" : ""
 }
 
@@ -150,7 +150,7 @@ database = {
 # Methods
 
 
-def getConfig(file):
+def get_config(file):
     config = ConfigParser()
     try:
         config.read(file)
@@ -188,10 +188,10 @@ def getConfig(file):
                 channels[key].clear()
                 for m in tmp:
                     channels[key].append(int(m))
-                    channelsList.append(int(m))
+                    channels_list.append(int(m))
             else:
                 channels[key] = int(config['Channels'][key])
-                channelsList.append(channels[key])
+                channels_list.append(channels[key])
         except KeyError:
             _errorMissing(key, 'Channels', file)
         except ValueError:

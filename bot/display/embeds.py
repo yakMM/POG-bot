@@ -3,7 +3,7 @@ import modules.config as cfg
 from datetime import datetime as dt
 from datetime import timezone as tz
 
-from modules.roles import isAdmin
+from modules.roles import is_admin
 from modules.enumerations import MatchStatus
 
 
@@ -20,8 +20,8 @@ def register_help(msg):
                     value = '`=r no account`\n',
                     inline = False)
     embed.add_field(name  = 'If you have a Jaeger account',
-                    value = '`=r charName` - If your character names have faction suffixes\n'
-                            '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes',
+                    value = '`=r char_name` - If your character names have faction suffixes\n'
+                            '`=r REGEX_charName1 REGEX_charName2 REGEX_charName3` - If your character names don\'t have faction suffixes',
                     inline = False)
     embed.add_field(name  = 'Notify feature',
                     value = '`=notify` - To join or leave the Notify feature\n'
@@ -29,7 +29,7 @@ def register_help(msg):
                             'when the queue is almost full',
                     inline = False)
     try:
-        if isAdmin(msg.author):
+        if is_admin(msg.author):
             embed.add_field(name  = "Staff Commands",
                             value = '`=unregister @player` - Permanently remove player profile from the system\n'
                                     '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
@@ -49,7 +49,7 @@ def lobby_help(msg):
                             '`=q` - See the current lobby\n'
                             '`=i` - Display the global information prompt',
                     inline = False)
-    if isAdmin(msg.author):
+    if is_admin(msg.author):
         embed.add_field(name  = "Staff Commands",
                         value = '`=clear` - Clear the lobby\n'
                                 '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages\n'
@@ -149,7 +149,7 @@ def match_help(msg):
                             '`=resign` - Resign from Team Captain position\n'
                             '`=ready` - To toggle the ready status of your team',
                     inline = False)
-    if isAdmin(msg.author):
+    if is_admin(msg.author):
         embed.add_field(name  = "Staff Commands",
                         value = '`=clear` - Clear the match\n'
                                 '`=map base name` - Force select a map\n'
@@ -165,11 +165,11 @@ def account(msg, account):
     """
     desc = ""
     color = None
-    if account.isDestroyed:
+    if account.is_destroyed:
         desc = "This account token is no longer valid"
         color = Color.dark_grey()
-    elif account.isValidated:
-        desc = f'Id: `{account.strId}`\n' + f'Username: `{account.ident}`\n' + f'Password: `{account.pwd}`\n' + 'Note: This account is given to you only for the time of **ONE** match'
+    elif account.is_validated:
+        desc = f'Id: `{account.str_id}`\n' + f'Username: `{account.ident}`\n' + f'Password: `{account.pwd}`\n' + 'Note: This account is given to you only for the time of **ONE** match'
         color = Color.green()
     else:
         desc = "Accept the rules by reacting with a checkmark to get your account details."
@@ -202,13 +202,13 @@ def auto_help(msg):
     return default_help(msg)
 
 
-def lobby_list(msg, namesInLobby):
+def lobby_list(msg, names_in_lobby):
     """ Returns the lobby list """
     embed = Embed(colour=Color.blue())
-    listOfNames = "\n".join(namesInLobby)
-    if listOfNames == "":
-        listOfNames = "Queue is empty"
-    embed.add_field(name=f'Lobby: {len(namesInLobby)} / {cfg.general["lobby_size"]}', value=listOfNames, inline = False)
+    list_of_names = "\n".join(names_in_lobby)
+    if list_of_names == "":
+        list_of_names = "Queue is empty"
+    embed.add_field(name=f'Lobby: {len(names_in_lobby)} / {cfg.general["lobby_size"]}', value=list_of_names, inline = False)
     return embed
 
 
@@ -216,27 +216,33 @@ def lobby_list(msg, namesInLobby):
 #     """ Returns a list of maps after a search selected
 #     """
 #     embed = Embed(colour=Color.blue())
-#     embed_text = sel.toString() + f"\n⤾ - Back to Maps"
-#     embed.add_field(name=f"{len(sel.getSelection())} maps found", value=embed_text, inline=False)
+#     embed_text = sel.to_string() + f"\n⤾ - Back to Maps"
+#     embed.add_field(name=f"{len(sel.get_selection())} maps found", value=embed_text, inline=False)
 #     return embed
 
 
 def selected_maps(msg, sel):
     """ Returns a list of maps currently selected
     """
-    embed = Embed(colour=Color.blue())
-    maps = sel.stringList
+    embed = Embed(colour=Color.blue(), title="Map selection",
+                  url="https://docs.google.com/spreadsheets/d/1eA4ybkAiz-nv_mPxu_laL504nwTDmc-9GnsojnTiSRE",
+                  description="Pick a base currently available in the calendar!")
+    date = dt.now(tz.utc)
+    embed.add_field(name="Current UTC time",
+                    value=date.strftime("%Y-%m-%d %H:%M UTC"),
+                    inline=False)
+    maps = sel.string_list
     embed.add_field(name=f"{len(maps)} maps found",value="\n".join(maps),inline = False)
     return embed
 
-def offline_list(msg, pList):
+def offline_list(msg, p_list):
     embed = Embed(
         colour=Color.red(),
         title='Offline Players',
         description=f'If your character info is incorrect, re-register using `=r` in <#{cfg.channels["register"]}>!'
     )
     embed.add_field(name  = "The following players are not online ingame:",
-                    value = "\n".join(f"{p.igName} ({p.mention})" for p in pList),
+                    value = "\n".join(f"{p.ig_name} ({p.mention})" for p in p_list),
                     inline = False)
 
     return embed
@@ -248,7 +254,7 @@ def global_info(msg, lobby, match_list):
         title='Global Info',
         description=f'POG bot version `{cfg.VERSION}`'
     )
-    lb_embed = lobby_list(msg, namesInLobby=lobby).fields[0]
+    lb_embed = lobby_list(msg, names_in_lobby=lobby).fields[0]
     embed.add_field(name = lb_embed.name, value = lb_embed.value, inline = lb_embed.inline)
     for m in match_list:
         desc = ""
@@ -296,13 +302,13 @@ def team_update(arg, match):
     for tm in match.teams:
         value = ""
         name = ""
-        if tm.captain.isTurn and match.status in (MatchStatus.IS_FACTION, MatchStatus.IS_PICKING):
+        if tm.captain.is_turn and match.status in (MatchStatus.IS_FACTION, MatchStatus.IS_PICKING):
             value = f"Captain **[pick]**: {tm.captain.mention}\n"
         else:
             value = f"Captain: {tm.captain.mention}\n"
         value += "Players:\n" + '\n'.join(tm.player_pings)
         if match.status is MatchStatus.IS_WAITING:
-            if tm.captain.isTurn:
+            if tm.captain.is_turn:
                 name = f"{tm.name} [{cfg.factions[tm.faction]}] - not ready"
             else:
                 name = f"{tm.name} [{cfg.factions[tm.faction]}] - ready"
@@ -331,8 +337,8 @@ def jaeger_calendar(arg):
     return embed
 
 
-def map_pool(msg, mapSel):
-    map = mapSel.navigator.current
+def map_pool(msg, sel):
+    map = sel.navigator.current
     if map is not None:
         if map.name in cfg.map_pool_images:
             embed = Embed(colour=Color.blue(), title=map.name)

@@ -5,7 +5,7 @@ from modules.exceptions import ElementNotFound
 _allWeapons = dict()
 
 
-def getWeapon(id):
+def get_weapon(id):
     we = _allWeapons.get(id)
     if we is None:
         raise ElementNotFound(id)
@@ -22,7 +22,7 @@ class Weapon:
         self.__faction = data["faction"]
         _allWeapons[self.__id] = self
 
-    def getData(self):  # get data for database push
+    def get_data(self):  # get data for database push
         data = {"_id": self.__id,
                 "name": self.__name,
                 "cat_id": self.__catId,
@@ -41,7 +41,7 @@ class Weapon:
         return self.__name
 
     @property
-    def isBanned(self):
+    def is_banned(self):
         return self.__banned
     
     @property

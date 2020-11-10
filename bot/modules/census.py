@@ -1,119 +1,119 @@
 # @CHECK 2.0 features OK
 
-from modules.asynchttp import apiRequestAndRetry as httpRequest
+from modules.asynchttp import api_request_and_retry as http_request
 from modules.exceptions import ApiNotReachable, ElementNotFound
-from classes.weapons import getWeapon
-from display import channelSend
+from classes.weapons import get_weapon
+from display import channel_send
 import modules.config as cfg
 from logging import getLogger
 
 log = getLogger(__name__)
 
 
-async def processScore(match):
-    igDict = dict()
-    start = match.startStamp
+async def process_score(match):
+    ig_dict = dict()
+    start = match.start_stamp
     end = start + cfg.ROUND_LENGTH * 60
     for tm in match.teams:
-        for aPlayer in tm.players:
-            igDict[aPlayer.igId] = aPlayer
-    for aPlayer in igDict.values():
+        for a_player in tm.players:
+            ig_dict[a_player.ig_id] = a_player
+    for a_player in ig_dict.values():
         url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_event/?character_id=' + \
-        f'{aPlayer.igId}&type=KILL&after={start}&before={end}&c:limit=500'
-        jdata = await httpRequest(url)
+        f'{a_player.ig_id}&type=KILL&after={start}&before={end}&c:limit=500'
+        jdata = await http_request(url)
         if jdata["returned"] == 0:
-            log.error(f'No kill found for player: id={aPlayer.igName} (url={url})')
+            log.error(f'No kill found for player: id={a_player.ig_name} (url={url})')
             continue
 
         # Loop through all events
         event_list = jdata["characters_event_list"]
         for event in event_list:
-            opoId = int(event["character_id"])
-            if opoId not in igDict:
+            opo_id = int(event["character_id"])
+            if opo_id not in ig_dict:
                 # interaction with outside player, to be ignored
                 continue
-            opo = igDict[opoId]
-            weapId = int(event["attacker_weapon_id"])
+            opo = ig_dict[opo_id]
+            weap_id = int(event["attacker_weapon_id"])
             try:
-                weapon = getWeapon(weapId)
+                weapon = get_weapon(weap_id)
             except ElementNotFound:
-                log.error(f'Weapon not found in database: id={weapId}')
-                weapon = getWeapon(0)
-            if opo is aPlayer:
-                aPlayer.addOneSuicide()
-            elif opo.team is aPlayer.team:
-                aPlayer.addOneTK()
-                opo.addOneDeath(0)
+                log.error(f'Weapon not found in database: id={weap_id}')
+                weapon = get_weapon(0)
+            if opo is a_player:
+                a_player.add_one_suicide()
+            elif opo.team is a_player.team:
+                a_player.add_one_t_k()
+                opo.add_one_death(0)
             else:
-                if not weapon.isBanned:
+                if not weapon.is_banned:
                     pts = weapon.points
-                    aPlayer.addOneKill(pts)
-                    opo.addOneDeath(pts)
+                    a_player.add_one_kill(pts)
+                    opo.add_one_death(pts)
                 else:
-                    aPlayer.addIllegalWeapon(weapon.id)
+                    a_player.add_illegal_weapon(weapon.id)
                     # TODO: Should we add penalty?
-        for weapId in aPlayer.illegalWeapons.keys():
-            weapon = getWeapon(weapId)
-            await channelSend("SC_ILLEGAL_WE",  match.id, aPlayer.mention, weapon.name,
-                                                match.number, aPlayer.illegalWeapons[weapId])
-            await channelSend("SC_ILLEGAL_WE",  cfg.channels["staff"], aPlayer.mention, weapon.name,
-                                                match.number, aPlayer.illegalWeapons[weapId])
+        for weap_id in a_player.illegal_weapons.keys():
+            weapon = get_weapon(weap_id)
+            await channel_send("SC_ILLEGAL_WE",  match.id, a_player.mention, weapon.name,
+                                                match.number, a_player.illegal_weapons[weap_id])
+            await channel_send("SC_ILLEGAL_WE",  cfg.channels["staff"], a_player.mention, weapon.name,
+                                                match.number, a_player.illegal_weapons[weap_id])
 
-    await getCaptures(match, start, end)
+    await get_captures(match, start, end)
 
 
-async def getCaptures(match, start, end):
-    factionDict = dict()
+async def get_captures(match, start, end):
+    faction_dict = dict()
     for tm in match.teams:
-        factionDict[tm.faction] = tm
+        faction_dict[tm.faction] = tm
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/world_event/' + \
             f'?world_id=19&after={start}&before={end}&c:limit=500'
-    jdata = await httpRequest(url)
+    jdata = await http_request(url)
     if jdata["returned"] == 0:
         log.warning(f'No event found for map! (url={url})')
         return
 
     event_list = jdata["world_event_list"]
-    baseOwner = None
+    base_owner = None
     # Loop through all events from older to newer
     for event in event_list[::-1]:
-        baseId = int(event["facility_id"])
-        if baseId != match.map.id:
+        base_id = int(event["facility_id"])
+        if base_id != match.map.id:
             # Not match base, to be ignored
             continue
         faction = int(event["faction_new"])
-        if faction not in factionDict:
+        if faction not in faction_dict:
             continue
-        capper = factionDict[faction]
-        if baseOwner is None:
+        capper = faction_dict[faction]
+        if base_owner is None:
             # First cap
-            capper.addCap(cfg.scores["capture"])
-            baseOwner = capper
-        if baseOwner is not capper:
+            capper.add_cap(cfg.scores["capture"])
+            base_owner = capper
+        if base_owner is not capper:
             # Re cap
-            capper.addCap(cfg.scores["recapture"])
-            baseOwner = capper
+            capper.add_cap(cfg.scores["recapture"])
+            base_owner = capper
 
-async def getOfflinePlayers(team):
-    if getOfflinePlayers.bypass:
+async def get_offline_players(team):
+    if get_offline_players.bypass:
         return list()
-    igDict = dict()
+    ig_dict = dict()
     for p in team.players:
-        igDict[p.igId] = p
-    idString = ",".join(str(igId) for igId in igDict.keys())
-    url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_online_status/?character_id={idString}'
-    jdata = await httpRequest(url)
+        ig_dict[p.ig_id] = p
+    id_string = ",".join(str(ig_id) for ig_id in ig_dict.keys())
+    url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_online_status/?character_id={id_string}'
+    jdata = await http_request(url)
     if jdata["returned"] == 0:
         raise ApiNotReachable(f"Empty answer on online_status call (url={url})")
 
-    charList = jdata["characters_online_status_list"]
+    char_list = jdata["characters_online_status_list"]
 
-    offlinePlayers = list()
+    offline_players = list()
 
-    for char in charList:
+    for char in char_list:
         if char["online_status"] == "0":
-            offlinePlayers.append(igDict[int(char["character_id"])])
+            offline_players.append(ig_dict[int(char["character_id"])])
 
-    return offlinePlayers
+    return offline_players
 
-getOfflinePlayers.bypass = False
+get_offline_players.bypass = False

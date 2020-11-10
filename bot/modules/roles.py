@@ -20,7 +20,7 @@ def init(client):
     _rolesDict["admin"] = _guild.get_role(cfg.roles["admin"])
 
 
-def isAdmin(member):
+def is_admin(member):
     """ Check if user is admin
     """
     if member is None:
@@ -28,9 +28,9 @@ def isAdmin(member):
     return _rolesDict["admin"] in member.roles
 
 
-async def forceInfo(pId):
+async def force_info(p_id):
     global _guild
-    memb = _guild.get_member(pId)
+    memb = _guild.get_member(p_id)
     if memb is None:
         return
     if _rolesDict["info"] not in memb.roles:
@@ -41,16 +41,16 @@ async def forceInfo(pId):
         await memb.remove_roles(_rolesDict["notify"])
 
 
-async def roleUpdate(player):
-    if player.isTimeout:
-        await forceInfo(player.id)
+async def role_update(player):
+    if player.is_timeout:
+        await force_info(player.id)
         return
-    await permsMuted(False, player.id)
+    await perms_muted(False, player.id)
     global _guild
     memb = _guild.get_member(player.id)
     if memb is None:
         return
-    if player.status is PlayerStatus.IS_REGISTERED and player.isNotify and memb.status not in (Status.offline, Status.dnd):
+    if player.status is PlayerStatus.IS_REGISTERED and player.is_notify and memb.status not in (Status.offline, Status.dnd):
         if _rolesDict["notify"] not in memb.roles:
             await memb.add_roles(_rolesDict["notify"])
         if _rolesDict["registered"] in memb.roles:
@@ -64,9 +64,9 @@ async def roleUpdate(player):
         await memb.remove_roles(_rolesDict["info"])
 
 
-async def permsMuted(value, pId):
+async def perms_muted(value, p_id):
     global _guild
-    memb = _guild.get_member(pId)
+    memb = _guild.get_member(p_id)
     if memb is None:
         return
     channel = _guild.get_channel(cfg.channels["muted"])
@@ -79,7 +79,7 @@ async def permsMuted(value, pId):
             await channel.set_permissions(memb, overwrite=None)
 
 
-async def channelFreeze(value, id):
+async def channel_freeze(value, id):
     global _guild
     channel = _guild.get_channel(id)
     ov_notify = channel.overwrites_for(_rolesDict["notify"])

@@ -64,13 +64,10 @@ class AllStrings(Enum):
     PK_FACTION_OK_NEXT = Message("{} chose {}! {} pick a faction!", ping=False)
     PK_FACTION_CHANGED = Message("{} changed to {}!")
     PK_FACTION_NOT_PLAYER = Message("Pick a faction, not a player!", embed=embeds.match_help)
-    PK_WAIT_MAP =  Message("{} {} Pick an available map!", ping=False, embed=embeds.map_pool)
+    PK_WAIT_MAP =  Message("{} {} Pick an available map!", ping=False, embed=embeds.selected_maps)
     PK_MAP_OK_CONFIRM = Message("Picked **{}**! {} confirm with `=p confirm` if you agree")
     PK_OVER_READY = Message("Can't do that if your team is ready!")
     PK_NO_MAP = Message("No map selected!")
-    PK_SHOW_REACT_MAP = Message("React with ⤾ to go back to map list",
-                                 embed=embeds.map_pool,
-                                 ping=False)
     PK_RESIGNED = Message("Successfully resigned! {} is the new captain for {}!", embed=embeds.team_update)
     PK_PICK_STARTED = Message("Can't do that, you already picked a player!")
 

@@ -10,14 +10,14 @@ All the strings sent can then be modified easily in this file.
 
 Import this module and use only the following public function:
 
-    * channelSend(stringName, id, *args, **kwargs)
-    * privateSend(stringName, id, *args, **kwargs)
-    * send(stringName, ctx, *args, **kwargs)
-    * edit(stringName, ctx, *args, **kwargs)
+    * channel_send(string_name, id, *args, **kwargs)
+    * private_send(string_name, id, *args, **kwargs)
+    * send(string_name, ctx, *args, **kwargs)
+    * edit(string_name, ctx, *args, **kwargs)
 
 """
 
-__all__ = ["init", "channelSend", "privateSend", "send", "edit", "imageSend"]
+__all__ = ["init", "channel_send", "private_send", "send", "edit", "image_send"]
 
 from display import strings
 
@@ -31,48 +31,53 @@ def init(client):
     global _client
     _client = client
 
-async def channelSend(stringName, cId, *args, **kwargs):
-    """ Send the message stringName in the channel identified with id,
+
+async def channel_send(string_name, c_id, *args, **kwargs):
+    """ Send the message string_name in the channel identified with id,
         with additional strings *args.
         Pass **kwargs to the embed function, if any.
         Returns the message sent.
     """
-    channel = _client.get_channel(cId)
-    kwargs = strings.AllStrings[stringName].value.getElements(channel,
-        {"string" : args, "embed" : kwargs})
+    channel = _client.get_channel(c_id)
+    kwargs = strings.AllStrings[string_name].value.get_elements(channel,
+        string = args, embed = kwargs)
     return await channel.send(**kwargs)
 
-async def privateSend(stringName, uId, *args, **kwargs):
-    """ Send the message stringName in dm to user identified with id,
+
+async def private_send(string_name, u_id, *args, **kwargs):
+    """ Send the message string_name in dm to user identified with id,
         with additional strings *args.
         Pass **kwargs to the embed function, if any.
         Returns the message sent.
     """
-    user = _client.get_user(uId)
-    kwargs = strings.AllStrings[stringName].value.getElements(user,
-        {"string" : args, "embed" : kwargs})
+    user = _client.get_user(u_id)
+    kwargs = strings.AllStrings[string_name].value.get_elements(user,
+        strings = args, embed = kwargs)
     return await user.send(**kwargs)
 
 
 async def send(string_name, ctx, *args, **kwargs):
-    """ Send the message stringName in context ctx,
+    """ Send the message string_name in context ctx,
         with additional strings *args.
         Pass **kwargs to the embed function, if any.
         Returns the message sent.
     """
-    return await strings.AllStrings[string_name].value.get_elements(ctx,
-        {"string" : args, "embed" : kwargs})
+    kwargs = strings.AllStrings[string_name].value.get_elements(ctx,
+        string = args, embed = kwargs)
     return await ctx.send(**kwargs)
 
 
-
-
-async def edit(stringName, ctx, *args, **kwargs):
-    """ Replaces the message ctx by the message stringName, with additional strings *args. Pass **kwargs to the embed function, if any
+async def edit(string_name, ctx, *args, **kwargs):
+    """ Replaces the message ctx by the message string_name, with additional strings *args. Pass **kwargs to the embed function, if any
         Returns the message sent
     """
-    return await StringEnum[stringName].value.display(ctx, ctx.edit,  *args, **kwargs)
+    kwargs = strings.AllStrings[string_name].value.get_elements(ctx,
+        string = args, embed = kwargs)
+    return await ctx.edit(**kwargs)
 
-async def imageSend(stringName, channelId, imagePath, *args):
-    channel = _client.get_channel(channelId)
-    return await channel.send(content=StringEnum[stringName].value.string.format(*args), file=File(imagePath))
+
+async def image_send(string_name, c_id, image_path, *args):
+    channel = _client.get_channel(c_id)
+    kwargs = strings.AllStrings[string_name].value.get_elements(channel,
+        string = args, image = image_path)
+    return await channel.send(**kwargs)

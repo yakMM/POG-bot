@@ -16,7 +16,7 @@ TZOFFSETS = {
 "CST": +28800
 }
 
-def isAlNum(string):
+def is_al_num(string):
     """ Little utility to check if a string contains only letters and numbers (a-z,A-Z,0-9)
         Parameters
         ----------
@@ -25,7 +25,7 @@ def isAlNum(string):
 
         Returns
         -------
-        isAlphaNum : boolean
+        is_alpha_num : boolean
             Result
     """
     for i in string.lower():
@@ -35,7 +35,7 @@ def isAlNum(string):
             return False
     return True
 
-def dateParser(string):
+def date_parser(string):
     dtx = parser.parse(string, dayfirst=False, tzinfos = TZOFFSETS)
     try:
         dtx = pytz.utc.localize(dtx)

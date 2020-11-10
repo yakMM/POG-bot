@@ -1,16 +1,16 @@
 # @CHECK 2.0 features OK
 
 from discord.ext import commands
-from discord import Status as discordStatus
+from discord import Status as discord_status
 from logging import getLogger
 
-from display import send, channelSend
+from display import send, channel_send
 import modules.config as cfg
 from modules.exceptions import UnexpectedError, ElementNotFound, LobbyStuck
 
-from classes.players import PlayerStatus, getPlayer
+from classes.players import PlayerStatus, get_player
 
-from matches import getLobbyLen, isLobbyStuck, removeFromLobby, addToLobby, getAllNamesInLobby, getMatch
+from matches import get_lobby_len, is_lobby_stuck, remove_from_lobby, add_to_lobby, get_all_names_in_lobby, get_match
 
 log = getLogger(__name__)
 
@@ -40,22 +40,22 @@ class LobbyCog(commands.Cog, name='lobby'):
     async def join(self, ctx):
         """ Join queue
         """
-        if getLobbyLen() > cfg.general["lobby_size"]:  # This should not happen EVER
+        if get_lobby_len() > cfg.general["lobby_size"]:  # This should not happen EVER
             await send("UNKNOWN_ERROR", ctx, "Lobby Overflow")
             return
         try:
-            player = getPlayer(ctx.message.author.id)
+            player = get_player(ctx.message.author.id)
         except ElementNotFound:
             await send("EXT_NOT_REGISTERED", ctx,  cfg.channels["register"])
             return
         if player.status is PlayerStatus.IS_NOT_REGISTERED:
             await send("EXT_NOT_REGISTERED", ctx, cfg.channels["register"])
             return
-        accs = player.accountsFlipped
+        accs = player.accounts_flipped
         if len(accs) != 0:
             await send("CHECK_ACCOUNT", ctx, cfg.channels["register"], account_names=accs)
             return
-        if ctx.author.status == discordStatus.offline:
+        if ctx.author.status == discord_status.offline:
             await send("LB_OFFLINE", ctx)
             return
         if player.status is PlayerStatus.IS_LOBBIED:
@@ -64,12 +64,12 @@ class LobbyCog(commands.Cog, name='lobby'):
         if player.status is not PlayerStatus.IS_REGISTERED:
             await send("LB_IN_MATCH", ctx)
             return
-        if isLobbyStuck():
+        if is_lobby_stuck():
             await send("LB_STUCK_JOIN", ctx)
             return
 
-        addToLobby(player)
-        await send("LB_ADDED", ctx, namesInLobby=getAllNamesInLobby())
+        add_to_lobby(player)
+        await send("LB_ADDED", ctx, names_in_lobby=get_all_names_in_lobby())
 
     @commands.command(aliases=['l'])
     @commands.guild_only()
@@ -77,13 +77,13 @@ class LobbyCog(commands.Cog, name='lobby'):
         """ Leave queue
         """
         try:
-            player = getPlayer(ctx.message.author.id)
+            player = get_player(ctx.message.author.id)
         except ElementNotFound:
             await send("LB_NOT_IN", ctx)
             return
         if player.status is PlayerStatus.IS_LOBBIED:
-            removeFromLobby(player)
-            await send("LB_REMOVED", ctx, namesInLobby=getAllNamesInLobby())
+            remove_from_lobby(player)
+            await send("LB_REMOVED", ctx, names_in_lobby=get_all_names_in_lobby())
             return
         await send("LB_NOT_IN", ctx)
 
@@ -92,22 +92,22 @@ class LobbyCog(commands.Cog, name='lobby'):
     async def queue(self, ctx):
         """ Display queue
         """
-        if getLobbyLen() > cfg.general["lobby_size"]:
+        if get_lobby_len() > cfg.general["lobby_size"]:
             await send("UNKNOWN_ERROR", ctx, "Lobby Overflow")
             return
-        if isLobbyStuck():
-            await send("LB_QUEUE", ctx, namesInLobby=getAllNamesInLobby())
+        if is_lobby_stuck():
+            await send("LB_QUEUE", ctx, names_in_lobby=get_all_names_in_lobby())
             await send("LB_STUCK", ctx)
             return
-        await send("LB_QUEUE", ctx, namesInLobby=getAllNamesInLobby())
+        await send("LB_QUEUE", ctx, names_in_lobby=get_all_names_in_lobby())
 
     @commands.command(aliases=['i'])
     @commands.guild_only()
     async def info(self, ctx):
         match_list = list()
         for ch in cfg.channels["matches"]:
-            match_list.append(getMatch(ch))
-        await send("GLOBAL_INFO", ctx, lobby=getAllNamesInLobby(), match_list=match_list)
+            match_list.append(get_match(ch))
+        await send("GLOBAL_INFO", ctx, lobby=get_all_names_in_lobby(), match_list=match_list)
 
 
 def setup(client):

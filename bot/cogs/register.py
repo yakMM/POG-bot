@@ -5,13 +5,13 @@ from discord.ext import commands
 from logging import getLogger
 
 # Custom classes
-from classes.players import Player, getPlayer
+from classes.players import Player, get_player
 
 # Custom modules
 import modules.config as cfg
 from modules.enumerations import PlayerStatus
-from display import channelSend, send
-from modules.tools import isAlNum
+from display import channel_send, send
+from modules.tools import is_al_num
 from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
 
 log = getLogger(__name__)
@@ -41,7 +41,7 @@ class RegisterCog(commands.Cog, name='register'):
             await send("REG_INVALID", ctx)
             return
         try:
-            player = getPlayer(ctx.author.id)
+            player = get_player(ctx.author.id)
         except ElementNotFound:
             await send("REG_NO_RULE", ctx, cfg.channels["rules"])
             return
@@ -52,17 +52,17 @@ class RegisterCog(commands.Cog, name='register'):
     @commands.guild_only()
     async def notify(self, ctx):
         try:
-            player = getPlayer(ctx.author.id)
+            player = get_player(ctx.author.id)
         except ElementNotFound:
             await send("REG_NO_RULE", ctx, cfg.channels["rules"])
             return
-        if player.isNotify:
-            player.isNotify = False
+        if player.is_notify:
+            player.is_notify = False
             await send("NOTIFY_REMOVED", ctx)
         else:
-            player.isNotify = True
+            player.is_notify = True
             await send("NOTIFY_ADDED", ctx)
-        await player.dbUpdate("notify")
+        await player.db_update("notify")
 
 
 def setup(client):
@@ -77,42 +77,42 @@ async def _register(player, ctx, args):
     Check the faction of each name and registered the name for the player
 
     Parameters:
-    ingameNames (str, list of str): If a list, will add each name one by one.
+    ingame_names (str, list of str): If a list, will add each name one by one.
     If a string, will add the faction suffixes automatically.
     """
     if player.status is PlayerStatus.IS_PLAYING:  # Can't register if already playing
         await send("REG_FROZEN", ctx)
         return
     for name in args:
-        if not isAlNum(name):  # Char names are only alphanum names
+        if not is_al_num(name):  # Char names are only alphanum names
             await send("INVALID_STR", ctx, name)
             return
     if len(args) == 0:  # If user did not input any arg, display their current registration status
         if player.status is PlayerStatus.IS_NOT_REGISTERED:
             await send("REG_NOT_REGISTERED", ctx)
             return
-        if player.hasOwnAccount:
-            await send("REG_IS_REGISTERED_OWN", ctx, *player.igNames)
+        if player.has_own_account:
+            await send("REG_IS_REGISTERED_OWN", ctx, *player.ig_names)
             return
         await send("REG_IS_REGISTERED_NOA", ctx)
         return
     # store previous status
-    wasPlayerRegistered = player.status is not PlayerStatus.IS_NOT_REGISTERED
+    was_player_registered = player.status is not PlayerStatus.IS_NOT_REGISTERED
     if len(args) == 1 or len(args) == 3:  # if 1 or 3 args
         if len(args) == 1 and args[0] == "help":  # =r help displays hel^p
             await send("REG_HELP", ctx)
             return
         try:
-            # player.register return a boolean: hasTheProfileBeenUpdated
+            # player.register return a boolean: has_the_profile_been_updated
             if not await player.register(args):
                 # if no update, say "you are already registered etc"
-                await send("REG_IS_REGISTERED_OWN", ctx, *player.igNames)
+                await send("REG_IS_REGISTERED_OWN", ctx, *player.ig_names)
                 return
-            await player.dbUpdate("register")  # push update to db
-            if wasPlayerRegistered:
-                await send("REG_UPDATE_OWN", ctx, *player.igNames)
+            await player.db_update("register")  # push update to db
+            if was_player_registered:
+                await send("REG_UPDATE_OWN", ctx, *player.ig_names)
                 return
-            await send("REG_WITH_CHARS", ctx, *player.igNames)
+            await send("REG_WITH_CHARS", ctx, *player.ig_names)
             return
         except CharNotFound as e:  # if problems with chars
             await send("REG_CHAR_NOT_FOUND", ctx, e.char)
@@ -140,8 +140,8 @@ async def _register(player, ctx, args):
             if not await player.register(None):
                 await send("REG_IS_REGISTERED_NOA", ctx)
                 return
-            await player.dbUpdate("register")
-            if wasPlayerRegistered:
+            await player.db_update("register")
+            if was_player_registered:
                 await send("REG_UPDATE_NOA", ctx)
                 return
             await send("REG_NO_ACCOUNT", ctx)

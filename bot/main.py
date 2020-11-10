@@ -20,29 +20,29 @@ from logging.handlers import RotatingFileHandler
 
 # Custom modules
 import modules.config as cfg
-from display import send, channelSend, init as displayInit
-from modules.spam import isSpam, unlock
+from display import send, channel_send, init as display_init
+from modules.spam import is_spam, unlock
 from modules.enumerations import MatchStatus
 from modules.exceptions import ElementNotFound, UnexpectedError
-from modules.database import init as dbInit, getAllItems
+from modules.database import init as db_init, get_all_items
 from modules.enumerations import PlayerStatus
-from modules.loader import init as cogInit, isAllLocked, unlockAll
-from modules.ts3 import init as ts3Init
-from modules.reactions import init as reactInit, reactionHandler
+from modules.loader import init as cog_init, is_all_locked, unlock_all
+from modules.ts3 import init as ts_3_init
+from modules.reactions import init as react_init, reaction_handler
 
 # Modules for the custom classes
-from modules.roles import init as rolesInit, roleUpdate, isAdmin
-from modules.reactions import reactionHandler
+from modules.roles import init as roles_init, role_update, is_admin
+from modules.reactions import reaction_handler
 
 # Modules for the custom classes
-from matches import onInactiveConfirmed, init as matchesInit
-from classes.players import Player, getPlayer, getAllPlayersList
+from matches import on_inactive_confirmed, init as matches_init
+from classes.players import Player, get_player, get_all_players_list
 from classes.accounts import AccountHander
 from classes.maps import Map, MapSelection
 from classes.weapons import Weapon
 
 
-rulesMsg = None  # Will contain message object representing the rules message, global variable
+rules_msg = None  # Will contain message object representing the rules message, global variable
 
 def _addMainHandlers(client):
     """_addMainHandlers, private function
@@ -69,13 +69,13 @@ def _addMainHandlers(client):
         if isinstance(message.channel, DMChannel):
             logging.info(message.author.name + ": " + message.content)
             return
-        if message.channel.id not in cfg.channelsList:
+        if message.channel.id not in cfg.channels_list:
             return
-        if isAllLocked():
-            if not isAdmin(message.author):
+        if is_all_locked():
+            if not is_admin(message.author):
                 return
             # Admins can still use bot when locked
-        if await isSpam(message):
+        if await is_spam(message):
             return
         message.content = message.content.lower()
         await client.process_commands(message)  # if not spam, process
@@ -86,26 +86,26 @@ def _addMainHandlers(client):
     @client.event
     async def on_command_error(ctx, error):
         if isinstance(error, commands.CommandNotFound):  # Unknown command
-            if isAllLocked():
+            if is_all_locked():
                 await send("BOT_IS_LOCKED", ctx)
                 return
             await send("INVALID_COMMAND", ctx)
             return
         if isinstance(error, commands.errors.CheckFailure):  # Unauthorized command
-            cogName = ctx.command.cog.qualified_name
-            if cogName == "admin":
+            cog_name = ctx.command.cog.qualified_name
+            if cog_name == "admin":
                 await send("NO_PERMISSION", ctx, ctx.command.name)
                 return
             try:
-                channelId = cfg.channels[cogName]
-                channelStr = ""
-                if isinstance(channelId, list):
-                    channelStr = "channels " + \
-                        ", ".join(f'<#{id}>' for id in channelId)
+                channel_id = cfg.channels[cog_name]
+                channel_str = ""
+                if isinstance(channel_id, list):
+                    channel_str = "channels " + \
+                        ", ".join(f'<#{id}>' for id in channel_id)
                 else:
-                    channelStr = f'channel <#{channelId}>'
+                    channel_str = f'channel <#{channel_id}>'
                 # Send the use back to the right channel
-                await send("WRONG_CHANNEL", ctx, ctx.command.name, channelStr)
+                await send("WRONG_CHANNEL", ctx, ctx.command.name, channel_str)
             except KeyError:  # Should not happen
                 await send("UNKNOWN_ERROR", ctx, "Channel key error")
             return
@@ -131,23 +131,23 @@ def _addMainHandlers(client):
     async def on_raw_reaction_add(payload):
         if payload.member is None or payload.member.bot:  # If bot, do nothing
             return
-        if isAllLocked():
+        if is_all_locked():
             return
         # reaction to the rule message?
         if payload.message_id == cfg.general["rules_msg_id"]:
             print(str(payload.emoji)) # @TODO: remove (test)
             if str(payload.emoji) == "✅":
                 try:
-                    p = getPlayer(payload.member.id)
+                    p = get_player(payload.member.id)
                 except ElementNotFound:  # if new player
                     # create a new profile
                     p = Player(payload.member.id, payload.member.name)
-                await roleUpdate(p)
+                await role_update(p)
                 if p.status is PlayerStatus.IS_NOT_REGISTERED:
                     # they can now register
-                    await channelSend("REG_RULES", cfg.channels["register"], payload.member.mention)
+                    await channel_send("REG_RULES", cfg.channels["register"], payload.member.mention)
             # In any case remove the reaction, message is to stay clean
-            await rulesMsg.remove_reaction(payload.emoji, payload.member)
+            await rules_msg.remove_reaction(payload.emoji, payload.member)
 
     # Reaction update handler (for accounts)
     @client.event
@@ -159,18 +159,18 @@ def _addMainHandlers(client):
         if reaction.message.author != client.user:
             return
         try:
-            player = getPlayer(user.id)
+            player = get_player(user.id)
         except ElementNotFound:
             return
-        await reactionHandler(reaction, user, player)
+        await reaction_handler(reaction, user, player)
 
     @client.event
     async def on_member_join(member):
         try:
-            player = getPlayer(member.id)
+            player = get_player(member.id)
         except ElementNotFound:
             return
-        await roleUpdate(player)
+        await role_update(player)
 
     @client.event
     async def on_member_update(before, after):
@@ -180,14 +180,14 @@ def _addMainHandlers(client):
     # Status update handler (for inactivity)
     async def on_status_update(user):
         try:
-            player = getPlayer(user.id)
+            player = get_player(user.id)
         except ElementNotFound:
             return
         if user.status == Status.offline:
-            player.onInactive(onInactiveConfirmed)
+            player.on_inactive(on_inactive_confirmed)
         else:
-            player.onActive()
-        await roleUpdate(player)
+            player.on_active()
+        await role_update(player)
 
 
 def _addInitHandlers(client):
@@ -195,22 +195,22 @@ def _addInitHandlers(client):
     @client.event
     async def on_ready():
         # Initialise matches channels
-        matchesInit(client, cfg.channels["matches"])
+        matches_init(client, cfg.channels["matches"])
 
-        rolesInit(client)
+        roles_init(client)
 
         # fetch rule message, remove all reaction but the bot's
-        global rulesMsg
-        rulesMsg = await client.get_channel(cfg.channels["rules"]).fetch_message(cfg.general["rules_msg_id"])
-        await rulesMsg.clear_reactions()
+        global rules_msg
+        rules_msg = await client.get_channel(cfg.channels["rules"]).fetch_message(cfg.general["rules_msg_id"])
+        await rules_msg.clear_reactions()
         await sleep(0.2)
-        await rulesMsg.add_reaction('✅')
+        await rules_msg.add_reaction('✅')
 
         # Update all players roles
-        for p in getAllPlayersList():
-            await roleUpdate(p)
+        for p in get_all_players_list():
+            await role_update(p)
         _addMainHandlers(client)
-        unlockAll(client)
+        unlock_all(client)
         logging.info('Client is ready!')
 
     @client.event
@@ -219,10 +219,10 @@ def _addInitHandlers(client):
 
 # TODO: testing, to be removed
 def _test(client):
-    from test2 import testHand
-    testHand(client)
+    from test2 import test_hand
+    test_hand(client)
 
-def main(launchStr=""):
+def main(launch_str=""):
     # Logging config
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
@@ -240,10 +240,10 @@ def main(launchStr=""):
     seed(dt.now())
 
     # Get data from the config file
-    cfg.getConfig(f"config{launchStr}.cfg")
+    cfg.get_config(f"config{launch_str}.cfg")
 
     # Initialize teamspeak bots
-    ts3Init()
+    ts_3_init()
 
     # Set up command prefix
     client = commands.Bot(command_prefix=cfg.general["command_prefix"])
@@ -252,31 +252,31 @@ def main(launchStr=""):
     client.remove_command('help')
 
     # Initialise db and get all the registered users and all maps from it
-    dbInit(cfg.database)
-    getAllItems(Player.newFromData, "users")
-    getAllItems(Map, "sBases")
-    getAllItems(Weapon, "sWeapons")
+    db_init(cfg.database)
+    get_all_items(Player.new_from_data, "users")
+    get_all_items(Map, "s_bases")
+    get_all_items(Weapon, "s_weapons")
 
     # Get Account sheet from drive
-    AccountHander.init(f"google_api_secret{launchStr}.json")
+    AccountHander.init(f"google_api_secret{launch_str}.json")
 
     # Establish connection with Jaeger Calendar
-    MapSelection.init(f"google_api_secret{launchStr}.json")
+    MapSelection.init(f"google_api_secret{launch_str}.json")
 
     # Initialise display module
-    displayInit(client)
+    display_init(client)
 
     # Initialise reaction handlers
-    reactInit(client)
+    react_init(client)
 
     # Add init handlers
     _addInitHandlers(client)
 
-    if launchStr == "_test":
+    if launch_str == "_test":
         _test(client)
 
     # Add all cogs
-    cogInit(client)
+    cog_init(client)
 
     # Run server
     client.run(cfg.general["token"])

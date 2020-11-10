@@ -25,10 +25,10 @@ class Ts3Bot:
         if main_url and instance_name:
             self.main_url = main_url
             botID_endpoint = "Id"
-            self.botId = requests.get(self.main_url + botID_endpoint).json()["defaultBotId"]
+            self.bot_id = requests.get(self.main_url + botID_endpoint).json()["default_bot_id"]
 
             login_endpoint = '/login'
-            data = {'username': username, 'password': password, 'botId': self.botId}
+            data = {'username': username, 'password': password, 'bot_id': self.bot_id}
             self.auth_token = ""
             try:
                 login_response = requests.post(self.main_url + login_endpoint, data=data)
@@ -43,12 +43,12 @@ class Ts3Bot:
             instances_response = requests.get(self.main_url + instances_endpoint,
                                               headers={"Authorization": "Bearer " + self.auth_token}).json()
 
-            self.instanceId = None
+            self.instance_id = None
             try:
                 for instance in instances_response:
                     if instance["name"] == instance_name:
-                        self.instanceId = instance["uuid"]
-                assert self.instanceId
+                        self.instance_id = instance["uuid"]
+                assert self.instance_id
                 self.initialized = True
             except AssertionError as ae:
                 log.error(f"Assertion Error. Instance ID not returned.\n{ae}")
@@ -70,20 +70,20 @@ class Ts3Bot:
             log.warning(f"Unable to complete request. TS3 bot not initialized.")
             return False
 
-    def enqueue(self, songId):
+    def enqueue(self, song_id):
         # enqueue will wait for the previous audio file to finish playing.
         # must wait >0.1 second between enqueues due to a sinusbot bug
         if self.check_initialized():
             endpoint = "/queue/append/"
-            response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint + songId,
+            response = requests.post(self.main_url + "/i/" + self.instance_id + endpoint + song_id,
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
 
-    def get_duration(self, songId):
+    def get_duration(self, song_id):
         if self.check_initialized():
             pad = 400  # extra time in ms to extend past duration
             try:
-                return (self.track_durations[songId] + pad) / 1000
+                return (self.track_durations[song_id] + pad) / 1000
             except KeyError:
                 logging.warning("Track uuid does not exist!")
                 return 0
@@ -100,61 +100,61 @@ class Ts3Bot:
                 tracks.append((track['uuid'], track['title'], track['duration']))
             return tracks
 
-    def move(self, channelId, channelPass=""):
+    def move(self, channel_id, channel_pass=""):
         if self.check_initialized():
             endpoint = "/event/move"
-            response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint,
+            response = requests.post(self.main_url + "/i/" + self.instance_id + endpoint,
                                      headers={"Authorization": "Bearer " + self.auth_token,
                                               'Content-Type': 'application/json'},
-                                     data=json.dumps({"id": channelId, "password": channelPass}))
+                                     data=json.dumps({"id": channel_id, "password": channel_pass}))
             return response
 
-    def play(self, songId):  # play will cut off any audio file currently playing
+    def play(self, song_id):  # play will cut off any audio file currently playing
         if self.check_initialized():
-            endpoint = "/play/byId/"
-            response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint + songId,
+            endpoint = "/play/by_id/"
+            response = requests.post(self.main_url + "/i/" + self.instance_id + endpoint + song_id,
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
 
     def restart(self):
         if self.check_initialized():
             endpoint = "/respawn"
-            response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint,
+            response = requests.post(self.main_url + "/i/" + self.instance_id + endpoint,
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
 
     def shutdown(self):
         if self.check_initialized():
             endpoint = "/kill"
-            response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint,
+            response = requests.post(self.main_url + "/i/" + self.instance_id + endpoint,
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
 
     def spawn(self):
         if self.check_initialized():
             endpoint = "/spawn"
-            response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint,
+            response = requests.post(self.main_url + "/i/" + self.instance_id + endpoint,
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
 
     def stop_song(self):
         if self.check_initialized():
             endpoint = "/stop"
-            response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint,
+            response = requests.post(self.main_url + "/i/" + self.instance_id + endpoint,
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
 
     def volume(self, value):
         if self.check_initialized():
             endpoint = "/volume/set/"
-            response = requests.post(self.main_url + "/i/" + self.instanceId + endpoint + str(value),
+            response = requests.post(self.main_url + "/i/" + self.instance_id + endpoint + str(value),
                                      headers={"Authorization": "Bearer " + self.auth_token})
             return response
 
     def get_queue(self):
         if self.check_initialized():
             endpoint = "/queue"
-            response = requests.get(self.main_url + "/i/" + self.instanceId + endpoint,
+            response = requests.get(self.main_url + "/i/" + self.instance_id + endpoint,
                                     headers={"Authorization": "Bearer " + self.auth_token})
             return response.content
 
@@ -188,15 +188,15 @@ def init():
         log.error(f"Uncaught exception starting ts3 bots! Continuing script without bots functioning... {type(e).__name__}\n{e}")
 
 
-def getTs3Bots():
+def REGEX_getTs3Bots():
     return bot1, bot2
 
 
 # FOR TESTING/GETTING SONG IDS:
 if __name__ == "__main__":
-    launchStr = "_test"
-    cfg.getConfig(f"../config{launchStr}.cfg")
+    launch_str = "_test"
+    cfg.get_config(f"../config{launch_str}.cfg")
     init()
     print("(<song id>, <song name>, <duration (ms)>)")
-    for song in getTs3Bots()[0].get_list():
+    for song in REGEX_getTs3Bots()[0].get_list():
         print(song)
