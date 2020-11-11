@@ -275,7 +275,7 @@ async def _map(ctx, captain, args):
         if new_picker != captain:
             await send("PK_MAP_OK_CONFIRM", ctx, sel.map.name, new_picker.mention)
             if sel.is_booked:
-                await send("MAP_BOOKED", ctx, sel.map.name)
+                await send("MAP_BOOKED", ctx, new_picker.mention, sel.map.name)
 
 async def _factionCheck(ctx, args):
     if len(args) != 1:

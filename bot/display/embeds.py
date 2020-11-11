@@ -220,19 +220,14 @@ def lobby_list(msg, names_in_lobby):
 #     embed.add_field(name=f"{len(sel.get_selection())} maps found", value=embed_text, inline=False)
 #     return embed
 
-
 def selected_maps(msg, sel):
     """ Returns a list of maps currently selected
     """
-    embed = Embed(colour=Color.blue(), title="Map selection",
-                  url="https://docs.google.com/spreadsheets/d/1eA4ybkAiz-nv_mPxu_laL504nwTDmc-9GnsojnTiSRE",
-                  description="Pick a base currently available in the calendar!")
-    date = dt.now(tz.utc)
-    embed.add_field(name="Current UTC time",
-                    value=date.strftime("%Y-%m-%d %H:%M UTC"),
-                    inline=False)
+    embed = Embed(colour=Color.blue())
     maps = sel.string_list
-    embed.add_field(name=f"{len(maps)} maps found",value="\n".join(maps),inline = False)
+    embed.add_field(name=f"{len(maps)} maps found",
+                    value="\n".join(maps),
+                    inline = False)
     return embed
 
 def offline_list(msg, p_list):
@@ -273,11 +268,11 @@ def global_info(msg, lobby, match_list):
         embed.add_field(name  = m.channel.name, value = desc, inline = False)
     return embed
 
-def pil_accounts(msg, account_names):
+def flip_accounts(msg, account_names):
     embed = Embed(
         colour=Color.red(),
-        title='PIL Account!',
-        description=f'The password of your PIL account have been flipped!'
+        title='Flipped Account!',
+        description=f'The password of your account have been flipped!'
     )
     embed.add_field(name  = "Characters affected:",
                     value = "\n".join(i_name for i_name in account_names),
@@ -341,9 +336,10 @@ def map_pool(msg, sel):
     map = sel.navigator.current
     if map is not None:
         if map.name in cfg.map_pool_images:
-            embed = Embed(colour=Color.blue(), title=map.name)
-            embed.set_author(name="Click here for the map pool document",
-                            url="https://docs.google.com/presentation/d/1KEDlqHxbpG2zXxuEZetAM9IpUHIisWTnrtybn3Kq-Is/")
+            if sel.navigator.is_booked:
+                embed = Embed(colour=Color.red(), title=map.name, description="WARNING! This map seems to be booked in the calendar!")
+            else:
+                 embed = Embed(colour=Color.blue(), title=map.name)
             embed.set_image(url=cfg.map_pool_images[map.name])
         else:
             embed = Embed(colour=Color.red(), title="No map image available")

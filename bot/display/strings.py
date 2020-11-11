@@ -64,7 +64,7 @@ class AllStrings(Enum):
     PK_FACTION_OK_NEXT = Message("{} chose {}! {} pick a faction!", ping=False)
     PK_FACTION_CHANGED = Message("{} changed to {}!")
     PK_FACTION_NOT_PLAYER = Message("Pick a faction, not a player!", embed=embeds.match_help)
-    PK_WAIT_MAP =  Message("{} {} Pick an available map!", ping=False, embed=embeds.selected_maps)
+    PK_WAIT_MAP =  Message("{} {} Pick an available map!", ping=False, embed=embeds.jaeger_calendar)
     PK_MAP_OK_CONFIRM = Message("Picked **{}**! {} confirm with `=p confirm` if you agree")
     PK_OVER_READY = Message("Can't do that if your team is ready!")
     PK_NO_MAP = Message("No map selected!")
@@ -84,7 +84,7 @@ class AllStrings(Enum):
     INVALID_STR = Message("You entered an invalid character! `{}`")
     API_ERROR = Message("Could not reach Planetside2 API, try again later!")
     GLOBAL_INFO = Message("Here is what's going on in POG at the moment:", embed=embeds.global_info)
-    CHECK_ACCOUNT = Message("PIL accounts password got changed! Re-register in <#{}> to confirm you still have access to your account!", embed=embeds.pil_accounts)
+    CHECK_ACCOUNT = Message("PIL accounts password got changed! Re-register in <#{}> to confirm you still have access to your account!", embed=embeds.flip_accounts)
 
     BOT_UNLOCKED = Message("Unlocked!")
     BOT_LOCKED = Message("Locked!")
@@ -122,10 +122,10 @@ class AllStrings(Enum):
     MAP_HELP = Message("Here is how to choose a map:", embed=embeds.map_help)
     MAP_TOO_MUCH = Message("Too many maps found! Try to be more precise")
     MAP_NOT_FOUND = Message("Couldn't find a result for your search!")
-    MAP_DISPLAY_LIST = Message("Here are the maps found:", embed=embeds.selected_maps)
-    MAP_SHOW_POOL = Message("Map list:", embed=embeds.selected_maps)
+    MAP_SHOW_LIST = Message("Here are the maps found:", embed=embeds.selected_maps)
+    MAP_SHOW_POOL = Message("Map list:", embed=embeds.map_pool)
     MAP_SELECTED = Message("The current map is **{}**")
-    MAP_BOOKED = Message("WARNING: **{}** is currently reserved in the Jaeger Calendar. Please check availability before confirming this map.",
+    MAP_BOOKED = Message("{} WARNING: **{}** is currently reserved in the Jaeger Calendar. Please check availability before confirming this map.", ping=False,
                           embed=embeds.jaeger_calendar)
 
     MP_ADDED = Message("Added {} to the map pool")

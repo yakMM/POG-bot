@@ -56,6 +56,7 @@ class LobbyCog(commands.Cog, name='lobby'):
             await send("CHECK_ACCOUNT", ctx, cfg.channels["register"], account_names=accs)
             return
         if ctx.author.status == discord_status.offline:
+            print(str(ctx.author.status))
             await send("LB_OFFLINE", ctx)
             return
         if player.status is PlayerStatus.IS_LOBBIED:

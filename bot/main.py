@@ -27,7 +27,7 @@ from modules.exceptions import ElementNotFound, UnexpectedError
 from modules.database import init as db_init, get_all_items
 from modules.enumerations import PlayerStatus
 from modules.loader import init as cog_init, is_all_locked, unlock_all
-from modules.ts3 import init as ts_3_init
+from modules.ts3 import init as ts3_init
 from modules.reactions import init as react_init, reaction_handler
 
 # Modules for the custom classes
@@ -243,7 +243,7 @@ def main(launch_str=""):
     cfg.get_config(f"config{launch_str}.cfg")
 
     # Initialize teamspeak bots
-    ts_3_init()
+    ts3_init()
 
     # Set up command prefix
     client = commands.Bot(command_prefix=cfg.general["command_prefix"])

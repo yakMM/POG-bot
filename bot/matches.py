@@ -387,8 +387,9 @@ class Match():
         ts3bot.move(pick_channel)
         await sleep(1)  # prevents playing this before faction announce
         ts3bot.enqueue(cfg.audio_ids["select_map"])
-        msg = await channel_send("PK_WAIT_MAP", self.__id, *captain_pings, sel=self.__mapSelector)
-        await self.__mapSelector.navigator.set_msg(msg)
+        await channel_send("PK_WAIT_MAP", self.__id, *captain_pings)
+        await channel_send("MAP_SHOW_LIST", self.__id, sel=self.__mapSelector)
+        await self.__mapSelector.navigator.set_msg()
 
     @loop(count=1)
     async def __ready(self):
@@ -508,7 +509,7 @@ class Match():
     async def _launch(self):
         await channel_send("MATCH_INIT", self.__id, " ".join(self.player_pings))
         self.__accounts = AccountHander(self)
-        self.__mapSelector = MapSelection(self, mainmap_pool)
+        self.__mapSelector = MapSelection(self.__id, mainmap_pool)
         for i in range(len(self.__teams)):
             self.__teams[i] = Team(i, f"Team {i + 1}", self)
             key = random_choice(list(self.__players))

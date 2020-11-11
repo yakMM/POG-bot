@@ -130,7 +130,7 @@ class Player:
     def accounts_flipped(self):
         accs = list()
         for ig in self.__igNames:
-            if ig[:4] == "pil_":
+            if ig[:4] == "flip_":
                 accs.append(ig[4:])
         return accs
 

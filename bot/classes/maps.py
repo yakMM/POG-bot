@@ -5,7 +5,7 @@
 import modules.config as cfg
 from modules.enumerations import SelStatus
 from modules.exceptions import ElementNotFound, UserLackingPermission
-from display import send
+from display import send, channel_send, edit
 from modules.tools import date_parser
 from modules.reactions import ReactionHandler, add_handler, rem_handler
 
@@ -165,7 +165,6 @@ class MapSelection:
                         booked_maps = [identify_map_from_name(map) for map in booked_maps.split(";")]
                         for booked in booked_maps:
                             if booked is not None and booked not in self.__booked:
-                                print(booked.name)
                                 self.__booked.append(booked)
                 except ValueError as e:
                     log.warning(f"Skipping invalid line in Jaeger Calendar:\n{booking}\nError: {e}")
@@ -315,10 +314,15 @@ class MapNavigator:
         self.__index = self.__index % len(map_list)
         return map_list[self.__index]
 
+    @property
+    def is_booked(self):
+        return self.__mapSel.is_map_booked(self.current)
+
     def clean(self):
         rem_handler(self.__msg.id)
 
-    async def set_msg(self, msg):
+    async def set_msg(self):
+        msg = await channel_send("MAP_SHOW_POOL", self.__mapSel.id, sel=self.__mapSel)
         self.__msg = msg
         add_handler(msg.id, self.__reactionHandler)
         await self.__reactionHandler.auto_add_reactions(msg)
@@ -341,6 +345,5 @@ class MapNavigator:
         raise UserLackingPermission
 
     async def refresh_message(self, *args):
-        pass
-        #await self.__msg.edit(content=self.__msg.content, embed = map_pool(self.__msg, sel=self.__mapSel))
+        await edit("MAP_SHOW_POOL", self.__msg, sel=self.__mapSel)
 

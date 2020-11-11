@@ -40,7 +40,7 @@ class DbPlayer(Player):
         #     bl = bl and ig[-3] == 'x'
         #     if bl: # is PIL char?
         #         print(ig)
-        #         ig = f"pil_{ig}"
+        #         ig = f"flip_{ig}"
         #     new_data["ig_names"].append(ig)
 
         new_data["has_own_account"] = data["hasOwnAccount"]

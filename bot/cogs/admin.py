@@ -88,7 +88,7 @@ class AdminCog(commands.Cog, name='admin'):
         if sel.status is not SelStatus.IS_SELECTED:
             return
         if sel.is_booked:
-            await send("MAP_BOOKED", ctx, sel.map.name)
+            await send("MAP_BOOKED", ctx, ctx.author.mention, sel.map.name)
             return
         else:
             match.confirm_map()
