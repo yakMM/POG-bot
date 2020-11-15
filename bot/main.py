@@ -7,7 +7,7 @@ The application should be launched from this file
 # discord.py
 from discord.ext import commands
 from discord.ext.commands import Bot
-from discord import Status, DMChannel
+from discord import Status, DMChannel, Intents
 
 # Other modules
 from asyncio import sleep
@@ -231,7 +231,7 @@ def main(launchStr=""):
     cfg.getConfig(f"config{launchStr}.cfg")
 
     # Set up command prefix
-    client = commands.Bot(command_prefix=cfg.general["command_prefix"])
+    client = commands.Bot(command_prefix=cfg.general["command_prefix"], intents=Intents.all())
 
     # Remove default help
     client.remove_command('help')
@@ -266,5 +266,5 @@ if __name__ == "__main__":
     # execute only if run as a script
     # Use main() for production
 
-    # main("_test")
+    #main("_test")
     main()
