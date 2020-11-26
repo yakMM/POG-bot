@@ -29,7 +29,7 @@ X_OFFSET = 3
 Y_OFFSET = 3
 QUIT_DELAY = 300
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 def get_not_ready_players(team):
     not_ready = list()

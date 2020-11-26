@@ -15,7 +15,7 @@ from modules.enumerations import MatchStatus, SelStatus
 from modules.census import get_offline_players
 from classes.accounts import get_not_ready_players
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 
 class MatchesCog(commands.Cog, name='matches'):

@@ -21,10 +21,10 @@ from asyncio import get_event_loop
 from re import compile as reg_compile, sub as reg_sub
 from random import randint
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 _allMapsList = list()
-mainmap_pool = list()
+main_maps_pool = list()
 
 MAX_SELECTED = 15
 
@@ -63,7 +63,7 @@ class Map:
         self.__typeId = data["type_id"]
         self.__inPool = data["in_map_pool"]
         if self.__inPool:
-            mainmap_pool.append(self)
+            main_maps_pool.append(self)
         _allMapsList.append(self)
 
     def get_data(self):  # get data for database push
@@ -204,7 +204,7 @@ class MapSelection:
             self.__selection = self.__allMaps.copy()
         if len(args) == 0:
             if self.__status is SelStatus.IS_SELECTION:
-                await send("MAP_DISPLAY_LIST", ctx, sel=self)
+                await send("MAP_SHOW_LIST", ctx, sel=self)
                 return
             if self.__status is SelStatus.IS_SELECTED:
                 await send("MAP_SELECTED", ctx, self.__selected.name)
@@ -222,7 +222,7 @@ class MapSelection:
             await send("MAP_TOO_MUCH", ctx)
             return
         if self.__status == SelStatus.IS_SELECTION:
-            await send("MAP_DISPLAY_LIST", ctx, sel=self)
+            await send("MAP_SHOW_LIST", ctx, sel=self)
             return
         # If successfully selected:
         return self.__selected
@@ -337,6 +337,7 @@ class MapNavigator:
         self.__index = randint(0, len(self.__mapSel.current_list)-1)
 
     def select(self, *args):
+
         pass
 
     def check_auth(self, reaction, player):

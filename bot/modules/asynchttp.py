@@ -15,7 +15,7 @@ from logging import getLogger
 # Custom modules
 from modules.exceptions import UnexpectedError, ApiNotReachable
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 # PUBLIC:
 

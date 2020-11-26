@@ -14,7 +14,7 @@ from display import channel_send, send
 from modules.tools import is_al_num
 from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 
 class RegisterCog(commands.Cog, name='register'):

@@ -12,7 +12,7 @@ from classes.players import PlayerStatus, get_player
 
 from matches import get_lobby_len, is_lobby_stuck, remove_from_lobby, add_to_lobby, get_all_names_in_lobby, get_match
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 
 class LobbyCog(commands.Cog, name='lobby'):

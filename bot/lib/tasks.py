@@ -14,7 +14,7 @@ import traceback
 
 from discord.backoff import ExponentialBackoff
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("pog_bot")
 
 
 class Loop:

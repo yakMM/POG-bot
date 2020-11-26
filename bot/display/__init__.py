@@ -23,7 +23,7 @@ from display import strings
 
 import logging
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("pog_bot")
 
 _client = None
 

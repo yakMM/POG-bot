@@ -5,7 +5,7 @@ from logging import getLogger
 from modules.exceptions import SinusbotAuthError, WebapiError
 import modules.config as cfg
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 
 # audio files use https://www.naturalreaders.com/online/ English (UK) - Amy voice

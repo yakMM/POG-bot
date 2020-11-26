@@ -8,7 +8,7 @@ The application should be launched from this file
 
 # discord.py
 from discord.ext import commands
-from discord import Status, DMChannel
+from discord import Status, DMChannel, Intents
 
 # Other modules
 from asyncio import sleep
@@ -43,6 +43,8 @@ from classes.weapons import Weapon
 
 
 rules_msg = None  # Will contain message object representing the rules message, global variable
+
+log = logging.getLogger("pog_bot")
 
 def _addMainHandlers(client):
     """_addMainHandlers, private function
@@ -211,7 +213,7 @@ def _addInitHandlers(client):
             await role_update(p)
         _addMainHandlers(client)
         unlock_all(client)
-        logging.info('Client is ready!')
+        log.info('Client is ready!')
 
     @client.event
     async def on_message(message):
@@ -224,14 +226,13 @@ def _test(client):
 
 def main(launch_str=""):
     # Logging config
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+    log.setLevel(logging.INFO)
     logging.Formatter.converter = gmtime
     formatter = logging.Formatter('%(asctime)s | %(levelname)s %(message)s', "%Y-%m-%d %H:%M:%S UTC")
     file_handler = RotatingFileHandler('../logging/bot_log.out', 'a', 1000000, 1)
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+    log.addHandler(file_handler)
 
     # Init order MATTERS
     # Init order MATTERS
@@ -246,7 +247,7 @@ def main(launch_str=""):
     ts3_init()
 
     # Set up command prefix
-    client = commands.Bot(command_prefix=cfg.general["command_prefix"])
+    client = commands.Bot(command_prefix=cfg.general["command_prefix"], intents=Intents.all())
 
     # Remove default help
     client.remove_command('help')

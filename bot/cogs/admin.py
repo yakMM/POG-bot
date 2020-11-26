@@ -18,7 +18,7 @@ from classes.players import remove_player, get_player, Player, TeamCaptain
 from matches import clear_lobby, get_match, get_all_names_in_lobby, remove_from_lobby, is_lobby_stuck, add_to_lobby, get_all_ids_in_lobby
 
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 
 class AdminCog(commands.Cog, name='admin'):

@@ -12,7 +12,7 @@ from modules.ts_interface import faction_audio, map_audio, which_bot, which_pick
 
 from classes.teams import Team  # ok
 from classes.players import TeamCaptain, ActivePlayer  # ok
-from classes.maps import MapSelection, mainmap_pool  # ok
+from classes.maps import MapSelection, main_maps_pool  # ok
 from classes.accounts import AccountHander  # ok
 
 from random import choice as random_choice
@@ -20,7 +20,7 @@ from lib.tasks import loop
 from asyncio import sleep
 from logging import getLogger
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 _lobby_list = list()
 _lobbyStuck = False
@@ -509,7 +509,7 @@ class Match():
     async def _launch(self):
         await channel_send("MATCH_INIT", self.__id, " ".join(self.player_pings))
         self.__accounts = AccountHander(self)
-        self.__mapSelector = MapSelection(self.__id, mainmap_pool)
+        self.__mapSelector = MapSelection(self.__id, main_maps_pool)
         for i in range(len(self.__teams)):
             self.__teams[i] = Team(i, f"Team {i + 1}", self)
             key = random_choice(list(self.__players))

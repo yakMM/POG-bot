@@ -123,7 +123,7 @@ class AllStrings(Enum):
     MAP_TOO_MUCH = Message("Too many maps found! Try to be more precise")
     MAP_NOT_FOUND = Message("Couldn't find a result for your search!")
     MAP_SHOW_LIST = Message("Here are the maps found:", embed=embeds.selected_maps)
-    MAP_SHOW_POOL = Message("Map list:", embed=embeds.map_pool)
+    MAP_SHOW_POOL = Message("Map list:", ping=False, embed=embeds.map_pool)
     MAP_SELECTED = Message("The current map is **{}**")
     MAP_BOOKED = Message("{} WARNING: **{}** is currently reserved in the Jaeger Calendar. Please check availability before confirming this map.", ping=False,
                           embed=embeds.jaeger_calendar)

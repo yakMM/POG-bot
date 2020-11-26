@@ -7,7 +7,7 @@ from display import channel_send
 import modules.config as cfg
 from logging import getLogger
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 
 async def process_score(match):

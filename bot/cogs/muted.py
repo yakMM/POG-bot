@@ -15,7 +15,7 @@ from modules.exceptions import ElementNotFound
 from display import send
 from modules.exceptions import ElementNotFound
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 
 class RegisterCog(commands.Cog, name='muted'):

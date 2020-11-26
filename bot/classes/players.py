@@ -17,7 +17,7 @@ from modules.database import update_player
 from logging import getLogger
 from datetime import datetime as dt
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 WORLD_ID = 19  # Jaeger ID
 
