@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord import Status as discord_status
 from logging import getLogger
 
-from display import send, channel_send
+from display import send
 import modules.config as cfg
 from modules.exceptions import UnexpectedError, ElementNotFound, LobbyStuck
 

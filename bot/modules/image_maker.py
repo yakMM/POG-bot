@@ -2,7 +2,7 @@
 
 from PIL import Image, ImageDraw, ImageFont
 from asyncio import get_event_loop
-from display import image_send
+from display import image_send, SendCtx
 from modules.enumerations import MatchStatus
 import modules.config as cfg
 from datetime import datetime as dt
@@ -21,12 +21,12 @@ Y_BIG_SPACE = 150
 X_OFFSET=100
 
 
-def _drawScoreLine(draw, x_start, y, values, font, fill):
+def _draw_score_line(draw, x_start, y, values, font, fill):
     for i in range(len(values)):
         draw.text((x_start + 300 * i, y), values[i], font=font, fill=fill)
 
-def _cutOffString(string, font, treshold):
-    def _binarySearch(base, i):
+def _cut_off_string(string, font, treshold):
+    def _binary_search(base, i):
         size = font.getsize(string[:base+i]+"...")[0]
         size1 = font.getsize(string[:base+i+1]+"...")[0]
         if size <= treshold and size1 >= treshold:
@@ -34,22 +34,22 @@ def _cutOffString(string, font, treshold):
         if i==1:
             return base+i+1
         if size >= treshold:
-            return _binarySearch(base,i//2)
+            return _binary_search(base,i//2)
         if size <= treshold:
-            return  _binarySearch(base+i,i//2)
+            return  _binary_search(base+i,i//2)
     if font.getsize(string)[0] <= treshold:
         return string
-    res = _binarySearch(0,len(string))
+    res = _binary_search(0,len(string))
     return string[:res]+"..."
 
-def _teamDisplay(draw, team, y_offset):
+def _team_display(draw, team, y_offset):
 
     # Titles:
-    _drawScoreLine(draw, X_OFFSET+2200, y_offset, ["Score","Net","Kills","Deaths"], font, yellow)
+    _draw_score_line(draw, X_OFFSET+2200, y_offset, ["Score","Net","Kills","Deaths"], font, yellow)
 
     # Team scores:
     scores = [str(team.score), str(team.net), str(team.kills), str(team.deaths)]
-    _drawScoreLine(draw, X_OFFSET+2200, Y_SPACING+y_offset, scores, big_font, white)
+    _draw_score_line(draw, X_OFFSET+2200, Y_SPACING+y_offset, scores, big_font, white)
 
     # Team name:
     draw.text((X_OFFSET,Y_SPACING+y_offset),
@@ -62,12 +62,12 @@ def _teamDisplay(draw, team, y_offset):
 
         # Scores:
         scores = [str(a_player.score), str(a_player.net), str(a_player.kills), str(a_player.deaths)]
-        _drawScoreLine(draw, X_OFFSET+2200, Y_BIG_SPACE*2+Y_SPACING*i+y_offset, scores,
+        _draw_score_line(draw, X_OFFSET+2200, Y_BIG_SPACE*2+Y_SPACING*i+y_offset, scores,
         font, color[i%2])
 
         # Names:
-        name = _cutOffString(a_player.name, font, 1000)
-        ig_name = _cutOffString(a_player.ig_name, font, 1000)
+        name = _cut_off_string(a_player.name, font, 1000)
+        ig_name = _cut_off_string(a_player.ig_name, font, 1000)
 
 
         draw.text((X_OFFSET,Y_BIG_SPACE*2+Y_SPACING*i+y_offset), name, font=font, fill=color[i%2])
@@ -77,7 +77,7 @@ def _teamDisplay(draw, team, y_offset):
 
 
 
-def _makeImage(match):
+def _make_image(match):
     img = Image.new('RGB', (3600, 3100), color = (17, 0, 68))
     logo = Image.open("../logos/bot.png")
     logo = logo.resize((600,600))
@@ -114,13 +114,13 @@ def _makeImage(match):
     draw.text((X_OFFSET+2200,200+100), f"Captures:", font=small_font, fill=white)
     for tm in match.teams:
         draw.text((X_OFFSET+2200,200+100*(tm.id+2)), f"{tm.name}: {tm.cap} points", font=small_font, white=white)
-        _teamDisplay(draw, tm, y_off(tm.id))
+        _team_display(draw, tm, y_off(tm.id))
     img.save(f'../matches/match_{match.number}.png')
 
 
 async def publish_match_image(match):
     loop = get_event_loop()
-    await loop.run_in_executor(None, _makeImage, match)
+    await loop.run_in_executor(None, _make_image, match)
 
     msg = match.msg
     if msg is not None:
@@ -130,6 +130,7 @@ async def publish_match_image(match):
         string = "SC_RESULT"
     else:
         string = "SC_RESULT_HALF"
-    msg = await image_send(string, cfg.channels["results"], f'../matches/match_{match.number}.png', match.number)
+    msg = await image_send(string, SendCtx.channel(cfg.channels["results"]),
+                f'../matches/match_{match.number}.png', match.number)
     return msg
 

@@ -37,7 +37,7 @@ class Ts3Bot:
                 else:
                     self.auth_token = login_response.json()["token"]
             except SinusbotAuthError as sae:
-                log.error(f"{sae}\nURL: '{main_url}\nInstance Name: {instance_name}\nUsername: '{username}'\nPassword: '{password}'")
+                log.error(f"{sae}\nURL: '{main_url}\n_instance Name: {instance_name}\n_username: '{username}'\n_password: '{password}'")
 
             instances_endpoint = '/instances'
             instances_response = requests.get(self.main_url + instances_endpoint,
@@ -183,7 +183,7 @@ def init():
     except ConnectionError as ce:
         log.warning(f"Unable to initialize TS3 bots! Continuing script without bots functioning...\n{ce}")
     except WebapiError as we:
-        log.warning(f"{we}\nContinuing script without bots functioning...")
+        log.warning(f"{we}\n_continuing script without bots functioning...")
     except Exception as e:
         log.error(f"Uncaught exception starting ts3 bots! Continuing script without bots functioning... {type(e).__name__}\n{e}")
 

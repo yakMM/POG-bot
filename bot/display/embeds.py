@@ -8,7 +8,7 @@ from modules.enumerations import MatchStatus
 
 
 
-def register_help(msg):
+def register_help(ctx):
     """ Returns register help embed
     """
     embed = Embed(
@@ -29,17 +29,17 @@ def register_help(msg):
                             'when the queue is almost full',
                     inline = False)
     try:
-        if is_admin(msg.author):
+        if is_admin(ctx.author):
             embed.add_field(name  = "Staff Commands",
                             value = '`=unregister @player` - Permanently remove player profile from the system\n'
                                     '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                             inline = False)
     except AttributeError:
-        pass  # if msg is from bot
+        pass  # if ctx is from bot
     return embed
 
 
-def lobby_help(msg):
+def lobby_help(ctx):
     """ Returns lobby help embed
     """
     embed = Embed(colour=Color.blurple())
@@ -49,7 +49,7 @@ def lobby_help(msg):
                             '`=q` - See the current lobby\n'
                             '`=i` - Display the global information prompt',
                     inline = False)
-    if is_admin(msg.author):
+    if is_admin(ctx.author):
         embed.add_field(name  = "Staff Commands",
                         value = '`=clear` - Clear the lobby\n'
                                 '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages\n'
@@ -57,7 +57,7 @@ def lobby_help(msg):
                         inline = False)
     return embed
 
-def admin_help(msg):
+def admin_help(ctx):
     """ Returns admin help embed
     """
     embed = Embed(colour=Color.blurple())
@@ -85,7 +85,7 @@ def admin_help(msg):
     return embed
 
 
-def default_help(msg):
+def default_help(ctx):
     """ Returns fallback help embed
     """
     embed = Embed(colour=Color.red())
@@ -99,7 +99,7 @@ def map_help(ctx):
     """ Returns map help embed
     """
     embed = Embed(colour=Color.blurple())
-    cmd = ctx.command.name
+    cmd = ctx.cmd_name
     if cmd == "pick":
         cmd = "p"
     embed.add_field(name  = 'Map selection commands',
@@ -134,7 +134,7 @@ def muted_help(ctx):
     return embed
 
 
-def match_help(msg):
+def match_help(ctx):
     """ Returns match help embed
     """
     embed = Embed(colour=Color.blurple())
@@ -149,7 +149,7 @@ def match_help(msg):
                             '`=resign` - Resign from Team Captain position\n'
                             '`=ready` - To toggle the ready status of your team',
                     inline = False)
-    if is_admin(msg.author):
+    if is_admin(ctx.author):
         embed.add_field(name  = "Staff Commands",
                         value = '`=clear` - Clear the match\n'
                                 '`=map base name` - Force select a map\n'
@@ -160,7 +160,7 @@ def match_help(msg):
     return embed
 
 
-def account(msg, account):
+def account(ctx, account):
     """ Returns account message embed
     """
     desc = ""
@@ -187,22 +187,22 @@ def account(msg, account):
     return embed
 
 
-def auto_help(msg):
+def auto_help(ctx):
     """ Return help embed depending on current channel """
-    if msg.channel.id == cfg.channels['register']:
-        return register_help(msg)
-    if msg.channel.id == cfg.channels['lobby']:
-        return lobby_help(msg)
-    if msg.channel.id in cfg.channels['matches']:
-        return match_help(msg)
-    if msg.channel.id == cfg.channels['muted']:
-        return muted_help(msg)
-    if msg.channel.id == cfg.channels['staff']:
-        return admin_help(msg)
-    return default_help(msg)
+    if ctx.channel_id == cfg.channels['register']:
+        return register_help(ctx)
+    if ctx.channel_id == cfg.channels['lobby']:
+        return lobby_help(ctx)
+    if ctx.channel_id in cfg.channels['matches']:
+        return match_help(ctx)
+    if ctx.channel_id == cfg.channels['muted']:
+        return muted_help(ctx)
+    if ctx.channel_id == cfg.channels['staff']:
+        return admin_help(ctx)
+    return default_help(ctx)
 
 
-def lobby_list(msg, names_in_lobby):
+def lobby_list(ctx, names_in_lobby):
     """ Returns the lobby list """
     embed = Embed(colour=Color.blue())
     list_of_names = "\n".join(names_in_lobby)
@@ -212,7 +212,7 @@ def lobby_list(msg, names_in_lobby):
     return embed
 
 
-# def selected_maps(msg, sel):
+# def selected_maps(ctx, sel):
 #     """ Returns a list of maps after a search selected
 #     """
 #     embed = Embed(colour=Color.blue())
@@ -220,7 +220,7 @@ def lobby_list(msg, names_in_lobby):
 #     embed.add_field(name=f"{len(sel.get_selection())} maps found", value=embed_text, inline=False)
 #     return embed
 
-def selected_maps(msg, sel):
+def selected_maps(ctx, sel):
     """ Returns a list of maps currently selected
     """
     embed = Embed(colour=Color.blue())
@@ -230,7 +230,7 @@ def selected_maps(msg, sel):
                     inline = False)
     return embed
 
-def offline_list(msg, p_list):
+def offline_list(ctx, p_list):
     embed = Embed(
         colour=Color.red(),
         title='Offline Players',
@@ -243,13 +243,13 @@ def offline_list(msg, p_list):
     return embed
 
 
-def global_info(msg, lobby, match_list):
+def global_info(ctx, lobby, match_list):
     embed = Embed(
         colour=Color.greyple(),
         title='Global Info',
         description=f'POG bot version `{cfg.VERSION}`'
     )
-    lb_embed = lobby_list(msg, names_in_lobby=lobby).fields[0]
+    lb_embed = lobby_list(ctx, names_in_lobby=lobby).fields[0]
     embed.add_field(name = lb_embed.name, value = lb_embed.value, inline = lb_embed.inline)
     for m in match_list:
         desc = ""
@@ -261,14 +261,14 @@ def global_info(msg, lobby, match_list):
             desc += "\n"
         desc += f"Status: {m.status_string}"
         if m.status in (MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
-            desc += f"\nBase: **{m.map.name}**\n"
+            desc += f"\n_base: **{m.map.name}**\n"
             desc += " / ".join(f"{tm.name}: **{cfg.factions[tm.faction]}**" for tm in m.teams)
         if m.status is MatchStatus.IS_PLAYING:
-            desc += f"\nTime Remaining: **{m.formated_time_to_round_end}**"
+            desc += f"\n_time Remaining: **{m.formated_time_to_round_end}**"
         embed.add_field(name  = m.channel.name, value = desc, inline = False)
     return embed
 
-def flip_accounts(msg, account_names):
+def flip_accounts(ctx, account_names):
     embed = Embed(
         colour=Color.red(),
         title='Flipped Account!',
@@ -290,7 +290,7 @@ def team_update(arg, match):
         title = f"Match {match.number}"
     desc = match.status_string
     if match.status is MatchStatus.IS_PLAYING:
-        desc += f"\nTime Remaining: **{match.formated_time_to_round_end}**"
+        desc += f"\n_time Remaining: **{match.formated_time_to_round_end}**"
     embed = Embed(colour=Color.blue(), title=title, description = desc)
     if match.map is not None:
         embed.add_field(name = "Map",value = match.map.name,inline = False)
@@ -332,15 +332,13 @@ def jaeger_calendar(arg):
     return embed
 
 
-def map_pool(msg, sel):
+def map_pool(ctx, sel):
     map = sel.navigator.current
-    if map is not None:
-        if map.name in cfg.map_pool_images:
-            if sel.navigator.is_booked:
-                embed = Embed(colour=Color.red(), title=map.name, description="WARNING! This map seems to be booked in the calendar!")
-            else:
-                 embed = Embed(colour=Color.blue(), title=map.name)
-            embed.set_image(url=cfg.map_pool_images[map.name])
-        else:
-            embed = Embed(colour=Color.red(), title="No map image available")
+    if sel.navigator.is_booked:
+        embed = Embed(colour=Color.red(), title=map.name, description="WARNING! This map seems to be booked in the calendar!")
+    elif map.name in cfg.map_pool_images:
+        embed = Embed(colour=Color.blue(), title=map.name)
+        embed.set_image(url=cfg.map_pool_images[map.name])
+    else:
+        embed = Embed(colour=Color.dark_grey(), title=map.name, description="No map image available")
     return embed

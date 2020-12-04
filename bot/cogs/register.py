@@ -10,7 +10,7 @@ from classes.players import Player, get_player
 # Custom modules
 import modules.config as cfg
 from modules.enumerations import PlayerStatus
-from display import channel_send, send
+from display import send
 from modules.tools import is_al_num
 from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
 

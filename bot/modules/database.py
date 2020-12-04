@@ -36,11 +36,11 @@ async def update_player(p, doc):
     """ Launch the task updating player p in database
     """
     loop = get_event_loop()
-    await loop.run_in_executor(None, _updatePlayer, p, doc)
+    await loop.run_in_executor(None, _update_player, p, doc)
 
 async def update_match(m):
     loop = get_event_loop()
-    await loop.run_in_executor(None, _addMatch, m)
+    await loop.run_in_executor(None, _add_match, m)
 
 async def remove_player(p):
     """ Launch the task updating player p in database
@@ -65,7 +65,7 @@ def force_update(db_name, elements):
 
 
 # Private
-def _updatePlayer(p, doc):
+def _update_player(p, doc):
     """ Update player p into db
     """
     if collections["users"].count_documents({"_id": p.id}) != 0:
@@ -74,7 +74,7 @@ def _updatePlayer(p, doc):
         collections["users"].insert_one(p.get_data())
 
 
-def _replacePlayer(p):
+def _replace_player(p):
     """ Update player p into db
     """
     if collections["users"].count_documents({"_id": p.id}) != 0:
@@ -82,7 +82,7 @@ def _replacePlayer(p):
     else:
         collections["users"].insert_one(p.get_data())
 
-def _updateMap(m):
+def _update_map(m):
     """ Update map m into db
     """
     if collections["s_bases"].count_documents({"_id": m.id}) != 0:
@@ -97,7 +97,7 @@ def _remove(p):
     else:
         raise DatabaseError(f"Player {p.id} not in database")
 
-def _addMatch(m):
+def _add_match(m):
     """ Update player p into db
     """
     if collections["matches"].count_documents({"_id": m.number}) != 0:

@@ -3,7 +3,7 @@
 from modules.asynchttp import api_request_and_retry as http_request
 from modules.exceptions import ApiNotReachable, ElementNotFound
 from classes.weapons import get_weapon
-from display import channel_send
+from display import SendCtx, send
 import modules.config as cfg
 from logging import getLogger
 
@@ -54,9 +54,9 @@ async def process_score(match):
                     # TODO: Should we add penalty?
         for weap_id in a_player.illegal_weapons.keys():
             weapon = get_weapon(weap_id)
-            await channel_send("SC_ILLEGAL_WE",  match.id, a_player.mention, weapon.name,
+            await send("SC_ILLEGAL_WE", match.channel, a_player.mention, weapon.name,
                                                 match.number, a_player.illegal_weapons[weap_id])
-            await channel_send("SC_ILLEGAL_WE",  cfg.channels["staff"], a_player.mention, weapon.name,
+            await send("SC_ILLEGAL_WE",  SendCtx.channel(cfg.channels["staff"]), a_player.mention, weapon.name,
                                                 match.number, a_player.illegal_weapons[weap_id])
 
     await get_captures(match, start, end)

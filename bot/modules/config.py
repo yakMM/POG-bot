@@ -158,7 +158,7 @@ def get_config(file):
         raise ConfigError(f"Parsing Error in '{file}'\n{e}")
 
     # General section
-    _checkSection(config, "General", file)
+    _check_section(config, "General", file)
 
     for key in general:
         try:
@@ -167,9 +167,9 @@ def get_config(file):
             else:
                 general[key] = config['General'][key]
         except KeyError:
-            _errorMissing(key, 'General', file)
+            _error_missing(key, 'General', file)
         except ValueError:
-            _errorIncorrect(key, 'General', file)
+            _error_incorrect(key, 'General', file)
 
     # Testing api key
     # url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
@@ -179,7 +179,7 @@ def get_config(file):
     #         f"Incorrect api key: {general['api_key']} in '{file}'")
 
     # Channels section
-    _checkSection(config, "Channels", file)
+    _check_section(config, "Channels", file)
 
     for key in channels:
         try:
@@ -193,70 +193,70 @@ def get_config(file):
                 channels[key] = int(config['Channels'][key])
                 channels_list.append(channels[key])
         except KeyError:
-            _errorMissing(key, 'Channels', file)
+            _error_missing(key, 'Channels', file)
         except ValueError:
-            _errorIncorrect(key, 'Channels', file)
+            _error_incorrect(key, 'Channels', file)
 
     # Teamspeak_Ids section
-    _checkSection(config, "Teamspeak_Ids", file)
+    _check_section(config, "Teamspeak_Ids", file)
 
     for key in teamspeak_ids:
         try:
             teamspeak_ids[key] = config['Teamspeak_Ids'][key]
         except KeyError:
-            _errorMissing(key, 'Teamspeak_Ids', file)
+            _error_missing(key, 'Teamspeak_Ids', file)
         except ValueError:
-            _errorIncorrect(key, 'Teamspeak_Ids', file)
+            _error_incorrect(key, 'Teamspeak_Ids', file)
 
     # Audio_Ids section
-    _checkSection(config, "Audio_Ids", file)
+    _check_section(config, "Audio_Ids", file)
 
     for key in audio_ids:
         try:
             audio_ids[key] = config['Audio_Ids'][key]
         except KeyError:
-            _errorMissing(key, 'Audio_Ids', file)
+            _error_missing(key, 'Audio_Ids', file)
         except ValueError:
-            _errorIncorrect(key, 'Audio_Ids', file)
+            _error_incorrect(key, 'Audio_Ids', file)
 
     # Roles section
-    _checkSection(config, "Roles", file)
+    _check_section(config, "Roles", file)
     for key in roles:
         try:
             roles[key] = int(config['Roles'][key])
         except KeyError:
-            _errorMissing(key, 'Roles', file)
+            _error_missing(key, 'Roles', file)
         except ValueError:
-            _errorIncorrect(key, 'Roles', file)
+            _error_incorrect(key, 'Roles', file)
 
     # Scores section
-    _checkSection(config, "Scores", file)
+    _check_section(config, "Scores", file)
     for key in scores:
         try:
             scores[key] = int(config['Scores'][key])
         except KeyError:
-            _errorMissing(key, 'Scores', file)
+            _error_missing(key, 'Scores', file)
         except ValueError:
-            _errorIncorrect(key, 'Scores', file)
+            _error_incorrect(key, 'Scores', file)
 
     # Database section
-    _checkSection(config, "Database", file)
+    _check_section(config, "Database", file)
 
     for key in database:
         if key != "collections":
             try:
                 database[key] = config['Database'][key]
             except KeyError:
-                _errorMissing(key, 'Database', file)
+                _error_missing(key, 'Database', file)
 
     # Collections section
-    _checkSection(config, "Collections", file)
+    _check_section(config, "Collections", file)
 
     for key in database["collections"]:
         try:
             database["collections"][key] = config['Collections'][key]
         except KeyError:
-            _errorMissing(key, 'Collections', file)
+            _error_missing(key, 'Collections', file)
 
     # Version
     try:
@@ -270,14 +270,14 @@ def get_config(file):
                         f"If you ran ts3.py just ignore this error...")
 
 
-def _checkSection(config, section, file):
+def _check_section(config, section, file):
     if section not in config:
         raise ConfigError(f"Missing section '{section}' in '{file}'")
 
 
-def _errorMissing(field, section, file):
+def _error_missing(field, section, file):
     raise ConfigError(f"Missing field '{field}' in '{section}' in '{file}'")
 
 
-def _errorIncorrect(field, section, file):
+def _error_incorrect(field, section, file):
     raise ConfigError(f"Incorrect field '{field}' in '{section}' in '{file}'")

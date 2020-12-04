@@ -8,6 +8,8 @@ Major feature implementations!
   - New requirements include installing and configuring Sinusbot for developers to run the ts3 bot
   - Bot announces match start and end, and informs captains on steps during pre-match
 - Various code viewability enhancements, PEP8 formatting, and typo fixes
+- Updated discord.py library
+- Fixed error handling int tasks
 
 # v1.15:
 - Cap points are no longer counted in team netscore

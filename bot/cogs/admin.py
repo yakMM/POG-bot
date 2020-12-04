@@ -6,7 +6,7 @@ from datetime import datetime as dt
 
 import modules.config as cfg
 from modules.enumerations import SelStatus, MatchStatus, PlayerStatus
-from display import send, channel_send
+from display import send, SendCtx
 from modules.exceptions import ElementNotFound, DatabaseError
 from modules.database import remove_player as db_remove
 from modules.loader import lock_all, unlock_all, is_all_locked
@@ -84,25 +84,25 @@ class AdminCog(commands.Cog, name='admin'):
             await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
             return
         # Handle the actual map selection
-        await sel.do_selection_process(ctx, args)
+        result = await sel.do_selection_process(ctx, args)
         if sel.status is not SelStatus.IS_SELECTED:
             return
         if sel.is_booked:
             await send("MAP_BOOKED", ctx, ctx.author.mention, sel.map.name)
             return
-        else:
+        elif result:
             match.confirm_map()
             await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
 
     @commands.command()
     @commands.guild_only()
     async def unregister(self, ctx):
-        player = await _removeChecks(ctx, cfg.channels["register"])
+        player = await _remove_checks(ctx, cfg.channels["register"])
         if player is None:
             return
         if player.status is PlayerStatus.IS_LOBBIED:
             remove_from_lobby(player)
-            await channel_send("RM_LOBBY", cfg.channels["lobby"], player.mention, names_in_lobby=get_all_names_in_lobby())
+            await send("RM_LOBBY", SendCtx.channel(cfg.channels["lobby"]), player.mention, names_in_lobby=get_all_names_in_lobby())
         if player.status in (PlayerStatus.IS_REGISTERED, PlayerStatus.IS_NOT_REGISTERED):
             try:
                 await db_remove(player)
@@ -117,19 +117,19 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def remove(self, ctx):
-        player = await _removeChecks(ctx, cfg.channels["lobby"])
+        player = await _remove_checks(ctx, cfg.channels["lobby"])
         if player is None:
             return
         if player.status is PlayerStatus.IS_LOBBIED:
             remove_from_lobby(player)
-            await channel_send("RM_LOBBY", cfg.channels["lobby"], player.mention, names_in_lobby=get_all_names_in_lobby())
+            await send("RM_LOBBY", SendCtx.channel(cfg.channels["lobby"]), player.mention, names_in_lobby=get_all_names_in_lobby())
             return
         await send("RM_NOT_LOBBIED", ctx)
     
     @commands.command()
     @commands.guild_only()
     async def demote(self, ctx):
-        player = await _removeChecks(ctx, cfg.channels["matches"])
+        player = await _remove_checks(ctx, cfg.channels["matches"])
         if player is None:
             return
         if player.status is not PlayerStatus.IS_PICKED:
@@ -190,7 +190,7 @@ class AdminCog(commands.Cog, name='admin'):
             return
         if player.status is PlayerStatus.IS_LOBBIED:
             remove_from_lobby(player)
-            await channel_send("RM_LOBBY", cfg.channels["lobby"], player.mention, names_in_lobby=get_all_names_in_lobby())
+            await send("RM_LOBBY", SendCtx.channel(cfg.channels["lobby"]), player.mention, names_in_lobby=get_all_names_in_lobby())
         if player.status not in (PlayerStatus.IS_REGISTERED, PlayerStatus.IS_NOT_REGISTERED):
             await send("RM_IN_MATCH", ctx)
             return
@@ -296,7 +296,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.guild_only()
     async def sub(self, ctx, *args):
         # Check for match status first maybe?
-        player = await _removeChecks(ctx, cfg.channels["matches"])
+        player = await _remove_checks(ctx, cfg.channels["matches"])
         if player is None:
             return
         if player.status not in (PlayerStatus.IS_MATCHED, PlayerStatus.IS_PICKED):
@@ -310,7 +310,7 @@ class AdminCog(commands.Cog, name='admin'):
             await send("SUB_NO_PLAYER", ctx)
             return
         else:
-            await channel_send("SUB_LOBBY",  cfg.channels["lobby"], new_player.mention, new_player.match.id,
+            await send("SUB_LOBBY",  SendCtx.channel(cfg.channels["lobby"]), new_player.mention, new_player.match.id,
                                             names_in_lobby=get_all_names_in_lobby())
             if new_player.status is PlayerStatus.IS_PICKED:
                 await send("SUB_OKAY_TEAM", ctx, new_player.mention, player.mention,
@@ -325,7 +325,7 @@ def setup(client):
     client.add_cog(AdminCog(client))
 
 
-async def _removeChecks(ctx, channels):
+async def _remove_checks(ctx, channels):
     if not isinstance(channels, list):
         channels = [channels]
     if ctx.channel.id not in channels:

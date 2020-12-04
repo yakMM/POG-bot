@@ -4,7 +4,7 @@ from discord.ext.commands.errors import ExtensionAlreadyLoaded
 
 main_cogs = ["cogs.admin"]
 standard_cogs = ["cogs.register", "cogs.matches", "cogs.lobby", "cogs.muted"]
-__isGlobalLocked = True  # Lock the bot from getting messages
+__is_global_locked = True  # Lock the bot from getting messages
 
 
 def init(client):
@@ -15,8 +15,8 @@ def init(client):
 def lock_all(client):
     for cog in standard_cogs:
         client.unload_extension(cog)
-    global __isGlobalLocked
-    __isGlobalLocked = True
+    global __is_global_locked
+    __is_global_locked = True
 
 
 def unlock_all(client):
@@ -25,10 +25,10 @@ def unlock_all(client):
             client.load_extension(cog)
         except ExtensionAlreadyLoaded:
             pass
-    global __isGlobalLocked
-    __isGlobalLocked = False
+    global __is_global_locked
+    __is_global_locked = False
 
 
 def is_all_locked():
-    global __isGlobalLocked
-    return __isGlobalLocked
+    global __is_global_locked
+    return __is_global_locked

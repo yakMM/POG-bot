@@ -20,7 +20,7 @@ from logging.handlers import RotatingFileHandler
 
 # Custom modules
 import modules.config as cfg
-from display import send, channel_send, init as display_init
+from display import send, SendCtx, init as display_init
 from modules.spam import is_spam, unlock
 from modules.enumerations import MatchStatus
 from modules.exceptions import ElementNotFound, UnexpectedError
@@ -46,8 +46,8 @@ rules_msg = None  # Will contain message object representing the rules message, 
 
 log = logging.getLogger("pog_bot")
 
-def _addMainHandlers(client):
-    """_addMainHandlers, private function
+def _add_main_handlers(client):
+    """_add_main_handlers, private function
         Parameters
         ----------
         client : discord.py bot
@@ -147,7 +147,7 @@ def _addMainHandlers(client):
                 await role_update(p)
                 if p.status is PlayerStatus.IS_NOT_REGISTERED:
                     # they can now register
-                    await channel_send("REG_RULES", cfg.channels["register"], payload.member.mention)
+                    await send("REG_RULES", SendCtx.channel(cfg.channels["register"]), payload.member.mention)
             # In any case remove the reaction, message is to stay clean
             await rules_msg.remove_reaction(payload.emoji, payload.member)
 
@@ -192,7 +192,7 @@ def _addMainHandlers(client):
         await role_update(player)
 
 
-def _addInitHandlers(client):
+def _add_init_handlers(client):
 
     @client.event
     async def on_ready():
@@ -211,7 +211,7 @@ def _addInitHandlers(client):
         # Update all players roles
         for p in get_all_players_list():
             await role_update(p)
-        _addMainHandlers(client)
+        _add_main_handlers(client)
         unlock_all(client)
         log.info('Client is ready!')
 
@@ -234,7 +234,6 @@ def main(launch_str=""):
     file_handler.setFormatter(formatter)
     log.addHandler(file_handler)
 
-    # Init order MATTERS
     # Init order MATTERS
 
     # Seeding random generator
@@ -271,7 +270,7 @@ def main(launch_str=""):
     react_init(client)
 
     # Add init handlers
-    _addInitHandlers(client)
+    _add_init_handlers(client)
 
     if launch_str == "_test":
         _test(client)

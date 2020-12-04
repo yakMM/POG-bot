@@ -4,7 +4,7 @@ from discord.ext import commands
 from logging import getLogger
 
 import modules.config as cfg
-from display import send, channel_send
+from display import send
 from modules.tools import is_al_num
 from modules.exceptions import ElementNotFound
 
@@ -45,7 +45,7 @@ class MatchesCog(commands.Cog, name='matches'):
         if len(args) == 1 and args[0] == "help":
             await send("PK_HELP", ctx)  # =p help shows the help
             return
-        player = await _testPlayer(ctx, match)
+        player = await _test_player(ctx, match)
         if player is None:
             return
         if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
@@ -65,7 +65,7 @@ class MatchesCog(commands.Cog, name='matches'):
                 return
             if match.status is MatchStatus.IS_WAITING:
                 if match.round_no == 1:
-                    await _factionChange(ctx, a_player, args)
+                    await _faction_change(ctx, a_player, args)
                     return
                 await send("PK_OVER", ctx)  # Picking process is over
                 return
@@ -96,7 +96,7 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.guild_only()
     async def resign(self, ctx):
         match = get_match(ctx.channel.id)
-        player = await _testPlayer(ctx, match)
+        player = await _test_player(ctx, match)
         if player is None:
             return
         if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
@@ -122,7 +122,7 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.guild_only()
     async def ready(self, ctx):  # when ready
         match = get_match(ctx.channel.id)
-        player = await _testPlayer(ctx, match)
+        player = await _test_player(ctx, match)
         if player is None:
             return
         if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
@@ -167,7 +167,7 @@ def setup(client):
     client.add_cog(MatchesCog(client))
 
 
-async def _testPlayer(ctx, match):
+async def _test_player(ctx, match):
     """ Test if the player is in position to issue a match command
         Returns the player object if yes, None if not
     """
@@ -221,7 +221,7 @@ async def _pick(ctx, captain, args):
 async def _faction(ctx, captain, args):
     """ Actual faction pick function
     """
-    is_faction = await _factionCheck(ctx, args)
+    is_faction = await _faction_check(ctx, args)
     if not is_faction:
         return
     try:
@@ -238,8 +238,8 @@ async def _faction(ctx, captain, args):
     except KeyError:
         await send("PK_NOT_VALID_FACTION", ctx)
 
-async def _factionChange(ctx, captain, args):
-    is_faction = await _factionCheck(ctx, args)
+async def _faction_change(ctx, captain, args):
+    is_faction = await _faction_check(ctx, args)
     if not is_faction:
         return
     team = captain.team
@@ -270,14 +270,13 @@ async def _map(ctx, captain, args):
         return
     # Handle the actual map selection
     map = await sel.do_selection_process(ctx, args)
-    if map is not None:
+    if map:
         new_picker = match.pick_map(captain)
-        if new_picker != captain:
-            await send("PK_MAP_OK_CONFIRM", ctx, sel.map.name, new_picker.mention)
-            if sel.is_booked:
-                await send("MAP_BOOKED", ctx, new_picker.mention, sel.map.name)
+        await sel.wait_confirm(ctx, new_picker)
+        if sel.is_booked:
+            await send("MAP_BOOKED", ctx, new_picker.mention, sel.map.name)
 
-async def _factionCheck(ctx, args):
+async def _faction_check(ctx, args):
     if len(args) != 1:
         # no faction is in two words...
         await send("PK_NOT_VALID_FACTION", ctx)

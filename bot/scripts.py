@@ -3,14 +3,14 @@
 from gspread import service_account
 from numpy import array
 import modules.config as cfg
-from classes.players import Player, _allPlayers, get_player
-from modules.database import force_update, get_all_items, _replacePlayer, _updateMap, init as db_init, get_one_item, collections, _remove
-from classes.maps import _allMapsList, Map
+from classes.players import Player, _all_players, get_player
+from modules.database import force_update, get_all_items, _replace_player, _update_map, init as db_init, get_one_item, collections, _remove
+from classes.maps import _all_maps_list, Map
 from matches import Match
 import requests
 import json
 import asyncio
-from modules.image_maker import _makeImage
+from modules.image_maker import _make_image
 from classes.weapons import Weapon
 
 LAUNCHSTR = "_test"  # this should be empty if your files are config.cfg and gspread_client_secret.json
@@ -31,8 +31,8 @@ class DbPlayer(Player):
         new_data["rank"] = data["rank"]
         new_data["notify"] = data["notify"]
         new_data["timeout"] = data["timeout"]
-        new_data["ig_ids"] = [int(p_id) for p_id in data["igIds"]]
-        new_data["ig_names"] = [p_name for p_name in data["igNames"]]
+        new_data["ig_ids"] = [int(p_id) for p_id in data["ig_ids"]]
+        new_data["ig_names"] = [p_name for p_name in data["ig_names"]]
         # new_data["ig_names"] = list()
         # for ig in data["ig_names"]:
         #     bl = ord('0') <= ord(ig[-1]) <= ord('9')
@@ -43,10 +43,10 @@ class DbPlayer(Player):
         #         ig = f"flip_{ig}"
         #     new_data["ig_names"].append(ig)
 
-        new_data["has_own_account"] = data["hasOwnAccount"]
+        new_data["has_own_account"] = data["has_own_account"]
         super().new_from_data(new_data)
 
-_allDbMatches = list()
+_all_db_matches = list()
 convert_dict_1 = dict()
 convert_dict_2 = dict()
 
@@ -54,7 +54,7 @@ class DbMatch:
     @classmethod
     def new_from_data(cls, data):
         obj = cls(data)
-        _allDbMatches.append(obj)
+        _all_db_matches.append(obj)
 
     def __init__(self, data):
         self.data = data
@@ -120,9 +120,9 @@ def push_accounts():
         p_list.append(p)
         print(acc)
         char_list = [f"POGx{acc}VS", f"POGx{acc}TR", f"POGx{acc}NC"]
-        p._hasOwnAccount = True
-        loop.run_until_complete(p._addCharacters(char_list))
-        _replacePlayer(p)
+        p._has_own_account = True
+        loop.run_until_complete(p._add_characters(char_list))
+        _replace_player(p)
     loop.close()
 
 
@@ -148,18 +148,18 @@ def get_all_maps_from_api():
 
 def players_db_update():
     get_all_items(DbPlayer.new_from_data, "users")
-    for p in _allPlayers.values():
-        _replacePlayer(p)
+    for p in _all_players.values():
+        _replace_player(p)
 
 def get_match_from_db(m_id):
     m=get_one_item("matches", Match.new_from_data, m_id)
-    _makeImage(m)
+    _make_image(m)
 
 def matches_db_update():
     get_all_items(DbMatch.new_from_data, "matches")
-    for m in _allDbMatches:
+    for m in _all_db_matches:
         m.do_change()
-    for m in _allDbMatches:
+    for m in _all_db_matches:
         collections["matches"].replace_one({"_id": m.id}, m.data)
 
 def remove_old_accounts():
