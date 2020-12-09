@@ -105,11 +105,9 @@ class Loop:
                     await sleep_until(self._next_iteration)
         except asyncio.CancelledError:
             self._is_being_cancelled = True
-            raise
         except Exception as exc:
             self._has_failed = True
             await self._call_loop_function('error', exc)
-            raise exc
         finally:
             await self._call_loop_function('after_loop')
             self._is_being_cancelled = False

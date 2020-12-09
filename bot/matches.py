@@ -7,8 +7,7 @@ from modules.image_maker import publish_match_image
 from modules.census import process_score, get_offline_players
 from modules.database import update_match
 from datetime import datetime as dt, timezone as tz
-from modules.ts3 import REGEX_getTs3Bots
-from modules.ts_interface import faction_audio, map_audio, which_bot, which_pick_channels, which_team_channels
+from modules.ts_interface import AudioBot
 
 from classes.teams import Team  # ok
 from classes.players import TeamCaptain, ActivePlayer  # ok
@@ -124,23 +123,6 @@ async def start_match_from_full_lobby():
     _lobby_list.clear()
     match._launch.start()
     await send("LB_MATCH_STARTING", SendCtx.channel(cfg.channels["lobby"]), match.id)
-    # ts3: lobby full
-    if match.id == cfg.channels["matches"][0]:  # if match 1
-        REGEX_getTs3Bots()[0].move(cfg.teamspeak_ids["ts_lobby"])  # IF IT HANGS HERE MAKE SURE webapi.js IS ENABLED FOR SINUSBOT
-        REGEX_getTs3Bots()[0].enqueue(cfg.audio_ids["drop_match_1_picks"])
-        await sleep(REGEX_getTs3Bots()[0].get_duration(cfg.audio_ids["drop_match_1_picks"]))
-        REGEX_getTs3Bots()[0].move(cfg.teamspeak_ids["ts_match_1_picks"])
-    elif match.id == cfg.channels["matches"][1]:  # if match 2
-        REGEX_getTs3Bots()[1].move(cfg.teamspeak_ids["ts_lobby"])
-        REGEX_getTs3Bots()[1].enqueue(cfg.audio_ids["drop_match_2_picks"])
-        await sleep(REGEX_getTs3Bots()[1].get_duration(cfg.audio_ids["drop_match_2_picks"]))
-        REGEX_getTs3Bots()[1].move(cfg.teamspeak_ids["ts_match_2_picks"])
-    elif match.id == cfg.channels["matches"][2]:  # if match 3
-        REGEX_getTs3Bots()[1].move(cfg.teamspeak_ids["ts_lobby"])
-        REGEX_getTs3Bots()[1].enqueue(cfg.audio_ids["drop_match_3_picks"])
-        await sleep(REGEX_getTs3Bots()[1].get_duration(cfg.audio_ids["drop_match_3_picks"]))
-        REGEX_getTs3Bots()[1].move(cfg.teamspeak_ids["ts_match_3_picks"])
-
 
 async def on_inactive_confirmed(player):
     remove_from_lobby(player)
@@ -184,6 +166,7 @@ class Match():
         _all_matches[m_id] = self
         self.__accounts = None
         self.__round_stamps = list()
+        self.__audio_bot = AudioBot(self)
 
     @classmethod
     def new_from_data(cls, data):
@@ -281,6 +264,7 @@ class Match():
 
     def confirm_map(self):
         self.__map_selector.confirm()
+        self.__audio_bot.map_selected()
         if self.__status is MatchStatus.IS_MAPPING:
             self.__ready.start()
 
@@ -309,12 +293,8 @@ class Match():
 
     @loop(count=1)
     async def __player_pick_over(self, picker):
+        self.__audio_bot.select_factions()
         await send("PK_OK_FACTION", self.__channel, picker.mention, match=self)
-        # ts3: select faction
-        ts3bot = which_bot(self.__id)
-        pick_channel = which_pick_channels(self.__id)
-        ts3bot.move(pick_channel)
-        ts3bot.enqueue(cfg.audio_ids["select_factions"])
 
     def faction_pick(self, team, arg):
         faction = cfg.i_factions[arg.upper()]
@@ -323,7 +303,7 @@ class Match():
             return team.captain
         team.faction = faction
         team.captain.is_turn = False
-        faction_audio(team)
+        self.__audio_bot.faction_pick(team)
         if other.faction != 0:
             self.__status = MatchStatus.IS_MAPPING
             self.__find_map.start()
@@ -367,24 +347,15 @@ class Match():
 
     @loop(count=1)
     async def __find_map(self):
-        ts3bot = which_bot(self.__id)
         for tm in self.__teams:
             tm.captain.is_turn = True
         if self.__map_selector.status is SelStatus.IS_CONFIRMED:
             await send("MATCH_MAP_AUTO", self.__channel, self.__map_selector.map.name)
-            # ts3: map selected
-            pick_channel = which_pick_channels(self.__id)
-            ts3bot.move(pick_channel)
-            ts3bot.enqueue(cfg.audio_ids["map_selected"])
             self.__ready.start()
             return
         captain_pings = [tm.captain.mention for tm in self.__teams]
         self.__status = MatchStatus.IS_MAPPING
-        # ts3: select map
-        pick_channel = which_pick_channels(self.__id)
-        ts3bot.move(pick_channel)
-        await sleep(1)  # prevents playing this before faction announce
-        ts3bot.enqueue(cfg.audio_ids["select_map"])
+        self.__audio_bot.select_map()
         await send("PK_WAIT_MAP", self.__channel, *captain_pings)
         await self.__map_selector.on_pick_start()
 
@@ -395,7 +366,6 @@ class Match():
             tm.on_match_ready()
             tm.captain.is_turn = True
         captain_pings = [tm.captain.mention for tm in self.__teams]
-        await map_audio(self)
         try:
             await self.__accounts.give_accounts()
         except AccountsNotEnough:
@@ -409,44 +379,24 @@ class Match():
             return
 
         self.__status = MatchStatus.IS_WAITING
+        self.__audio_bot.match_confirm()
         await send("MATCH_CONFIRM", self.__channel, *captain_pings, match=self)
-        # ts3: type =ready
-        await sleep(10)  # waits long enough for people to move to their team's channels
-        team_channels = which_team_channels(self.__id)
-        REGEX_getTs3Bots()[0].move(team_channels[0])
-        REGEX_getTs3Bots()[1].move(team_channels[1])
-        REGEX_getTs3Bots()[0].enqueue(cfg.audio_ids["type_ready"])
-        REGEX_getTs3Bots()[1].enqueue(cfg.audio_ids["type_ready"])
 
     @loop(minutes=cfg.ROUND_LENGTH, delay=1, count=2)
     async def _on_match_over(self):
         player_pings = [" ".join(tm.all_pings) for tm in self.__teams]
+        self.__audio_bot.round_over()
         await send("MATCH_ROUND_OVER", self.__channel, *player_pings, self.round_no)
         self._score_calculation.start()
-        # ts3: round over
-        team_channels = which_team_channels(self.__id)
-        REGEX_getTs3Bots()[0].move(team_channels[0])
-        REGEX_getTs3Bots()[1].move(team_channels[1])
-        REGEX_getTs3Bots()[0].play(cfg.audio_ids["round_over"])
-        REGEX_getTs3Bots()[1].play(cfg.audio_ids["round_over"])
         for tm in self.__teams:
             tm.captain.is_turn = True
         if self.round_no < 2:
+            self.__audio_bot.switch_sides()
             await send("MATCH_SWAP", self.__channel)
-            # ts3: swap sundies
-            REGEX_getTs3Bots()[0].move(team_channels[0])
-            REGEX_getTs3Bots()[1].move(team_channels[1])
-            await sleep(0.1)  # prevents bug when enqueuing songs too quickly
-            REGEX_getTs3Bots()[0].enqueue(cfg.audio_ids["switch_sides"])
-            REGEX_getTs3Bots()[1].enqueue(cfg.audio_ids["switch_sides"])
             self.__status = MatchStatus.IS_WAITING
             captain_pings = [tm.captain.mention for tm in self.__teams]
+            self.__audio_bot.match_confirm()
             await send("MATCH_CONFIRM", self.__channel, *captain_pings, match=self)
-            REGEX_getTs3Bots()[0].move(team_channels[0])
-            REGEX_getTs3Bots()[1].move(team_channels[1])
-            REGEX_getTs3Bots()[0].enqueue(cfg.audio_ids["type_ready"])
-            REGEX_getTs3Bots()[1].enqueue(cfg.audio_ids["type_ready"])
-            self._score_calculation.start()
             return
         await send("MATCH_OVER", self.__channel)
         self.__status = MatchStatus.IS_RESULT
@@ -469,33 +419,13 @@ class Match():
 
     @loop(count=1)
     async def __start_match(self):
-        # ts3: ensure bots are in match team channels -- ideally add a check to ensure no matches start within 30s of each other
-        team_channels = which_team_channels(self.__id)
-        REGEX_getTs3Bots()[0].move(team_channels[0])
-        REGEX_getTs3Bots()[1].move(team_channels[1])
+        self.__audio_bot.countdown()
         await send("MATCH_STARTING_1", self.__channel, self.round_no, "30")
-        # ts3: 30s
-        REGEX_getTs3Bots()[0].move(team_channels[0])
-        REGEX_getTs3Bots()[1].move(team_channels[1])
-        REGEX_getTs3Bots()[0].play(cfg.audio_ids["30s"])
-        REGEX_getTs3Bots()[1].play(cfg.audio_ids["30s"])
         await sleep(10)
         await send("MATCH_STARTING_2", self.__channel, self.round_no, "20")
-        # ts3: 10s
-        await sleep(8)
-        REGEX_getTs3Bots()[0].move(team_channels[0])
-        REGEX_getTs3Bots()[1].move(team_channels[1])
-        REGEX_getTs3Bots()[0].play(cfg.audio_ids["10s"])
-        REGEX_getTs3Bots()[1].play(cfg.audio_ids["10s"])
-        await sleep(2)
+        await sleep(10)
         await send("MATCH_STARTING_2", self.__channel, self.round_no, "10")
-        await sleep(3.2)  # odd timings make sure the voice line plays at the right time
-        # ts3: 5s
-        REGEX_getTs3Bots()[0].move(team_channels[0])
-        REGEX_getTs3Bots()[1].move(team_channels[1])
-        REGEX_getTs3Bots()[0].play(cfg.audio_ids["5s"])
-        REGEX_getTs3Bots()[1].play(cfg.audio_ids["5s"])
-        await sleep(6.8)
+        await sleep(10)
         player_pings = [" ".join(tm.all_pings) for tm in self.__teams]
         await send("MATCH_STARTED", self.__channel, *player_pings, self.round_no)
         self.__round_stamps.append(int(dt.timestamp(dt.now())))
@@ -504,6 +434,7 @@ class Match():
 
     @loop(count=1)
     async def _launch(self):
+        self.__audio_bot.drop_match()
         await send("MATCH_INIT", self.__channel, " ".join(self.player_pings))
         self.__accounts = AccountHander(self)
         self.__map_selector = MapSelection(self, main_maps_pool)
@@ -513,13 +444,8 @@ class Match():
             self.__teams[i].add_player(TeamCaptain, self.__players.pop(key))
         self.__teams[0].captain.is_turn = True
         self.__status = MatchStatus.IS_PICKING
+        self.__audio_bot.select_teams()
         await send("MATCH_SHOW_PICKS", self.__channel, self.__teams[0].captain.mention, match=self)
-        # ts3: select teams
-        await sleep(17)  # wait some time after the bot moves before announcing to select players for teams
-        ts3bot = which_bot(self.__id)
-        pick_channel = which_pick_channels(self.__id)
-        ts3bot.move(pick_channel)
-        ts3bot.enqueue(cfg.audio_ids["select_teams"])
 
     async def clear(self):
         """ Clearing match and base player objetcts
@@ -528,15 +454,9 @@ class Match():
         if self.status is MatchStatus.IS_PLAYING:
             self._on_match_over.cancel()
             player_pings = [" ".join(tm.all_pings) for tm in self.__teams]
+            self.__audio_bot.round_over()
             await send("MATCH_ROUND_OVER", self.__channel, *player_pings, self.round_no)
-            # ts3: round over
-            team_channels = which_team_channels(self.__id)
-            REGEX_getTs3Bots()[0].move(team_channels[0])
-            REGEX_getTs3Bots()[1].move(team_channels[1])
-            REGEX_getTs3Bots()[0].play(cfg.audio_ids["round_over"])
-            REGEX_getTs3Bots()[1].play(cfg.audio_ids["round_over"])
             await send("MATCH_OVER", self.__channel)
-            # ts3: round over
 
         # Updating account sheet with current match
         await self.__accounts.do_update()
@@ -563,9 +483,6 @@ class Match():
         await send("MATCH_CLEARED", self.__channel)
         self.__status = MatchStatus.IS_FREE
         _on_match_free()
-        await sleep(REGEX_getTs3Bots()[0].get_duration(cfg.audio_ids["round_over"]))
-        REGEX_getTs3Bots()[0].move(cfg.teamspeak_ids["ts_lobby"])
-        REGEX_getTs3Bots()[1].move(cfg.teamspeak_ids["ts_lobby"])
 
     @property
     def map(self):

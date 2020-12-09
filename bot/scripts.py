@@ -171,4 +171,4 @@ def remove_old_accounts():
         _remove(p)
 
 
-players_db_update()
+

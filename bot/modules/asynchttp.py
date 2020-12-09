@@ -24,6 +24,11 @@ async def request(url):
         result = await _fetch(client, url)
         return loads(result)
 
+async def request_code(url):
+    async with ClientSession() as client:
+        result = await _fetch_code(client, url)
+        return result
+
 async def api_request_and_retry(url):
     for i in range(5):
         try:
@@ -44,3 +49,7 @@ async def _fetch(client, url):
         if resp.status != 200:
             raise UnexpectedError("Received wrong status from http page: " + str(resp.status))
         return await resp.text()
+
+async def _fetch_code(client, url):
+    async with client.get(url) as resp:
+        return resp.status

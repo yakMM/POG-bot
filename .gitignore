@@ -3,6 +3,7 @@ __pycache__/
 permissions.txt
 bot/test*.py
 bot/others/
+bot/test
 bot/config_test*.cfg
 bot/config.cfg
 bot/google_api_secret_test*.json
@@ -13,4 +14,5 @@ secret/
 logging/
 matches/
 bot/others/
+commands/running
 .vscode/

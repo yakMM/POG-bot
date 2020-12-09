@@ -14,9 +14,9 @@ from discord import Status, DMChannel, Intents
 from asyncio import sleep
 from random import seed
 from datetime import datetime as dt
-import logging
+from datetime import timezone as tz
+import logging, logging.handlers, sys, os
 from time import gmtime
-from logging.handlers import RotatingFileHandler
 
 # Custom modules
 import modules.config as cfg
@@ -27,7 +27,6 @@ from modules.exceptions import ElementNotFound, UnexpectedError
 from modules.database import init as db_init, get_all_items
 from modules.enumerations import PlayerStatus
 from modules.loader import init as cog_init, is_all_locked, unlock_all
-from modules.ts3 import init as ts3_init
 from modules.reactions import init as react_init, reaction_handler
 
 # Modules for the custom classes
@@ -121,9 +120,11 @@ def _add_main_handlers(client):
             return
 
         if isinstance(error.original, UnexpectedError):
+            log.error(str(error))
             await send("UNKNOWN_ERROR", ctx, error.original.reason)
         else:
             # Print unhandled error
+            log.error(str(error))
             await send("UNKNOWN_ERROR", ctx, type(error.original).__name__)
         raise error
 
@@ -224,26 +225,61 @@ def _test(client):
     from test2 import test_hand
     test_hand(client)
 
-def main(launch_str=""):
-    # Logging config
-    log.setLevel(logging.INFO)
+def _define_log(launch_str):
+    # Logging config, logging outside the github repo
+    log_filename = '../../POG-data/logging/bot_log'
     logging.Formatter.converter = gmtime
     formatter = logging.Formatter('%(asctime)s | %(levelname)s %(message)s', "%Y-%m-%d %H:%M:%S UTC")
-    file_handler = RotatingFileHandler('../logging/bot_log.out', 'a', 1000000, 1)
-    file_handler.setLevel(logging.INFO)
+    # If test mode
+    if launch_str == "_test":
+        # Print debug
+        level = logging.DEBUG
+        # Print logging to console
+        file_handler = logging.StreamHandler(sys.stdout)
+    else:
+        # Print info
+        level = logging.INFO
+        # Print to file, change file everyday at 12:00 UTC
+        date = dt(2020, 1, 1, 12)
+        file_handler = logging.handlers.TimedRotatingFileHandler(log_filename, when='midnight', atTime=date, utc=True)
+    log.setLevel(level)
+    file_handler.setLevel(level)
     file_handler.setFormatter(formatter)
+    class StreamToLogger(object):
+        """
+        Fake file-like stream object that redirects writes to a logger instance.
+        """
+        def __init__(self, logger, log_level=logging.INFO):
+            self.logger = logger
+            self.log_level = log_level
+            self.linebuf = ''
+
+        def write(self, buf):
+            for line in buf.rstrip().splitlines():
+                  self.logger.log(self.log_level, line.rstrip())
+
+        def flush(self):
+            pass
+
+    # Redirect stdout and stderr to log:
+    sys.stdout = StreamToLogger(log, logging.INFO)
+    sys.stderr = StreamToLogger(log, logging.ERROR)
+
     log.addHandler(file_handler)
+
+def main(launch_str=""):
+
+    _define_log(launch_str)
 
     # Init order MATTERS
 
     # Seeding random generator
     seed(dt.now())
 
+    log.info("Starting init...")
+
     # Get data from the config file
     cfg.get_config(f"config{launch_str}.cfg")
-
-    # Initialize teamspeak bots
-    ts3_init()
 
     # Set up command prefix
     client = commands.Bot(command_prefix=cfg.general["command_prefix"], intents=Intents.all())
@@ -283,8 +319,8 @@ def main(launch_str=""):
 
 
 if __name__ == "__main__":
-    # execute only if run as a script
-    # Use main() for production
 
-    main("_test")
-    #main()
+    if os.path.isfile("test"):
+        main("_test")
+    else:
+        main()

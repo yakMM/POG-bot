@@ -1,15 +1,15 @@
 # v2.0:
 Major feature implementations!
-- Added jaeger calendar integration, now suggested bases to choose from the map pool will not include those booked in the jaeger calendar
+- Added jaeger calendar integration
 - Added a warning if a chosen map is currently reserved in the jaeger calendar
-- Added/improved map pool and map selection process
-- Added react-based image previews of map pool maps using a new emoji handler
+- Added a proper reaction framework:
+    - Improved map pool and map selection process with reactions
 - Implemented a teamspeak bot:
-  - New requirements include installing and configuring Sinusbot for developers to run the ts3 bot
-  - Bot announces match start and end, and informs captains on steps during pre-match
+    - Bot announces match start and end, and informs captains on steps during pre-match
 - Various code viewability enhancements, PEP8 formatting, and typo fixes
 - Updated discord.py library
-- Fixed error handling int tasks
+- Fixed error handling in tasks
+- Misc :)
 
 # v1.15:
 - Cap points are no longer counted in team netscore

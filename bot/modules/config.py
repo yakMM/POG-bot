@@ -5,7 +5,9 @@ from json import loads
 from requests import get
 from configparser import ConfigParser, ParsingError
 from modules.exceptions import ConfigError
-import logging
+from logging import getLogger
+
+log = getLogger("pog_bot")
 
 # STATIC PARAMETERS:
 AFK_TIME = 15  # minutes
@@ -33,43 +35,6 @@ roles = {
     "notify": 0
 }
 
-# TeamspeakIds
-teamspeak_ids = {
-    "ts_lobby": "",
-    "ts_afk": "",
-    "ts_match_1_picks": "",
-    "ts_match_1_team_1": "",
-    "ts_match_1_team_2": "",
-    "ts_match_2_picks": "",
-    "ts_match_2_team_1": "",
-    "ts_match_2_team_2": "",
-}
-
-# AudioIds
-audio_ids = {
-    "round_over": "",
-    "select_factions": "",
-    "select_map": "",
-    "select_teams": "",
-    "team_1_nc": "",
-    "team_1_tr": "",
-    "team_1_vs": "",
-    "team_2_nc": "",
-    "team_2_tr": "",
-    "team_2_vs": "",
-    "type_ready": "",
-    "5s": "",
-    "10s": "",
-    "30s": "",
-    "drop_match_1_picks": "",
-    "drop_match_2_picks": "",
-    "drop_match_3_picks": "",
-    "factions_selected": "",
-    "gelos_in_prison": "",
-    "map_selected": "",
-    "players_drop_channel": "",
-    "switch_sides": ""
-}
 
 # General
 
@@ -172,11 +137,11 @@ def get_config(file):
             _error_incorrect(key, 'General', file)
 
     # Testing api key
-    # url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
-    # jdata = loads(get(url).content)
-    # if 'error' in jdata:
-    #     raise ConfigError(
-    #         f"Incorrect api key: {general['api_key']} in '{file}'")
+    url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
+    jdata = loads(get(url).content)
+    if 'error' in jdata:
+        raise ConfigError(
+            f"Incorrect api key: {general['api_key']} in '{file}'")
 
     # Channels section
     _check_section(config, "Channels", file)
@@ -196,28 +161,6 @@ def get_config(file):
             _error_missing(key, 'Channels', file)
         except ValueError:
             _error_incorrect(key, 'Channels', file)
-
-    # Teamspeak_Ids section
-    _check_section(config, "Teamspeak_Ids", file)
-
-    for key in teamspeak_ids:
-        try:
-            teamspeak_ids[key] = config['Teamspeak_Ids'][key]
-        except KeyError:
-            _error_missing(key, 'Teamspeak_Ids', file)
-        except ValueError:
-            _error_incorrect(key, 'Teamspeak_Ids', file)
-
-    # Audio_Ids section
-    _check_section(config, "Audio_Ids", file)
-
-    for key in audio_ids:
-        try:
-            audio_ids[key] = config['Audio_Ids'][key]
-        except KeyError:
-            _error_missing(key, 'Audio_Ids', file)
-        except ValueError:
-            _error_incorrect(key, 'Audio_Ids', file)
 
     # Roles section
     _check_section(config, "Roles", file)
@@ -259,15 +202,11 @@ def get_config(file):
             _error_missing(key, 'Collections', file)
 
     # Version
-    try:
-        with open('../CHANGELOG.md', 'r', encoding='utf-8') as txt:
-            txt_str = txt.readline()
-        global VERSION
-        # Extracts "X.X.X" from string "# vX.X.X:" in a lazy way
-        VERSION = txt_str[3:-2]
-    except Exception as e:
-        logging.warning(f"Error readying CHANGELOG.md. Did you remember to call this module from the root level?\n{e}\n"
-                        f"If you ran ts3.py just ignore this error...")
+    with open('../CHANGELOG.md', 'r', encoding='utf-8') as txt:
+        txt_str = txt.readline()
+    global VERSION
+    # Extracts "X.X.X" from string "# vX.X.X:" in a lazy way
+    VERSION = txt_str[3:-2]
 
 
 def _check_section(config, section, file):

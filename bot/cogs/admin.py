@@ -60,7 +60,6 @@ class AdminCog(commands.Cog, name='admin'):
                 return
             await send("MATCH_CLEAR", ctx)
             await match.clear()
-            await send("MATCH_CLEARED", ctx)
             return
         await send("WRONG_CHANNEL_2", ctx, ctx.command.name, f"<#{ctx.channel.id}>")
 
