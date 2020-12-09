@@ -319,7 +319,6 @@ def main(launch_str=""):
 
 
 if __name__ == "__main__":
-
     if os.path.isfile("test"):
         main("_test")
     else:
