@@ -1,8 +1,11 @@
-""" Handle the accounts
-    Account sheet is retreived at init, and then all operations are done in memory
-    Account sheet is updated at the end of each match
-    Like so, when players didn't accept their accounts or when match got canceled, players who didn't see the accounts info are not tracked in the sheet
-    The day memory and account sheet gets different, everything is broken. Account sheet should be read only for humans on google drive
+# @CHECK 2.0 features OK
+
+""" This class handles the account tracking and distribution.
+    Account sheet is retrieved at bot init, and then all operations are done in memory.
+    Account sheet is updated at the end of each match.
+    This way, if players don't accept their accounts or if a match is canceled, account info is not tracked in the sheet.
+    If the accounts in memory and on account sheet are ever different, account tracking and distribution will break.
+    Therefore the account sheet should be read only for humans on google drive.
 """
 
 # Ext imports
@@ -11,49 +14,47 @@ from gspread.exceptions import APIError
 from numpy import array, vstack
 from datetime import datetime as dt
 from discord.errors import Forbidden
-
-#from discord.ext import tasks
-from lib import tasks
 from asyncio import get_event_loop
 from logging import getLogger
 
+from lib.tasks import loop
+
 # Custom modules
 import modules.config as cfg
-from modules.display import channelSend, privateSend, edit, remReaction
+from display import send, edit, SendCtx
 from modules.exceptions import AccountsNotEnough
+from modules.reactions import ReactionHandler, add_handler, rem_handler
 
 X_OFFSET = 3
 Y_OFFSET = 3
 QUIT_DELAY = 300
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
-def getNotReadyPlayers(team):
-    notReady = list()
+def get_not_ready_players(team):
+    not_ready = list()
     for p in team.players:
-        if p.hasOwnAccount:
+        if p.has_own_account:
             continue
         if p.account is None:
             log.error(f"Debug: {p.name} has no account")  # Should not happen
-        if not p.account.isValidated:
-            notReady.append(p)
-    return notReady
+        if not p.account.is_validated:
+            not_ready.append(p)
+    return not_ready
 
-class Account():
-    """ Account object, each of these represent one single account
-    """
+class Account:
+    """ Account object, each of these represent one single account"""
 
     def __init__(self, id, ident, pwd, x):
-        self.__strId = id       # strId to keep the 0, example: PSBx0123 would be 0123
-        self.__id = int(id)     # actual id
-        self.__ident = ident    # ps2 account username
-        self.__pwd = pwd        # ps2 account password
-        self.__x = x            # x coordiante of the account in the account sheet
-        self.__aPlayer = None   # player who received the account
-        self.message = None     # Message when giving the account
-        self.__isValidated = False  # Has player accepted the account?
-        # flag account to be destroyed (removing account info from the message)
-        self.isDestroyed = False
+        self.__str_id = id  # str_id to keep the 0, example: PSBx0123 would be 0123
+        self.__id = int(id)  # actual id
+        self.__ident = ident  # ps2 account username
+        self.__pwd = pwd  # ps2 account password
+        self.__x = x  # x coordinate of the account in the account sheet
+        self.__a_player = None  # player who received the account
+        self.message = None  # Message when giving the account
+        self.__is_validated = False  # Has player accepted the account?
+        self.is_destroyed = False  # flag account to be destroyed (removing account info from the message)
 
     @property
     def ident(self):
@@ -68,182 +69,183 @@ class Account():
         return self.__id
 
     @property
-    def strId(self):
-        return self.__strId
+    def str_id(self):
+        return self.__str_id
 
     @property
     def x(self):
         return self.__x
 
     @property
-    def aPlayer(self):
-        return self.__aPlayer
+    def a_player(self):
+        return self.__a_player
 
-    @aPlayer.setter
-    def aPlayer(self, ap):
+    @a_player.setter
+    def a_player(self, ap):
         ap.account = self
-        self.__aPlayer = ap
+        self.__a_player = ap
 
     @property
-    def isValidated(self):
-        return self.__isValidated
+    def is_validated(self):
+        return self.__is_validated
 
     def validate(self):
-        self.__isValidated = True
-        self.__aPlayer.acceptAccount()
+        self.__is_validated = True
+        self.__a_player.accept_account()
 
 
-class AccountHander():
-    """ AccountHander object, interface for giving accounts
-    """
+class AccountHander:
+    """ AccountHander object, interface for giving accounts"""
 
-    _currentNumber = 0  # number of matches played/registered in the sheet
-    _sheetTab = None    # numpy array of the account sheet, in memory for internal work, only pushed to sheets at the end of the matches
-    _secretFile = ""    # gspread ident file
+    _current_number = 0  # number of matches played/registered in the sheet
+    _sheet_tab = None  # numpy array of the account sheet, in memory for internal work, only pushed to sheets at the end of the matches
+    _secret_file = ""  # gspread ident file
 
     @classmethod
-    def init(cls, secretFile):  # global init: retrieving data once, will work in memory afterwards
-        cls._secretFile = secretFile
-        gc = service_account(filename=secretFile)
+    def init(cls, secret_file):  # global init: retrieving data once, will work in memory afterwards
+        cls._secret_file = secret_file
+        gc = service_account(filename=secret_file)
         sh = gc.open_by_key(cfg.database["accounts"])
-        rawSheet = sh.worksheet("RAW")
-        cls._sheetTab = array(rawSheet.get_all_values())
-        cls._currentNumber = int(cls._sheetTab[-1][0])
+        raw_sheet = sh.worksheet("RAW")
+        cls._sheet_tab = array(raw_sheet.get_all_values())
+        cls._current_number = int(cls._sheet_tab[-1][0])
 
     def __init__(self, match):
-        self.__freeAccounts = list()
-        self.__yCoord = 0
-        self.__xMax = 0
+        self.__free_accounts = list()
+        self.__y_coord = 0
+        self.__x_max = 0
         self.__match = match
-        type(self)._currentNumber += 1
-        self.__handingStamp = 0     # timestamp: when have these accounts been given?
-        match.number = type(self)._currentNumber
+        type(self)._current_number += 1
+        self.__handing_stamp = 0  # timestamp: when have these accounts been given?
+        match.number = type(self)._current_number
+        self.__reaction_handler = ReactionHandler(rem_user_react=False, rem_bot_react=True)
+        self.__reaction_handler.set_reaction('✅', on_account_reaction)
 
-    def __letterFromNumber(self, num):
+    def __letter_from_number(self, num):
         """ Utility method to convert number in sheet coordinate
-            For example 0=A, 25=Z, 26=AA, 27=AB, etc
-        """
+            For example 0=A, 25=Z, 26=AA, 27=AB, etc."""
         lets = ""
         if num >= 26:
-            lets += chr(ord('@')+num//26)
-        lets += chr(ord('@')+num % 26+1)
+            lets += chr(ord('@') + num // 26)
+        lets += chr(ord('@') + num % 26 + 1)
         return lets
 
-    def __getAccounts(self, stamp):
-        """ Get all free accounts at a given time
-        """
-        sheetTab = type(self)._sheetTab
-        numMatches = sheetTab.shape[0]-Y_OFFSET
-        numAccounts = sheetTab.shape[1]-X_OFFSET
+    def __get_accounts(self, stamp):
+        """ Get all available accounts at a given time"""
+        sheet_tab = type(self)._sheet_tab
+        num_matches = sheet_tab.shape[0] - Y_OFFSET
+        num_accounts = sheet_tab.shape[1] - X_OFFSET
 
-        self.__freeAccounts.clear()
+        self.__free_accounts.clear()
 
         # Get all accounts
-        for i in range(numAccounts):
+        for i in range(num_accounts):
             free = True  # free by default
-            for j in range(numMatches):
-                endStamp = sheetTab[-j-1][2]
-                # Check for all matches still happening
-                if endStamp == "" or int(endStamp) > stamp:
-                    if sheetTab[-j-1][i+X_OFFSET] != "":  # if someone have this account
+            for j in range(num_matches):
+                end_stamp = sheet_tab[-j - 1][2]
+                if end_stamp == "" or int(end_stamp) > stamp:  # Check for all matches still happening
+                    if sheet_tab[-j - 1][i + X_OFFSET] != "":  # if someone have this account
                         free = False  # it is not free
                         break
             if free:
-                args = sheetTab[0][i+X_OFFSET], sheetTab[1][i +
-                                                            X_OFFSET], sheetTab[2][i+X_OFFSET], i+X_OFFSET
-                # if free, add an account object to the list
-                self.__freeAccounts.append(Account(*args))
+                args = sheet_tab[0][i + X_OFFSET], sheet_tab[1][i + X_OFFSET], sheet_tab[2][i + X_OFFSET], i + X_OFFSET
+                self.__free_accounts.append(Account(*args))  # if free, add an account object to the list
 
-        self.__yCoord = numMatches+Y_OFFSET+1  # coordinate for this match
-        self.__xMax = sheetTab.shape[1]
+        self.__y_coord = num_matches + Y_OFFSET + 1  # coordinate for this match
+        self.__x_max = sheet_tab.shape[1]
 
-    async def doUpdate(self):
-        """ launch the update function asynchronously
-        """
-        if len(self.__freeAccounts) == 0:
+    async def do_update(self):
+        """ launch the update function asynchronously"""
+        if len(self.__free_accounts) == 0:
             return
-        row = ['']*self.__xMax
-        vRow = ['']*self.__xMax
+        row = [''] * self.__x_max
+        v_row = [''] * self.__x_max
         row[0] = str(self.__match.number)
-        vRow[0] = f"Match {row[0]}"
-        row[1] = str(self.__handingStamp)
-        if self.__handingStamp == 0:
-            vRow[1] = "ERROR in match!"
+        v_row[0] = f"Match {row[0]}"
+        row[1] = str(self.__handing_stamp)
+        if self.__handing_stamp == 0:
+            v_row[1] = "ERROR in match!"
         else:
-            vRow[1] = dt.utcfromtimestamp(self.__handingStamp).strftime("%Y-%m-%d %H:%M UTC")
-        closingStamp = int(dt.timestamp(dt.now())) + QUIT_DELAY
-        type(self)._sheetTab[self.__yCoord-1][2] = str(closingStamp)
-        row[2] = str(closingStamp)
-        vRow[2] = dt.utcfromtimestamp(closingStamp).strftime("%Y-%m-%d %H:%M UTC")
-        for acc in self.__freeAccounts:
-            if acc.isValidated:
-                row[acc.x] = str(acc.aPlayer.id)
-                vRow[acc.x] = acc.aPlayer.name
-        self._updateSheet.start(row, vRow)
-        for acc in self.__freeAccounts:
+            v_row[1] = dt.utcfromtimestamp(self.__handing_stamp).strftime("%Y-%m-%d %H:%M UTC")
+        closing_stamp = int(dt.timestamp(dt.now())) + QUIT_DELAY
+        type(self)._sheet_tab[self.__y_coord - 1][2] = str(closing_stamp)
+        row[2] = str(closing_stamp)
+        v_row[2] = dt.utcfromtimestamp(closing_stamp).strftime("%Y-%m-%d %H:%M UTC")
+        for acc in self.__free_accounts:
+            if acc.is_validated:
+                row[acc.x] = str(acc.a_player.id)
+                v_row[acc.x] = acc.a_player.name
+        self._update_sheet.start(row, v_row)
+        for acc in self.__free_accounts:
             if acc.message is not None:
-                acc.isDestroyed = True
+                rem_handler(acc.message.id)
+                acc.is_destroyed = True
                 await edit("ACC_UPDATE", acc.message, account=acc)
-                if acc.isValidated:
-                    await privateSend("ACC_OVER", acc.aPlayer.id)
+                if acc.is_validated:
+                    await send("ACC_OVER", SendCtx.user(acc.a_player.id))
                 else:
-                    await remReaction(acc.message)
+                    await self.__reaction_handler.auto_remove_reactions(acc.message)
 
-    @tasks.loop(seconds=2, count=5)
-    async def _updateSheet(self, row, vRow):
-        """ Push updates to the google sheet
-        """
+    @loop(seconds=2, count=5)
+    async def _update_sheet(self, row, v_row):
+        """ Push updates to the google sheet"""
         loop = get_event_loop()
         log.info(f"GSpread loop on match: {self.__match.number}")
         try:
-            await loop.run_in_executor(None, self.__pushUpdateToSheet, row, vRow)
+            await loop.run_in_executor(None, self.__push_update_toSheet, row, v_row)
         except APIError as e:
             log.warning(f"GSpread APIError on match: {self.__match.number}\n{e}")
             return
         log.info(f"GSpread ok on match: {self.__match.number}")
-        self._updateSheet.cancel()
+        self._update_sheet.cancel()
 
-    def __pushUpdateToSheet(self, row, vRow):
-        gc = service_account(filename=type(self)._secretFile)
+    def __push_update_toSheet(self, row, v_row):
+        gc = service_account(filename=type(self)._secret_file)
         sh = gc.open_by_key(cfg.database["accounts"])
-        rawSheet = sh.worksheet("RAW")
-        visibleSheet = sh.worksheet("VISIBLE")
-        lt = self.__letterFromNumber(self.__xMax-1)
-        y = self.__yCoord
-        rawSheet.update(f"A{y}:{lt}{y}", [row])
-        visibleSheet.update(f"A{y}:{lt}{y}", [vRow])
+        raw_sheet = sh.worksheet("RAW")
+        visible_sheet = sh.worksheet("VISIBLE")
+        lt = self.__letter_from_number(self.__x_max - 1)
+        y = self.__y_coord
+        raw_sheet.update(f"A{y}:{lt}{y}", [row])
+        visible_sheet.update(f"A{y}:{lt}{y}", [v_row])
 
     async def give_accounts(self):
-        """ Find free accounts for all players needing some
-        """
-        await channelSend("ACC_SENDING", self.__match.id)
-        pList = list()
+        """ Find available accounts for all players registered without an account"""
+        await send("ACC_SENDING", self.__match.channel)
+        p_list = list()
         for tm in self.__match.teams:
-            for aPlayer in tm.players:
-                pList.append(aPlayer)
+            for a_player in tm.players:
+                p_list.append(a_player)
 
         stamp = int(dt.timestamp(dt.now()))
-        self.__getAccounts(stamp)
+        self.__get_accounts(stamp)
 
-        newLine = [""]*self.__xMax
+        new_line = [""] * self.__x_max
 
-        newLine[0] = str(self.__match.number)
-        newLine[1] = str(stamp)
+        new_line[0] = str(self.__match.number)
+        new_line[1] = str(stamp)
         i = 0
-        for aPlayer in pList:
-            if not aPlayer.hasOwnAccount:
-                if i == len(self.__freeAccounts):
+        for a_player in p_list:
+            if not a_player.has_own_account:
+                if i == len(self.__free_accounts):
                     raise AccountsNotEnough  # not enough accounts for all the player without account
-                currentAcc = self.__freeAccounts[i]
-                currentAcc.aPlayer = aPlayer
-                newLine[currentAcc.x] = str(aPlayer.id)
+                current_acc = self.__free_accounts[i]
+                current_acc.a_player = a_player
+                new_line[current_acc.x] = str(a_player.id)
                 try:
-                    msg = await privateSend("ACC_UPDATE", aPlayer.id, account=currentAcc)
-                    await msg.add_reaction('✅')
+                    msg = await send("ACC_UPDATE", SendCtx.user(a_player.id), account=current_acc)
+                    add_handler(msg.id, self.__reaction_handler)
+                    await self.__reaction_handler.auto_add_reactions(msg)
                 except Forbidden:
-                    msg = await channelSend("ACC_CLOSED", self.__match.id, aPlayer.mention)
-                currentAcc.message = msg
+                    msg = await send("ACC_CLOSED", self.__match.channel, a_player.mention)
+                current_acc.message = msg
                 i += 1
-        type(self)._sheetTab = vstack((type(self)._sheetTab, array(newLine)))
-        self.__handingStamp = stamp
-        await channelSend("ACC_SENT", self.__match.id)
+        type(self)._sheet_tab = vstack((type(self)._sheet_tab, array(new_line)))
+        self.__handing_stamp = stamp
+        await send("ACC_SENT", self.__match.channel)
+
+
+async def on_account_reaction(reaction, player, user):
+    account = player.active.account
+    account.validate()
+    await edit("ACC_UPDATE", account.message, account=account)

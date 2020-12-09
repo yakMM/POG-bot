@@ -1,7 +1,9 @@
+# @CHECK 2.0 features OK
+
 """Handle asynchronous http requests to Census API
 
 Usage:
-    * jsonResultFile = await request(url)
+    * json_result_file = await request(url)
 """
 
 # Others
@@ -13,7 +15,7 @@ from logging import getLogger
 # Custom modules
 from modules.exceptions import UnexpectedError, ApiNotReachable
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 # PUBLIC:
 
@@ -22,7 +24,12 @@ async def request(url):
         result = await _fetch(client, url)
         return loads(result)
 
-async def apiRequestAndRetry(url):
+async def request_code(url):
+    async with ClientSession() as client:
+        result = await _fetch_code(client, url)
+        return result
+
+async def api_request_and_retry(url):
     for i in range(5):
         try:
             jdata = await request(url)
@@ -39,6 +46,10 @@ async def apiRequestAndRetry(url):
 
 async def _fetch(client, url):
     async with client.get(url) as resp:
-        if(resp.status != 200):
-            raise UnexpectedError("Received wrong status from http page: "+str(resp.status))
+        if resp.status != 200:
+            raise UnexpectedError("Received wrong status from http page: " + str(resp.status))
         return await resp.text()
+
+async def _fetch_code(client, url):
+    async with client.get(url) as resp:
+        return resp.status

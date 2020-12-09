@@ -1,28 +1,31 @@
+# @CHECK 2.0 features OK
+
 from modules.exceptions import ElementNotFound
 
-_allWeapons = dict()
+_all_weapons = dict()
 
-def getWeapon(id):
-    we = _allWeapons.get(id)
+
+def get_weapon(id):
+    we = _all_weapons.get(id)
     if we is None:
         raise ElementNotFound(id)
     return we
 
 
-class Weapon():
+class Weapon:
     def __init__(self, data):
         self.__id = data["_id"]
         self.__name = data["name"]
-        self.__catId = data["cat_id"]
+        self.__cat_id = data["cat_id"]
         self.__points = data["points"]
         self.__banned = data["banned"]
         self.__faction = data["faction"]
-        _allWeapons[self.__id] = self
+        _all_weapons[self.__id] = self
 
-    def getData(self):  # get data for database push
+    def get_data(self):  # get data for database push
         data = {"_id": self.__id,
                 "name": self.__name,
-                "cat_id": self.__catId,
+                "cat_id": self.__cat_id,
                 "points": self.__points,
                 "banned": self.__banned,
                 "faction": self.__faction
@@ -38,7 +41,7 @@ class Weapon():
         return self.__name
 
     @property
-    def isBanned(self):
+    def is_banned(self):
         return self.__banned
     
     @property

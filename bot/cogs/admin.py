@@ -1,22 +1,24 @@
+# @CHECK 2.0 features OK
+
 from discord.ext import commands
 from logging import getLogger
 from datetime import datetime as dt
 
 import modules.config as cfg
 from modules.enumerations import SelStatus, MatchStatus, PlayerStatus
-from modules.display import send, channelSend
+from display import send, SendCtx
 from modules.exceptions import ElementNotFound, DatabaseError
-from modules.database import removePlayer as dbRemove
-from modules.loader import lockAll, unlockAll, isAllLocked
-from modules.roles import forceInfo, roleUpdate, isAdmin, permsMuted, channelFreeze
-from modules.census import getOfflinePlayers
+from modules.database import remove_player as db_remove
+from modules.loader import lock_all, unlock_all, is_all_locked
+from modules.roles import force_info, role_update, is_admin, perms_muted, channel_freeze
+from modules.census import get_offline_players
 
-from classes.players import removePlayer, getPlayer, Player, TeamCaptain
+from classes.players import remove_player, get_player, Player, TeamCaptain
 
-from matches import clearLobby, getMatch, getAllNamesInLobby, removeFromLobby, isLobbyStuck, addToLobby, getAllIdsInLobby
+from matches import clear_lobby, get_match, get_all_names_in_lobby, remove_from_lobby, is_lobby_stuck, add_to_lobby, get_all_ids_in_lobby
 
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 
 class AdminCog(commands.Cog, name='admin'):
@@ -28,7 +30,7 @@ class AdminCog(commands.Cog, name='admin'):
         self.client = client
 
     async def cog_check(self, ctx):
-        return isAdmin(ctx.author)
+        return is_admin(ctx.author)
 
     """
     Admin Commands
@@ -42,14 +44,14 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.guild_only()
     async def clear(self, ctx):
         if ctx.channel.id == cfg.channels["lobby"]:  # clear lobby
-            if clearLobby():
-                await send("LB_CLEARED", ctx, namesInLobby=getAllNamesInLobby())
+            if clear_lobby():
+                await send("LB_CLEARED", ctx, names_in_lobby=get_all_names_in_lobby())
                 return
             await send("LB_EMPTY", ctx)
             return
         # clear a match channel
         if ctx.channel.id in cfg.channels["matches"]:
-            match = getMatch(ctx.channel.id)
+            match = get_match(ctx.channel.id)
             if match.status is MatchStatus.IS_FREE:
                 await send("MATCH_NO_MATCH", ctx, ctx.command.name)
                 return
@@ -58,47 +60,55 @@ class AdminCog(commands.Cog, name='admin'):
                 return
             await send("MATCH_CLEAR", ctx)
             await match.clear()
-            await send("MATCH_CLEARED", ctx)
             return
         await send("WRONG_CHANNEL_2", ctx, ctx.command.name, f"<#{ctx.channel.id}>")
 
     @commands.command()
     @commands.guild_only()
     async def map(self, ctx, *args):
-        channelId = ctx.channel.id
-        if channelId not in cfg.channels["matches"]:
+        channel_id = ctx.channel.id
+        if channel_id not in cfg.channels["matches"]:
             await send("WRONG_CHANNEL", ctx, ctx.command.name, " channels " + ", ".join(f'<#{id}>' for id in cfg.channels["matches"]))
             return
-        match = getMatch(ctx.channel.id)
+        match = get_match(ctx.channel.id)
         if match.status is MatchStatus.IS_FREE:
             await send("MATCH_NO_MATCH", ctx, ctx.command.name)
             return
         if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT, MatchStatus.IS_RUNNING):
             await send("MATCH_NO_COMMAND", ctx, ctx.command.name)
             return
-        sel = match.mapSelector
+        sel = match.map_selector
+        if len(args) == 1 and args[0] ==  "confirm":
+            match.confirm_map()
+            await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
+            return
         # Handle the actual map selection
-        await sel.doSelectionProcess(ctx, args)
-        if sel.status is SelStatus.IS_SELECTED:
-            match.confirmMap()
+        result = await sel.do_selection_process(ctx, args)
+        if sel.status is not SelStatus.IS_SELECTED:
+            return
+        if sel.is_booked:
+            await send("MAP_BOOKED", ctx, ctx.author.mention, sel.map.name)
+            return
+        elif result:
+            match.confirm_map()
             await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
 
     @commands.command()
     @commands.guild_only()
     async def unregister(self, ctx):
-        player = await _removeChecks(ctx, cfg.channels["register"])
+        player = await _remove_checks(ctx, cfg.channels["register"])
         if player is None:
             return
         if player.status is PlayerStatus.IS_LOBBIED:
-            removeFromLobby(player)
-            await channelSend("RM_LOBBY", cfg.channels["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
+            remove_from_lobby(player)
+            await send("RM_LOBBY", SendCtx.channel(cfg.channels["lobby"]), player.mention, names_in_lobby=get_all_names_in_lobby())
         if player.status in (PlayerStatus.IS_REGISTERED, PlayerStatus.IS_NOT_REGISTERED):
             try:
-                await dbRemove(player)
+                await db_remove(player)
             except DatabaseError:
                 pass  # ignored if not yet in db
-            await forceInfo(player.id)
-            removePlayer(player)
+            await force_info(player.id)
+            remove_player(player)
             await send("RM_OK", ctx)
             return
         await send("RM_IN_MATCH", ctx)
@@ -106,34 +116,34 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def remove(self, ctx):
-        player = await _removeChecks(ctx, cfg.channels["lobby"])
+        player = await _remove_checks(ctx, cfg.channels["lobby"])
         if player is None:
             return
         if player.status is PlayerStatus.IS_LOBBIED:
-            removeFromLobby(player)
-            await channelSend("RM_LOBBY", cfg.channels["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
+            remove_from_lobby(player)
+            await send("RM_LOBBY", SendCtx.channel(cfg.channels["lobby"]), player.mention, names_in_lobby=get_all_names_in_lobby())
             return
         await send("RM_NOT_LOBBIED", ctx)
     
     @commands.command()
     @commands.guild_only()
     async def demote(self, ctx):
-        player = await _removeChecks(ctx, cfg.channels["matches"])
+        player = await _remove_checks(ctx, cfg.channels["matches"])
         if player is None:
             return
         if player.status is not PlayerStatus.IS_PICKED:
             await send("RM_DEMOTE_NO", ctx)
             return
-        match = getMatch(ctx.channel.id)
+        match = get_match(ctx.channel.id)
         if player.match.id != match.id:
             await send("PK_WRONG_CHANNEL", ctx,  player.match.id)
             return
-        aPlayer = player.active
-        if not isinstance(aPlayer, TeamCaptain):
+        a_player = player.active
+        if not isinstance(a_player, TeamCaptain):
             await send("RM_DEMOTE_NO", ctx)
             return
-        team = aPlayer.team
-        if match.resign(aPlayer):
+        team = a_player.team
+        if match.resign(a_player):
             await send("RM_DEMOTE_OK", ctx, team.captain.mention, team.name)
         else:
             await send("RM_DEMOTE_PICKING", ctx)
@@ -145,17 +155,17 @@ class AdminCog(commands.Cog, name='admin'):
             await send("WRONG_CHANNEL", ctx, ctx.command.name, f'<#{cfg.channels["lobby"]}>')
             return
         if len(args)>0 and args[0] == "restore":
-            for pId in args[1:]:
+            for p_id in args[1:]:
                 try:
-                    player = getPlayer(int(pId))
-                    if not isLobbyStuck() and player.status is PlayerStatus.IS_REGISTERED:
-                        addToLobby(player)
+                    player = get_player(int(p_id))
+                    if not is_lobby_stuck() and player.status is PlayerStatus.IS_REGISTERED:
+                        add_to_lobby(player)
                 except (ElementNotFound, ValueError):
                     pass
-            await send("LB_QUEUE", ctx, namesInLobby=getAllNamesInLobby())
+            await send("LB_QUEUE", ctx, names_in_lobby=get_all_names_in_lobby())
             return
         if len(args)>0 and args[0] == "get":
-            await send("LB_GET", ctx, " ".join(getAllIdsInLobby()))
+            await send("LB_GET", ctx, " ".join(get_all_ids_in_lobby()))
             return
         await send("WRONG_USAGE", ctx, ctx.command.name)
 
@@ -172,35 +182,35 @@ class AdminCog(commands.Cog, name='admin'):
             await send("RM_MENTION_ONE", ctx)
             return
         try:
-            player = getPlayer(ctx.message.mentions[0].id)
+            player = get_player(ctx.message.mentions[0].id)
         except ElementNotFound:
             # player isn't even registered in the system...
             player = Player(ctx.message.mentions[0].id, ctx.message.mentions[0].name)
             return
         if player.status is PlayerStatus.IS_LOBBIED:
-            removeFromLobby(player)
-            await channelSend("RM_LOBBY", cfg.channels["lobby"], player.mention, namesInLobby=getAllNamesInLobby())
+            remove_from_lobby(player)
+            await send("RM_LOBBY", SendCtx.channel(cfg.channels["lobby"]), player.mention, names_in_lobby=get_all_names_in_lobby())
         if player.status not in (PlayerStatus.IS_REGISTERED, PlayerStatus.IS_NOT_REGISTERED):
             await send("RM_IN_MATCH", ctx)
             return
         if len(args) == 1:
-            if player.isTimeout:
+            if player.is_timeout:
                 await send("RM_TIMEOUT_INFO", ctx, dt.utcfromtimestamp(player.timeout).strftime("%Y-%m-%d %H:%M UTC"))
                 return
-            await roleUpdate(player)
-            await permsMuted(False, player.id)
+            await role_update(player)
+            await perms_muted(False, player.id)
             await send("RM_TIMEOUT_NO", ctx)
             return
         # =timeout @player remove
         if len(args) == 2 and args[1] == 'remove':
-            if not player.isTimeout:
+            if not player.is_timeout:
                 await send("RM_TIMEOUT_ALREADY", ctx)
                 return
             player.timeout = 0
-            await player.dbUpdate("timeout")
+            await player.db_update("timeout")
             await send("RM_TIMEOUT_FREE", ctx, player.mention)
-            await roleUpdate(player)
-            await permsMuted(False, player.id)
+            await role_update(player)
+            await perms_muted(False, player.id)
             return
         # Check if command is correct (=timeout @player 12 d)
         if len(args) != 3:
@@ -210,7 +220,7 @@ class AdminCog(commands.Cog, name='admin'):
             time = 86400
         elif args[2] in ['h', 'hour', 'hours']:
             time = 3600
-        elif args[2] in ['m', 'min', 'mins', 'minute', 'minutes'] :
+        elif args[2] in ['m', 'min', 'mins', 'minute', 'minutes']:
             time = 60
         else:
             await send("RM_TIMEOUT_INVALID", ctx)
@@ -222,44 +232,43 @@ class AdminCog(commands.Cog, name='admin'):
         except ValueError:
             await send("RM_TIMEOUT_INVALID", ctx)
             return
-        endTime = int(dt.timestamp(dt.now()))+time
-        player.timeout = endTime
-        await roleUpdate(player)
-        await player.dbUpdate("timeout")
-        await permsMuted(True, player.id)
-        await send("RM_TIMEOUT", ctx, player.mention, dt.utcfromtimestamp(endTime).strftime("%Y-%m-%d %H:%M UTC"))
-
+        end_time = int(dt.timestamp(dt.now()))+time
+        player.timeout = end_time
+        await role_update(player)
+        await player.db_update("timeout")
+        await perms_muted(True, player.id)
+        await send("RM_TIMEOUT", ctx, player.mention, dt.utcfromtimestamp(end_time).strftime("%Y-%m-%d %H:%M UTC"))
 
     @commands.command()
     @commands.guild_only()
     async def pog(self, ctx, *args):
         if len(args) == 0:
-            await send("BOT_VERSION", ctx, cfg.VERSION, isAllLocked())
+            await send("BOT_VERSION", ctx, cfg.VERSION, is_all_locked())
             return
         arg = args[0]
         if arg == "version":
-            await send("BOT_VERSION", ctx, cfg.VERSION, isAllLocked())
+            await send("BOT_VERSION", ctx, cfg.VERSION, is_all_locked())
             return
         if arg == "lock":
-            if isAllLocked():
+            if is_all_locked():
                 await send("BOT_ALREADY", ctx, "locked")
                 return
-            lockAll(self.client)
+            lock_all(self.client)
             await send("BOT_LOCKED", ctx)
             return
         if arg == "unlock":
-            if not isAllLocked():
+            if not is_all_locked():
                 await send("BOT_ALREADY", ctx, "unlocked")
                 return
-            unlockAll(self.client)
+            unlock_all(self.client)
             await send("BOT_UNLOCKED", ctx)
             return
         if arg == "ingame":
-            if getOfflinePlayers.bypass:
-                getOfflinePlayers.bypass = False
+            if get_offline_players.bypass:
+                get_offline_players.bypass = False
                 await send("BOT_BP_OFF", ctx)
             else:
-                getOfflinePlayers.bypass = True
+                get_offline_players.bypass = True
                 await send("BOT_BP_ON", ctx)
             return
         await send("WRONG_USAGE", ctx, ctx.command.name)
@@ -273,11 +282,11 @@ class AdminCog(commands.Cog, name='admin'):
         if len(args) == 1:
             arg = args[0]
             if arg == "freeze":
-                await channelFreeze(True, ctx.channel.id)
+                await channel_freeze(True, ctx.channel.id)
                 await send("BOT_FROZEN", ctx)
                 return
             if arg == "unfreeze":
-                await channelFreeze(False, ctx.channel.id)
+                await channel_freeze(False, ctx.channel.id)
                 await send("BOT_UNFROZEN", ctx)
                 return
         await send("WRONG_USAGE", ctx, ctx.command.name)
@@ -286,7 +295,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.guild_only()
     async def sub(self, ctx, *args):
         # Check for match status first maybe?
-        player = await _removeChecks(ctx, cfg.channels["matches"])
+        player = await _remove_checks(ctx, cfg.channels["matches"])
         if player is None:
             return
         if player.status not in (PlayerStatus.IS_MATCHED, PlayerStatus.IS_PICKED):
@@ -295,18 +304,18 @@ class AdminCog(commands.Cog, name='admin'):
         if player.status is PlayerStatus.IS_PICKED and isinstance(player.active, TeamCaptain):
             await send("SUB_NO_CAPTAIN", ctx)
             return
-        newPlayer = player.match.onPlayerSub(player)
-        if newPlayer is None:
+        new_player = player.match.on_player_sub(player)
+        if new_player is None:
             await send("SUB_NO_PLAYER", ctx)
             return
         else:
-            await channelSend("SUB_LOBBY",  cfg.channels["lobby"], newPlayer.mention, newPlayer.match.id,
-                                            namesInLobby=getAllNamesInLobby())
-            if newPlayer.status is PlayerStatus.IS_PICKED:
-                await send("SUB_OKAY_TEAM", ctx, newPlayer.mention, player.mention,
-                                            newPlayer.active.team.name, match=newPlayer.match)
+            await send("SUB_LOBBY",  SendCtx.channel(cfg.channels["lobby"]), new_player.mention, new_player.match.id,
+                                            names_in_lobby=get_all_names_in_lobby())
+            if new_player.status is PlayerStatus.IS_PICKED:
+                await send("SUB_OKAY_TEAM", ctx, new_player.mention, player.mention,
+                                            new_player.active.team.name, match=new_player.match)
             else:
-                await send("SUB_OKAY", ctx, newPlayer.mention, player.mention, match=newPlayer.match)
+                await send("SUB_OKAY", ctx, new_player.mention, player.mention, match=new_player.match)
             return
 
 
@@ -314,17 +323,18 @@ class AdminCog(commands.Cog, name='admin'):
 def setup(client):
     client.add_cog(AdminCog(client))
 
-async def _removeChecks(ctx, channels):
+
+async def _remove_checks(ctx, channels):
     if not isinstance(channels, list):
         channels = [channels]
     if ctx.channel.id not in channels:
-        await send("WRONG_CHANNEL", ctx, ctx.command.name, ", ".join(f"<#{cId}>" for cId in channels))
+        await send("WRONG_CHANNEL", ctx, ctx.command.name, ", ".join(f"<#{c_id}>" for c_id in channels))
         return
     if len(ctx.message.mentions) != 1:
         await send("RM_MENTION_ONE", ctx)
         return
     try:
-        player = getPlayer(ctx.message.mentions[0].id)
+        player = get_player(ctx.message.mentions[0].id)
     except ElementNotFound:
         # player isn't even registered in the system...
         await send("RM_NOT_IN_DB", ctx)

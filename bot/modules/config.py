@@ -1,16 +1,19 @@
-""" Retreives configuration from the config file
+""" Retrieves configuration from the config file
 """
 
 from json import loads
 from requests import get
 from configparser import ConfigParser, ParsingError
 from modules.exceptions import ConfigError
+from logging import getLogger
 
-## STATIC PARAMETERS:
+log = getLogger("pog_bot")
+
+# STATIC PARAMETERS:
 AFK_TIME = 15  # minutes
-ROUND_LENGTH = 10  # minutes
+ROUND_LENGTH = 0.09  # minutes
 
-## DYNAMIC PARAMETERS:
+# DYNAMIC PARAMETERS:
 # (pulled from the config file)
 
 channels = {
@@ -23,7 +26,7 @@ channels = {
     "muted": 0
 }
 
-channelsList = list()
+channels_list = list()
 
 roles = {
     "admin": 0,
@@ -32,6 +35,7 @@ roles = {
     "notify": 0
 }
 
+
 # General
 
 general = {
@@ -39,14 +43,16 @@ general = {
     "api_key": "",
     "command_prefix": "",
     "lobby_size": 0,
+    "sinusbot_user": "",
+    "sinusbot_pass": "",
     "rules_msg_id": 0
 }
 
 scores = {
-    "teamkill" : 0,
-    "suicide" : 0,
-    "capture" : 0,
-    "recapture" : 0
+    "teamkill": 0,
+    "suicide": 0,
+    "capture": 0,
+    "recapture": 0
 }
 
 VERSION = "0"
@@ -73,19 +79,27 @@ zones = {
 }
 
 # http://census.daybreakgames.com/get/ps2:v2/facility_type?c:limit=100
-facilitiy_suffix = {
+facility_suffix = {
     2: "Amp Station",
     3: "Bio Lab",
     4: "Tech Plant"
 }
 
+# PIL map images, these should be added to config file I think
+map_pool_images = {"Acan Southern Labs": "https://i.imgur.com/IhF9wQN.png",
+                   "Chac Fusion Lab": "https://i.imgur.com/XQ5YERh.jpeg",
+                   "Ghanan Southern Crossing": "https://i.imgur.com/3GEEcx7.png",
+                   "Pale Canyon Chemical": "https://i.imgur.com/JuRQrQm.png",
+                   "Peris Eastern Grove": "https://i.imgur.com/2yoMxU2.jpeg",
+                   "Rashnu Watchtower": "https://i.imgur.com/9RkkmFQ.jpeg",
+                   "XenoTech Labs": "https://i.imgur.com/REGEX_uIc2NJH.png"}
 
 # Database
 
 _collections = {
     "users": "",
-    "sBases": "",
-    "sWeapons" : "",
+    "s_bases": "",
+    "s_weapons" : "",
     "matches" : ""
 }
 
@@ -93,21 +107,23 @@ database = {
     "url": "",
     "cluster": "",
     "accounts": "",
+    "jaeger_cal": "",
     "collections": _collections
 }
+
 
 # Methods
 
 
-def getConfig(file):
+def get_config(file):
     config = ConfigParser()
     try:
         config.read(file)
     except ParsingError as e:
-        raise ConfigError(f"Parsing Error in '{file}'")
+        raise ConfigError(f"Parsing Error in '{file}'\n{e}")
 
     # General section
-    _checkSection(config, "General", file)
+    _check_section(config, "General", file)
 
     for key in general:
         try:
@@ -116,19 +132,19 @@ def getConfig(file):
             else:
                 general[key] = config['General'][key]
         except KeyError:
-            _errorMissing(key, 'General', file)
+            _error_missing(key, 'General', file)
         except ValueError:
-            _errorIncorrect(key, 'General', file)
+            _error_incorrect(key, 'General', file)
 
     # Testing api key
-    # url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
-    # jdata = loads(get(url).content)
-    # if 'error' in jdata:
-    #     raise ConfigError(
-    #         f"Incorrect api key: {general['api_key']} in '{file}'")
+    url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
+    jdata = loads(get(url).content)
+    if 'error' in jdata:
+        raise ConfigError(
+            f"Incorrect api key: {general['api_key']} in '{file}'")
 
     # Channels section
-    _checkSection(config, "Channels", file)
+    _check_section(config, "Channels", file)
 
     for key in channels:
         try:
@@ -137,53 +153,53 @@ def getConfig(file):
                 channels[key].clear()
                 for m in tmp:
                     channels[key].append(int(m))
-                    channelsList.append(int(m))
+                    channels_list.append(int(m))
             else:
                 channels[key] = int(config['Channels'][key])
-                channelsList.append(channels[key])
+                channels_list.append(channels[key])
         except KeyError:
-            _errorMissing(key, 'Channels', file)
+            _error_missing(key, 'Channels', file)
         except ValueError:
-            _errorIncorrect(key, 'Channels', file)
+            _error_incorrect(key, 'Channels', file)
 
     # Roles section
-    _checkSection(config, "Roles", file)
+    _check_section(config, "Roles", file)
     for key in roles:
         try:
             roles[key] = int(config['Roles'][key])
         except KeyError:
-            _errorMissing(key, 'Roles', file)
+            _error_missing(key, 'Roles', file)
         except ValueError:
-            _errorIncorrect(key, 'Roles', file)
-    
+            _error_incorrect(key, 'Roles', file)
+
     # Scores section
-    _checkSection(config, "Scores", file)
+    _check_section(config, "Scores", file)
     for key in scores:
         try:
             scores[key] = int(config['Scores'][key])
         except KeyError:
-            _errorMissing(key, 'Scores', file)
+            _error_missing(key, 'Scores', file)
         except ValueError:
-            _errorIncorrect(key, 'Scores', file)
+            _error_incorrect(key, 'Scores', file)
 
     # Database section
-    _checkSection(config, "Database", file)
+    _check_section(config, "Database", file)
 
     for key in database:
         if key != "collections":
             try:
                 database[key] = config['Database'][key]
             except KeyError:
-                _errorMissing(key, 'Database', file)
+                _error_missing(key, 'Database', file)
 
     # Collections section
-    _checkSection(config, "Collections", file)
+    _check_section(config, "Collections", file)
 
     for key in database["collections"]:
         try:
             database["collections"][key] = config['Collections'][key]
         except KeyError:
-            _errorMissing(key, 'Collections', file)
+            _error_missing(key, 'Collections', file)
 
     # Version
     with open('../CHANGELOG.md', 'r', encoding='utf-8') as txt:
@@ -193,14 +209,14 @@ def getConfig(file):
     VERSION = txt_str[3:-2]
 
 
-def _checkSection(config, section, file):
-    if not section in config:
+def _check_section(config, section, file):
+    if section not in config:
         raise ConfigError(f"Missing section '{section}' in '{file}'")
 
 
-def _errorMissing(field, section, file):
+def _error_missing(field, section, file):
     raise ConfigError(f"Missing field '{field}' in '{section}' in '{file}'")
 
 
-def _errorIncorrect(field, section, file):
+def _error_incorrect(field, section, file):
     raise ConfigError(f"Incorrect field '{field}' in '{section}' in '{file}'")

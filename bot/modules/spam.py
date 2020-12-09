@@ -1,33 +1,34 @@
+# @CHECK 2.0 features OK
+
 """Tiny module used as a slight spam protector
 """
 
-from modules.display import send
+from display import send
 
-__spamList = dict()
+__spam_list = dict()
 __SPAM_MSG_FREQUENCY = 5
 
 
-async def isSpam(msg):
+async def is_spam(msg):
     id = msg.author.id
-    if not id in __spamList:
-        __spamList[id] = 1
+    if id not in __spam_list:
+        __spam_list[id] = 1
         return False
-    __spamList[id] += 1
-    if __spamList[id] == 1:
+    __spam_list[id] += 1
+    if __spam_list[id] == 1:
         return False
-    if __spamList[id] % __SPAM_MSG_FREQUENCY == 0:
+    if __spam_list[id] % __SPAM_MSG_FREQUENCY == 0:
         await send("STOP_SPAM", msg)
     return True
 
-# THis is never called:
 
-
+# This is never called:
 def clean():
-    tmp = __spamList.copy()
+    tmp = __spam_list.copy()
     for id in tmp:
-        if __spamList[id] == 0:
-            del __spamList[id]
+        if __spam_list[id] == 0:
+            del __spam_list[id]
 
 
 def unlock(id):
-    __spamList[id] = 0
+    __spam_list[id] = 0

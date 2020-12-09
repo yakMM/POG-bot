@@ -1,3 +1,5 @@
+# @CHECK 2.0 features OK
+
 """ Basic team object, should be explicit
 """
 
@@ -19,7 +21,7 @@ class Team:
         self.__match = match
 
     @classmethod
-    def newFromData(cls, i, data, match):
+    def new_from_data(cls, i, data, match):
         obj = cls(i, data["name"], match)
         obj.__faction = data["faction_id"]
         obj.__score = data["score"]
@@ -27,14 +29,14 @@ class Team:
         obj.__deaths = data["deaths"]
         obj.__kills = data["kills"]
         obj.__cap = data["cap_points"]
-        for pData in data["players"]:
-            obj.__players.append(ActivePlayer.newFromData(pData, obj))
+        for p_data in data["players"]:
+            obj.__players.append(ActivePlayer.new_from_data(p_data, obj))
         return obj
 
-    def getData(self):
-        playersData = list()
+    def get_data(self):
+        players_data = list()
         for p in self.__players:
-            playersData.append(p.getData())
+            players_data.append(p.get_data())
         data = {"name": self.__name,
                 "faction_id": self.__faction,
                 "score": self.__score,
@@ -42,7 +44,7 @@ class Team:
                 "deaths": self.deaths,
                 "kills": self.__kills,
                 "cap_points": self.__cap,
-                "players": playersData
+                "players": players_data
                 }
         return data
 
@@ -51,9 +53,9 @@ class Team:
         return self.__id
 
     @property
-    def igString(self):
-        pString = ",".join(p.igName for p in self.__players)
-        return f"{self.__name}: `{pString}`"
+    def ig_string(self):
+        p_string = ",".join(p.ig_name for p in self.__players)
+        return f"{self.__name}: `{p_string}`"
 
     @property
     def name(self):
@@ -92,13 +94,13 @@ class Team:
         return self.__deaths
 
     @property
-    def playerPings(self):
+    def player_pings(self):
         # Excluding captain
         pings = [p.mention for p in self.__players[1:]]
         return pings
 
     @property
-    def allPings(self):
+    def all_pings(self):
         # All players with captain
         pings = [p.mention for p in self.__players]
         return pings
@@ -108,44 +110,48 @@ class Team:
         return self.__players[0]
 
     @property
-    def isPlayers(self):
+    def is_players(self):
         return len(self.__players) > 1
+
+    @property
+    def match(self):
+        return self.__match
     
     def clear(self):
         self.__players.clear()
 
-    def addCap(self, points):
+    def add_cap(self, points):
         self.__cap += points
         self.__score += points
         # self.__net += points
 
-    def addScore(self, points):
+    def add_score(self, points):
         self.__score += points
 
-    def addNet(self, points):
+    def add_net(self, points):
         self.__net += points
 
-    def addOneKill(self):
-        self.__kills +=1
+    def add_one_kill(self):
+        self.__kills += 1
 
-    def addOneDeath(self):
-        self.__deaths +=1
+    def add_one_death(self):
+        self.__deaths += 1
 
-    def addPlayer(self, cls, player):
+    def add_player(self, cls, player):
         active = cls(player, self)
         self.__players.append(active)
     
-    def onTeamReady(self):
+    def on_team_ready(self):
         for aP in self.__players:
-            aP.onTeamReady()
+            aP.on_team_ready()
 
-    def onMatchReady(self):
+    def on_match_ready(self):
         for p in self.__players:
-            p.onMatchReady()
+            p.on_match_ready()
 
-    def onPlayerSub(self, subbed, newPlayer):
+    def on_player_sub(self, subbed, new_player):
         i = 0
         while self.__players[i] is not subbed:
             i+=1
-        active = type(subbed)(newPlayer, self)
+        active = type(subbed)(new_player, self)
         self.__players[i] = active

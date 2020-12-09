@@ -6,7 +6,7 @@
 # Others:
 from logging import getLogger
 
-log = getLogger(__name__)
+log = getLogger("pog_bot")
 
 
 class CharNotFound(Exception):
@@ -43,14 +43,14 @@ class CharMissingFaction(Exception):
 class UnexpectedError(Exception):
     def __init__(self, msg):
         self.reason = msg
-        message = "Encountered unexpected error: "+msg
+        message = "Encountered unexpected error: " + msg
         log.error(message)
         super().__init__(message)
 
 
 class ConfigError(Exception):
     def __init__(self, msg):
-        self.message = "Error in config file: "+msg
+        self.message = "Error in config file: " + msg
         super().__init__(self.message)
 
 
@@ -94,3 +94,16 @@ class ApiNotReachable(Exception):
         message = f"Cannot reach Api ({url})!"
         log.error(message)
         super().__init__(message)
+
+class UserLackingPermission(Exception):
+    pass
+
+
+class WebapiError(Exception):
+    def __init__(self):
+        super().__init__(f"Unable to send 'move' command to TS3 bots! Is the webapi.js extension enabled for Sinusbot?")
+
+
+class SinusbotAuthError(Exception):
+    def __init__(self):
+        super().__init__(f"Bad sinusbot username or password. Unable to connect!")

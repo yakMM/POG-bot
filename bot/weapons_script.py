@@ -1,12 +1,14 @@
+# @CHECK 2.0 features OK
+
 import modules.config as cfg
-from modules.database import forceUpdate, init as dbInit
+from modules.database import force_update, init as db_init
 import requests
 import json
 
 LAUNCHSTR = ""  # this should be empty if your files are config.cfg and client_secret.json
 
-cfg.getConfig(f"config{LAUNCHSTR}.cfg")
-dbInit(cfg.database)
+cfg.get_config(f"config{LAUNCHSTR}.cfg")
+db_init(cfg.database)
 
 item_type_id = 26 #weapon
 
@@ -51,84 +53,84 @@ allowed_categories = [24,6,7,8]
 no_point = [13,17]
 detailled = [2,3,5,11,12]
 
-def getBannedPerCategorie(cat, id):
+def get_banned_per_categorie(cat, id):
     # Knife
     if cat == 2:
-        d={
-        271:"Carver",
-        285:"Ripper",
-        286:"Lumine Edge",
-        1082	:"MAX Punch",
-        1083	:"MAX Punch",
-        1084	:"MAX Punch",
-        804795:"NSX Amaterasu",
-        6005451:"Lumine Edge AE",
-        6005452:"Ripper AE",
-        6005453:"Carver AE"
+        d = {
+        271:        "Carver",
+        285:        "Ripper",
+        286:        "Lumine Edge",
+        1082:       "MAX Punch",
+        1083:       "MAX Punch",
+        1084:       "MAX Punch",
+        804795:     "NSX Amaterasu",
+        6005451:    "Lumine Edge AE",
+        6005452:    "Ripper AE",
+        6005453:    "Carver AE"
         }
     # Pistol
     elif cat == 3:
         d={
-        7390:"NC08 Mag-Scatter"
+        7390:       "NC08 Mag-Scatter"
         }
     # SMG
     elif cat == 5:
         d={
-        1899:	"Tempest",
-        1944	:   "Shuriken",
-        1949	:   "Skorpios",
-        27000:	"AF-4 Cyclone",
-        27005:	"AF-4G Cyclone",
-        28000:	"SMG-46 Armistice",
-        28005:	"SMG-46G Armistice",
-        29000:	"Eridani SX5",
-        29005:	"Eridani SX5G",
-        6002772:	"Eridani SX5-AE",
-        6002800:	"SMG-46AE Armistice",
-        6002824:	"AF-4AE Cyclone",
-        6003850:	"MGR-S1 Gladius",
-        6003879:	"MG-S1 Jackal",
-        6003925:	"VE-S Canis",
-        6005968:	"NSX-A Kappa"
+        1899:       "Tempest",
+        1944:       "Shuriken",
+        1949:       "Skorpios",
+        27000:      "AF-4 Cyclone",
+        27005:      "AF-4G Cyclone",
+        28000:      "SMG-46 Armistice",
+        28005:      "SMG-46G Armistice",
+        29000:      "Eridani SX5",
+        29005:      "Eridani SX5G",
+        6002772:    "Eridani SX5-AE",
+        6002800:    "SMG-46AE Armistice",
+        6002824:    "AF-4AE Cyclone",
+        6003850:    "MGR-S1 Gladius",
+        6003879:    "MG-S1 Jackal",
+        6003925:    "VE-S Canis",
+        6005968:    "NSX-A Kappa"
         }
     # Sniper Rifle
     elif cat == 11:
         d={
-        88:	    "99SV",
-        89:	    "VA39 Spectre",
-        7316:	"TRAP-M1",
-        7337	:   "Phaseshift VX-S",
-        24000:	"Gauss SPR",
-        24002:	"Impetus",
-        25002:	"KSR-35",
-        26002:	"Phantom VA23",
-        802771:	"NS-AM7 Archer",
-        802910:	"NS-AM7B Archer",
-        802921:	"NS-AM7G Archer",
-        804255:	"NSX Daimyo",
-        6002918:	"NS-AM7 VS/AE Archer",
-        6002930:	"NS-AM7 AE/TR Archer",
-        6002943:	"NS-AM7 AE/NC Archer",
-        6004294:	"AM7-XOXO",
-        6004992:	"NS-AM8 Shortbow",
-        6008496:	"PSA-01 Hammerhead AMR",
-        6008652:	'NSX "Ivory" Daimyo',
-        6008670:	'NSX "Networked" Daimyo'
+        88:         "99SV",
+        89:         "VA39 Spectre",
+        7316:       "TRAP-M1",
+        7337:       "Phaseshift VX-S",
+        24000:      "Gauss SPR",
+        24002:      "Impetus",
+        25002:      "KSR-35",
+        26002:      "Phantom VA23",
+        802771:     "NS-AM7 Archer",
+        802910:     "NS-AM7B Archer",
+        802921:     "NS-AM7G Archer",
+        804255:     "NSX Daimyo",
+        6002918:    "NS-AM7 VS/AE Archer",
+        6002930:    "NS-AM7 AE/TR Archer",
+        6002943:    "NS-AM7 AE/NC Archer",
+        6004294:    "AM7-XOXO",
+        6004992:    "NS-AM8 Shortbow",
+        6008496:    "PSA-01 Hammerhead AMR",
+        6008652:    'NSX "Ivory" Daimyo',
+        6008670:    'NSX "Networked" Daimyo'
         }
     # Scout Rifle
     elif cat == 12:
         d={
-        2311	:   "NS-30 Vandal",
-        2312	:   "NS-30B Vandal",
-        2313	:   "NS-30G Vandal",
-        24007:	"AF-6 Shadow",
-        25007:	"HSR-1",
-        26007:	"Nyx VX31",
-        6004198:"Mystery Weapon"
+        2311:       "NS-30 Vandal",
+        2312:       "NS-30B Vandal",
+        2313:       "NS-30G Vandal",
+        24007:      "AF-6 Shadow",
+        25007:      "HSR-1",
+        26007:      "Nyx VX31",
+        6004198:    "Mystery Weapon"
         }
     return id in d.keys()
 
-def getWeaponsCategories():
+def get_weapons_categories():
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/item/?item_type_id=26&is_vehicle_weapon=0&c:limit=5000&c:show=item_id,item_category_id,name.en'
     response = requests.get(url)
     jdata = json.loads(response.content)
@@ -151,19 +153,19 @@ def getWeaponsCategories():
             print(f'Key on cat of id {we["_id"]}')
 
     return cats
-def getUnknownWeapon():
-    nData=dict()
-    nData["_id"] = 0
-    nData["name"] = "Unknown"
-    nData["points"] = 1
-    nData["banned"] = False
-    nData["faction"]  = 0
-    nData["cat_id"] = 0
-    return nData
+def get_unknown_weapon():
+    n_data=dict()
+    n_data["_id"] = 0
+    n_data["name"] = "Unknown"
+    n_data["points"] = 1
+    n_data["banned"] = False
+    n_data["faction"] = 0
+    n_data["cat_id"] = 0
+    return n_data
 
 
-def pushAllWeapons():
-    gigaList=list()
+def push_all_weapons():
+    giga_list=list()
     for cat in we_cats.keys():
         if cat in ignored_categories:
             continue
@@ -175,38 +177,38 @@ def pushAllWeapons():
             print("Error")
             return
         for we in jdata["item_list"]:
-            nData = dict()
-            nData["_id"] = int(we["item_id"])
-            if nData["_id"] == 0:
+            n_data = dict()
+            n_data["_id"] = int(we["item_id"])
+            if n_data["_id"] == 0:
                 print("RAAAAA")
-            nData["name"] = we["name"]["en"]
-            nData["cat_id"] = int(we["item_category_id"])
+            n_data["name"] = we["name"]["en"]
+            n_data["cat_id"] = int(we["item_category_id"])
             if cat in banned_categories:
-                nData["points"] = 0
-                nData["banned"] = True
+                n_data["points"] = 0
+                n_data["banned"] = True
             elif cat in allowed_categories:
-                nData["points"] = 1
-                nData["banned"] = False
+                n_data["points"] = 1
+                n_data["banned"] = False
             elif cat in no_point:
-                nData["points"] = 0
-                nData["banned"] = False
+                n_data["points"] = 0
+                n_data["banned"] = False
             elif cat in detailled:
-                if getBannedPerCategorie(cat, nData["_id"]):
-                    nData["points"] = 0
-                    nData["banned"] = True
+                if get_banned_per_categorie(cat, n_data["_id"]):
+                    n_data["points"] = 0
+                    n_data["banned"] = True
                 else:
-                    nData["points"] = 1
-                    nData["banned"] = False
+                    n_data["points"] = 1
+                    n_data["banned"] = False
             try:
-                nData["faction"] = int(we["faction_id"])
+                n_data["faction"] = int(we["faction_id"])
             except KeyError:
-                nData["faction"]  = 0
-                #print("illegal faction:" + nData["name"])
-            gigaList.append(nData)
-    gigaList.append(getUnknownWeapon())
-    forceUpdate("sWeapons", gigaList)
+                n_data["faction"]  = 0
+                # print("illegal faction:" + n_data["name"])
+            giga_list.append(n_data)
+    giga_list.append(get_unknown_weapon())
+    force_update("s_weapons", giga_list)
 
-def getAllCategories():
+def get_all_categories():
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/item_category/?c:limit=500'
     response = requests.get(url)
     jdata = json.loads(response.content)
@@ -216,8 +218,8 @@ def getAllCategories():
         return
 
     di = dict()
-    for  cat in jdata["item_category_list"]:
+    for cat in jdata["item_category_list"]:
         di[int(cat["item_category_id"])] = cat["name"]["en"]
     return di
 
-pushAllWeapons()
+push_all_weapons()

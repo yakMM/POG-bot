@@ -1,6 +1,6 @@
 """
 Taken from Rapptz's discord.py task extension.
-Modified for the need of POG bot app: Added a delay functionnality
+Modified for the need of POG bot app: Added a delay functionality
 """
 
 import asyncio
@@ -14,19 +14,17 @@ import traceback
 
 from discord.backoff import ExponentialBackoff
 
-log = logging.getLogger(__name__)
-
+log = logging.getLogger("pog_bot")
 
 class Loop:
     """A background task helper that abstracts the loop and reconnection logic for you.
 
     The main interface to create this is through :func:`loop`.
     """
-
     def __init__(self, coro, seconds, hours, minutes, delay, count, reconnect, loop):
         self.coro = coro
         self.reconnect = reconnect
-        self.loop = loop or asyncio.get_event_loop()
+        self.loop = loop
         self.count = count
         self.delay = delay
         self._current_loop = 0
@@ -34,7 +32,6 @@ class Loop:
         self._injected = None
         self._valid_exception = (
             OSError,
-            discord.HTTPException,
             discord.GatewayNotFound,
             discord.ConnectionClosed,
             aiohttp.ClientError,
@@ -49,7 +46,7 @@ class Loop:
 
         if self.count is not None and self.count <= 0:
             raise ValueError('count must be greater than 0 or None.')
-
+    
         if self.delay is None:
             raise ValueError('delay can not be None.')
 
@@ -57,12 +54,12 @@ class Loop:
             raise ValueError('delay must be positive and lower than count.')
 
         self.change_interval(seconds=seconds, minutes=minutes, hours=hours)
+        self._last_iteration_failed = False
         self._last_iteration = None
         self._next_iteration = None
 
         if not inspect.iscoroutinefunction(self.coro):
-            raise TypeError(
-                'Expected coroutine function, not {0.__name__!r}.'.format(type(self.coro)))
+            raise TypeError('Expected coroutine function, not {0.__name__!r}.'.format(type(self.coro)))
 
     async def _call_loop_function(self, name, *args, **kwargs):
         coro = getattr(self, '_' + name)
@@ -78,19 +75,23 @@ class Loop:
         backoff = ExponentialBackoff()
         await self._call_loop_function('before_loop')
         sleep_until = discord.utils.sleep_until
+        self._last_iteration_failed = False
         self._next_iteration = datetime.datetime.now(datetime.timezone.utc)
         try:
-            await asyncio.sleep(0)  # allows canceling in before_loop
+            await asyncio.sleep(0) # allows canceling in before_loop
             while True:
-                self._last_iteration = self._next_iteration
-                self._next_iteration = self._get_next_sleep_time()
+                if not self._last_iteration_failed:
+                    self._last_iteration = self._next_iteration
+                    self._next_iteration = self._get_next_sleep_time()
                 try:
                     if self._current_loop >= self.delay:
                         await self.coro(*args, **kwargs)
+                    self._last_iteration_failed = False
                     now = datetime.datetime.now(datetime.timezone.utc)
                     if now > self._next_iteration:
                         self._next_iteration = now
                 except self._valid_exception as exc:
+                    self._last_iteration_failed = True
                     if not self.reconnect:
                         raise
                     await asyncio.sleep(backoff.delay())
@@ -104,11 +105,9 @@ class Loop:
                     await sleep_until(self._next_iteration)
         except asyncio.CancelledError:
             self._is_being_cancelled = True
-            raise
         except Exception as exc:
             self._has_failed = True
             await self._call_loop_function('error', exc)
-            raise exc
         finally:
             await self._call_loop_function('after_loop')
             self._is_being_cancelled = False
@@ -168,11 +167,13 @@ class Loop:
         """
 
         if self._task is not None and not self._task.done():
-            raise RuntimeError(
-                'Task is already launched and is not completed.')
+            raise RuntimeError('Task is already launched and is not completed.')
 
         if self._injected is not None:
             args = (self._injected, *args)
+
+        if self.loop is None:
+            self.loop = asyncio.get_event_loop()
 
         self._task = self.loop.create_task(self._loop(*args, **kwargs))
         return self._task
@@ -255,8 +256,7 @@ class Loop:
             if not inspect.isclass(exc):
                 raise TypeError('{0!r} must be a class.'.format(exc))
             if not issubclass(exc, BaseException):
-                raise TypeError(
-                    '{0!r} must inherit from BaseException.'.format(exc))
+                raise TypeError('{0!r} must inherit from BaseException.'.format(exc))
 
         self._valid_exception = (*self._valid_exception, *exceptions)
 
@@ -283,8 +283,7 @@ class Loop:
             Whether all exceptions were successfully removed.
         """
         old_length = len(self._valid_exception)
-        self._valid_exception = tuple(
-            x for x in self._valid_exception if x not in exceptions)
+        self._valid_exception = tuple(x for x in self._valid_exception if x not in exceptions)
         return len(self._valid_exception) == old_length - len(exceptions)
 
     def get_task(self):
@@ -311,10 +310,8 @@ class Loop:
 
     async def _error(self, *args):
         exception = args[-1]
-        print('Unhandled exception in internal background task {0.__name__!r}.'.format(
-            self.coro), file=sys.stderr)
-        traceback.print_exception(
-            type(exception), exception, exception.__traceback__, file=sys.stderr)
+        print('Unhandled exception in internal background task {0.__name__!r}.'.format(self.coro), file=sys.stderr)
+        traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
 
     def before_loop(self, coro):
         """A decorator that registers a coroutine to be called before the loop starts running.
@@ -431,7 +428,6 @@ class Loop:
         self.seconds = seconds
         self.hours = hours
         self.minutes = minutes
-
 
 def loop(*, seconds=0, minutes=0, hours=0, delay=0, count=None, reconnect=True, loop=None):
     """A decorator that schedules a task in the background for you with
