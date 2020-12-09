@@ -96,7 +96,7 @@ def _make_image(match):
     if len(match.round_stamps) < 2:
         draw.text((x,200+100*3), f"Round 2: ", font=small_font, fill=white)
         draw.text((x+small_font.getsize("Round 2: ")[0],200+100*3), f"In progress...", font=small_font, fill=yellow)
-    draw.text((x,200+100*4), f"Round length: {cfg.ROUND_LENGTH} minutes", font=small_font, fill=white)
+    draw.text((x,200+100*4), f"Round length: {cfg.general['round_length']} minutes", font=small_font, fill=white)
 
     hal_size = 25
     x_max=3600

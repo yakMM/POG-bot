@@ -336,9 +336,9 @@ def map_pool(ctx, sel):
     map = sel.navigator.current
     if sel.navigator.is_booked:
         embed = Embed(colour=Color.red(), title=map.name, description="WARNING! This map seems to be booked in the calendar!")
-    elif map.name in cfg.map_pool_images:
+    elif map.id in cfg.map_images:
         embed = Embed(colour=Color.blue(), title=map.name)
-        embed.set_image(url=cfg.map_pool_images[map.name])
+        embed.set_image(url=cfg.map_images[map.id])
     else:
         embed = Embed(colour=Color.dark_grey(), title=map.name, description="No map image available")
     return embed

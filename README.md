@@ -2,17 +2,18 @@
 
 <img src="logos/bot.png" width="200">
 
-@TODO: write a proper README
+This repository contains POG bot, a discord bot used by [Planetside Open Games](https://docs.google.com/document/d/13rsrWA4r16gpB-F3gvx5HWf2T974mdHLraPSjh5DO1Q) to provide a community-driven matchmaking system for 6v6 infantry scrims in Planetside2.
 
 @TODO: write proper doc in the code
 
 ### Requirements:
-- This project uses a `requirements.txt` to relay its dependencies that need to be installed.
+- This project uses a `requirements.txt` to relay its python dependencies that need to be installed.
 - A [discord bot application and channels](#discord-bot-component) have to be created.
 - The app uses a [MongoDB database](#preparing-mongodb-component). 
 - Jaeger accounts are managed from a [Google Sheet](#preparing-google-component). 
 - To retrieve PS2 game information a [Daybreak Census ID](#assigning-census-id) has to be provided.
-- Finally, to prepare the environment, [two `script.py` functions](#populating-the-collections) have to be run.
+- To use the TeamSpeak 3 Integration, set up an instance of [TS3AudioBot](#teamspeak-integration).
+- Finally, to prepare the environment, [three functions](#populating-the-collections) have to be run.
 
 
 ### Notes for the developer:
@@ -32,7 +33,7 @@
     - Do not import any of the `classes` modules from here.    
     
     
-#### Discord Bot Component
+### Discord Bot Component
 Create a bot application following the [discord.py documentation](https://discordpy.readthedocs.io/en/latest/discord.html).
 The client-secret retrieved at this manual has to put into the configuration at:
 ```buildoutcfg
@@ -40,18 +41,23 @@ The client-secret retrieved at this manual has to put into the configuration at:
 token = RetrievedDiscordApiBotToken
 ```
 
-##### Create channels and roles
+#### Create channels and roles
 To retrieve discord channel, message and role-ids you have to enable Discord Developer Mode which can be toggled at appearance.
 `Copy ID` will then appear at the right click menu for channels, messages and roles.
 At that point you can populate the `[channels]` section of the configuration.
 
-#### Preparing MongoDB Component
-Pymongo is used for interaction with the mongodb. As of now, the database should contain two collections: one for the bases and one for the user data. Check `script.py` to populate the databases.
+### Preparing MongoDB Component
+Pymongo is used for interaction with the mongodb. As of now, the database should contain four collections:
+- One for the user data.
+- One for the bases.
+- One for the weapons.
+- One for the matches.
+Check `script.py` to populate the databases.
 The mapping of these can be configured at the `[Collections]` part of the config.
 
 There are two common ways to get MongoDB running: [Atlas](#Atlas) and [Manual Deployment](#manual-deployment).
 
-##### Atlas
+#### Atlas
 Atlas can be run using a free instance at [MongoDB Cloud Atlas](https://www.mongodb.com/cloud/atlas)
 When using MongoDB Atlas the following URI format is expected:
 ```buildoutcfg
@@ -60,7 +66,7 @@ url = mongodb+srv://username:password@clusteruri/databasename
 cluster = ClusterName
 ```
 
-##### Manual Deployment
+#### Manual Deployment
 When using a single manually deployed MongoDB instance, omit `+srv` and remove the database name from the `url` and put it at `cluster` instead:
 ```buildoutcfg
 [Database]
@@ -68,11 +74,11 @@ url = mongodb://username:password@host:port/
 cluster = DatabaseName
 ```
 
-#### Preparing Google Component
+### Preparing Google Component
 The Gspread module is used for interaction with google API. [Follow these steps to create your google_api_secret.json](https://gspread.readthedocs.io/en/latest/oauth2.html#for-bots-using-service-account)
 
-##### Prepare Google Sheet
-An example excel sheet has been provided called `pug-accounts.xlsx`. 
+#### Prepare Google Sheet
+An example excel sheet has been provided called `accounts_sheet_template.xlsx`. 
 By creating a new Google Sheet in your Drive and importing the excel file through the menu you can avoid format and naming convention errors.
 
 The `accounts` configuration at `[Database]` has to contain the ID of the Google Sheet.
@@ -81,7 +87,7 @@ This ID can be easily retrieved from the URI of the document: `https://docs.goog
 Finally, add the service account email to the shared users with editor permissions to the google sheet. 
 This email is also listed as `client_email` at the `google_api_secret.json`.
 
-#### Assigning Census ID
+### Assigning Census ID
 Communication with the Daybreak Census API is required to retrieve game information, therefore you have to supply a Service ID.
 You can apply for one at the [Daybreak Census](http://census.daybreakgames.com/#service-id) website.
 Once you obtained an ID, add it the configuration as `api_key`:
@@ -90,6 +96,13 @@ Once you obtained an ID, add it the configuration as `api_key`:
 api_key = Daybreak_Registered_Service_ID
 ```
 
-#### Populating the collections
-The file `scripts.py` contains two functions called `pushAccounts()` and `getAllMapsFromApi()`. 
-Running both of these functions will populate the MongoDB users and bases collections, allowing you to run `main.py`.
+### Teamspeak integration
+The bot used for Teamspeak audio integration is Splamy's [TS3AudioBot](https://github.com/Splamy/TS3AudioBot)
+This bot works on the dotnet runtime and can be built and installed following the readme available in TS3AudioBot github's repo.
+
+@TODO: Explain how to configure the TS3 bot
+
+### Populating the collections
+The file `scripts.py` contains two functions called `pushAccounts()` and `getAllMapsFromApi()`.
+The file `weapons_script.py` contains the function `push_all_weapons()`.
+Running all of these functions will populate the MongoDB users, bases and weapons collections, allowing you to run `main.py`.

@@ -13,7 +13,7 @@ log = getLogger("pog_bot")
 async def process_score(match):
     ig_dict = dict()
     start = match.start_stamp
-    end = start + cfg.ROUND_LENGTH * 60
+    end = start + cfg.general['round_length'] * 60
     for tm in match.teams:
         for a_player in tm.players:
             ig_dict[a_player.ig_id] = a_player

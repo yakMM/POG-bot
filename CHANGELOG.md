@@ -1,3 +1,6 @@
+# v2.1:
+
+
 # v2.0:
 Major feature implementations!
 - Added jaeger calendar integration
@@ -9,6 +12,8 @@ Major feature implementations!
 - Various code viewability enhancements, PEP8 formatting, and typo fixes
 - Updated discord.py library
 - Fixed error handling in tasks
+- Some database changes
+- Overhauled logging
 - Misc :)
 
 # v1.15:

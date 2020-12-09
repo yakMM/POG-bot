@@ -169,7 +169,7 @@ class MapSelection:
                             if booked is not None and booked not in self.__booked:
                                 self.__booked.append(booked)
                 except ValueError as e:
-                    log.warning(f"Skipping invalid line in Jaeger Calendar:\n{booking}\n_error: {e}")
+                    log.warning(f"Skipping invalid line in Jaeger Calendar:\n{booking}\nError: {e}")
         except AssertionError:
             log.warning(f"Unable to find date range in Jaeger calendar for today's date. Returned: '{date_rng_start}' to '{date_rng_end}'")
         except Exception as e:

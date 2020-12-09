@@ -9,53 +9,9 @@ from logging import getLogger
 
 log = getLogger("pog_bot")
 
-# STATIC PARAMETERS:
+## STATIC PARAMETERS:
+
 AFK_TIME = 15  # minutes
-ROUND_LENGTH = 0.09  # minutes
-
-# DYNAMIC PARAMETERS:
-# (pulled from the config file)
-
-channels = {
-    "lobby": 0,
-    "register": 0,
-    "matches": list(),
-    "results": 0,
-    "rules": 0,
-    "staff": 0,
-    "muted": 0
-}
-
-channels_list = list()
-
-roles = {
-    "admin": 0,
-    "info": 0,
-    "registered": 0,
-    "notify": 0
-}
-
-
-# General
-
-general = {
-    "token": "",
-    "api_key": "",
-    "command_prefix": "",
-    "lobby_size": 0,
-    "sinusbot_user": "",
-    "sinusbot_pass": "",
-    "rules_msg_id": 0
-}
-
-scores = {
-    "teamkill": 0,
-    "suicide": 0,
-    "capture": 0,
-    "recapture": 0
-}
-
-VERSION = "0"
 
 factions = {
     1: "VS",
@@ -85,17 +41,68 @@ facility_suffix = {
     4: "Tech Plant"
 }
 
-# PIL map images, these should be added to config file I think
-map_pool_images = {"Acan Southern Labs": "https://i.imgur.com/IhF9wQN.png",
-                   "Chac Fusion Lab": "https://i.imgur.com/XQ5YERh.jpeg",
-                   "Ghanan Southern Crossing": "https://i.imgur.com/3GEEcx7.png",
-                   "Pale Canyon Chemical": "https://i.imgur.com/JuRQrQm.png",
-                   "Peris Eastern Grove": "https://i.imgur.com/2yoMxU2.jpeg",
-                   "Rashnu Watchtower": "https://i.imgur.com/9RkkmFQ.jpeg",
-                   "XenoTech Labs": "https://i.imgur.com/REGEX_uIc2NJH.png"}
+# http://census.daybreakgames.com/get/ps2/map_region/?c:limit=400&c:show=facility_id,facility_name,zone_id,facility_type_id
+map_to_id = {
+    "acan" : 302030,
+    "ghanan" : 305010,
+    "chac" : 307010,
+    "pale" : 239000,
+    "peris" : 3430,
+    "rashnu" : 3620,
+    "xeno" : 230
+}
 
-# Database
+## DYNAMIC PARAMETERS:
+# (pulled from the config file)
 
+VERSION = "0"
+
+# General
+general = {
+    "token": "",
+    "api_key": "",
+    "command_prefix": "",
+    "lobby_size": 0,
+    'round_length': 0,
+    "rules_msg_id": 0
+}
+
+# Teamspeak
+ts = {
+    "url": "",
+    "lobby_id": 0
+}
+
+# Channels
+channels = {
+    "lobby": 0,
+    "register": 0,
+    "matches": list(),
+    "results": 0,
+    "rules": 0,
+    "staff": 0,
+    "muted": 0
+}
+
+channels_list = list()
+
+# Roles
+roles = {
+    "admin": 0,
+    "info": 0,
+    "registered": 0,
+    "notify": 0
+}
+
+# Scores
+scores = {
+    "teamkill": 0,
+    "suicide": 0,
+    "capture": 0,
+    "recapture": 0
+}
+
+# Collections
 _collections = {
     "users": "",
     "s_bases": "",
@@ -103,6 +110,7 @@ _collections = {
     "matches" : ""
 }
 
+# Database
 database = {
     "url": "",
     "cluster": "",
@@ -111,9 +119,11 @@ database = {
     "collections": _collections
 }
 
+# Map Images
+map_images = dict()
 
-# Methods
 
+## Methods
 
 def get_config(file):
     config = ConfigParser()
@@ -142,6 +152,21 @@ def get_config(file):
     if 'error' in jdata:
         raise ConfigError(
             f"Incorrect api key: {general['api_key']} in '{file}'")
+
+    # Teamspeak section
+    _check_section(config, "Teamspeak", file)
+
+    for key in ts:
+        try:
+            if isinstance(ts[key], int):
+                ts[key] = int(config['Teamspeak'][key])
+            else:
+                ts[key] = config['Teamspeak'][key]
+        except KeyError:
+            _error_missing(key, 'Teamspeak', file)
+        except ValueError:
+            _error_incorrect(key, 'Teamspeak', file)
+
 
     # Channels section
     _check_section(config, "Channels", file)
@@ -207,6 +232,15 @@ def get_config(file):
     global VERSION
     # Extracts "X.X.X" from string "# vX.X.X:" in a lazy way
     VERSION = txt_str[3:-2]
+
+    # Map_Images section
+    _check_section(config, "Map_Images", file)
+
+    for key in config['Map_Images'].keys():
+        try:
+            map_images[map_to_id[key]] = config['Map_Images'][key]
+        except KeyError:
+            raise ConfigError(f"Missing map '{key}' in 'map_to_id' dictionary in 'config.py'")
 
 
 def _check_section(config, section, file):

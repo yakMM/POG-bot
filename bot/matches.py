@@ -230,7 +230,7 @@ class Match():
             teams_data.append(tm.get_data())
         data = {"_id": self.__number,
                 "round_stamps": self.__round_stamps,
-                "round_length_min": cfg.ROUND_LENGTH,
+                "cfg.general['round_length']_min": cfg.general['round_length'],
                 "base_id": self.__map_selector.map.id,
                 "teams": teams_data
                 }
@@ -382,7 +382,7 @@ class Match():
         self.__audio_bot.match_confirm()
         await send("MATCH_CONFIRM", self.__channel, *captain_pings, match=self)
 
-    @loop(minutes=cfg.ROUND_LENGTH, delay=1, count=2)
+    @loop(minutes=cfg.general['round_length'], delay=1, count=2)
     async def _on_match_over(self):
         player_pings = [" ".join(tm.all_pings) for tm in self.__teams]
         self.__audio_bot.round_over()
