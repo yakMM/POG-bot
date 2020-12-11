@@ -129,6 +129,8 @@ class Player:
     @property
     def accounts_flipped(self):
         accs = list()
+        if not self.__has_own_account:
+            return accs
         for i in range(3):
             if self.__ig_ids[i] == 0:
                 accs.append(self.__ig_names[i])
