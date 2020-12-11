@@ -1,17 +1,23 @@
 # @CHECK 2.0 features OK
 
 import modules.config as cfg
-from modules.database import force_update, init as db_init
+from modules.database import force_update, init as db_init, get_all_items
 import requests
 import json
+import os
+from classes.weapons import Weapon, get_weapon
+from modules.exceptions import ElementNotFound
 
-LAUNCHSTR = ""  # this should be empty if your files are config.cfg and client_secret.json
+if os.path.isfile("test"):
+    LAUNCHSTR = "_test"
+else:
+    LAUNCHSTR = ""
 
 cfg.get_config(f"config{LAUNCHSTR}.cfg")
 db_init(cfg.database)
+get_all_items(Weapon, "s_weapons")
 
 item_type_id = 26 #weapon
-
 
 we_cats = {
     2:  'Knife',                    # DET
@@ -47,8 +53,9 @@ we_cats = {
     210:'Bastion Weapon System'     # REMOVE
 }
 
-ignored_categories = [104,211,144,157,126,208,209,210,139]
-banned_categories  = [21,20,22,9,23,10,18,19,147,14,4]
+
+ignored_categories = [] # [104,211,144,157,126,208,209,210,139] Switched this to banned
+banned_categories  = [21,20,22,9,23,10,18,19,147,14,4,104,211,144,157,126,208,209,210,139]
 allowed_categories = [24,6,7,8]
 no_point = [13,17]
 detailled = [2,3,5,11,12]
@@ -71,7 +78,13 @@ def get_banned_per_categorie(cat, id):
     # Pistol
     elif cat == 3:
         d={
-        7390:       "NC08 Mag-Scatter"
+        7390:       "NC08 Mag-Scatter",
+        802733:     "NS-44L Blackhand",
+        802781:     "NS-44LB Blackhand",
+        802782:     "NS-44LG Blackhand",
+        804960:     "NS-44LP Blackhand",
+        6002661:    'NS-44L "Ravenous" Blackhand',
+        6009652:    'NS-357 "Endeavor" Underboss'
         }
     # SMG
     elif cat == 5:
@@ -153,6 +166,7 @@ def get_weapons_categories():
             print(f'Key on cat of id {we["_id"]}')
 
     return cats
+
 def get_unknown_weapon():
     n_data=dict()
     n_data["_id"] = 0
@@ -181,7 +195,11 @@ def push_all_weapons():
             n_data["_id"] = int(we["item_id"])
             if n_data["_id"] == 0:
                 print("RAAAAA")
-            n_data["name"] = we["name"]["en"]
+            try:
+                n_data["name"] = we["name"]["en"]
+            except KeyError:
+                n_data["name"] = "Unknown"
+                print("Unknown weapon, id: " + we["item_id"])
             n_data["cat_id"] = int(we["item_category_id"])
             if cat in banned_categories:
                 n_data["points"] = 0
@@ -203,8 +221,12 @@ def push_all_weapons():
                 n_data["faction"] = int(we["faction_id"])
             except KeyError:
                 n_data["faction"]  = 0
-                # print("illegal faction:" + n_data["name"])
             giga_list.append(n_data)
+            # To find new weapons:
+            # try:
+            #     get_weapon(n_data["_id"])
+            # except ElementNotFound:
+            #     print(f'Weapon not found in database: cat : {n_data["cat_id"]}, name: {n_data["name"]}, id: {n_data["_id"]}')
     giga_list.append(get_unknown_weapon())
     force_update("s_weapons", giga_list)
 

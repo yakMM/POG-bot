@@ -84,7 +84,7 @@ class AllStrings(Enum):
     INVALID_STR = Message("You entered an invalid character! `{}`")
     API_ERROR = Message("Could not reach Planetside2 API, try again later!")
     GLOBAL_INFO = Message("Here is what's going on in POG at the moment:", embed=embeds.global_info)
-    CHECK_ACCOUNT = Message("PIL accounts password got changed! Re-register in <#{}> to confirm you still have access to your account!", embed=embeds.flip_accounts)
+    CHECK_ACCOUNT = Message("Your account password may have been flipped!\n Re-register in <#{}> to confirm you still have access to it!", embed=embeds.flip_accounts)
 
     BOT_UNLOCKED = Message("Unlocked!")
     BOT_LOCKED = Message("Locked!")
@@ -136,10 +136,11 @@ class AllStrings(Enum):
     ACC_NOT_ENOUGH = Message("Not enough accounts are available for this match!\n**Match has been canceled!**")
     ACC_ERROR = Message("Error when giving out Jaeger accounts!\n**Match has been canceled!**")
     ACC_UPDATE = Message(None, ping=False, embed=embeds.account)
+    ACC_STAFF = Message("{}, couldn't send the account to {}, please send it manually...", ping=False, embed=embeds.account)
     ACC_SENT = Message("**Successfully sent jaeger accounts  in DMs!**")
     ACC_SENDING = Message("Loading Jaeger accounts...")
     ACC_OVER = Message("Match is over, please log out of your Jaeger account!")
-    ACC_CLOSED = Message("{}'s DMS are locked, can't send them a Jaeger account!")
+    ACC_CLOSED = Message("{}'s DMS are locked, couldn't send them a Jaeger account after 3 retries!\nSending the account to staff instead.")
 
     NOTIFY_REMOVED = Message("You left Notify!")
     NOTIFY_ADDED = Message("You joined Notify!")

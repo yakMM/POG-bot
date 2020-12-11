@@ -12,15 +12,19 @@ import json
 import asyncio
 from modules.image_maker import _make_image
 from classes.weapons import Weapon
+import os
+from modules.census import process_score
 
-LAUNCHSTR = "_test"  # this should be empty if your files are config.cfg and gspread_client_secret.json
+if os.path.isfile("test"):
+    LAUNCHSTR = "_test"
+else:
+    LAUNCHSTR = ""
 
 cfg.get_config(f"config{LAUNCHSTR}.cfg")
 db_init(cfg.database)
-#get_all_items(Player.new_from_data, "users")
+get_all_items(Player.new_from_data, "users")
 get_all_items(Map, "s_bases")
 get_all_items(Weapon, "s_weapons")
-
 
 class DbPlayer(Player):
     @classmethod
@@ -31,18 +35,18 @@ class DbPlayer(Player):
         new_data["rank"] = data["rank"]
         new_data["notify"] = data["notify"]
         new_data["timeout"] = data["timeout"]
-        new_data["ig_ids"] = [int(p_id) for p_id in data["ig_ids"]]
-        new_data["ig_names"] = [p_name for p_name in data["ig_names"]]
-        # new_data["ig_names"] = list()
-        # for ig in data["ig_names"]:
-        #     bl = ord('0') <= ord(ig[-1]) <= ord('9')
-        #     bl = bl and ord('0') <= ord(ig[-2]) <= ord('9')
-        #     bl = bl and ig[-3] == 'x'
-        #     if bl: # is PIL char?
-        #         print(ig)
-        #         ig = f"flip_{ig}"
-        #     new_data["ig_names"].append(ig)
-
+        new_data["ig_names"] = data["ig_names"]
+        new_data["ig_ids"] = list()
+        for i in range(3):
+            ig = new_data["ig_names"][i]
+            bl = ord('0') <= ord(ig[-1]) <= ord('9')
+            bl = bl and ord('0') <= ord(ig[-2]) <= ord('9')
+            bl = bl and ig[-3] == 'x'
+            if bl: # is PIL char?
+                print(ig)
+                new_data["ig_ids"].append(0)
+            else:
+                new_data["ig_ids"].append(data["ig_ids"][i])
         new_data["has_own_account"] = data["has_own_account"]
         super().new_from_data(new_data)
 
@@ -135,15 +139,22 @@ def get_all_maps_from_api():
         print("Error")
         return
 
-    ids = [302030, 239000, 305010, 230, 3430, 3620, 307010]
-    # acan,pale,ghanan,xenotech,peris,rashnu,chac
+    ids = cfg.map_to_id.values()
+
+    all_maps = list()
 
     for mp in jdata["map_region_list"]:
-        mp["_id"] = int(mp.pop("facility_id"))
-        mp["in_map_pool"] = mp["_id"] in ids
-        mp["zone_id"] = int(mp.pop("zone_id"))
-        mp["type_id"] = int(mp.pop("facility_type_id"))
-    force_update("s_bases", jdata["map_region_list"])
+        try:
+            new_data = dict()
+            new_data["_id"] = int(mp["facility_id"])
+            new_data["name"] = mp["facility_name"]
+            new_data["in_map_pool"] = new_data["_id"] in ids
+            new_data["zone_id"] = int(mp["zone_id"])
+            new_data["type_id"] = int(mp["facility_type_id"])
+            all_maps.append(new_data)
+        except KeyError:
+            print(mp)
+    force_update("s_bases", all_maps)
 
 
 def players_db_update():
@@ -152,8 +163,18 @@ def players_db_update():
         _replace_player(p)
 
 def get_match_from_db(m_id):
+    if collections["matches"].count_documents({"_id": m_id}) == 0:
+        print(f'{m_id} cancelled!')
+        return None
     m=get_one_item("matches", Match.new_from_data, m_id)
-    _make_image(m)
+    #print(m.get_data())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(process_score(m))
+    dta=m.get_data()
+    print(f'Match {dta["_id"]}: team1: {dta["teams"][0]["score"]}, team2: {dta["teams"][1]["score"]}')
+    return dta
+
+    #_make_image(m)
 
 def matches_db_update():
     get_all_items(DbMatch.new_from_data, "matches")
@@ -170,5 +191,10 @@ def remove_old_accounts():
         p = get_player(pid)
         _remove(p)
 
+ij = 817
 
-
+while True:
+    dta=get_match_from_db(ij)
+    if dta:
+        collections["matches"].replace_one({"_id": dta["_id"]}, dta)
+    ij-=1

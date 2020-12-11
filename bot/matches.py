@@ -154,25 +154,28 @@ def init(client, list):
 
 class Match():
 
-    def __init__(self, m_id, ch):
+    def __init__(self, m_id, ch, from_data = False):
         self.__id = m_id
-        self.__channel = ch
         self.__players = dict()
-        self.__status = MatchStatus.IS_FREE
         self.__teams = [None, None]
         self.__map_selector = None
-        self.__number = 0
         self.__result_msg = None
         _all_matches[m_id] = self
         self.__accounts = None
         self.__round_stamps = list()
+        if from_data:
+            self.__number = m_id
+            return
+        self.__number = 0
+        self.__status = MatchStatus.IS_FREE
+        self.__channel = ch
         self.__audio_bot = AudioBot(self)
 
     @classmethod
     def new_from_data(cls, data):
-        obj = cls(data["_id"])
+        obj = cls(data["_id"], None, from_data=True)
         obj.__round_stamps = data["round_stamps"]
-        obj.__map_selector = MapSelection.new_from_id(data["_id"], data["base_id"])
+        obj.__map_selector = MapSelection.new_from_id(obj, data["base_id"])
         for i in range(len(data["teams"])):
             obj.__teams[i] = Team.new_from_data(i, data["teams"][i], obj)
         return obj
@@ -264,7 +267,7 @@ class Match():
 
     def confirm_map(self):
         self.__map_selector.confirm()
-        self.__audio_bot.map_selected()
+        self.__audio_bot.map_selected(self.__map_selector.map)
         if self.__status is MatchStatus.IS_MAPPING:
             self.__ready.start()
 
@@ -338,6 +341,7 @@ class Match():
     def on_team_ready(self, team):
         team.captain.is_turn = False
         team.on_team_ready()
+        self.__audio_bot.team_ready(team)
         other = self.__teams[team.id-1]
         # If other is_turn, then not ready
         # Else everyone ready
@@ -403,14 +407,14 @@ class Match():
         await send("MATCH_OVER", self.__channel)
         self.__status = MatchStatus.IS_RESULT
         try:
-            await update_match(self)
-        except Exception as e:
-            log.error(f"Error in match database push!\n{e}")
-        try:
             await process_score(self)
             self.__result_msg = await publish_match_image(self)
         except Exception as e:
             log.error(f"Error in score or publish function!\n{e}")
+        try:
+            await update_match(self)
+        except Exception as e:
+            log.error(f"Error in match database push!\n{e}")
         await self.clear()
 
     @loop(count=1)

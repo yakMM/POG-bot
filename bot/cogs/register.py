@@ -108,7 +108,6 @@ async def _register(player, ctx, args):
                 # if no update, say "you are already registered etc"
                 await send("REG_IS_REGISTERED_OWN", ctx, *player.ig_names)
                 return
-            await player.db_update("register")  # push update to db
             if was_player_registered:
                 await send("REG_UPDATE_OWN", ctx, *player.ig_names)
                 return
@@ -140,7 +139,6 @@ async def _register(player, ctx, args):
             if not await player.register(None):
                 await send("REG_IS_REGISTERED_NOA", ctx)
                 return
-            await player.db_update("register")
             if was_player_registered:
                 await send("REG_UPDATE_NOA", ctx)
                 return

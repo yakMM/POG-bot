@@ -20,11 +20,7 @@ factions = {
 }
 
 # Lazy way to get factions from user input:
-i_factions = {
-    "VS": 1,
-    "NC": 2,
-    "TR": 3
-}
+i_factions = {v: k for k, v in factions.items()}
 
 # http://census.daybreakgames.com/get/ps2:v2/zone?c:limit=100
 zones = {
@@ -49,8 +45,16 @@ map_to_id = {
     "pale" : 239000,
     "peris" : 3430,
     "rashnu" : 3620,
-    "xeno" : 230
+    "xeno" : 230,
+    "ns_material" : 224,
+    "ceres" : 219,
+    "kessel" : 266000,
+    "nettlemire" : 283000,
+    "bridgewater" : 272000,
+    "rime" : 244610
 }
+
+id_to_map = {v: k for k, v in map_to_id.items()}
 
 ## DYNAMIC PARAMETERS:
 # (pulled from the config file)

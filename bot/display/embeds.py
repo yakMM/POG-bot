@@ -21,7 +21,7 @@ def register_help(ctx):
                     inline = False)
     embed.add_field(name  = 'If you have a Jaeger account',
                     value = '`=r char_name` - If your character names have faction suffixes\n'
-                            '`=r REGEX_charName1 REGEX_charName2 REGEX_charName3` - If your character names don\'t have faction suffixes',
+                            '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes',
                     inline = False)
     embed.add_field(name  = 'Notify feature',
                     value = '`=notify` - To join or leave the Notify feature\n'
@@ -260,11 +260,7 @@ def global_info(ctx, lobby, match_list):
     return embed
 
 def flip_accounts(ctx, account_names):
-    embed = Embed(
-        colour=Color.red(),
-        title='Flipped Account!',
-        description=f'The password of your account have been flipped!'
-    )
+    embed = Embed(colour=Color.red())
     embed.add_field(name  = "Characters affected:",
                     value = "\n".join(i_name for i_name in account_names),
                     inline = False)

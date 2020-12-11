@@ -33,11 +33,16 @@ class AudioBot:
     def select_map(self):
         _TaskAudio(self.__num).task_audio.start("select_map")
     
-    def map_selected(self):
+    def map_selected(self, map):
         _TaskAudio(self.__num).task_audio.start("map_selected")
+        _TaskAudio(self.__num).task_audio.start(f'map_{cfg.id_to_map[map.id]}', wait=1)
 
     def match_confirm(self):
         _TaskAudio(self.__num).task_audio.start("type_ready")
+
+    def team_ready(self, team):
+        audio_string = f"team_{team.id+1}_ready"
+        _TaskAudio(self.__num).task_audio.start(audio_string)
 
     def countdown(self):
         # Because of Asyncio not really being full asynchronous stuff, these timings will

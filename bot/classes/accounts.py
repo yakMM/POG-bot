@@ -232,12 +232,18 @@ class AccountHander:
                 current_acc = self.__free_accounts[i]
                 current_acc.a_player = a_player
                 new_line[current_acc.x] = str(a_player.id)
-                try:
-                    msg = await send("ACC_UPDATE", SendCtx.user(a_player.id), account=current_acc)
-                    add_handler(msg.id, self.__reaction_handler)
-                    await self.__reaction_handler.auto_add_reactions(msg)
-                except Forbidden:
-                    msg = await send("ACC_CLOSED", self.__match.channel, a_player.mention)
+                msg = None
+                for i in range(3):
+                    try:
+                        msg = await send("ACC_UPDATE", SendCtx.user(a_player.id), account=current_acc)
+                        break
+                    except Forbidden:
+                        pass
+                if not msg:
+                    await send("ACC_CLOSED", self.__match.channel, a_player.mention)
+                    msg = await send("ACC_STAFF", SendCtx.channel(cfg.channels["staff"]), f'<@&{cfg.roles["admin"]}>', a_player.mention, account=current_acc)
+                add_handler(msg.id, self.__reaction_handler)
+                await self.__reaction_handler.auto_add_reactions(msg)
                 current_acc.message = msg
                 i += 1
         self._sheet_tab = vstack((self._sheet_tab, array(new_line)))

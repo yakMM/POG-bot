@@ -2,6 +2,8 @@
 - Ingame online check feature now reactivates after each match
 - Added =as command for admins to impersonate players
 - Any message sent to the bot in DM will be forwarded to staff
+- Flagged all the flip PIL accounts and ask users to re-register
+- Match won't get stuck if a user has locked their DMs anymore
 
 # v2.0:
 Major feature implementations!

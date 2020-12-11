@@ -129,9 +129,9 @@ class Player:
     @property
     def accounts_flipped(self):
         accs = list()
-        for ig in self.__ig_names:
-            if ig[:4] == "flip_":
-                accs.append(ig[4:])
+        for i in range(3):
+            if self.__ig_ids[i] == 0:
+                accs.append(self.__ig_names[i])
         return accs
 
 
@@ -261,6 +261,8 @@ class Player:
                 self.__status = PlayerStatus.IS_REGISTERED
                 self.__rank = 1
             self.__has_own_account = False
+            if updated:
+                await self.db_update("register")
             return updated
         updated = await self._add_characters(char_list)
         if updated:
@@ -268,6 +270,7 @@ class Player:
                 self.__status = PlayerStatus.IS_REGISTERED
                 self.__rank = 1
             self.__has_own_account = True
+            await self.db_update("register")
         return updated
 
     async def _add_characters(self, char_list):
@@ -322,12 +325,18 @@ class Player:
                 _names_checking[i][self.__ig_ids[i]] = self
         return updated
 
+class DataPlayer:
+
+    def __init__(self, p_id, ig_name, ig_id):
+        self.id = p_id
+        self.ig_names = [ig_name]*3
+        self.ig_ids = [ig_id]*3
 
 class ActivePlayer:
     """ ActivePlayer class, with more data than Player class, for when match is happening
     """
 
-    def __init__(self, player, team):
+    def __init__(self, player, team, from_data=False):
         self.__player = player
         self.__illegal_weapons = dict()
         self.__kills = 0
@@ -336,15 +345,18 @@ class ActivePlayer:
         self.__score = 0
         self.__team = team
         self.__account = None
+        if from_data:
+            return
         self.__player.on_picked(self)
 
     @classmethod
     def new_from_data(cls, data, team):
         try:
-            player = get_player(data["discord_id"])
-        except ElementNotFound:
-            player = Player(data["discord_id"], "unknown")
-        obj = cls(player, team)
+            ig_name = data["ig_name"]
+        except KeyError:
+            ig_name = "N/A"
+        pl = DataPlayer(data["discord_id"], ig_name, data["ig_id"])
+        obj = cls(pl, team, from_data=True)
         obj.__score = data["score"]
         obj.__net = data["net"]
         obj.__deaths = data["deaths"]

@@ -61,7 +61,7 @@ def identify_map_from_name(string):
 class Map:
     def __init__(self, data):
         self.__id = data["_id"]
-        self.__name = data["facility_name"]
+        self.__name = data["name"]
         self.__zone_id = data["zone_id"]
         self.__type_id = data["type_id"]
         self.__in_pool = data["in_map_pool"]
@@ -71,7 +71,7 @@ class Map:
 
     def get_data(self):  # get data for database push
         data = {"_id": self.__id,
-                "facility_name": self.__name,
+                "name": self.__name,
                 "zone_id": self.__zone_id,
                 "type_id": self.__type_id,
                 "in_map_pool": self.__in_pool
@@ -107,9 +107,8 @@ class MapSelection:
         cls._secret_file = secret_file
 
     @classmethod
-    def new_from_id(cls, match_id, map_id):
-        obj = cls(match_id)
-        obj.__id = match_id
+    def new_from_id(cls, match, map_id):
+        obj = cls(match, from_data = True)
         i = 0
         while _all_maps_list[i].id != map_id:
             i+=1
@@ -118,17 +117,19 @@ class MapSelection:
         obj.__status = SelStatus.IS_CONFIRMED
         return obj
 
-    def __init__(self, match, map_list=_all_maps_list):
+    def __init__(self, match, map_list=_all_maps_list, from_data = False):
         self.__id = match.id
         self.__match = match
-        self.__booked = list()
-        self._get_booked_from_calendar.start()
         self.__selection = list()
         self.__selected = None
         self.__all_maps = map_list
-        self.__status = SelStatus.IS_EMPTY
+        self.__booked = list()
         _map_selections_dict[self.__id] = self
+        self.__status = SelStatus.IS_EMPTY
+        if from_data:
+            return
         self.__nav = MapNavigator(self)
+        self._get_booked_from_calendar.start()
 
     @loop(count=1)
     async def _get_booked_from_calendar(self):
