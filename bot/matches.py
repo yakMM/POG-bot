@@ -388,7 +388,7 @@ class Match():
         self.__audio_bot.match_confirm()
         await send("MATCH_CONFIRM", self.__channel, *captain_pings, match=self)
 
-    @loop(minutes=cfg.general['round_length'], delay=1, count=2)
+    @loop(minutes=10, delay=1, count=2)
     async def _on_match_over(self):
         player_pings = [" ".join(tm.all_pings) for tm in self.__teams]
         self.__audio_bot.round_over()

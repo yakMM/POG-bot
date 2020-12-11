@@ -22,7 +22,7 @@ import re
 # Custom modules
 import modules.config as cfg
 from display import send, SendCtx, init as display_init
-from modules.spam import is_spam, unlock
+from modules.message_filter import on_message as filter_message
 from modules.enumerations import MatchStatus
 from modules.exceptions import ElementNotFound, UnexpectedError
 from modules.database import init as db_init, get_all_items
@@ -64,38 +64,7 @@ def _add_main_handlers(client):
     # Useful for the long processes like ps2 api, database or spreadsheet calls
     @client.event
     async def on_message(message):
-        if message.author == client.user:  # if bot, do nothing
-            await client.process_commands(message)
-            return
-        # if dm, send in staff
-        if isinstance(message.channel, DMChannel):
-            await send("BOT_DM", SendCtx.channel(cfg.channels["staff"]), msg=message)
-            await send("BOT_DM_RECEIVED", message.author)
-            return
-        if message.channel.id not in cfg.channels_list:
-            return
-        if is_all_locked():
-            if not is_admin(message.author):
-                return
-            # Admins can still use bot when locked
-        actual_author = message.author
-        if await is_spam(message):
-            return
-        message.content = message.content.lower()
-        if is_admin(message.author) and message.content[0:3] == "=as":
-            if message.mentions:
-                message.author = message.mentions[0]
-                del message.mentions[0]
-                try:
-                    i = message.content[1:].index('=')
-                    message.content = message.content[i+1:]
-                    await client.process_commands(message)
-                except ValueError:
-                    await send("WRONG_USAGE", message.channel, "as")
-        else:
-            await client.process_commands(message)  # if not spam, process
-        await sleep(0.5)
-        unlock(actual_author.id)  # call finished, we can release user
+        await filter_message(client, message)
 
     # Global command error handler
     @client.event
