@@ -39,6 +39,8 @@ def get_map_selection(id):
 
 def identify_map_from_name(string):
     # Regex magic
+    if len(string) == 0:
+        return
     pattern = reg_compile("[^a-zA-Z0-9 ]")
     string = reg_sub(" {2,}", " ", pattern.sub('', string)).strip()
     results = list()
@@ -54,7 +56,7 @@ def identify_map_from_name(string):
             if map.pool:
                 results.append(map)
         if len(results) == 1:
-            return map
+            return results[0]
 
 class Map:
     def __init__(self, data):
@@ -350,10 +352,13 @@ class MapNavigator:
     def is_booked(self):
         return self.__sel.is_map_booked(self.current)
 
-    async def reset_msg(self):
+    async def __remove_msg(self):
         if self.__msg:
             rem_handler(self.__msg.id)
             await self.__msg.delete()
+
+    async def reset_msg(self):
+        await self.__remove_msg()
         try:
             self.__index = randint(0, len(self.__sel.current_list)-1)
         except ValueError:
@@ -386,7 +391,7 @@ class MapNavigator:
         self.__sel.select_by_index(self.__index)
         ctx = SendCtx.wrap(self.__match.channel)
         ctx.author = user
-        rem_handler(self.__msg.id)
+        await self.__msg.clear_reactions()
         if is_admin(user) and not player.active.is_captain:
             self.__match.confirm_map()
             await send("MATCH_MAP_SELECTED", ctx, self.__sel.map.name)

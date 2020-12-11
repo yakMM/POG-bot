@@ -211,15 +211,6 @@ def lobby_list(ctx, names_in_lobby):
     embed.add_field(name=f'Lobby: {len(names_in_lobby)} / {cfg.general["lobby_size"]}', value=list_of_names, inline = False)
     return embed
 
-
-# def selected_maps(ctx, sel):
-#     """ Returns a list of maps after a search selected
-#     """
-#     embed = Embed(colour=Color.blue())
-#     embed_text = sel.to_string() + f"\n⤾ - Back to Maps"
-#     embed.add_field(name=f"{len(sel.get_selection())} maps found", value=embed_text, inline=False)
-#     return embed
-
 def selected_maps(ctx, sel):
     """ Returns a list of maps currently selected
     """
@@ -336,9 +327,24 @@ def map_pool(ctx, sel):
     map = sel.navigator.current
     if sel.navigator.is_booked:
         embed = Embed(colour=Color.red(), title=map.name, description="WARNING! This map seems to be booked in the calendar!")
-    elif map.id in cfg.map_images:
+    else:
         embed = Embed(colour=Color.blue(), title=map.name)
+    if map.id in cfg.map_images:
         embed.set_image(url=cfg.map_images[map.id])
     else:
-        embed = Embed(colour=Color.dark_grey(), title=map.name, description="No map image available")
+        embed.add_field(name=f"Image",
+                        value="Not available for this map",
+                        inline=False)
+    return embed
+
+def join_ts(ctx):
+    embed = Embed(colour=Color.blue(), title="Teamspeak server", description="Join the Teamspeak server for the duration of the match! The address is `PSB` (no password)")
+    embed.set_image(url=cfg.ts["config_help"])
+    return embed
+
+def direct_message(ctx, msg):
+    embed = Embed(colour=Color.dark_grey(), title="Direct Message", description=f"Received a DM from {msg.author.mention}")
+    embed.add_field(name=f"Message:",
+                    value=msg.content,
+                    inline=False)
     return embed

@@ -17,6 +17,7 @@ from datetime import datetime as dt
 from datetime import timezone as tz
 import logging, logging.handlers, sys, os
 from time import gmtime
+import re
 
 # Custom modules
 import modules.config as cfg
@@ -66,9 +67,10 @@ def _add_main_handlers(client):
         if message.author == client.user:  # if bot, do nothing
             await client.process_commands(message)
             return
-        # if dm, print in console and ignore the message
+        # if dm, send in staff
         if isinstance(message.channel, DMChannel):
-            logging.info(message.author.name + ": " + message.content)
+            await send("BOT_DM", SendCtx.channel(cfg.channels["staff"]), msg=message)
+            await send("BOT_DM_RECEIVED", message.author)
             return
         if message.channel.id not in cfg.channels_list:
             return
@@ -76,12 +78,24 @@ def _add_main_handlers(client):
             if not is_admin(message.author):
                 return
             # Admins can still use bot when locked
+        actual_author = message.author
         if await is_spam(message):
             return
         message.content = message.content.lower()
-        await client.process_commands(message)  # if not spam, process
+        if is_admin(message.author) and message.content[0:3] == "=as":
+            if message.mentions:
+                message.author = message.mentions[0]
+                del message.mentions[0]
+                try:
+                    i = message.content[1:].index('=')
+                    message.content = message.content[i+1:]
+                    await client.process_commands(message)
+                except ValueError:
+                    await send("WRONG_USAGE", message.channel, "as")
+        else:
+            await client.process_commands(message)  # if not spam, process
         await sleep(0.5)
-        unlock(message.author.id)  # call finished, we can release user
+        unlock(actual_author.id)  # call finished, we can release user
 
     # Global command error handler
     @client.event

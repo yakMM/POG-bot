@@ -73,6 +73,5 @@ class ReactionHandler:
             await msg.add_reaction(react)
 
     async def auto_remove_reactions(self, msg):
-        for m_react in msg.reactions:
-            if str(m_react) in self.__f_dict.keys() and m_react.me:
-                await msg.remove_reaction(m_react, _client.user)
+        for react in self.__f_dict.keys():
+            await msg.remove_reaction(react, _client.user)

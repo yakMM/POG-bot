@@ -1,4 +1,3 @@
-from modules.ts3 import REGEX_getTs3Bots
 import modules.config as cfg
 from modules.asynchttp import request_code as http_request
 

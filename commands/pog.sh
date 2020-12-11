@@ -52,7 +52,7 @@ function my_update
     git reset --hard origin/master
 
     chmod a+x commands/*
-    cp ../secret/* bot/
+    cp ../POG-data/secret/* bot/
 }
 
 function my_log

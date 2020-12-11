@@ -70,6 +70,7 @@ general = {
 # Teamspeak
 ts = {
     "url": "",
+    "config_help" : "",
     "lobby_id": 0
 }
 

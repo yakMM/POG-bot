@@ -1,5 +1,7 @@
 # v2.1:
-
+- Ingame online check feature now reactivates after each match
+- Added =as command for admins to impersonate players
+- Any message sent to the bot in DM will be forwarded to staff
 
 # v2.0:
 Major feature implementations!

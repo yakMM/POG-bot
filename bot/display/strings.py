@@ -36,7 +36,7 @@ class AllStrings(Enum):
     LB_FULL = Message("Lobby is already full! Waiting for a match to start...")
     LB_STUCK = Message("Lobby is full, but can't start a new match yet. Please wait...", ping=False)
     LB_STUCK_JOIN = Message("You can't join the lobby, it is already full!")
-    LB_MATCH_STARTING = Message("Lobby full, match can start! Join <#{}> for team selection!", ping=False)
+    LB_MATCH_STARTING = Message("Lobby full, match can start! Join <#{}> for team selection!", ping=False, embed=embeds.join_ts)
     LB_WENT_INACTIVE = Message("{} was removed from the lobby because they went offline!", embed=embeds.lobby_list)
     LB_CLEARED = Message("Lobby has been cleared!", embed=embeds.lobby_list)
     LB_EMPTY = Message("Lobby is already empty!")
@@ -95,6 +95,8 @@ class AllStrings(Enum):
     BOT_UNFROZEN = Message("Channel unfrozen!")
     BOT_BP_OFF = Message("Ingame status check is now enabled!")
     BOT_BP_ON = Message("Ingame status check is now disabled!")
+    BOT_DM = Message(None, embed=embeds.direct_message)
+    BOT_DM_RECEIVED = Message("Thanks for your message, it was forwarded to POG staff!", ping=False)
 
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ping=False)
