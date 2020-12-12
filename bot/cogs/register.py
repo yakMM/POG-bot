@@ -123,7 +123,7 @@ async def _register(player, ctx, args):
             await send("REG_MISSING_FACTION", ctx, e.faction)
             return
         except CharAlreadyExists as e:
-            await send("REG_ALREADY_EXIST", ctx, e.char, f"<@{e.id}>")
+            await send("REG_ALREADY_EXIST", ctx, e.char, e.player.mention)
             return
         except ApiNotReachable:
             await send("API_ERROR", ctx)

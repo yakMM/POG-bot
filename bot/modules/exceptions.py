@@ -22,9 +22,9 @@ class CharInvalidWorld(Exception):
 
 
 class CharAlreadyExists(Exception):
-    def __init__(self, char, id):
+    def __init__(self, char, p):
         self.char = char
-        self.id = id  # id of player who already registered the char
+        self.player = p  # player who already registered the char
         super().__init__(f"Character {char} is already registered!")
 
 

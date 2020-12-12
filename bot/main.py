@@ -121,7 +121,7 @@ def _add_main_handlers(client):
             return
         # reaction to the rule message?
         if payload.message_id == cfg.general["rules_msg_id"]:
-            print(str(payload.emoji)) # @TODO: remove (test)
+            #print(str(payload.emoji)) # @TODO: remove (test)
             if str(payload.emoji) == "✅":
                 try:
                     p = get_player(payload.member.id)

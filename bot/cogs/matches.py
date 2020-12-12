@@ -114,7 +114,7 @@ class MatchesCog(commands.Cog, name='matches'):
             return
         team = a_player.team
         if match.resign(a_player):
-            await send("PK_RESIGNED", ctx, team.captain.mention, team.name)
+            await send("PK_RESIGNED", ctx, team.captain.mention, team.name, match=match)
         else:
             await send("PK_PICK_STARTED", ctx)
 

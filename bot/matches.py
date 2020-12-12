@@ -393,7 +393,6 @@ class Match():
         player_pings = [" ".join(tm.all_pings) for tm in self.__teams]
         self.__audio_bot.round_over()
         await send("MATCH_ROUND_OVER", self.__channel, *player_pings, self.round_no)
-        self._score_calculation.start()
         for tm in self.__teams:
             tm.captain.is_turn = True
         if self.round_no < 2:
@@ -403,6 +402,7 @@ class Match():
             captain_pings = [tm.captain.mention for tm in self.__teams]
             self.__audio_bot.match_confirm()
             await send("MATCH_CONFIRM", self.__channel, *captain_pings, match=self)
+            self._score_calculation.start()
             return
         await send("MATCH_OVER", self.__channel)
         self.__status = MatchStatus.IS_RESULT
@@ -419,8 +419,11 @@ class Match():
 
     @loop(count=1)
     async def _score_calculation(self):
-        await process_score(self)
-        self.__result_msg = await publish_match_image(self)
+        try:
+            await process_score(self)
+            self.__result_msg = await publish_match_image(self)
+        except Exception as e:
+            log.error(f"Error in score or publish function!\n{e}")
 
 
     @loop(count=1)

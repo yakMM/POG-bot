@@ -38,10 +38,16 @@ def remove_player(p):
     if p.id not in _all_players:
         raise ElementNotFound(p.id)
     if p.has_own_account:
-        for i in range(len(_names_checking)):
-            del _names_checking[i][p.ig_ids[i]]
+        name_check_remove(p)
     del _all_players[p.id]
 
+def name_check_add(p):
+    for i in range(3):
+        _names_checking[i][p.ig_ids[i]] = p
+
+def name_check_remove(p):
+    for i in range(3):
+        del _names_checking[i][p.ig_ids[i]]
 
 def get_all_players_list():
     return _all_players.values()
@@ -78,8 +84,7 @@ class Player:
         obj.__ig_names = data["ig_names"]
         obj.__ig_ids = data["ig_ids"]
         obj.__has_own_account = data["has_own_account"]
-        for i in range(len(obj.__ig_ids)):
-            _names_checking[i][obj.__ig_ids[i]] = obj
+        name_check_add(obj)
         return obj
 
     async def db_update(self, arg):
@@ -255,7 +260,10 @@ class Player:
         """
         updated = False
         if char_list is None:
-            if(self.__status is PlayerStatus.IS_NOT_REGISTERED or self.__has_own_account):
+            if self.__has_own_account:
+                name_check_remove(self)
+                updated = True
+            if self.__status is PlayerStatus.IS_NOT_REGISTERED:
                 updated = True
             self.__ig_ids = [0, 0, 0]
             self.__ig_names = ["N/A", "N/A", "N/A"]
@@ -279,52 +287,74 @@ class Player:
         """ Add a Jaeger character to the player
             Check if characters are valid thanks to ps2 api
         """
+
+        # If something changed
         updated = False
+
+        # If only 1 string, we add faction names
         if len(char_list) == 1:
             char_list = [char_list[0] + 'VS', char_list[0] + 'NC', char_list[0] + 'TR']
+
+        # Else it should be 3 strings
         if len(char_list) != 3:
             raise UnexpectedError("char_list is not the good size!")  # Should not happen, we checked earlier
+
+        # Intializing
         new_ids = [0, 0, 0]
         new_names = ["N/A", "N/A", "N/A"]
+
         for i_name in char_list:
-            url = 'http://census.daybreakgames.com/s:' + cfg.general['api_key'] + \
+            try:
+                # Query API
+                url = 'http://census.daybreakgames.com/s:' + cfg.general['api_key'] + \
                   '/get/ps2:v2/character/?name.first_lower=' + i_name.lower() + \
                   '&c:show=character_id,faction_id,name&c:resolve=world'
-            jdata = await http_request(url)
-            try:
+                jdata = await http_request(url)
+
+                # Check if something returned
                 if jdata["returned"] == 0:
                     raise CharNotFound(i_name)
-            except KeyError:
-                raise ApiNotReachable(url)
-            try:
+
+                # Check char world
                 world = int(jdata["character_list"][0]["world_id"])
                 if world != WORLD_ID:
                     raise CharInvalidWorld(jdata["character_list"][0]["name"]["first"])
-                else:
-                    faction = int(jdata["character_list"][0]["faction_id"])
-                    curr_id = int(jdata["character_list"][0]["character_id"])
-                    curr_name = jdata["character_list"][0]["name"]["first"]
-                    if curr_id in _names_checking[faction - 1]:
-                        p = _names_checking[faction - 1][curr_id]
-                        if p != self:
-                            raise CharAlreadyExists(curr_name, p.id)
-                            
-                    new_ids[faction - 1] = curr_id
-                    updated = updated or new_ids[faction - 1] != self.__ig_ids[faction - 1]
-                    new_names[faction - 1] = jdata["character_list"][0]["name"]["first"]
+
+                # Get faction, id and name from API
+                faction = int(jdata["character_list"][0]["faction_id"])
+                curr_id = int(jdata["character_list"][0]["character_id"])
+                curr_name = jdata["character_list"][0]["name"]["first"]
+                
+                # Check if the char is already registered:
+                if curr_id in _names_checking[faction - 1]:
+                    p = _names_checking[faction - 1][curr_id]
+                    if p != self:
+                        raise CharAlreadyExists(curr_name, p)
+
+                # Add current id to new ids list
+                new_ids[faction - 1] = curr_id
+
+                # If it changed, updated=True
+                updated = updated or new_ids[faction - 1] != self.__ig_ids[faction - 1]
+
+                # Add current name to new names list
+                new_names[faction - 1] = jdata["character_list"][0]["name"]["first"]
             except IndexError:
                 raise UnexpectedError("IndexError when setting player name: " + i_name)  # Should not happen, we checked earlier
             except KeyError:
                 raise UnexpectedError("KeyError when setting player name: " + i_name)  # Don't know when this should happen either
 
-        for i in range(len(new_ids)):
+        # Check if user submitted one char per faction
+        for i in range(3):
             if new_ids[i] == 0:
                 raise CharMissingFaction(cfg.factions[i + 1])
+
+        # If updated, we validate
         if updated:
             self.__ig_ids = new_ids.copy()
             self.__ig_names = new_names.copy()
-            for i in range(len(self.__ig_ids)):
-                _names_checking[i][self.__ig_ids[i]] = self
+            name_check_add(self)
+
         return updated
 
 class DataPlayer:
