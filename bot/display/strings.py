@@ -115,7 +115,7 @@ class AllStrings(Enum):
     MATCH_PLAYERS_NOT_READY = Message("Can't get {} ready, {} did not accept their Jaeger accounts", ping=False)
     MATCH_PLAYERS_OFFLINE = Message("Can't get {} ready, {} are not online in game!", ping=False, embed=embeds.offline_list)
     MATCH_CLEAR = Message("Clearing match...", ping=False)
-    MATCH_MAP_SELECTED = Message("Successfully selected **{}**")
+    MATCH_MAP_SELECTED = Message("Successfully selected **{}**", embed=embeds.map_pool)
     MATCH_ROUND_OVER = Message("{}\n{}\nRound {} is over!")
     MATCH_OVER = Message("The match is over!\nClearing channel...")
     MATCH_ALREADY = Message("The match is already started!")

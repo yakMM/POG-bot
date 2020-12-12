@@ -15,7 +15,7 @@ from modules.census import get_offline_players
 
 from classes.players import remove_player, get_player, Player, TeamCaptain
 
-from matches import clear_lobby, get_match, get_all_names_in_lobby, remove_from_lobby, is_lobby_stuck, add_to_lobby, get_all_ids_in_lobby
+from matches import clear_lobby, Match, get_all_names_in_lobby, remove_from_lobby, is_lobby_stuck, add_to_lobby, get_all_ids_in_lobby
 
 
 log = getLogger("pog_bot")
@@ -51,7 +51,7 @@ class AdminCog(commands.Cog, name='admin'):
             return
         # clear a match channel
         if ctx.channel.id in cfg.channels["matches"]:
-            match = get_match(ctx.channel.id)
+            match = Match.get(ctx.channel.id)
             if match.status is MatchStatus.IS_FREE:
                 await send("MATCH_NO_MATCH", ctx, ctx.command.name)
                 return
@@ -70,7 +70,7 @@ class AdminCog(commands.Cog, name='admin'):
         if channel_id not in cfg.channels["matches"]:
             await send("WRONG_CHANNEL", ctx, ctx.command.name, " channels " + ", ".join(f'<#{id}>' for id in cfg.channels["matches"]))
             return
-        match = get_match(ctx.channel.id)
+        match = Match.get(ctx.channel.id)
         if match.status is MatchStatus.IS_FREE:
             await send("MATCH_NO_MATCH", ctx, ctx.command.name)
             return
@@ -80,7 +80,7 @@ class AdminCog(commands.Cog, name='admin'):
         sel = match.map_selector
         if len(args) == 1 and args[0] ==  "confirm":
             match.confirm_map()
-            await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
+            await send("MATCH_MAP_SELECTED", ctx, sel.map.name, sel=sel)
             return
         # Handle the actual map selection
         result = await sel.do_selection_process(ctx, args)
@@ -91,7 +91,7 @@ class AdminCog(commands.Cog, name='admin'):
             return
         elif result:
             match.confirm_map()
-            await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
+            await send("MATCH_MAP_SELECTED", ctx, sel.map.name, sel=sel)
 
     @commands.command()
     @commands.guild_only()
@@ -134,7 +134,7 @@ class AdminCog(commands.Cog, name='admin'):
         if player.status is not PlayerStatus.IS_PICKED:
             await send("RM_DEMOTE_NO", ctx)
             return
-        match = get_match(ctx.channel.id)
+        match = Match.get(ctx.channel.id)
         if player.match.id != match.id:
             await send("PK_WRONG_CHANNEL", ctx,  player.match.id)
             return
@@ -154,7 +154,7 @@ class AdminCog(commands.Cog, name='admin'):
         if ctx.channel.id not in cfg.channels["matches"]:
             await send("WRONG_CHANNEL", ctx, ctx.command.name, ", ".join(f"<#{c_id}>" for c_id in cfg.channels["matches"]))
             return
-        match = get_match(ctx.channel.id)
+        match = Match.get(ctx.channel.id)
         match.ts3_test()
 
     @commands.command()

@@ -64,6 +64,9 @@ class DatabaseError(Exception):
 class AccountsNotEnough(Exception):
     pass
 
+class AlreadyPicked(Exception):
+    pass
+
 
 class InvalidTag(Exception):
     def __init__(self, tag):

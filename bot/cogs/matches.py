@@ -6,11 +6,11 @@ from logging import getLogger
 import modules.config as cfg
 from display import send
 from modules.tools import is_al_num
-from modules.exceptions import ElementNotFound
+from modules.exceptions import ElementNotFound, AlreadyPicked
 
 from classes.players import TeamCaptain, ActivePlayer, PlayerStatus, get_player
 
-from matches import get_match
+from matches import Match
 from modules.enumerations import MatchStatus, SelStatus
 from modules.census import get_offline_players
 from classes.accounts import get_not_ready_players
@@ -41,7 +41,7 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.guild_only()
     @commands.max_concurrency(number=1, wait=True)
     async def pick(self, ctx, *args):
-        match = get_match(ctx.channel.id)
+        match = Match.get(ctx.channel.id)
         if len(args) == 1 and args[0] == "help":
             await send("PK_HELP", ctx)  # =p help shows the help
             return
@@ -86,7 +86,7 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.command(aliases=['m'])
     @commands.guild_only()
     async def match(self, ctx):  # list the current team comp
-        match = get_match(ctx.channel.id)
+        match = Match.get(ctx.channel.id)
         if match.status not in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
             await send("PK_SHOW_TEAMS", ctx, match=match)
             return
@@ -95,7 +95,7 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.command()
     @commands.guild_only()
     async def resign(self, ctx):
-        match = get_match(ctx.channel.id)
+        match = Match.get(ctx.channel.id)
         player = await _test_player(ctx, match)
         if player is None:
             return
@@ -121,7 +121,7 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.command(aliases=['rdy'])
     @commands.guild_only()
     async def ready(self, ctx):  # when ready
-        match = get_match(ctx.channel.id)
+        match = Match.get(ctx.channel.id)
         player = await _test_player(ctx, match)
         if player is None:
             return
@@ -156,7 +156,7 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.command()
     @commands.guild_only()
     async def squittal(self, ctx):
-        match = get_match(ctx.channel.id)
+        match = Match.get(ctx.channel.id)
         if match.status not in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
             await send("MATCH_NOT_READY", ctx, ctx.command.name)
             return
@@ -224,17 +224,11 @@ async def _faction(ctx, captain, args):
     is_faction = await _faction_check(ctx, args)
     if not is_faction:
         return
+    team = captain.team
     try:
-        team = captain.team
-        new_picker = captain.match.faction_pick(team, args[0])
-        if captain.match.status is not MatchStatus.IS_FACTION:
-            await send("PK_FACTION_OK", ctx, team.name, cfg.factions[team.faction])  # faction picked
-            return
-        if new_picker == captain:
-            # faction already picked
-            await send("PK_FACTION_ALREADY", ctx)
-            return
-        await send("PK_FACTION_OK_NEXT", ctx, team.name, cfg.factions[team.faction], new_picker.mention)
+        await captain.match.faction_pick(team, args[0])
+    except AlreadyPicked:
+        await send("PK_FACTION_ALREADY", ctx)
     except KeyError:
         await send("PK_NOT_VALID_FACTION", ctx)
 
@@ -266,7 +260,7 @@ async def _map(ctx, captain, args):
             await send("PK_NOT_TURN", ctx)
             return
         match.confirm_map()
-        await send("MATCH_MAP_SELECTED", ctx, sel.map.name)
+        await send("MATCH_MAP_SELECTED", ctx, sel.map.name, sel=sel)
         return
     # Handle the actual map selection
     map = await sel.do_selection_process(ctx, args)

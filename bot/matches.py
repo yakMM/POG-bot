@@ -1,6 +1,6 @@
 import modules.config as cfg
 from modules.exceptions import UnexpectedError, AccountsNotEnough, \
-    ElementNotFound
+    ElementNotFound, UserLackingPermission, AlreadyPicked
 from display import SendCtx, send
 from modules.enumerations import PlayerStatus, MatchStatus, SelStatus
 from modules.image_maker import publish_match_image
@@ -8,6 +8,7 @@ from modules.census import process_score, get_offline_players
 from modules.database import update_match
 from datetime import datetime as dt, timezone as tz
 from modules.ts_interface import AudioBot
+from modules.reactions import ReactionHandler, add_handler
 
 from classes.teams import Team  # ok
 from classes.players import TeamCaptain, ActivePlayer  # ok
@@ -33,7 +34,6 @@ def get_match(id):
 
 
 def is_lobby_stuck():
-    global _lobby_stuck
     return _lobby_stuck
 
 
@@ -297,22 +297,39 @@ class Match():
     @loop(count=1)
     async def __player_pick_over(self, picker):
         self.__audio_bot.select_factions()
-        await send("PK_OK_FACTION", self.__channel, picker.mention, match=self)
+        msg = await send("PK_OK_FACTION", self.__channel, picker.mention, match=self)
 
-    def faction_pick(self, team, arg):
+        rh = ReactionHandler(rem_bot_react = True)
+
+        @rh.reaction(cfg.emojis["vs"], cfg.emojis["nc"], cfg.emojis["tr"])
+        def pick_faction(reaction, player, user):
+            if player.active and isinstance(player.active, TeamCaptain) and player.active.is_turn:
+                for faction in ["vs", "nc", "tr"]:
+                    if str(reaction) == cfg.emojis[faction]:
+                        self.faction_pick(player.active.team, faction)
+                        await self.__msg.clear_reactions()
+            else:
+                raise UserLackingPermission
+
+        add_handler(msg.id, rh)
+        await rh.auto_add_reactions(msg)
+
+    async def faction_pick(self, team, arg):
         faction = cfg.i_factions[arg.upper()]
         other = self.__teams[team.id-1]
         if other.faction == faction:
-            return team.captain
+            raise AlreadyPicked
         team.faction = faction
         team.captain.is_turn = False
         self.__audio_bot.faction_pick(team)
         if other.faction != 0:
+            msg = await send("PK_FACTION_OK", self.channel, team.name, cfg.factions[team.faction])
             self.__status = MatchStatus.IS_MAPPING
             self.__find_map.start()
         else:
             other.captain.is_turn = True
-        return other.captain
+            msg = await send("PK_FACTION_OK_NEXT", self.channel, team.name, cfg.factions[team.faction], other.captain.mention)
+        return msg
 
     def faction_change(self, team, arg):
         faction = cfg.i_factions[arg.upper()]

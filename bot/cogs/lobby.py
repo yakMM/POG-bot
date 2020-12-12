@@ -10,7 +10,7 @@ from modules.exceptions import UnexpectedError, ElementNotFound, LobbyStuck
 
 from classes.players import PlayerStatus, get_player
 
-from matches import get_lobby_len, is_lobby_stuck, remove_from_lobby, add_to_lobby, get_all_names_in_lobby, get_match
+from matches import get_lobby_len, is_lobby_stuck, remove_from_lobby, add_to_lobby, get_all_names_in_lobby, Match
 
 log = getLogger("pog_bot")
 
@@ -107,7 +107,7 @@ class LobbyCog(commands.Cog, name='lobby'):
     async def info(self, ctx):
         match_list = list()
         for ch in cfg.channels["matches"]:
-            match_list.append(get_match(ch))
+            match_list.append(Match.get(ch))
         await send("GLOBAL_INFO", ctx, lobby=get_all_names_in_lobby(), match_list=match_list)
 
 

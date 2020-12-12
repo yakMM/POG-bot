@@ -99,6 +99,13 @@ roles = {
     "notify": 0
 }
 
+# Emojis
+emojis = {
+    "vs": "",
+    "tr": "",
+    "nc": ""
+}
+
 # Scores
 scores = {
     "teamkill": 0,
@@ -201,6 +208,14 @@ def get_config(file):
             _error_missing(key, 'Roles', file)
         except ValueError:
             _error_incorrect(key, 'Roles', file)
+
+    # Emojis section
+    _check_section(config, "Emojis", file)
+    for key in emojis:
+        try:
+            emojis[key] = config['Emojis'][key]
+        except KeyError:
+            _error_missing(key, 'Emojis', file)
 
     # Scores section
     _check_section(config, "Scores", file)

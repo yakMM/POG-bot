@@ -1,6 +1,7 @@
 from modules.enumerations import PlayerStatus
 from modules.exceptions import ElementNotFound, UserLackingPermission
 from inspect import iscoroutinefunction as is_coroutine
+from functools import wraps
 
 _all_handlers = dict()
 
@@ -20,7 +21,7 @@ async def reaction_handler(reaction, user, player):
         result = await handler.run(reaction, player, user)
         if result and handler.rem_bot_react:
             await msg.remove_reaction(reaction.emoji, _client.user)
-            rem_handler(msg.id)
+            handler.rem_reaction(reaction.emoji, msg.id)
     except UserLackingPermission:
         pass
     if handler.rem_user_react:
@@ -56,6 +57,18 @@ class ReactionHandler:
     def set_reaction(self, react, *fcts):
         self.__f_dict[react] = [fct for fct in fcts]
 
+    def add_reaction(self, react, fct):
+        if react not in self.__f_dict:
+            self.__f_dict[react] = list()
+        self.__f_dict[react].append(fct)
+
+    def rem_reaction(self, react, m_id):
+        react = str(react)
+        if react in self.__f_dict:
+            del self.__f_dict[react]
+        if len(self.__f_dict) == 0:
+            rem_handler(m_id)
+
     async def run(self, reaction, player, user):
         try:
             fcts = self.__f_dict[str(reaction.emoji)]
@@ -75,3 +88,10 @@ class ReactionHandler:
     async def auto_remove_reactions(self, msg):
         for react in self.__f_dict.keys():
             await msg.remove_reaction(react, _client.user)
+
+    def reaction(self, *args):
+        def decorator(func):
+            for react in args:
+                self.add_reaction(react, func)
+            return func
+        return decorator

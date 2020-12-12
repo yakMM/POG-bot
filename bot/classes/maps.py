@@ -347,6 +347,8 @@ class MapNavigator:
 
     @property
     def current(self):
+        if self.__sel.status is SelStatus.IS_CONFIRMED:
+            return self.__sel.map
         return self.__sel.current_list[self.__index]
 
     @property
@@ -395,7 +397,7 @@ class MapNavigator:
         await self.__msg.clear_reactions()
         if is_admin(user) and not player.active.is_captain:
             self.__match.confirm_map()
-            await send("MATCH_MAP_SELECTED", ctx, self.__sel.map.name)
+            await send("MATCH_MAP_SELECTED", ctx, self.__sel.map.name, sel=self.__sel)
             return
         new_picker = self.__match.pick_map(player.active)
         await self.__sel.wait_confirm(ctx, new_picker)

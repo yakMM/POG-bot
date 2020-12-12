@@ -35,7 +35,7 @@ from modules.roles import init as roles_init, role_update, is_admin
 from modules.reactions import reaction_handler
 
 # Modules for the custom classes
-from matches import on_inactive_confirmed, init as matches_init
+from matches import on_inactive_confirmed, Match
 from classes.players import Player, get_player, get_all_players_list
 from classes.accounts import AccountHander
 from classes.maps import Map, MapSelection
@@ -124,7 +124,8 @@ def _add_main_handlers(client):
             return
         # reaction to the rule message?
         if payload.message_id == cfg.general["rules_msg_id"]:
-            #print(str(payload.emoji)) # @TODO: remove (test)
+            # TODO: remove (test)
+            print(str(payload.emoji))
             if str(payload.emoji) == "✅":
                 try:
                     p = get_player(payload.member.id)
@@ -184,7 +185,7 @@ def _add_init_handlers(client):
     @client.event
     async def on_ready():
         # Initialise matches channels
-        matches_init(client, cfg.channels["matches"])
+        Match.init(client, cfg.channels["matches"])
 
         roles_init(client)
 
