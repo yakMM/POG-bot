@@ -150,6 +150,15 @@ class AdminCog(commands.Cog, name='admin'):
 
     @commands.command()
     @commands.guild_only()
+    async def ts3(self, ctx):
+        if ctx.channel.id not in cfg.channels["matches"]:
+            await send("WRONG_CHANNEL", ctx, ctx.command.name, ", ".join(f"<#{c_id}>" for c_id in cfg.channels["matches"]))
+            return
+        match = get_match(ctx.channel.id)
+        match.ts3_test()
+
+    @commands.command()
+    @commands.guild_only()
     async def lobby(self, ctx, *args):
         if ctx.channel.id != cfg.channels["lobby"]:
             await send("WRONG_CHANNEL", ctx, ctx.command.name, f'<#{cfg.channels["lobby"]}>')

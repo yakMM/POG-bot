@@ -5,7 +5,7 @@
 - Flagged all the flip PIL accounts and ask users to re-register
 - Match won't get stuck if a user has locked their DMs anymore
 - Fixed error on =resign command
-- Fixed error with score calculation
+- Speculative fix for error with score calculation
 - Fixed error with ghost accounts
 
 # v2.0:

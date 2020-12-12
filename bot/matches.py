@@ -336,6 +336,8 @@ class Match():
         subbed.on_player_clean()
         return new_player
 
+    def ts3_test(self):
+        self.__audio_bot.drop_match()
 
 
     def on_team_ready(self, team):

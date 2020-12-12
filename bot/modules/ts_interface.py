@@ -69,12 +69,14 @@ class _TaskAudio:
     async def task_audio(self, string, lobby=False, wait=0):
         if wait != 0:
             await sleep(wait)
+        print("LB1"+str(lobby))
         await self.__lobby(lobby)
         url = f'http://localhost:58913/api/bot/template/{self.num}(/xecute(/add/{string}.mp3)(/play))'
         code = await http_request(url)
         log.debug(f"CODE: {code} for url {url}")
 
     async def __lobby(self, bl):
+        print("LB2"+str(bl))
         if _TaskAudio.lobby == bl:
             return
         if bl:

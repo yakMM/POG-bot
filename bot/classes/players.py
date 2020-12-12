@@ -254,38 +254,96 @@ class Player:
                 }
         return data
 
-    async def register(self, char_list):
-        """ Called when player is trying to register
-            Returns whether player data was updated or not
+    async def register(self, char_list: list) -> bool:
+        """ Register the player with char_list.
+
+            Parameters
+            ----------
+            char_list : list
+                List of character names to be added.
+
+            Raises
+            ------
+            Check _add_characters.
+
+            Returns
+            -------
+            updated : bool
+                Wether there was an update in the player profile.
+
         """
-        updated = False
+
+        # If "no account"
         if char_list is None:
+
+            # If player had an account, updated = True
             if self.__has_own_account:
+                # Remove old chars from name check
                 name_check_remove(self)
-                updated = True
-            if self.__status is PlayerStatus.IS_NOT_REGISTERED:
-                updated = True
+
+            # If player was not registered, updated = True
+            elif self.__status is PlayerStatus.IS_NOT_REGISTERED:
+                self.__status = PlayerStatus.IS_REGISTERED
+                self.__rank = 1
+
+            # Else updated = False
+            else:
+                return False
+
+            # "no account" data
             self.__ig_ids = [0, 0, 0]
             self.__ig_names = ["N/A", "N/A", "N/A"]
-            if self.__status is PlayerStatus.IS_NOT_REGISTERED:
-                self.__status = PlayerStatus.IS_REGISTERED
-                self.__rank = 1
             self.__has_own_account = False
-            if updated:
-                await self.db_update("register")
-            return updated
-        updated = await self._add_characters(char_list)
-        if updated:
-            if self.__status is PlayerStatus.IS_NOT_REGISTERED:
-                self.__status = PlayerStatus.IS_REGISTERED
-                self.__rank = 1
-            self.__has_own_account = True
-            await self.db_update("register")
-        return updated
 
-    async def _add_characters(self, char_list):
-        """ Add a Jaeger character to the player
-            Check if characters are valid thanks to ps2 api
+            # Push to db
+            await self.db_update("register")
+            return True
+
+        # Else there are characters
+        # If not updated, return
+        if not await self._add_characters(char_list):
+            return False
+
+        # Else if updated
+        if self.__status is PlayerStatus.IS_NOT_REGISTERED:
+            self.__status = PlayerStatus.IS_REGISTERED
+            self.__rank = 1
+
+        self.__has_own_account = True
+
+        # Push to db
+        await self.db_update("register")
+        return True
+
+
+    async def _add_characters(self, char_list: list) -> bool:
+        """ Add Jaeger character names to the player.
+            Check if characters are valid thanks to ps2 api.
+
+            Parameters
+            ----------
+            char_list : list
+                List of character names to be added.
+
+            Raises
+            ------
+            UnexpectedError
+                When something unexpected happens.
+            CharNotFound
+                When a character name is not found in the API.
+            CharInvalidWorld
+                When a character doesn't belongs to Jaeger.
+            CharAlreadyExists
+                When a character is already registered by another player.
+            CharMissingFaction
+                When no character was provided for one of the faction.
+
+            Returns
+            -------
+            updated : bool
+                Wether there was an update in the character names of the
+                player.
+
         """
 
         # If something changed
@@ -293,11 +351,13 @@ class Player:
 
         # If only 1 string, we add faction names
         if len(char_list) == 1:
-            char_list = [char_list[0] + 'VS', char_list[0] + 'NC', char_list[0] + 'TR']
+            char_list = [char_list[0] + 'VS', char_list[0] + 'NC',\
+                         char_list[0] + 'TR']
 
         # Else it should be 3 strings
         if len(char_list) != 3:
-            raise UnexpectedError("char_list is not the good size!")  # Should not happen, we checked earlier
+            # Should not happen, we checked earlier
+            raise UnexpectedError("char_list is not the good size!")
 
         # Intializing
         new_ids = [0, 0, 0]
@@ -306,9 +366,10 @@ class Player:
         for i_name in char_list:
             try:
                 # Query API
-                url = 'http://census.daybreakgames.com/s:' + cfg.general['api_key'] + \
-                  '/get/ps2:v2/character/?name.first_lower=' + i_name.lower() + \
-                  '&c:show=character_id,faction_id,name&c:resolve=world'
+                url = \
+                f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}'\
+                f'/get/ps2:v2/character/?name.first_lower={i_name.lower()}'\
+                f'&c:show=character_id,faction_id,name&c:resolve=world'
                 jdata = await http_request(url)
 
                 # Check if something returned
@@ -340,9 +401,11 @@ class Player:
                 # Add current name to new names list
                 new_names[faction - 1] = jdata["character_list"][0]["name"]["first"]
             except IndexError:
-                raise UnexpectedError("IndexError when setting player name: " + i_name)  # Should not happen, we checked earlier
+                # Should not happen, we checked earlier
+                raise UnexpectedError(f'IndexError when setting player name: {i_name}')
             except KeyError:
-                raise UnexpectedError("KeyError when setting player name: " + i_name)  # Don't know when this should happen either
+                # Don't know when this should happen either
+                raise UnexpectedError(f'KeyError when setting player name: {i_name}')
 
         # Check if user submitted one char per faction
         for i in range(3):

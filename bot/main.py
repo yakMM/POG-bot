@@ -54,11 +54,14 @@ def _add_main_handlers(client):
             Our bot object
     """
 
-    # help command, works in all channels
-    @client.command(aliases=['h'])
-    @commands.guild_only()
-    async def help(ctx):
-        await send("HELP", ctx)
+    try:
+        # help command, works in all channels
+        @client.command(aliases=['h'])
+        @commands.guild_only()
+        async def help(ctx):
+            await send("HELP", ctx)
+    except commands.errors.CommandRegistrationError:
+        log.warning("Skipping =help registration")
 
     # Slight anti-spam: prevent the user to input a command if the last one isn't yet processed
     # Useful for the long processes like ps2 api, database or spreadsheet calls

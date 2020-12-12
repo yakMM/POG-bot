@@ -47,7 +47,8 @@ async def api_request_and_retry(url):
 async def _fetch(client, url):
     async with client.get(url) as resp:
         if resp.status != 200:
-            raise UnexpectedError("Received wrong status from http page: " + str(resp.status))
+            log.error(f'Status {resp.status} for url {url}')
+            raise UnexpectedError(f'Received wrong status from http page: {resp.status}')
         return await resp.text()
 
 async def _fetch_code(client, url):
