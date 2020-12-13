@@ -393,13 +393,14 @@ class MapNavigator:
         ctx = SendCtx.wrap(self.__match.channel)
         ctx.author = user
         await self.__msg.clear_reactions()
-        if is_admin(user) and not player.active.is_captain:
+        if player.active and player.active.is_captain:
+            new_picker = self.__match.pick_map(player.active)
+            await self.__sel.wait_confirm(ctx, new_picker)
+            return
+        if is_admin(user):
             self.__match.confirm_map()
             await send("MATCH_MAP_SELECTED", ctx, self.__sel.map.name)
             return
-        new_picker = self.__match.pick_map(player.active)
-        await self.__sel.wait_confirm(ctx, new_picker)
-        
 
     def check_auth(self, reaction, player, user):
         if player.active and player.active.is_captain:

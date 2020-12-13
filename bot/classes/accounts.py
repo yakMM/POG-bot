@@ -233,12 +233,14 @@ class AccountHander:
                 current_acc.a_player = a_player
                 new_line[current_acc.x] = str(a_player.id)
                 msg = None
+                log.info(f"Player [name:{a_player.name}], [id:{a_player.id}] will receive {current_acc.str_id}")
+                await send("ACC_LOG", SendCtx.channel(cfg.channels["staff"]), a_player.name, a_player.id, current_acc.str_id)
                 for i in range(3):
                     try:
                         msg = await send("ACC_UPDATE", SendCtx.user(a_player.id), account=current_acc)
                         break
                     except Forbidden:
-                        pass
+                        msg = None
                 if not msg:
                     await send("ACC_CLOSED", self.__match.channel, a_player.mention)
                     msg = await send("ACC_STAFF", SendCtx.channel(cfg.channels["staff"]), f'<@&{cfg.roles["admin"]}>', a_player.mention, account=current_acc)
