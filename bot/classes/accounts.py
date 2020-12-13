@@ -115,9 +115,9 @@ class AccountHander:
         self.__y_coord = 0
         self.__x_max = 0
         self.__match = match
-        self._current_number += 1
+        AccountHander._current_number += 1
         self.__handing_stamp = 0  # timestamp: when have these accounts been given?
-        match.number = self._current_number
+        match.number = AccountHander._current_number
         self.__reaction_handler = ReactionHandler(rem_user_react=False, rem_bot_react=True)
         self.__reaction_handler.set_reaction('✅', on_account_reaction)
 
@@ -132,7 +132,7 @@ class AccountHander:
 
     def __get_accounts(self, stamp):
         """ Get all available accounts at a given time"""
-        sheet_tab = self._sheet_tab
+        sheet_tab = AccountHander._sheet_tab
         num_matches = sheet_tab.shape[0] - Y_OFFSET
         num_accounts = sheet_tab.shape[1] - X_OFFSET
 
@@ -168,7 +168,7 @@ class AccountHander:
         else:
             v_row[1] = dt.utcfromtimestamp(self.__handing_stamp).strftime("%Y-%m-%d %H:%M UTC")
         closing_stamp = int(dt.timestamp(dt.now())) + QUIT_DELAY
-        self._sheet_tab[self.__y_coord - 1][2] = str(closing_stamp)
+        AccountHander._sheet_tab[self.__y_coord - 1][2] = str(closing_stamp)
         row[2] = str(closing_stamp)
         v_row[2] = dt.utcfromtimestamp(closing_stamp).strftime("%Y-%m-%d %H:%M UTC")
         for acc in self.__free_accounts:
@@ -200,7 +200,7 @@ class AccountHander:
         self._update_sheet.cancel()
 
     def __push_update_toSheet(self, row, v_row):
-        gc = service_account(filename=self._secret_file)
+        gc = service_account(filename=AccountHander._secret_file)
         sh = gc.open_by_key(cfg.database["accounts"])
         raw_sheet = sh.worksheet("RAW")
         visible_sheet = sh.worksheet("VISIBLE")
@@ -246,7 +246,7 @@ class AccountHander:
                 await self.__reaction_handler.auto_add_reactions(msg)
                 current_acc.message = msg
                 i += 1
-        self._sheet_tab = vstack((self._sheet_tab, array(new_line)))
+        AccountHander._sheet_tab = vstack((AccountHander._sheet_tab, array(new_line)))
         self.__handing_stamp = stamp
         await send("ACC_SENT", self.__match.channel)
 

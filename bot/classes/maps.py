@@ -139,7 +139,7 @@ class MapSelection:
     def __get_booked(self):  # runs on class init, saves a list of booked maps at the time of init to self.booked
         try:
             date_rng_start = date_rng_end = None
-            gc = service_account(filename=type(self)._secret_file)
+            gc = service_account(filename=MapSelection._secret_file)
             sh = gc.open_by_key(cfg.database["jaeger_cal"])
             ws = sh.worksheet("Current")
             cal_export = np_array(ws.get_all_values())
