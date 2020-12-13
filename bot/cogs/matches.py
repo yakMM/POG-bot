@@ -10,7 +10,7 @@ from modules.exceptions import ElementNotFound, AlreadyPicked
 
 from classes.players import TeamCaptain, ActivePlayer, PlayerStatus, get_player
 
-from matches import Match
+from match_process import Match
 from modules.enumerations import MatchStatus, SelStatus
 from modules.census import get_offline_players
 from classes.accounts import get_not_ready_players

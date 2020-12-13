@@ -20,6 +20,8 @@ from lib.tasks import loop
 from asyncio import sleep
 from logging import getLogger
 
+from match_process.player_picking import PlayerPicking
+
 log = getLogger("pog_bot")
 
 
@@ -29,29 +31,76 @@ class Match:
 
     @classmethod
     def get(this, m_id):
-        if id not in this.__all_matches:
+        if m_id not in this.__all_matches:
             raise ElementNotFound(m_id)
         return this.__all_matches[m_id]
 
     @classmethod
-    def init(this, client, list):
-        for m_id in list:
+    def init(this, client, ch_list):
+        for m_id in ch_list:
             ch = client.get_channel(m_id)
             this.__all_matches[m_id] = this(m_id, ch)
+            print(f"Adding: {m_id}")
 
-    def __init__(self, m_id, ch, from_data = False):
+    @classmethod
+    def find_empty(this):
+        for match in this.__all_matches.values():
+            if match.status is MatchStatus.IS_FREE:
+                return match
+        return None
+
+    def __init__(self, m_id, ch):
         self.__id = m_id
-        self.__players = dict()
-        self.__teams = [None, None]
-        self.__map_selector = None
-        self.__result_msg = None
-        self.__accounts = None
-        self.__round_stamps = list()
-        if from_data:
-            self.__number = m_id
-            return
-        self.__number = 0
-        self.__status = MatchStatus.IS_FREE
         self.__channel = ch
-        self.__audio_bot = AudioBot(self)
-    
+        self.__cp = None
+        self.__currentProcess = None
+
+    @property
+    def id(self):
+        return self.__id
+
+    @property
+    def channel(self):
+        return self.__channel
+
+    # @property
+    # def msg(self):
+    #     return self.__cp.result_msg
+
+    # @property
+    # def status(self):
+    #     return self.__status
+
+
+
+    # @property
+    # def teams(self):
+    #     return self.__cp.teams
+
+    # @property
+    # def status_string(self):
+    #     return self.__status.value
+
+    # @property
+    # def number(self):
+    #     return self.__number
+
+    def spin_up(self, p_list):
+        self.__cp.status = MatchStatus.IS_RUNNING
+        self.__currentProcess = PlayerPicking(self.__cp, p_list)
+
+
+class MatchContentProxy:
+
+    def __init__(self, match):
+        self.match = match
+        self.id = match.id
+        self.channel = match.channel
+        self.teams = [None, None]
+        self.map_selector = None
+        self.result_msg = None
+        self.accounts = None
+        self.round_stamps = list()
+        self.number = 0
+        self.status = MatchStatus.IS_FREE
+        self.audio_bot = AudioBot(self)

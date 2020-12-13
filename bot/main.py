@@ -29,13 +29,14 @@ from modules.database import init as db_init, get_all_items
 from modules.enumerations import PlayerStatus
 from modules.loader import init as cog_init, is_all_locked, unlock_all
 from modules.reactions import init as react_init, reaction_handler
+from modules.lobby import on_inactive_confirmed
 
 # Modules for the custom classes
 from modules.roles import init as roles_init, role_update, is_admin
 from modules.reactions import reaction_handler
 
 # Modules for the custom classes
-from matches import on_inactive_confirmed, Match
+from match_process import Match
 from classes.players import Player, get_player, get_all_players_list
 from classes.accounts import AccountHander
 from classes.maps import Map, MapSelection

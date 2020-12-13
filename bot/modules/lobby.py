@@ -1,24 +1,11 @@
 import modules.config as cfg
-from modules.exceptions import UnexpectedError, AccountsNotEnough, \
-    ElementNotFound, UserLackingPermission, AlreadyPicked
 from display import SendCtx, send
-from modules.enumerations import PlayerStatus, MatchStatus, SelStatus
-from modules.image_maker import publish_match_image
-from modules.census import process_score, get_offline_players
-from modules.database import update_match
-from datetime import datetime as dt, timezone as tz
-from modules.ts_interface import AudioBot
-from modules.reactions import ReactionHandler, add_handler
-
-from classes.teams import Team  # ok
-from classes.players import TeamCaptain, ActivePlayer  # ok
-from classes.maps import MapSelection, main_maps_pool  # ok
-from classes.accounts import AccountHander  # ok
 
 from random import choice as random_choice
 from lib.tasks import loop
-from asyncio import sleep
 from logging import getLogger
+
+from match_process import Match
 
 log = getLogger("pog_bot")
 
@@ -63,7 +50,7 @@ def add_to_lobby(player):
 
 @loop(minutes=3, delay=1, count=2)
 async def _auto_ping():
-    if _find_spot_for_match() is None:
+    if Match.find_empty() is None:
         return
     await send("LB_NOTIFY", SendCtx.channel(cfg.channels["lobby"]), f'<@&{cfg.roles["notify"]}>')
 _auto_ping.already = False
@@ -103,18 +90,15 @@ def _on_lobby_remove():
 
 @loop(count=1)
 async def start_match_from_full_lobby():
-    match = _find_spot_for_match()
+    match = Match.find_empty()
     _auto_ping_cancel()
     if match is None:
         set_lobby_stuck(True)
         await send("LB_STUCK", SendCtx.channel(cfg.channels["lobby"]))
         return
     set_lobby_stuck(False)
-    match._set_player_list(_lobby_list)
-    for p in _lobby_list:
-        p.on_match_selected(match)
+    match.spin_up(_lobby_list)
     _lobby_list.clear()
-    match._launch.start()
     await send("LB_MATCH_STARTING", SendCtx.channel(cfg.channels["lobby"]), match.id)
 
 async def on_inactive_confirmed(player):
@@ -130,10 +114,3 @@ def clear_lobby():
     _lobby_list.clear()
     _on_lobby_remove()
     return True
-
-
-def _find_spot_for_match():
-    for match in _all_matches.values():
-        if match.status is MatchStatus.IS_FREE:
-            return match
-    return None

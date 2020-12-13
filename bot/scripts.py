@@ -6,7 +6,7 @@ import modules.config as cfg
 from classes.players import Player, _all_players, get_player
 from modules.database import force_update, get_all_items, _replace_player, _update_map, init as db_init, get_one_item, collections, _remove
 from classes.maps import _all_maps_list, Map
-from matches import Match
+from match_process import Match
 import requests
 import json
 import asyncio

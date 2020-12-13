@@ -12,10 +12,13 @@ from modules.database import remove_player as db_remove
 from modules.loader import lock_all, unlock_all, is_all_locked
 from modules.roles import force_info, role_update, is_admin, perms_muted, channel_freeze
 from modules.census import get_offline_players
+from modules.lobby import clear_lobby, get_all_names_in_lobby, remove_from_lobby, is_lobby_stuck, add_to_lobby, get_all_ids_in_lobby
+
+from match_process import Match
 
 from classes.players import remove_player, get_player, Player, TeamCaptain
 
-from matches import clear_lobby, Match, get_all_names_in_lobby, remove_from_lobby, is_lobby_stuck, add_to_lobby, get_all_ids_in_lobby
+
 
 
 log = getLogger("pog_bot")

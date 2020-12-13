@@ -10,7 +10,9 @@ from modules.exceptions import UnexpectedError, ElementNotFound, LobbyStuck
 
 from classes.players import PlayerStatus, get_player
 
-from matches import get_lobby_len, is_lobby_stuck, remove_from_lobby, add_to_lobby, get_all_names_in_lobby, Match
+from modules.lobby import get_lobby_len, is_lobby_stuck, remove_from_lobby, add_to_lobby, get_all_names_in_lobby
+
+from match_process import Match
 
 log = getLogger("pog_bot")
 
@@ -56,7 +58,6 @@ class LobbyCog(commands.Cog, name='lobby'):
             await send("CHECK_ACCOUNT", ctx, cfg.channels["register"], account_names=accs)
             return
         if ctx.author.status == discord_status.offline:
-            print(str(ctx.author.status))
             await send("LB_OFFLINE", ctx)
             return
         if player.status is PlayerStatus.IS_LOBBIED:
