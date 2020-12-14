@@ -139,7 +139,7 @@ class MapSelection:
     def __get_booked(self):  # runs on class init, saves a list of booked maps at the time of init to self.booked
         try:
             date_rng_start = date_rng_end = None
-            gc = service_account(filename=type(self)._secret_file)
+            gc = service_account(filename=MapSelection._secret_file)
             sh = gc.open_by_key(cfg.database["jaeger_cal"])
             ws = sh.worksheet("Current")
             cal_export = np_array(ws.get_all_values())
@@ -395,13 +395,14 @@ class MapNavigator:
         ctx = SendCtx.wrap(self.__match.channel)
         ctx.author = user
         await self.__msg.clear_reactions()
-        if is_admin(user) and not player.active.is_captain:
+        if player.active and player.active.is_captain:
+            new_picker = self.__match.pick_map(player.active)
+            await self.__sel.wait_confirm(ctx, new_picker)
+            return
+        if is_admin(user):
             self.__match.confirm_map()
             await send("MATCH_MAP_SELECTED", ctx, self.__sel.map.name, sel=self.__sel)
             return
-        new_picker = self.__match.pick_map(player.active)
-        await self.__sel.wait_confirm(ctx, new_picker)
-        
 
     def check_auth(self, reaction, player, user):
         if player.active and player.active.is_captain:

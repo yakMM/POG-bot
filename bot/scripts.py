@@ -167,14 +167,14 @@ def get_match_from_db(m_id):
         print(f'{m_id} cancelled!')
         return None
     m=get_one_item("matches", Match.new_from_data, m_id)
-    #print(m.get_data())
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(process_score(m))
-    dta=m.get_data()
-    print(f'Match {dta["_id"]}: team1: {dta["teams"][0]["score"]}, team2: {dta["teams"][1]["score"]}')
-    return dta
+    # #print(m.get_data())
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(process_score(m))
+    # dta=m.get_data()
+    # print(f'Match {dta["_id"]}: team1: {dta["teams"][0]["score"]}, team2: {dta["teams"][1]["score"]}')
+    # #return dta
 
-    #_make_image(m)
+    _make_image(m)
 
 def matches_db_update():
     get_all_items(DbMatch.new_from_data, "matches")
@@ -191,10 +191,11 @@ def remove_old_accounts():
         p = get_player(pid)
         _remove(p)
 
-ij = 817
 
-while True:
-    dta=get_match_from_db(ij)
-    if dta:
-        collections["matches"].replace_one({"_id": dta["_id"]}, dta)
-    ij-=1
+get_match_from_db(1103)
+# ij = 817
+# while True:
+#     dta=get_match_from_db(ij)
+#     if dta:
+#         collections["matches"].replace_one({"_id": dta["_id"]}, dta)
+#     ij-=1

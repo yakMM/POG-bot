@@ -233,7 +233,7 @@ class Match():
             teams_data.append(tm.get_data())
         data = {"_id": self.__number,
                 "round_stamps": self.__round_stamps,
-                "cfg.general['round_length']_min": cfg.general['round_length'],
+                "round_length": cfg.general['round_length'],
                 "base_id": self.__map_selector.map.id,
                 "teams": teams_data
                 }

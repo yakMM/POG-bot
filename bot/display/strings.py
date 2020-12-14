@@ -141,6 +141,7 @@ class AllStrings(Enum):
     ACC_SENDING = Message("Loading Jaeger accounts...")
     ACC_OVER = Message("Match is over, please log out of your Jaeger account!")
     ACC_CLOSED = Message("{}'s DMS are locked, couldn't send them a Jaeger account after 3 retries!\nSending the account to staff instead.")
+    ACC_LOG = Message("Player [name:{}], [id:{}] will receive {}")
 
     NOTIFY_REMOVED = Message("You left Notify!")
     NOTIFY_ADDED = Message("You joined Notify!")

@@ -115,7 +115,7 @@ def _make_image(match):
     for tm in match.teams:
         draw.text((X_OFFSET+2200,200+100*(tm.id+2)), f"{tm.name}: {tm.cap} points", font=small_font, white=white)
         _team_display(draw, tm, y_off(tm.id))
-    img.save(f'../matches/match_{match.number}.png')
+    img.save(f'../../POG-data/matches/match_{match.number}.png')
 
 
 async def publish_match_image(match):
@@ -131,6 +131,6 @@ async def publish_match_image(match):
     else:
         string = "SC_RESULT_HALF"
     msg = await image_send(string, SendCtx.channel(cfg.channels["results"]),
-                f'../matches/match_{match.number}.png', match.number)
+                f'../../POG-data/matches/match_{match.number}.png', match.number)
     return msg
 

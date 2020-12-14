@@ -80,7 +80,7 @@ class SendCtx:
     @classmethod
     def user(cls, user_id):
         user = _client.get_user(user_id)
-        return cls(user, "x", 0, user.send)
+        return cls(user, "x", user_id, user.send)
 
     @classmethod
     def channel(cls, channel_id, cmd_name = "x"):
