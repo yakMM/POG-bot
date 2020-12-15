@@ -29,13 +29,6 @@ main_maps_pool = list()
 
 MAX_SELECTED = 15
 
-_map_selections_dict = dict()
-
-def get_map_selection(id):
-    sel = _map_selections_dict.get(id)
-    if sel is None:
-        raise ElementNotFound(id)
-    return sel
 
 def identify_map_from_name(string):
     # Regex magic
@@ -59,6 +52,13 @@ def identify_map_from_name(string):
             return results[0]
 
 class Map:
+
+    @classmethod
+    def get(this, m_id : int):
+        if m_id not in _all_maps_list:
+            raise ElementNotFound(m_id)
+        return _all_maps_list[m_id]
+
     def __init__(self, data):
         self.__id = data["_id"]
         self.__name = data["name"]
@@ -117,14 +117,15 @@ class MapSelection:
         obj.__status = SelStatus.IS_CONFIRMED
         return obj
 
-    def __init__(self, match, map_list=_all_maps_list, from_data = False):
-        self.__id = match.id
+    def __init__(self, match, map_pool = False, from_data = False):
+        if map_pool:
+            self.__all_maps = main_maps_pool
+        else:
+            self.__all_maps = _all_maps_list
         self.__match = match
         self.__selection = list()
         self.__selected = None
-        self.__all_maps = map_list
         self.__booked = list()
-        _map_selections_dict[self.__id] = self
         self.__status = SelStatus.IS_EMPTY
         if from_data:
             return
@@ -298,10 +299,6 @@ class MapSelection:
         return self.__selected
 
     @property
-    def id(self):
-        return self.__id
-
-    @property
     def status(self):
         return self.__status
 
@@ -315,8 +312,6 @@ class MapSelection:
             return True
         return False
 
-    def clean(self):
-        del _map_selections_dict[self.__id]
 
     async def wait_confirm(self, ctx, picker):
         def confirm_map(reaction, player, user):

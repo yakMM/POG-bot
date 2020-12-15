@@ -14,7 +14,7 @@ class AudioBot:
     # conflict)
 
     def __init__(self, match):
-        self.num = cfg.channels["matches"].index(match.id)+1
+        self.num = cfg.channels["matches"].index(match.channel.id)+1
         self.lobby = False
 
     def drop_match(self):

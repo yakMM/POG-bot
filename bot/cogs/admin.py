@@ -138,8 +138,8 @@ class AdminCog(commands.Cog, name='admin'):
             await send("RM_DEMOTE_NO", ctx)
             return
         match = Match.get(ctx.channel.id)
-        if player.match.id != match.id:
-            await send("PK_WRONG_CHANNEL", ctx,  player.match.id)
+        if player.match.channel.id != match.channel.id:
+            await send("PK_WRONG_CHANNEL", ctx,  player.match.channel.id)
             return
         a_player = player.active
         if not isinstance(a_player, TeamCaptain):
@@ -321,7 +321,7 @@ class AdminCog(commands.Cog, name='admin'):
             await send("SUB_NO_PLAYER", ctx)
             return
         else:
-            await send("SUB_LOBBY",  SendCtx.channel(cfg.channels["lobby"]), new_player.mention, new_player.match.id,
+            await send("SUB_LOBBY",  SendCtx.channel(cfg.channels["lobby"]), new_player.mention, new_player.match.channel.id,
                                             names_in_lobby=get_all_names_in_lobby())
             if new_player.status is PlayerStatus.IS_PICKED:
                 await send("SUB_OKAY_TEAM", ctx, new_player.mention, player.mention,

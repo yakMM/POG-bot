@@ -182,9 +182,9 @@ async def _test_player(ctx, match):
         # if player not in match
         await send("PK_NO_LOBBIED", ctx,  cfg.channels["lobby"])
         return
-    if player.match.id != match.id:
+    if player.match.channel.id != match.channel.id:
         # if player not in the right match channel
-        await send("PK_WRONG_CHANNEL", ctx,  player.match.id)
+        await send("PK_WRONG_CHANNEL", ctx,  player.match.channel.id)
         return
     return player
 
@@ -206,7 +206,7 @@ async def _pick(ctx, captain, args):
         await send("PK_INVALID", ctx)
         return
     match = captain.match
-    if picked.status is PlayerStatus.IS_MATCHED and picked.match.id == match.id:
+    if picked.status is PlayerStatus.IS_MATCHED and picked.match.channel.id == match.channel.id:
         # this function return the next picker and triggers next step if everyone is already picked
         new_picker = match.pick(captain.team, picked)
         if match.status is MatchStatus.IS_FACTION:

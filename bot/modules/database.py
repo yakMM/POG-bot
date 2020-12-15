@@ -24,13 +24,9 @@ def get_all_items(init_class_method, db_name):
     except KeyError as e:
         raise DatabaseError(f"KeyError when retrieving {db_name} from database: {e}")
 
-def get_one_item(db_name, init_class_method, item_id):
-    item = collections[db_name].find_one({"_id": item_id})
-
-    try:
-        return init_class_method(item)
-    except KeyError as e:
-        raise DatabaseError(f"KeyError when retrieving {db_name} from database: {e}")
+async def get_one_item(db_name, item_id):
+    loop = get_event_loop()
+    await loop.run_in_executor(None, _get_one_item, db_name, item_id)
 
 async def update_player(p, doc):
     """ Launch the task updating player p in database
@@ -73,6 +69,14 @@ def _update_player(p, doc):
     else:
         collections["users"].insert_one(p.get_data())
 
+def _get_one_item(db_name, item_id):
+    if collections[db_name].count_documents({"_id": item_id}) == 0:
+        raise DatabaseError(f"Item [id:{item_id}] not found in collection 'db_name'")
+    item = collections[db_name].find_one({"_id": item_id})
+    try:
+        return item
+    except KeyError as e:
+        raise DatabaseError(f"KeyError when retrieving {db_name} from database: {e}")
 
 def _replace_player(p):
     """ Update player p into db

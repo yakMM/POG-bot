@@ -186,7 +186,7 @@ def _add_init_handlers(client):
     @client.event
     async def on_ready():
         # Initialise matches channels
-        Match.init(client, cfg.channels["matches"])
+        Match.init_channels(client, cfg.channels["matches"])
 
         roles_init(client)
 

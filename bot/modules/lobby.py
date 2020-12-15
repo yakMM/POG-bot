@@ -99,7 +99,7 @@ async def start_match_from_full_lobby():
     set_lobby_stuck(False)
     match.spin_up(_lobby_list)
     _lobby_list.clear()
-    await send("LB_MATCH_STARTING", SendCtx.channel(cfg.channels["lobby"]), match.id)
+    await send("LB_MATCH_STARTING", SendCtx.channel(cfg.channels["lobby"]), match.channel.id)
 
 async def on_inactive_confirmed(player):
     remove_from_lobby(player)

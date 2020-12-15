@@ -21,7 +21,7 @@ class Team:
         self.__match = match
 
     @classmethod
-    def new_from_data(cls, i, data, match):
+    def from_data(cls, match, i, data):
         obj = cls(i, data["name"], match)
         obj.__faction = data["faction_id"]
         obj.__score = data["score"]
