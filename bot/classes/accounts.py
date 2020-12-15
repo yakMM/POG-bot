@@ -229,24 +229,29 @@ class AccountHander:
             if not a_player.has_own_account:
                 if i == len(self.__free_accounts):
                     raise AccountsNotEnough  # not enough accounts for all the player without account
-                current_acc = self.__free_accounts[i]
-                current_acc.a_player = a_player
-                new_line[current_acc.x] = str(a_player.id)
-                msg = None
-                log.info(f"Player [name:{a_player.name}], [id:{a_player.id}] will receive {current_acc.str_id}")
-                await send("ACC_LOG", SendCtx.channel(cfg.channels["staff"]), a_player.name, a_player.id, current_acc.str_id)
-                for i in range(3):
-                    try:
-                        msg = await send("ACC_UPDATE", SendCtx.user(a_player.id), account=current_acc)
-                        break
-                    except Forbidden:
-                        msg = None
-                if not msg:
-                    await send("ACC_CLOSED", self.__match.channel, a_player.mention)
-                    msg = await send("ACC_STAFF", SendCtx.channel(cfg.channels["staff"]), f'<@&{cfg.roles["admin"]}>', a_player.mention, account=current_acc)
-                add_handler(msg.id, self.__reaction_handler)
-                await self.__reaction_handler.auto_add_reactions(msg)
-                current_acc.message = msg
+                try:
+                    current_acc = self.__free_accounts[i]
+                    current_acc.a_player = a_player
+                    new_line[current_acc.x] = str(a_player.id)
+                    msg = None
+                    log.info(f"Player [name:{a_player.name}], [id:{a_player.id}] will receive {current_acc.str_id}")
+                    await send("ACC_LOG", SendCtx.channel(cfg.channels["staff"]), a_player.name, a_player.id, current_acc.str_id)
+                    log.info("After staff...")
+                    for i in range(3):
+                        try:
+                            msg = await send("ACC_UPDATE", SendCtx.user(a_player.id), account=current_acc)
+                            break
+                        except Forbidden:
+                            msg = None
+                    if not msg:
+                        await send("ACC_CLOSED", self.__match.channel, a_player.mention)
+                        msg = await send("ACC_STAFF", SendCtx.channel(cfg.channels["staff"]), f'<@&{cfg.roles["admin"]}>', a_player.mention, account=current_acc)
+                    add_handler(msg.id, self.__reaction_handler)
+                    await self.__reaction_handler.auto_add_reactions(msg)
+                    current_acc.message = msg
+                except Exception as e:
+                    log.error(f'Exception catched when sending account: {e}')
+                log.info("i+=1")
                 i += 1
         AccountHander._sheet_tab = vstack((AccountHander._sheet_tab, array(new_line)))
         self.__handing_stamp = stamp
