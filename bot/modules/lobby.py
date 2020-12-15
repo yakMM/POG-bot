@@ -5,12 +5,15 @@ from random import choice as random_choice
 from lib.tasks import loop
 from logging import getLogger
 
-from match_process import Match
-
 log = getLogger("pog_bot")
 
 _lobby_list = list()
 _lobby_stuck = False
+MatchClass = None
+
+def lobby_init(m_cls):
+    global MatchClass
+    MatchClass = m_cls
 
 def is_lobby_stuck():
     return _lobby_stuck
@@ -28,7 +31,7 @@ def _auto_ping_cancel():
     _auto_ping.cancel()
     _auto_ping.already = False
 
-def _get_sub():
+def get_sub():
     if len(_lobby_list) == 0:
         return
     player = random_choice(_lobby_list)
@@ -41,7 +44,7 @@ def add_to_lobby(player):
     _lobby_list.append(player)
     player.on_lobby_add()
     if len(_lobby_list) == cfg.general["lobby_size"]:
-        start_match_from_full_lobby.start()
+        _start_match_from_full_lobby()
     elif len(_lobby_list) >= _auto_ping_threshold():
         if not _auto_ping.is_running() and not _auto_ping.already:
             _auto_ping.start()
@@ -50,7 +53,7 @@ def add_to_lobby(player):
 
 @loop(minutes=3, delay=1, count=2)
 async def _auto_ping():
-    if Match.find_empty() is None:
+    if MatchClass.find_empty() is None:
         return
     await send("LB_NOTIFY", SendCtx.channel(cfg.channels["lobby"]), f'<@&{cfg.roles["notify"]}>')
 _auto_ping.already = False
@@ -79,7 +82,7 @@ def remove_from_lobby(player):
 def _on_match_free():
     _auto_ping.already = True
     if len(_lobby_list) == cfg.general["lobby_size"]:
-        start_match_from_full_lobby.start()
+        _start_match_from_full_lobby
 
 
 def _on_lobby_remove():
@@ -87,19 +90,24 @@ def _on_lobby_remove():
     if len(_lobby_list) < _auto_ping_threshold():
         _auto_ping_cancel()
 
-
-@loop(count=1)
-async def start_match_from_full_lobby():
-    match = Match.find_empty()
+def _start_match_from_full_lobby():
+    match = MatchClass.find_empty()
     _auto_ping_cancel()
     if match is None:
         set_lobby_stuck(True)
+        _start_match_display.start(match)
+    else:
+        set_lobby_stuck(False)
+        match.spin_up(_lobby_list)
+        _lobby_list.clear()
+        _start_match_display.start(match)
+
+@loop(count=1)
+async def _start_match_display(match):
+    if not match:
         await send("LB_STUCK", SendCtx.channel(cfg.channels["lobby"]))
-        return
-    set_lobby_stuck(False)
-    match.spin_up(_lobby_list)
-    _lobby_list.clear()
-    await send("LB_MATCH_STARTING", SendCtx.channel(cfg.channels["lobby"]), match.channel.id)
+    else:
+        await send("LB_MATCH_STARTING", SendCtx.channel(cfg.channels["lobby"]), match.channel.id)
 
 async def on_inactive_confirmed(player):
     remove_from_lobby(player)

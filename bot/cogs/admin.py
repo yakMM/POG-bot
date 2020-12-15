@@ -142,14 +142,15 @@ class AdminCog(commands.Cog, name='admin'):
             await send("PK_WRONG_CHANNEL", ctx,  player.match.channel.id)
             return
         a_player = player.active
-        if not isinstance(a_player, TeamCaptain):
+        if not a_player.is_captain:
             await send("RM_DEMOTE_NO", ctx)
             return
+        if not a_player.is_turn:
+            await send("RM_DEMOTE_NO_TURN", ctx)
+            return
         team = a_player.team
-        if match.resign(a_player):
-            await send("RM_DEMOTE_OK", ctx, team.captain.mention, team.name)
-        else:
-            await send("RM_DEMOTE_PICKING", ctx)
+        match.demote(a_player)
+        await send("RM_DEMOTE_OK", ctx, team.captain.mention, team.name, match = match)
 
     @commands.command()
     @commands.guild_only()
@@ -313,22 +314,8 @@ class AdminCog(commands.Cog, name='admin'):
         if player.status not in (PlayerStatus.IS_MATCHED, PlayerStatus.IS_PICKED):
             await send("SUB_NO", ctx)
             return
-        if player.status is PlayerStatus.IS_PICKED and isinstance(player.active, TeamCaptain):
-            await send("SUB_NO_CAPTAIN", ctx)
-            return
-        new_player = player.match.on_player_sub(player)
-        if new_player is None:
-            await send("SUB_NO_PLAYER", ctx)
-            return
-        else:
-            await send("SUB_LOBBY",  SendCtx.channel(cfg.channels["lobby"]), new_player.mention, new_player.match.channel.id,
-                                            names_in_lobby=get_all_names_in_lobby())
-            if new_player.status is PlayerStatus.IS_PICKED:
-                await send("SUB_OKAY_TEAM", ctx, new_player.mention, player.mention,
-                                            new_player.active.team.name, match=new_player.match)
-            else:
-                await send("SUB_OKAY", ctx, new_player.mention, player.mention, match=new_player.match)
-            return
+        await player.match.sub(player)
+        # Display is handled in the sub method, nothing to display here
 
 
 

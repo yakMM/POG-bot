@@ -116,10 +116,14 @@ class AccountHander:
         self.__x_max = 0
         self.__match = match
         AccountHander._current_number += 1
+        self.__number = AccountHander._current_number
         self.__handing_stamp = 0  # timestamp: when have these accounts been given?
-        match.number = AccountHander._current_number
         self.__reaction_handler = ReactionHandler(rem_user_react=False, rem_bot_react=True)
         self.__reaction_handler.set_reaction('✅', on_account_reaction)
+
+    @property
+    def number(self):
+        return self.__number
 
     def __letter_from_number(self, num):
         """ Utility method to convert number in sheet coordinate

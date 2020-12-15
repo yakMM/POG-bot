@@ -11,6 +11,7 @@ from classes.accounts import AccountHander
 from logging import getLogger
 
 from match_process.player_picking import PlayerPicking
+from match_process.faction_picking import  FactionPicking
 
 log = getLogger("pog_bot")
 
@@ -49,10 +50,9 @@ class Match:
     def __init__(self, data=None):
         self.__data = MatchData(self, data)
         self.__objects = None
-        self.__currentProcess = None
 
     def bind(self, channel):
-        self.__objects = MatchObjects(self, channel)
+        self.__objects = MatchObjects(self, self.__data, channel)
 
     @property
     def channel(self):
@@ -83,27 +83,66 @@ class Match:
     def teams(self):
         return self.__data.teams
 
+    @property
+    def round_no(self):
+        return self.__data.round_no
+
+    @property
+    def map(self):
+        if self.__objects and self.__objects.map_selector:
+            return self.__objects.map_selector.map
+        else:
+            return self.__data.map
+
     def spin_up(self, p_list):
-        self.__objects.status = MatchStatus.IS_RUNNING
-        self.__objects.init()
-        self.__currentProcess = PlayerPicking(self, self.__objects,\
-                                              self.__data, p_list)
+        self.__objects.on_spin_up(p_list)
+
+    def __getattr__(self, name):
+        if not self.__objects:
+            raise AttributeError(f"Match instance is not bound,\
+                                  no attribute '{name}'")
+        if name in self.__objects.sub_attributes:
+            return getattr(self.__objects.currentProcess, name)
+        else:
+            raise AttributeError(f"'Match' object has no attribute '{name}'")
+
 
 
 class MatchObjects:
-    def __init__(self, match, channel):
+    def __init__(self, match, data, channel):
         self.status = MatchStatus.IS_FREE
-        self.match = match
+        self.data = data
+        self.currentProcess = None
+        self.sub_attributes = list()
+        self.proxy = match
         self.channel = channel
         self.map_selector = None
         self.audio_bot = None
         self.result_msg = None
         self.account_hander = None
 
-    def init(self):
-        self.map_selector = MapSelection(self.match, map_pool=True)
-        self.audio_bot = AudioBot(self.match)
-        self.account_hander = AccountHander(self.match)
+    def on_spin_up(self, p_list):
+        self.status = MatchStatus.IS_RUNNING
+        self.map_selector = MapSelection(self.proxy, map_pool=True)
+        self.audio_bot = AudioBot(self.proxy)
+        self.account_hander = AccountHander(self.proxy)
+        self.data.id = self.account_hander.number
+        self.change_process(PlayerPicking, p_list)
+
+    def on_player_pick_over(self):
+        self.status = MatchStatus.IS_FACTION
+        self.change_process(FactionPicking)
+
+    def change_process(self, new_process, *args):
+        self.sub_attributes = new_process.get_authorized_attributes()
+        self.currentProcess = new_process(self, *args)
+
+    def __getattr__(self, name):
+        try:
+            return getattr(self.data, name)
+        except AttributeError:
+            raise AttributeError(f"'MatchObjects' object has no attribute '{name}'")
+
 
 class MatchData:
     def __init__(self, match, data):
@@ -119,3 +158,11 @@ class MatchData:
             self.teams = [None, None]
             self.map = None
             self.round_stamps = list()
+
+    @property
+    def round_no(self):
+        if self.match.status is MatchStatus.IS_PLAYING:
+            return len(self.round_stamps)
+        if self.match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_WAITING):
+            return len(self.round_stamps) + 1
+        return 0

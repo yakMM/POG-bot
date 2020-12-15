@@ -21,7 +21,7 @@ class Loop:
 
     The main interface to create this is through :func:`loop`.
     """
-    def __init__(self, coro, seconds, hours, minutes, delay, count, reconnect, loop):
+    def __init__(self, coro, seconds=0, hours=0, minutes=0, delay=0, count=1, reconnect=True, loop=None):
         self.coro = coro
         self.reconnect = reconnect
         self.loop = loop

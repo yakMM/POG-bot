@@ -1,3 +1,12 @@
+# v2.2
+- Match process rewrite [IN PROGRESS]
+- Changed how demote works:
+    - It's only possible to demote/resign a captain when it's their turn
+    - On resign, player is not put back in the picking pool but instead added to the team as a player
+    - It is now possible to demote/resign even after picking players
+- Streamlined sub process
+- Code cleaning/commentinc/documenting
+
 # v2.1:
 - Ingame online check feature now reactivates after each match
 - Added =as command for admins to impersonate players

@@ -240,30 +240,30 @@ class Match():
         return data
 
 
-    def _set_player_list(self, p_list):
-        self.__status = MatchStatus.IS_RUNNING
-        for p in p_list:
-            self.__players[p.id] = p
+    # def _set_player_list(self, p_list):
+    #     self.__status = MatchStatus.IS_RUNNING
+    #     for p in p_list:
+    #         self.__players[p.id] = p
 
-    def pick(self, team, player):
-        team.add_player(ActivePlayer, player)
-        self.__players.pop(player.id)
-        team.captain.is_turn = False
-        other = self.__teams[team.id - 1]
-        other.captain.is_turn = True
-        if len(self.__players) == 1:
-            # Auto pick last player
-            p = [*self.__players.values()][0]
-            self.__ping_last_player.start(other, p)
-            return self.pick(other, p)
-        if len(self.__players) == 0:
-            self.__status = MatchStatus.IS_FACTION
-            self.__teams[1].captain.is_turn = True
-            self.__teams[0].captain.is_turn = False
-            picker = self.__teams[1].captain
-            self.__player_pick_over.start(picker)
-            return self.__teams[1].captain
-        return other.captain
+    # def pick(self, team, player):
+    #     team.add_player(ActivePlayer, player)
+    #     self.__players.pop(player.id)
+    #     team.captain.is_turn = False
+    #     other = self.__teams[team.id - 1]
+    #     other.captain.is_turn = True
+    #     if len(self.__players) == 1:
+    #         # Auto pick last player
+    #         p = [*self.__players.values()][0]
+    #         self.__ping_last_player.start(other, p)
+    #         return self.pick(other, p)
+    #     if len(self.__players) == 0:
+    #         self.__status = MatchStatus.IS_FACTION
+    #         self.__teams[1].captain.is_turn = True
+    #         self.__teams[0].captain.is_turn = False
+    #         picker = self.__teams[1].captain
+    #         self.__player_pick_over.start(picker)
+    #         return self.__teams[1].captain
+    #     return other.captain
 
     def confirm_map(self):
         self.__map_selector.confirm()
@@ -277,42 +277,42 @@ class Match():
         other.captain.is_turn = True
         return other.captain
 
-    def resign(self, captain):
-        team = captain.team
-        if team.is_players:
-            return False
-        else:
-            player = captain.on_resign()
-            key = random_choice(list(self.__players))
-            self.__players[player.id] = player
-            team.clear()
-            team.add_player(TeamCaptain, self.__players.pop(key))
-            team.captain.is_turn = captain.is_turn
-            return True
+    # def resign(self, captain):
+    #     team = captain.team
+    #     if team.is_players:
+    #         return False
+    #     else:
+    #         player = captain.on_resign()
+    #         key = random_choice(list(self.__players))
+    #         self.__players[player.id] = player
+    #         team.clear()
+    #         team.add_player(TeamCaptain, self.__players.pop(key))
+    #         team.captain.is_turn = captain.is_turn
+    #         return True
 
-    @loop(count=1)
-    async def __ping_last_player(self, team, p):
-        await send("PK_LAST", self.__channel, p.mention, team.name)
+    # @loop(count=1)
+    # async def __ping_last_player(self, team, p):
+    #     await send("PK_LAST", self.__channel, p.mention, team.name)
 
-    @loop(count=1)
-    async def __player_pick_over(self, picker):
-        self.__audio_bot.select_factions()
-        msg = await send("PK_OK_FACTION", self.__channel, picker.mention, match=self)
+    # @loop(count=1)
+    # async def __player_pick_over(self, picker):
+    #     self.__audio_bot.select_factions()
+    #     msg = await send("PK_OK_FACTION", self.__channel, picker.mention, match=self)
 
-        rh = ReactionHandler(rem_bot_react = True)
+    #     rh = ReactionHandler(rem_bot_react = True)
 
-        @rh.reaction(cfg.emojis["vs"], cfg.emojis["nc"], cfg.emojis["tr"])
-        def pick_faction(reaction, player, user):
-            if player.active and isinstance(player.active, TeamCaptain) and player.active.is_turn:
-                for faction in ["vs", "nc", "tr"]:
-                    if str(reaction) == cfg.emojis[faction]:
-                        self.faction_pick(player.active.team, faction)
-                        await self.__msg.clear_reactions()
-            else:
-                raise UserLackingPermission
+    #     @rh.reaction(cfg.emojis["vs"], cfg.emojis["nc"], cfg.emojis["tr"])
+    #     def pick_faction(reaction, player, user):
+    #         if player.active and isinstance(player.active, TeamCaptain) and player.active.is_turn:
+    #             for faction in ["vs", "nc", "tr"]:
+    #                 if str(reaction) == cfg.emojis[faction]:
+    #                     self.faction_pick(player.active.team, faction)
+    #                     await self.__msg.clear_reactions()
+    #         else:
+    #             raise UserLackingPermission
 
-        add_handler(msg.id, rh)
-        await rh.auto_add_reactions(msg)
+    #     add_handler(msg.id, rh)
+    #     await rh.auto_add_reactions(msg)
 
     async def faction_pick(self, team, arg):
         faction = cfg.i_factions[arg.upper()]
@@ -339,19 +339,19 @@ class Match():
         team.faction = faction
         return True
 
-    def on_player_sub(self, subbed):
-        new_player = _get_sub()
-        if new_player is None:
-            return
-        new_player.on_match_selected(self)
-        if subbed.status is PlayerStatus.IS_MATCHED:
-            del self.__players[subbed.id]
-            self.__players[new_player.id] = new_player
-        elif subbed.status is PlayerStatus.IS_PICKED:
-            a_sub = subbed.active
-            a_sub.team.on_player_sub(a_sub, new_player)
-        subbed.on_player_clean()
-        return new_player
+    # def on_player_sub(self, subbed):
+    #     new_player = _get_sub()
+    #     if new_player is None:
+    #         return
+    #     new_player.on_match_selected(self)
+    #     if subbed.status is PlayerStatus.IS_MATCHED:
+    #         del self.__players[subbed.id]
+    #         self.__players[new_player.id] = new_player
+    #     elif subbed.status is PlayerStatus.IS_PICKED:
+    #         a_sub = subbed.active
+    #         a_sub.team.on_player_sub(a_sub, new_player)
+    #     subbed.on_player_clean()
+    #     return new_player
 
     def ts3_test(self):
         self.__audio_bot.drop_match()

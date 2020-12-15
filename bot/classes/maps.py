@@ -296,7 +296,10 @@ class MapSelection:
 
     @property
     def map(self):
-        return self.__selected
+        if self.status is SelStatus.IS_CONFIRMED:
+            return self.__selected
+        else:
+            return None
 
     @property
     def status(self):

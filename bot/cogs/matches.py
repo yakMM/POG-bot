@@ -109,14 +109,15 @@ class MatchesCog(commands.Cog, name='matches'):
             await send("PK_WAIT_FOR_PICK", ctx)
             return
         a_player = player.active
-        if not isinstance(a_player, TeamCaptain):
+        if not a_player.is_captain:
             await send("PK_NOT_CAPTAIN", ctx)
             return
+        if not a_player.is_turn:
+            await send("PK_NOT_TURN", ctx)
+            return
         team = a_player.team
-        if match.resign(a_player):
-            await send("PK_RESIGNED", ctx, team.captain.mention, team.name, match=match)
-        else:
-            await send("PK_PICK_STARTED", ctx)
+        match.demote(a_player)
+        await send("PK_RESIGNED", ctx, team.captain.mention, team.name, match=match)
 
     @commands.command(aliases=['rdy'])
     @commands.guild_only()
@@ -209,7 +210,7 @@ async def _pick(ctx, captain, args):
     if picked.status is PlayerStatus.IS_MATCHED and picked.match.channel.id == match.channel.id:
         # this function return the next picker and triggers next step if everyone is already picked
         new_picker = match.pick(captain.team, picked)
-        if match.status is MatchStatus.IS_FACTION:
+        if match.status is not MatchStatus.IS_PICKING:
             # Don't mention next picker
             await send("PK_OK_2", ctx, match=match)
             return

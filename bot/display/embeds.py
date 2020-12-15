@@ -250,12 +250,12 @@ def global_info(ctx, lobby, match_list):
             else:
                 desc += f"*Match {m.number}*"
             desc += "\n"
-        desc += f"Status: {m.status_string}"
+        desc += f"Status: {m.status_str}"
         if m.status in (MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
-            desc += f"\n_base: **{m.map.name}**\n"
+            desc += f"\nBase: **{m.map.name}**\n"
             desc += " / ".join(f"{tm.name}: **{cfg.factions[tm.faction]}**" for tm in m.teams)
         if m.status is MatchStatus.IS_PLAYING:
-            desc += f"\n_time Remaining: **{m.formated_time_to_round_end}**"
+            desc += f"\nTime Remaining: **{m.formated_time_to_round_end}**"
         embed.add_field(name  = m.channel.name, value = desc, inline = False)
     return embed
 
@@ -275,9 +275,9 @@ def team_update(arg, match):
         title = f"Match {match.number} - Round {match.round_no}"
     else:
         title = f"Match {match.number}"
-    desc = match.status_string
+    desc = match.status_str
     if match.status is MatchStatus.IS_PLAYING:
-        desc += f"\n_time Remaining: **{match.formated_time_to_round_end}**"
+        desc += f"\nTime Remaining: **{match.formated_time_to_round_end}**"
     embed = Embed(colour=Color.blue(), title=title, description = desc)
     if match.map is not None:
         embed.add_field(name = "Map",value = match.map.name,inline = False)
@@ -302,7 +302,7 @@ def team_update(arg, match):
                         value = value,
                         inline = False)
     if match.status is MatchStatus.IS_PICKING:
-        embed.add_field(name=f'Remaining', value="\n".join(match.player_pings), inline = False)
+        embed.add_field(name=f'Remaining', value="\n".join(match.left_players_pings), inline = False)
     return embed
 
 

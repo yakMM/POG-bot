@@ -4,7 +4,7 @@
 """
 
 from modules.enumerations import PlayerStatus
-from classes.players import ActivePlayer # ok
+from classes.players import ActivePlayer, TeamCaptain # ok
 
 
 class Team:
@@ -137,8 +137,8 @@ class Team:
     def add_one_death(self):
         self.__deaths += 1
 
-    def add_player(self, cls, player):
-        active = cls(player, self)
+    def add_player(self, p_class, player):
+        active = p_class(player, self)
         self.__players.append(active)
     
     def on_team_ready(self):
@@ -149,9 +149,11 @@ class Team:
         for p in self.__players:
             p.on_match_ready()
 
-    def on_player_sub(self, subbed, new_player):
+    def sub(self, subbed, new_player):
         i = 0
         while self.__players[i] is not subbed:
             i+=1
         active = type(subbed)(new_player, self)
+        if subbed.is_captain:
+            active.is_turn = subbed.is_turn
         self.__players[i] = active
