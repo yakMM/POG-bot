@@ -2,10 +2,11 @@ from display import send, SendCtx
 from lib.tasks import loop
 
 from modules.enumerations import MatchStatus, PlayerStatus
+from modules.exceptions import ElementNotFound
 from random import choice as random_choice
 
 from classes.teams import Team
-from classes.players import TeamCaptain, ActivePlayer
+from classes.players import TeamCaptain, ActivePlayer, get_player
 
 import match_process.common as common
 
@@ -19,6 +20,7 @@ class PlayerPicking:
         attr_list.append("left_players_pings")
         attr_list.append("demote")
         attr_list.append("pick")
+        attr_list.append("pick_status")
         attr_list.append("sub")
         return attr_list
 
@@ -26,6 +28,7 @@ class PlayerPicking:
     def __init__(self, match, p_list):
         self.players = dict()
         self.match = match
+        self.picking_captain = None
 
         for p in p_list:
             self.players[p.id] = p
@@ -73,34 +76,13 @@ class PlayerPicking:
             p_key = self.find_captain()
             self.match.teams[i].add_player(TeamCaptain, self.players.pop(p_key))
         self.match.teams[0].captain.is_turn = True
+        self.picking_captain = self.match.teams[0].captain
 
         # Ready for players to pick
         self.match.status = MatchStatus.IS_PICKING
         self.match.audio_bot.select_teams()
         await send("MATCH_SHOW_PICKS", self.match.channel,\
             self.match.teams[0].captain.mention, match=self.match.proxy)
-
-
-    def switch_turn(self, team):
-        """ Change the team who can pick.
-
-            Parameters
-            ----------
-            team : Team
-                The team who is currently picking.
-
-            Returns
-            -------
-            other : Team
-                The other team who will pick now
-        """
-        # Toggle turn
-        team.captain.is_turn = False
-        
-        # Get the other team
-        other = self.match.teams[team.id - 1]
-        other.captain.is_turn = True
-        return other
 
 
     def demote(self, captain : TeamCaptain):
@@ -125,7 +107,7 @@ class PlayerPicking:
         team.add_player(ActivePlayer, player)
 
         # It's other team captain's time to pick
-        other = self.switch_turn(team)
+        other = common.switch_turn(self, team)
 
         # Check if no player left to pick
         self.pick_check(other)
@@ -185,14 +167,74 @@ class PlayerPicking:
             # If subbed is not a captain, just replace them by new player
             # in their team
             else:
-                a_sub.team.sub(a_sub, new_player)
+                team.sub(a_sub, new_player)
                 display = "SUB_OKAY_TEAM"
 
             # Display what happened
             await send(display, *args, match=self.match.proxy)
 
 
-    def pick(self, team : Team, player) -> TeamCaptain:
+    async def pick_status(self, ctx):
+        """ Displays the picking status/help
+            
+            Parameters
+            ----------
+            ctx : Context
+                discord command context, contains the message received
+        """
+        await send("PK_PLAYERS_HELP", ctx, self.picking_captain.mention)
+
+
+    async def pick(self, ctx, captain, args):
+        """ Pick a player, and display what happened.
+            
+            Parameters
+            ----------
+            ctx : Context
+                discord command context, contains the message received
+            captain : TeamCaptain
+                The captain currently picking
+            args : list
+                Differents arguments found in the command (not used in this case)
+        """
+
+        # If no mention, can't pick a player
+        if len(ctx.message.mentions) == 0:
+            await send("PK_NO_ARG", ctx)
+            return
+
+        # If more than one mention, can'pick a player
+        if len(ctx.message.mentions) > 1:
+            await send("PK_TOO_MUCH", ctx)
+            return
+
+        # Try to get the player object from the mention
+        try:
+            picked = get_player(ctx.message.mentions[0].id)
+        except ElementNotFound:
+            # Player isn't even registered in the system...
+            await send("PK_INVALID", ctx)
+            return
+
+        # If the player is not in the list, can'be picked
+        if picked.id not in self.players:
+            await send("PK_INVALID", ctx)
+            return
+
+        # Do selection
+        team = captain.team
+        self.do_pick(team, picked)
+
+        # If player pick is over
+        if len(self.players) == 0:
+            await send("PK_OK_2", ctx, match=self.match.proxy)
+        # Else ping the other captain
+        else:
+            other = self.match.teams[team.id - 1]
+            await send("PK_OK", ctx, other.captain.mention, match=self.match.proxy)
+
+
+    def do_pick(self, team : Team, player) -> TeamCaptain:
         """ Pick a player.
             
             Parameters
@@ -201,24 +243,16 @@ class PlayerPicking:
                 The team picking the player.
             player : Player
                 Player picked.
-
-            Returns
-            -------
-            other.captain : TeamCaptain
-                The captain of the next team who can pick.
         """
         # Remove player from the list and add them to the team
         team.add_player(ActivePlayer, player)
         self.players.pop(player.id)
 
         # It's other team captain's time to pick
-        other = self.switch_turn(team)
+        other = common.switch_turn(self, team)
 
         # Check if no player left to pick
         self.pick_check(other)
-
-        # Return next picker
-        return other.captain
 
 
     def pick_check(self, other):
@@ -240,10 +274,10 @@ class PlayerPicking:
         if len(self.players) == 1:
             # Get last player
             p = [*self.players.values()][0]
+            # Pick them
+            self.do_pick(other, p)
             # Ping them
             self.ping_last_player.start(other, p)
-            # Pick them
-            self.pick(other, p)
         # If no player left, trigger the next step
         elif len(self.players) == 0:
             # Start next step

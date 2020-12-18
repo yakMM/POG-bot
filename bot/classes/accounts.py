@@ -239,7 +239,7 @@ class AccountHander:
                 msg = None
                 log.info(f"Player [name:{a_player.name}], [id:{a_player.id}] will receive {current_acc.str_id}")
                 await send("ACC_LOG", SendCtx.channel(cfg.channels["staff"]), a_player.name, a_player.id, current_acc.str_id)
-                for i in range(3):
+                for j in range(3):
                     try:
                         msg = await send("ACC_UPDATE", SendCtx.user(a_player.id), account=current_acc)
                         break

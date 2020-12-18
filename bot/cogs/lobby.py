@@ -103,14 +103,6 @@ class LobbyCog(commands.Cog, name='lobby'):
             return
         await send("LB_QUEUE", ctx, names_in_lobby=get_all_names_in_lobby())
 
-    @commands.command(aliases=['i'])
-    @commands.guild_only()
-    async def info(self, ctx):
-        match_list = list()
-        for ch in cfg.channels["matches"]:
-            match_list.append(Match.get(ch))
-        await send("GLOBAL_INFO", ctx, lobby=get_all_names_in_lobby(), match_list=match_list)
-
 
 def setup(client):
     client.add_cog(LobbyCog(client))

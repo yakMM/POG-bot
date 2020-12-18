@@ -44,10 +44,14 @@ def remove_player(p):
 def name_check_add(p):
     for i in range(3):
         _names_checking[i][p.ig_ids[i]] = p
+    
 
 def name_check_remove(p):
     for i in range(3):
-        del _names_checking[i][p.ig_ids[i]]
+        try:
+            del _names_checking[i][p.ig_ids[i]]
+        except KeyError:
+            log.warning(f"name_check_remove KeyError for player [id={p.id}], [key={p.ig_ids[i]}]")
 
 def get_all_players_list():
     return _all_players.values()
@@ -309,8 +313,6 @@ class Player:
             self.__status = PlayerStatus.IS_REGISTERED
             self.__rank = 1
 
-        self.__has_own_account = True
-
         # Push to db
         await self.db_update("register")
         return True
@@ -414,9 +416,12 @@ class Player:
 
         # If updated, we validate
         if updated:
+            if self.__has_own_account:
+                name_check_remove(self)
             self.__ig_ids = new_ids.copy()
             self.__ig_names = new_names.copy()
             name_check_add(self)
+            self.__has_own_account = True
 
         return updated
 

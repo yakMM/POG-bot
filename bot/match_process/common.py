@@ -22,3 +22,26 @@ async def ping_sub_in_lobby(match, new_player):
     await send("SUB_LOBBY", SendCtx.channel(cfg.channels["lobby"]),\
                             new_player.mention, match.channel.id,\
                             names_in_lobby=get_all_names_in_lobby())
+
+
+def switch_turn(process, team):
+    """ Change the team who can pick.
+
+        Parameters
+        ----------
+        team : Team
+            The team who is currently picking.
+
+        Returns
+        -------
+        other : Team
+            The other team who will pick now
+    """
+    # Toggle turn
+    team.captain.is_turn = False
+    
+    # Get the other team
+    other = process.match.teams[team.id - 1]
+    other.captain.is_turn = True
+    process.picking_captain = other.captain
+    return other
