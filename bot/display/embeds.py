@@ -302,7 +302,7 @@ def team_update(arg, match):
                         value = value,
                         inline = False)
     if match.status is MatchStatus.IS_PICKING:
-        embed.add_field(name=f'Remaining', value="\n".join(match.left_players_pings), inline = False)
+        embed.add_field(name=f'Remaining', value="\n".join(match.get_left_players_pings()), inline = False)
     return embed
 
 def jaeger_calendar(arg):

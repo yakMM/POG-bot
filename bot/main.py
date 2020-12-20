@@ -23,7 +23,6 @@ import re
 import modules.config as cfg
 from display import send, SendCtx, init as display_init
 from modules.message_filter import on_message as filter_message
-from modules.enumerations import MatchStatus
 from modules.exceptions import ElementNotFound, UnexpectedError
 from modules.database import init as db_init, get_all_items
 from modules.enumerations import PlayerStatus

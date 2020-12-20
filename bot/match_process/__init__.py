@@ -12,6 +12,8 @@ from logging import getLogger
 
 from match_process.player_picking import PlayerPicking
 from match_process.faction_picking import  FactionPicking
+from match_process.map_picking import  MapPicking
+from match_process.common import Process
 
 log = getLogger("pog_bot")
 
@@ -21,30 +23,30 @@ class Match:
     __bound_matches = dict()
 
     @classmethod
-    def get(this, m_id : int):
-        if m_id not in this.__bound_matches:
+    def get(cls, m_id : int):
+        if m_id not in cls.__bound_matches:
             raise ElementNotFound(m_id)
-        return this.__bound_matches[m_id]
+        return cls.__bound_matches[m_id]
 
     @classmethod
-    def init_channels(this, client, ch_list : list):
+    def init_channels(cls, client, ch_list : list):
         for ch_id in ch_list:
             channel = client.get_channel(ch_id)
-            instance = this()
+            instance = cls()
             instance.bind(channel)
-            this.__bound_matches[ch_id] = instance
+            cls.__bound_matches[ch_id] = instance
 
     @classmethod
-    def find_empty(this):
-        for match in this.__bound_matches.values():
+    def find_empty(cls):
+        for match in cls.__bound_matches.values():
             if match.status is MatchStatus.IS_FREE:
                 return match
         return None
 
     @classmethod
-    async def get_from_database(this, m_id : int):
+    async def get_from_database(cls, m_id : int):
         data = await get_one_item("matches", m_id)
-        instance = this(data)
+        instance = cls(data)
         return instance
 
     def __init__(self, data=None):
@@ -73,7 +75,7 @@ class Match:
         if not self.__objects:
             raise AttributeError("Match instance is not bound,\
                                   no attribute 'status_str'")
-        return self.__objects.status.value
+        return self.__objects.status_str
 
     @property
     def number(self):
@@ -101,10 +103,7 @@ class Match:
         if not self.__objects:
             raise AttributeError(f"Match instance is not bound,\
                                   no attribute '{name}'")
-        if name in self.__objects.sub_attributes:
-            return getattr(self.__objects.currentProcess, name)
-        else:
-            raise AttributeError(f"'Match' object has no attribute '{name}'")
+        return self.__objects.get_process_attr(name)
 
 
 
@@ -112,10 +111,9 @@ class MatchObjects:
     def __init__(self, match, data, channel):
         self.status = MatchStatus.IS_FREE
         self.data = data
-        self.currentProcess = None
-        self.sub_attributes = list()
         self.proxy = match
         self.channel = channel
+        self.current_process = None
         self.map_selector = None
         self.audio_bot = None
         self.result_msg = None
@@ -127,15 +125,28 @@ class MatchObjects:
         self.audio_bot = AudioBot(self.proxy)
         self.account_hander = AccountHander(self.proxy)
         self.data.id = self.account_hander.number
-        self.change_process(PlayerPicking, p_list)
+        self.current_process = PlayerPicking(self, p_list)
 
     def on_player_pick_over(self):
-        self.status = MatchStatus.IS_FACTION
-        self.change_process(FactionPicking)
+        self.status = MatchStatus.IS_RUNNING
+        self.current_process = FactionPicking(self)
 
-    def change_process(self, new_process, *args):
-        self.sub_attributes = new_process.get_authorized_attributes()
-        self.currentProcess = new_process(self, *args)
+    def on_faction_pick_over(self):
+        self.status = MatchStatus.IS_RUNNING
+        self.current_process = MapPicking(self)
+
+    def get_process_attr(self, name):
+        if name in self.current_process.attributes:
+            return self.current_process.attributes[name]
+        else:
+            raise AttributeError(f"Current process has no attribute '{name}'")
+
+    @property
+    def status_str(self):
+        if not self.current_process:
+            return MatchStatus.IS_FREE.value
+        else:
+            return self.current_process.status.value
 
     def __getattr__(self, name):
         try:

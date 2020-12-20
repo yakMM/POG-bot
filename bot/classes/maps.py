@@ -54,7 +54,7 @@ def identify_map_from_name(string):
 class Map:
 
     @classmethod
-    def get(this, m_id : int):
+    def get(cls, m_id : int):
         if m_id not in _all_maps_list:
             raise ElementNotFound(m_id)
         return _all_maps_list[m_id]

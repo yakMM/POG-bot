@@ -11,13 +11,13 @@ from modules.exceptions import UserLackingPermission, AlreadyPicked
 import match_process.common as common
 from asyncio import sleep
 
-class FactionPicking(common.Process, status=MatchStatus.IS_FACTION):
+class MapPicking(common.Process, status=MatchStatus.IS_MAPPING):
 
     def __init__(self, match):
         self.match = match
         self.last_msg = None
         self.picking_captain = None
-        self.reaction_handler = ReactionHandler()
+        self.reaction_handler = ReactionHandler(rem_bot_react = True)
         self.add_callbacks(self.reaction_handler)
 
         self.match.teams[1].captain.is_turn = True
@@ -28,7 +28,7 @@ class FactionPicking(common.Process, status=MatchStatus.IS_FACTION):
 
 
     @common.init_loop
-    async def init_loop(self, picker):
+    async def init(self, picker):
         await sleep(0)
         self.match.audio_bot.select_factions()
         msg = await send("PK_OK_FACTION", self.match.channel, picker.mention, match=self.match.proxy)

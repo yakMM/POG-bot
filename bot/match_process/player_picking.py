@@ -11,34 +11,22 @@ from classes.players import TeamCaptain, ActivePlayer, get_player
 import match_process.common as common
 
 
-class PlayerPicking:
-
-
-    @classmethod
-    def get_authorized_attributes(this):
-        attr_list = list()
-        attr_list.append("left_players_pings")
-        attr_list.append("demote")
-        attr_list.append("pick")
-        attr_list.append("pick_status")
-        attr_list.append("sub")
-        return attr_list
-
+class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
 
     def __init__(self, match, p_list):
-        self.players = dict()
         self.match = match
+        self.players = dict()
         self.picking_captain = None
 
         for p in p_list:
             self.players[p.id] = p
             p.on_match_selected(self.match.proxy)
 
-        self.init.start()
+        super().__init__(match)
 
 
-    @property
-    def left_players_pings(self) -> list:
+    @common.is_public
+    def get_left_players_pings(self) -> list:
         """ The list of mentions of all players left to pick.
         """
         pings = [p.mention for p in self.players.values()]
@@ -57,7 +45,7 @@ class PlayerPicking:
         return random_choice(list(self.players))
 
 
-    @loop(count=1)
+    @common.init_loop
     async def init(self):
         """ Init the match channel, ping players, find two captains \
             and ask them to start picking players.
@@ -79,12 +67,12 @@ class PlayerPicking:
         self.picking_captain = self.match.teams[0].captain
 
         # Ready for players to pick
-        self.match.status = MatchStatus.IS_PICKING
         self.match.audio_bot.select_teams()
         await send("MATCH_SHOW_PICKS", self.match.channel,\
             self.match.teams[0].captain.mention, match=self.match.proxy)
 
 
+    @common.is_public
     def demote(self, captain : TeamCaptain):
         """ Demote player from its TeamCaptain position.
             Put the demoted player in the team as a regular player.
@@ -113,6 +101,7 @@ class PlayerPicking:
         self.pick_check(other)
 
 
+    @common.is_public
     async def sub(self, subbed):
         """ Substitute a player by another one picked at random \
             in the lobby.
@@ -174,6 +163,7 @@ class PlayerPicking:
             await send(display, *args, match=self.match.proxy)
 
 
+    @common.is_public
     async def pick_status(self, ctx):
         """ Displays the picking status/help
             
@@ -185,6 +175,7 @@ class PlayerPicking:
         await send("PK_PLAYERS_HELP", ctx, self.picking_captain.mention)
 
 
+    @common.is_public
     async def pick(self, ctx, captain, args):
         """ Pick a player, and display what happened.
             
