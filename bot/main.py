@@ -201,6 +201,7 @@ def _add_init_handlers(client):
         _add_main_handlers(client)
         unlock_all(client)
         log.info('Client is ready!')
+        await send("RDY", SendCtx.channel(cfg.channels["spam"]), cfg.VERSION)
 
     @client.event
     async def on_message(message):
