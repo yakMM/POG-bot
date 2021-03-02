@@ -35,12 +35,12 @@ async def api_request_and_retry(url):
         try:
             jdata = await request(url)
         except (ClientOSError, ClientConnectorError, JSONDecodeError) as e:
-            log.warn(f"API request: {e.__name__} on try {i} for {url}")
+            log.warning(f"API request: {e.__name__} on try {i} for {url}")
             continue  # Try again
         if "returned" in jdata:
             return jdata
         else:
-            log.warn(f"Nothing returned on try {i} for {url}")
+            log.warning(f"Nothing returned on try {i} for {url}")
     raise ApiNotReachable(url)
 
 # PRIVATE:

@@ -6,7 +6,8 @@ from logging import getLogger
 import modules.config as cfg
 from modules.lobby import get_all_names_in_lobby
 from match_process import Match
-from display import send
+from display.strings import AllStrings as display
+from display.classes import ContextWrapper
 from modules.enumerations import MatchStatus
 
 log = getLogger("pog_bot")
@@ -27,18 +28,18 @@ class MatchesCog(commands.Cog, name='common'):
             match_list = list()
             for ch in cfg.channels["matches"]:
                 match_list.append(Match.get(ch))
-            await send("GLOBAL_INFO", ctx, lobby=get_all_names_in_lobby(), match_list=match_list)
+            await display.GLOBAL_INFO.send(ctx, lobby=get_all_names_in_lobby(), match_list=match_list)
             return
 
         if ctx.channel.id in cfg.channels["matches"]:
             match = Match.get(ctx.channel.id)
             if match.status not in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
-                await send("PK_SHOW_TEAMS", ctx, match=match)
+                await display.PK_SHOW_TEAMS.send(ctx, match=match)
             else:
-                await send("MATCH_NO_MATCH", ctx, ctx.command.name)
+                await display.MATCH_NO_MATCH.send(ctx, ctx.command.name)
             return
 
-        await send("WRONG_CHANNEL_2", ctx, ctx.command.name, f"<#{ctx.channel.id}>")
+        await display.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
         
 
 def setup(client):

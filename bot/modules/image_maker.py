@@ -2,7 +2,8 @@
 
 from PIL import Image, ImageDraw, ImageFont
 from asyncio import get_event_loop
-from display import image_send, SendCtx
+from display.strings import AllStrings as display
+from display.classes import ContextWrapper
 from modules.enumerations import MatchStatus
 import modules.config as cfg
 from datetime import datetime as dt
@@ -127,10 +128,10 @@ async def publish_match_image(match):
         await msg.delete()
     
     if match.status is MatchStatus.IS_RESULT:
-        string = "SC_RESULT"
-    else:
-        string = "SC_RESULT_HALF"
-    msg = await image_send(string, SendCtx.channel(cfg.channels["results"]),
+        msg = await display.SC_RESULT.imageSend(ContextWrapper.channel(cfg.channels["results"]),
                 f'../../POG-data/matches/match_{match.number}.png', match.number)
+    else:
+        msg = await display.SC_RESULT_HALF.imageSend(ContextWrapper.channel(cfg.channels["results"]),
+                                          f'../../POG-data/matches/match_{match.number}.png', match.number)
     return msg
 

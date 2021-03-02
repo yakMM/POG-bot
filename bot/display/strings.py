@@ -1,7 +1,7 @@
 from enum import Enum
 from display import embeds
 
-from display.message import Message
+from display.classes import Message, ContextWrapper
 
 
 class AllStrings(Enum):
@@ -180,3 +180,29 @@ class AllStrings(Enum):
     SUB_OKAY_NO_CAP = Message("{} replaced {} in {}.\n{} is the new captain for {}", ping=False, embed=embeds.team_update)
     SUB_OKAY = Message("{} replaced {}!", ping=False, embed=embeds.team_update)
     SUB_LOBBY = Message("{} you have been designated as a substitute, join <#{}>!", embed=embeds.lobby_list)
+
+    async def send(self, ctx, *args, **kwargs):
+        """ Send the message string_name in context ctx,
+            with additional strings *args.
+            Pass **kwargs to the embed function, if any.
+            Returns the message sent.
+        """
+        if not isinstance(ctx, ContextWrapper):
+            ctx = ContextWrapper.wrap(ctx)
+        kwargs = self.value.get_elements(ctx, string=args, embed=kwargs)
+        return await ctx.send(**kwargs)
+
+    async def edit(self, msg, *args, **kwargs):
+        """ Replaces the message ctx by the message string_name, with additional strings *args. Pass **kwargs to the embed function, if any
+            Returns the message sent
+        """
+        kwargs = self.value.get_elements(msg, string=args, embed=kwargs)
+        return await msg.edit(**kwargs)
+
+    async def image_send(self, ctx, image_path, *args):
+        if not isinstance(ctx, ContextWrapper):
+            ctx = ContextWrapper.wrap(ctx)
+        kwargs = self.value.get_elements(ctx, string=args, image=image_path)
+        return await ctx.send(**kwargs)
+
+

@@ -94,9 +94,10 @@ class LobbyStuck(Exception):
 class ApiNotReachable(Exception):
     def __init__(self, url):
         self.url = url
-        message = f"Cannot reach Api ({url})!"
+        message = f"Cannot resolve Api ({url})!"
         log.error(message)
         super().__init__(message)
+
 
 class UserLackingPermission(Exception):
     pass

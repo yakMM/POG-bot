@@ -12,7 +12,8 @@ from classes.players import get_player
 import modules.config as cfg
 from modules.roles import perms_muted, force_info, role_update
 from modules.exceptions import ElementNotFound
-from display import send
+from display.strings import AllStrings as display
+from display.classes import ContextWrapper
 from modules.exceptions import ElementNotFound
 
 log = getLogger("pog_bot")
@@ -39,10 +40,10 @@ class RegisterCog(commands.Cog, name='muted'):
             await force_info(ctx.author.id)
             return
         if player.is_timeout:
-            await send("MUTE_SHOW", ctx, dt.utcfromtimestamp(player.timeout).strftime("%Y-%m-%d %H:%M UTC"))
+            await display.MUTE_SHOW.send(ctx, dt.utcfromtimestamp(player.timeout).strftime("%Y-%m-%d %H:%M UTC"))
             return
         await role_update(player)
-        await send("MUTE_FREED", ctx)
+        await display.MUTE_FREED.send(ctx)
         await perms_muted(False, player.id)
 
 

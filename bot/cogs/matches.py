@@ -4,7 +4,8 @@ from discord.ext import commands
 from logging import getLogger
 
 import modules.config as cfg
-from display import send
+from display.strings import AllStrings as display
+from display.classes import ContextWrapper
 from modules.tools import is_al_num
 from modules.exceptions import ElementNotFound, AlreadyPicked
 
@@ -47,26 +48,26 @@ class MatchesCog(commands.Cog, name='matches'):
             return
         if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
             # Edge case, will happen very rarely if not never
-            await send("MATCH_NOT_READY", ctx, ctx.command.name)
+            await display.MATCH_NOT_READY.send(ctx, ctx.command.name)
             return
         if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
-            await send("PK_OVER", ctx)  # Picking process is over
+            await display.PK_OVER.send(ctx)  # Picking process is over
             return
         if len(args) == 0 or (len(args) == 1 and args[0] == "help"):
             await match.pick_status(ctx)
             return
         if player.status is PlayerStatus.IS_MATCHED:
-            await send("PK_WAIT_FOR_PICK", ctx)  # Player is to be picked soon
+            await display.PK_WAIT_FOR_PICK.send(ctx)  # Player is to be picked soon
             return
         a_player = player.active
         if len(args) == 0 or (len(args) == 1 and args[0] == "help"):
             await match.pick_help()
             return
         if not a_player.is_captain:
-            await send("PK_NOT_CAPTAIN", ctx)
+            await display.PK_NOT_CAPTAIN.send(ctx)
             return
         if not a_player.is_turn:
-            await send("PK_NOT_TURN", ctx)
+            await display.PK_NOT_TURN.send(ctx)
             return
         await match.pick(ctx, a_player, args)
         # if isinstance(a_player, TeamCaptain):
@@ -77,7 +78,7 @@ class MatchesCog(commands.Cog, name='matches'):
         #         if match.round_no == 1:
         #             await _faction_change(ctx, a_player, args)
         #             return
-        #         await send("PK_OVER", ctx)  # Picking process is over
+        #         await display.PK_OVER.send(ctx)  # Picking process is over
         #         return
         #     if a_player.is_turn:
         #         if match.status is MatchStatus.IS_PICKING:
@@ -87,7 +88,7 @@ class MatchesCog(commands.Cog, name='matches'):
         #             # faction picking function
         #             await _faction(ctx, a_player, args)
         #             return
-        #         await send("UNKNOWN_ERROR", ctx, "Unknown match state")  # Should never happen
+        #         await display.UNKNOWN_ERROR.send(ctx, "Unknown match state")  # Should never happen
         #         return
 
     @commands.command()
@@ -98,24 +99,24 @@ class MatchesCog(commands.Cog, name='matches'):
         if player is None:
             return
         if match.status in (MatchStatus.IS_FREE, MatchStatus.IS_RUNNING):
-            await send("MATCH_NOT_READY", ctx, ctx.command.name)
+            await display.MATCH_NOT_READY.send(ctx, ctx.command.name)
             return
         if match.status is not MatchStatus.IS_PICKING:
-            await send("MATCH_NO_COMMAND", ctx, ctx.command.name)
+            await display.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
             return
         if player.status is PlayerStatus.IS_MATCHED:
-            await send("PK_WAIT_FOR_PICK", ctx)
+            await display.PK_WAIT_FOR_PICK.send(ctx)
             return
         a_player = player.active
         if not a_player.is_captain:
-            await send("PK_NOT_CAPTAIN", ctx)
+            await display.PK_NOT_CAPTAIN.send(ctx)
             return
         if not a_player.is_turn:
-            await send("PK_NOT_TURN", ctx)
+            await display.PK_NOT_TURN.send(ctx)
             return
         team = a_player.team
         match.demote(a_player)
-        await send("PK_RESIGNED", ctx, team.captain.mention, team.name, match=match)
+        await display.PK_RESIGNED.send(ctx, team.captain.mention, team.name, match=match)
 
     @commands.command(aliases=['rdy'])
     @commands.guild_only()
@@ -126,11 +127,11 @@ class MatchesCog(commands.Cog, name='matches'):
             return
         if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
             # match not ready for this command
-            await send("MATCH_ALREADY", ctx, ctx.command.name)
+            await display.MATCH_ALREADY.send(ctx, ctx.command.name)
             return
         if match.status is not MatchStatus.IS_WAITING:
             # match not ready for this command
-            await send("MATCH_NOT_READY", ctx, ctx.command.name)
+            await display.MATCH_NOT_READY.send(ctx, ctx.command.name)
             return
         # Getting the "active" version of the player (version when player is in matched, more data inside)
         a_player = player.active
@@ -138,28 +139,28 @@ class MatchesCog(commands.Cog, name='matches'):
             if a_player.is_turn:
                 result = get_not_ready_players(a_player.team)
                 if len(result) != 0:
-                    await send("MATCH_PLAYERS_NOT_READY", ctx, a_player.team.name, " ".join(p.mention for p in result))
+                    await display.MATCH_PLAYERS_NOT_READY.send(ctx, a_player.team.name, " ".join(p.mention for p in result))
                     return
                 result = await get_offline_players(a_player.team)
                 if len(result) != 0:
-                    await send("MATCH_PLAYERS_OFFLINE", ctx, a_player.team.name, " ".join(p.mention for p in result), p_list=result)
+                    await display.MATCH_PLAYERS_OFFLINE.send(ctx, a_player.team.name, " ".join(p.mention for p in result), p_list=result)
                     return
                 match.on_team_ready(a_player.team)
-                await send("MATCH_TEAM_READY", ctx, a_player.team.name, match=match)
+                await display.MATCH_TEAM_READY.send(ctx, a_player.team.name, match=match)
                 return
             a_player.is_turn = True
-            await send("MATCH_TEAM_UNREADY", ctx, a_player.team.name, match=match)
+            await display.MATCH_TEAM_UNREADY.send(ctx, a_player.team.name, match=match)
             return
-        await send("PK_NOT_CAPTAIN", ctx)
+        await display.PK_NOT_CAPTAIN.send(ctx)
 
     @commands.command()
     @commands.guild_only()
     async def squittal(self, ctx):
         match = Match.get(ctx.channel.id)
         if match.status not in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
-            await send("MATCH_NOT_READY", ctx, ctx.command.name)
+            await display.MATCH_NOT_READY.send(ctx, ctx.command.name)
             return
-        await send("SC_PLAYERS_STRING", ctx, "\n".join(tm.ig_string for tm in match.teams))
+        await display.SC_PLAYERS_STRING.send(ctx, "\n".join(tm.ig_string for tm in match.teams))
 
 
 def setup(client):
@@ -175,15 +176,15 @@ async def _test_player(ctx, match):
         player = get_player(ctx.author.id)
     except ElementNotFound:
         # player not registered
-        await send("EXT_NOT_REGISTERED", ctx,  cfg.channels["register"])
+        await display.EXT_NOT_REGISTERED.send(ctx,  cfg.channels["register"])
         return
     if player.status in (PlayerStatus.IS_NOT_REGISTERED, PlayerStatus.IS_REGISTERED, PlayerStatus.IS_LOBBIED):
         # if player not in match
-        await send("PK_NO_LOBBIED", ctx,  cfg.channels["lobby"])
+        await display.PK_NO_LOBBIED.send(ctx,  cfg.channels["lobby"])
         return
     if player.match.channel.id != match.channel.id:
         # if player not in the right match channel
-        await send("PK_WRONG_CHANNEL", ctx,  player.match.channel.id)
+        await display.PK_WRONG_CHANNEL.send(ctx,  player.match.channel.id)
         return
     return player
 
@@ -195,29 +196,29 @@ async def _faction_change(ctx, captain, args):
         return
     team = captain.team
     if not captain.is_turn:
-        await send("PK_OVER_READY", ctx)
+        await display.PK_OVER_READY.send(ctx)
         return
     try:
         if captain.match.faction_change(team, args[0]):
-            await send("PK_FACTION_CHANGED", ctx, team.name, cfg.factions[team.faction])
+            await display.PK_FACTION_CHANGED.send(ctx, team.name, cfg.factions[team.faction])
             return
-        await send("PK_FACTION_ALREADY", ctx)
+        await display.PK_FACTION_ALREADY.send(ctx)
         return
     except KeyError:
-        await send("PK_NOT_VALID_FACTION", ctx)
+        await display.PK_NOT_VALID_FACTION.send(ctx)
 
 async def _map(ctx, captain, args):
     sel = captain.match.map_selector
     match = captain.match
     if len(args) == 1 and args[0] == "confirm":
         if sel.status is not SelStatus.IS_SELECTED:
-            await send("PK_NO_MAP", ctx)
+            await display.PK_NO_MAP.send(ctx)
             return
         if not captain.is_turn:
-            await send("PK_NOT_TURN", ctx)
+            await display.PK_NOT_TURN.send(ctx)
             return
         match.confirm_map()
-        await send("MATCH_MAP_SELECTED", ctx, sel.map.name, sel=sel)
+        await display.MATCH_MAP_SELECTED.send(ctx, sel.map.name, sel=sel)
         return
     # Handle the actual map selection
     map = await sel.do_selection_process(ctx, args)
@@ -225,4 +226,4 @@ async def _map(ctx, captain, args):
         new_picker = match.pick_map(captain)
         await sel.wait_confirm(ctx, new_picker)
         if sel.is_booked:
-            await send("MAP_BOOKED", ctx, new_picker.mention, sel.map.name)
+            await display.MAP_BOOKED.send(ctx, new_picker.mention, sel.map.name)

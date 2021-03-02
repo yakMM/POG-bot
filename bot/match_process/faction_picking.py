@@ -1,5 +1,6 @@
 
-from display import send, SendCtx
+from display.strings import AllStrings as display
+from display.classes import ContextWrapper
 from lib.tasks import loop
 
 import modules.config as cfg
@@ -31,7 +32,7 @@ class FactionPicking(common.Process, status=MatchStatus.IS_FACTION):
     async def init_loop(self, picker):
         await sleep(0)
         self.match.audio_bot.select_factions()
-        msg = await send("PK_OK_FACTION", self.match.channel, picker.mention, match=self.match.proxy)
+        msg = await display.PK_OK_FACTION.send(self.match.channel, picker.mention, match=self.match.proxy)
         await self.set_faction_msg(msg)
 
 
@@ -53,7 +54,7 @@ class FactionPicking(common.Process, status=MatchStatus.IS_FACTION):
         async def pick_faction(reaction, player, user):
             for faction in ["vs", "nc", "tr"]:
                 if str(reaction) == cfg.emojis[faction]:
-                    ctx = SendCtx.wrap(self.match.channel)
+                    ctx = ContextWrapper.wrap(self.match.channel)
                     ctx.author = user
                     msg = await self.do_pick(ctx, player.active.team, faction)
                     if msg:
@@ -96,14 +97,11 @@ class FactionPicking(common.Process, status=MatchStatus.IS_FACTION):
         # Sub the player
         team.sub(a_sub, new_player)
 
-        # Set display according to the context
-        if new_player.active.is_captain:
-            display = "SUB_OKAY_CAP"
-        else:
-            display = "SUB_OKAY_TEAM"
-
         # Display what happened
-        await send(display, *args, match=self.match.proxy)
+        if new_player.active.is_captain:
+            display.SUB_OKAY_CAP(*args, match=self.match.proxy)
+        else:
+            display.SUB_OKAY_TEAM(*args, match=self.match.proxy)
 
 
     @common.is_public
@@ -115,7 +113,7 @@ class FactionPicking(common.Process, status=MatchStatus.IS_FACTION):
             ctx : Context
                 discord command context, contains the message received
         """
-        msg = await send("PK_FACTION_HELP", ctx, self.picking_captain.mention)
+        msg = await display.PK_FACTION_HELP.send(ctx, self.picking_captain.mention)
         await self.set_faction_msg(msg)
 
 
@@ -123,15 +121,15 @@ class FactionPicking(common.Process, status=MatchStatus.IS_FACTION):
     async def pick(self, ctx, captain, args):
         # Don't want a mentioned player
         if len(ctx.message.mentions) != 0:
-            msg = await send("PK_FACTION_NOT_PLAYER", ctx)
+            msg = await display.PK_FACTION_NOT_PLAYER.send(ctx)
 
         # All factions are in one word
         elif len(args) != 1:
-            msg = await send("PK_NOT_VALID_FACTION", ctx)
+            msg = await display.PK_NOT_VALID_FACTION.send(ctx)
 
         # Check for faction string
         elif args[0].upper() not in cfg.i_factions:
-            msg = await send("PK_NOT_VALID_FACTION", ctx)
+            msg = await display.PK_NOT_VALID_FACTION.send(ctx)
 
         # Else do the pick
         else:
@@ -148,7 +146,7 @@ class FactionPicking(common.Process, status=MatchStatus.IS_FACTION):
 
         # Check if the other team already picked it
         if other.faction == faction:
-            msg = await send("PK_FACTION_ALREADY", ctx)
+            msg = await display.PK_FACTION_ALREADY.send(ctx)
             return msg
 
         # If not, select the faction and give turn to other team
@@ -158,12 +156,12 @@ class FactionPicking(common.Process, status=MatchStatus.IS_FACTION):
 
         # If other team didn't pick yet:
         if other.faction == 0:
-            msg = await send("PK_FACTION_OK_NEXT", self.match.channel, team.name, cfg.factions[team.faction], other.captain.mention)
+            msg = await display.PK_FACTION_OK_NEXT.send(self.match.channel, team.name, cfg.factions[team.faction], other.captain.mention)
             self.reaction_handler.rem_reaction(cfg.emojis[arg.lower()])
             return msg
 
         # Else, over, all teams have selected a faction
-        await send("PK_FACTION_OK", ctx, team.name, cfg.factions[team.faction])
+        await display.PK_FACTION_OK.send(ctx, team.name, cfg.factions[team.faction])
         await self.last_msg.clear_reactions()
         rem_handler(self.last_msg.id)
         self.match.on_faction_pick_over()

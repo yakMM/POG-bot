@@ -1,4 +1,5 @@
-from display import send, SendCtx
+from display.strings import AllStrings as display
+from display.classes import ContextWrapper
 from lib.tasks import loop
 
 from modules.enumerations import MatchStatus, PlayerStatus
@@ -53,7 +54,7 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
         # Inform players of match init
         players_ping = " ".join(p.mention for p in self.players.values())
         self.match.audio_bot.drop_match()
-        await send("MATCH_INIT", self.match.channel, players_ping)
+        await display.MATCH_INIT.send(self.match.channel, players_ping)
 
         # Initialize teams
         self.match.teams[0] = Team(0, f"Team 1", self.match.proxy)
@@ -68,7 +69,7 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
 
         # Ready for players to pick
         self.match.audio_bot.select_teams()
-        await send("MATCH_SHOW_PICKS", self.match.channel,\
+        await display.MATCH_SHOW_PICKS.send(self.match.channel,\
             self.match.teams[0].captain.mention, match=self.match.proxy)
 
 
@@ -124,7 +125,7 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
             self.players[new_player.id] = new_player
             # Clean subbed one and send message
             subbed.on_player_clean()
-            await send("SUB_OKAY", self.match.channel, new_player.mention,\
+            await display.SUB_OKAY.send(self.match.channel, new_player.mention,\
                                    subbed.mention, match=self.match.proxy)
             return 
 
@@ -172,7 +173,7 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
             ctx : Context
                 discord command context, contains the message received
         """
-        await send("PK_PLAYERS_HELP", ctx, self.picking_captain.mention)
+        await display.PK_PLAYERS_HELP.send(ctx, self.picking_captain.mention)
 
 
     @common.is_public
@@ -191,12 +192,12 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
 
         # If no mention, can't pick a player
         if len(ctx.message.mentions) == 0:
-            await send("PK_NO_ARG", ctx)
+            await display.PK_NO_ARG.send(ctx)
             return
 
         # If more than one mention, can'pick a player
         if len(ctx.message.mentions) > 1:
-            await send("PK_TOO_MUCH", ctx)
+            await display.PK_TOO_MUCH.send(ctx)
             return
 
         # Try to get the player object from the mention
@@ -204,12 +205,12 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
             picked = get_player(ctx.message.mentions[0].id)
         except ElementNotFound:
             # Player isn't even registered in the system...
-            await send("PK_INVALID", ctx)
+            await display.PK_INVALID.send(ctx)
             return
 
         # If the player is not in the list, can'be picked
         if picked.id not in self.players:
-            await send("PK_INVALID", ctx)
+            await display.PK_INVALID.send(ctx)
             return
 
         # Do selection
@@ -218,11 +219,11 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
 
         # If player pick is over
         if len(self.players) == 0:
-            await send("PK_OK_2", ctx, match=self.match.proxy)
+            await display.PK_OK_2.send(ctx, match=self.match.proxy)
         # Else ping the other captain
         else:
             other = self.match.teams[team.id - 1]
-            await send("PK_OK", ctx, other.captain.mention, match=self.match.proxy)
+            await display.PK_OK.send(ctx, other.captain.mention, match=self.match.proxy)
 
 
     def do_pick(self, team : Team, player) -> TeamCaptain:
@@ -277,4 +278,4 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
 
     @loop(count=1)
     async def ping_last_player(self, team, p):
-        await send("PK_LAST", self.match.channel, p.mention, team.name, match=self.match.proxy)
+        await display.PK_LAST.send(self.match.channel, p.mention, team.name, match=self.match.proxy)

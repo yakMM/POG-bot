@@ -1,12 +1,12 @@
-# v2.2:
+# v3.0:
 - Match process rewrite [IN PROGRESS]
 - Changed how demote works:
     - It's only possible to demote/resign a captain when it's their turn
     - On resign, player is not put back in the picking pool but instead added to the team as a player
     - It is now possible to demote/resign even after picking players
 - Streamlined sub process
-    - Captains can now be subsitued, a new captain will automatically get chosen
-- match command replaced by info command
+    - Captains can now be substituted, a new captain will automatically get chosen
+- match command (=m) replaced by info command (=i)
 - =p or =p help will now give info on the picking progress instead of displaying generic command help
 - Code cleaning/commenting/documenting
 

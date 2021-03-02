@@ -5,7 +5,8 @@
 import modules.config as cfg
 from modules.enumerations import SelStatus
 from modules.exceptions import ElementNotFound, UserLackingPermission
-from display import send, SendCtx, edit
+from display.strings import AllStrings as display
+from display.classes import ContextWrapper
 from modules.tools import date_parser
 from modules.reactions import ReactionHandler, add_handler, rem_handler
 from modules.roles import is_admin
@@ -209,11 +210,11 @@ class MapSelection:
             self.__status = SelStatus.IS_SELECTION
             self.__selection = self.__all_maps.copy()
         if self.__status is SelStatus.IS_SELECTION:
-            await send("MAP_SHOW_LIST", self.__match.channel, sel=self)
+            await display.MAP_SHOW_LIST.send(self.__match.channel, sel=self)
             await self.__nav.reset_msg()
             return
         if self.__status is SelStatus.IS_SELECTED:
-            await send("MAP_SELECTED", self.__match.channel, self.__selected.name)
+            await display.MAP_SELECTED.send(self.__match.channel, self.__selected.name)
             return
 
     async def do_selection_process(self, ctx, args):
@@ -222,26 +223,26 @@ class MapSelection:
             self.__selection = self.__all_maps.copy()
         if len(args) == 0:
             if self.__status is SelStatus.IS_SELECTION:
-                await send("MAP_SHOW_LIST", ctx, sel=self)
+                await display.MAP_SHOW_LIST.send(ctx, sel=self)
                 await self.__nav.reset_msg()
                 return
             if self.__status is SelStatus.IS_SELECTED:
-                await send("MAP_SELECTED", ctx, self.__selected.name)
+                await display.MAP_SELECTED.send(ctx, self.__selected.name)
                 return
-            await send("MAP_HELP", ctx)
+            await display.MAP_HELP.send(ctx)
             return
         if len(args) == 1 and args[0] == "help":
-            await send("MAP_HELP", ctx)
+            await display.MAP_HELP.send(ctx)
             return
         sel_status = self.__do_selection(args)
         if sel_status is SelStatus.IS_EMPTY:
-            await send("MAP_NOT_FOUND", ctx)
+            await display.MAP_NOT_FOUND.send(ctx)
             return
         if sel_status is SelStatus.IS_TOO_MUCH:
-            await send("MAP_TOO_MUCH", ctx)
+            await display.MAP_TOO_MUCH.send(ctx)
             return
         if sel_status == SelStatus.IS_SELECTION:
-            await send("MAP_SHOW_LIST", ctx, sel=self)
+            await display.MAP_SHOW_LIST.send(ctx, sel=self)
             await self.__nav.reset_msg()
             return
         # If successfully selected:
@@ -325,7 +326,7 @@ class MapSelection:
 
         rh = ReactionHandler(rem_bot_react=True)
         rh.set_reaction('✅', confirm_map)
-        msg = await send("PK_MAP_OK_CONFIRM", ctx, self.map.name, picker.mention)
+        msg = await display.PK_MAP_OK_CONFIRM.send(ctx, self.map.name, picker.mention)
         add_handler(msg.id, rh)
         await rh.auto_add_reactions(msg)
 
@@ -365,7 +366,7 @@ class MapNavigator:
         except ValueError:
             self.__index = 0
         self.__current_length = len(self.__sel.current_list)
-        msg = await send("MAP_SHOW_POOL", self.__match.channel, sel=self.__sel)
+        msg = await display.MAP_SHOW_POOL.send(self.__match.channel, sel=self.__sel)
         self.__msg = msg
         add_handler(msg.id, self.__reaction_handler)
         await self.__reaction_handler.auto_add_reactions(msg)
@@ -390,7 +391,7 @@ class MapNavigator:
 
     async def select(self, reaction, player, user):
         self.__sel.select_by_index(self.__index)
-        ctx = SendCtx.wrap(self.__match.channel)
+        ctx = ContextWrapper.wrap(self.__match.channel)
         ctx.author = user
         await self.__msg.clear_reactions()
         if player.active and player.active.is_captain:
@@ -399,7 +400,7 @@ class MapNavigator:
             return
         if is_admin(user):
             self.__match.confirm_map()
-            await send("MATCH_MAP_SELECTED", ctx, self.__sel.map.name, sel=self.__sel)
+            await display.MATCH_MAP_SELECTED.send(ctx, self.__sel.map.name, sel=self.__sel)
             return
 
     def check_auth(self, reaction, player, user):
@@ -410,5 +411,5 @@ class MapNavigator:
         raise UserLackingPermission
 
     async def refresh_message(self, *args):
-        await edit("MAP_SHOW_POOL", self.__msg, sel=self.__sel)
+        await display.MAP_SHOW_POOL.edit(self.__msg, sel=self.__sel)
 

@@ -1,5 +1,6 @@
 from discord import File
 
+
 class Message:
     """ Class for the enum to use
     """
@@ -49,3 +50,44 @@ class Message:
 
         return elements
 
+
+
+class ContextWrapper:
+
+    _client = None
+
+    @classmethod
+    def init(cls, client):
+        cls._client = client
+
+    @classmethod
+    def wrap(cls, ctx):
+        try:
+            cmd_name = ctx.command.name
+        except AttributeError:
+            cmd_name = "?"
+        try:
+            channel_id = ctx.channel.id
+        except AttributeError:
+            channel_id = 0
+        try:
+            author = ctx.author
+        except AttributeError:
+            author = None
+        return cls(author, cmd_name, channel_id, ctx.send)
+
+    @classmethod
+    def user(cls, user_id):
+        user = cls._client.get_user(user_id)
+        return cls(user, "x", user_id, user.send)
+
+    @classmethod
+    def channel(cls, channel_id, cmd_name="x"):
+        channel = cls._client.get_channel(channel_id)
+        return cls(None, cmd_name, channel_id, channel.send)
+
+    def __init__(self, author, cmd_name, channel_id, send):
+        self.author = author
+        self.cmd_name = cmd_name
+        self.channel_id = channel_id
+        self.send = send

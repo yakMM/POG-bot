@@ -1,5 +1,6 @@
 import modules.config as cfg
-from display import SendCtx, send
+from display.strings import AllStrings as display
+from display.classes import ContextWrapper
 
 from random import choice as random_choice
 from lib.tasks import loop
@@ -55,7 +56,7 @@ def add_to_lobby(player):
 async def _auto_ping():
     if MatchClass.find_empty() is None:
         return
-    await send("LB_NOTIFY", SendCtx.channel(cfg.channels["lobby"]), f'<@&{cfg.roles["notify"]}>')
+    await display.LB_NOTIFY.send(ContextWrapper.channel(cfg.channels["lobby"]), f'<@&{cfg.roles["notify"]}>')
 _auto_ping.already = False
 
 
@@ -105,13 +106,13 @@ def _start_match_from_full_lobby():
 @loop(count=1)
 async def _start_match_display(match):
     if not match:
-        await send("LB_STUCK", SendCtx.channel(cfg.channels["lobby"]))
+        await display.LB_STUCK.send(ContextWrapper.channel(cfg.channels["lobby"]))
     else:
-        await send("LB_MATCH_STARTING", SendCtx.channel(cfg.channels["lobby"]), match.channel.id)
+        await display.LB_MATCH_STARTING.send(ContextWrapper.channel(cfg.channels["lobby"]), match.channel.id)
 
 async def on_inactive_confirmed(player):
     remove_from_lobby(player)
-    await send("LB_WENT_INACTIVE", SendCtx.channel(cfg.channels["lobby"]), player.mention, names_in_lobby=get_all_names_in_lobby())
+    await display.LB_WENT_INACTIVE.send(ContextWrapper.channel(cfg.channels["lobby"]), player.mention, names_in_lobby=get_all_names_in_lobby())
 
 
 def clear_lobby():

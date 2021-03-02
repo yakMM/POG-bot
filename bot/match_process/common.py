@@ -1,5 +1,6 @@
 
-from display import send, SendCtx
+from display.strings import AllStrings as display
+from display.classes import ContextWrapper
 from modules.lobby import get_sub, get_all_names_in_lobby
 import modules.config as cfg
 from lib.tasks import Loop
@@ -101,7 +102,7 @@ async def get_substitute(match):
     # Get a new player from the lobby, if None available, display
     new_player = get_sub()
     if new_player is None:
-        await send("SUB_NO_PLAYER", match.channel)
+        await display.SUB_NO_PLAYER.send(match.channel)
         return
 
     # We have a player. Ping them in the lobby and change their status
@@ -111,7 +112,7 @@ async def get_substitute(match):
     return new_player
 
 async def ping_sub_in_lobby(match, new_player):
-    await send("SUB_LOBBY", SendCtx.channel(cfg.channels["lobby"]),\
+    await display.SUB_LOBBY.send(ContextWrapper.channel(cfg.channels["lobby"]),\
                             new_player.mention, match.channel.id,\
                             names_in_lobby=get_all_names_in_lobby())
 

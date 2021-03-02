@@ -17,11 +17,13 @@ from discord.errors import Forbidden
 from asyncio import get_event_loop
 from logging import getLogger
 
+import display
 from lib.tasks import loop
 
 # Custom modules
 import modules.config as cfg
-from display import send, edit, SendCtx
+from display.strings import AllStrings as display
+from display.classes import ContextWrapper
 from modules.exceptions import AccountsNotEnough
 from modules.reactions import ReactionHandler, add_handler, rem_handler
 
@@ -184,9 +186,9 @@ class AccountHander:
             if acc.message is not None:
                 rem_handler(acc.message.id)
                 acc.is_destroyed = True
-                await edit("ACC_UPDATE", acc.message, account=acc)
+                await display.ACC_UPDATE.send(acc.message, account=acc)
                 if acc.is_validated:
-                    await send("ACC_OVER", SendCtx.user(acc.a_player.id))
+                    await display.ACC_OVER.send(ContextWrapper.user(acc.a_player.id))
                 else:
                     await self.__reaction_handler.auto_remove_reactions(acc.message)
 
@@ -215,7 +217,7 @@ class AccountHander:
 
     async def give_accounts(self):
         """ Find available accounts for all players registered without an account"""
-        await send("ACC_SENDING", self.__match.channel)
+        await display.ACC_SENDING.send(self.__match.channel)
         p_list = list()
         for tm in self.__match.teams:
             for a_player in tm.players:
@@ -238,26 +240,26 @@ class AccountHander:
                 new_line[current_acc.x] = str(a_player.id)
                 msg = None
                 log.info(f"Player [name:{a_player.name}], [id:{a_player.id}] will receive {current_acc.str_id}")
-                await send("ACC_LOG", SendCtx.channel(cfg.channels["staff"]), a_player.name, a_player.id, current_acc.str_id)
+                await display.ACC_LOG.send(ContextWrapper.channel(cfg.channels["staff"]), a_player.name, a_player.id, current_acc.str_id)
                 for j in range(3):
                     try:
-                        msg = await send("ACC_UPDATE", SendCtx.user(a_player.id), account=current_acc)
+                        msg = await display.ACC_UPDATE.send(ContextWrapper.user(a_player.id), account=current_acc)
                         break
                     except Forbidden:
                         msg = None
                 if not msg:
-                    await send("ACC_CLOSED", self.__match.channel, a_player.mention)
-                    msg = await send("ACC_STAFF", SendCtx.channel(cfg.channels["staff"]), f'<@&{cfg.roles["admin"]}>', a_player.mention, account=current_acc)
+                    await display.ACC_CLOSED.send(self.__match.channel, a_player.mention)
+                    msg = await display.ACC_STAFF.send(ContextWrapper.channel(cfg.channels["staff"]), f'<@&{cfg.roles["admin"]}>', a_player.mention, account=current_acc)
                 add_handler(msg.id, self.__reaction_handler)
                 await self.__reaction_handler.auto_add_reactions(msg)
                 current_acc.message = msg
                 i += 1
         AccountHander._sheet_tab = vstack((AccountHander._sheet_tab, array(new_line)))
         self.__handing_stamp = stamp
-        await send("ACC_SENT", self.__match.channel)
+        await display.ACC_SENT.send(self.__match.channel)
 
 
 async def on_account_reaction(reaction, player, user):
     account = player.active.account
     account.validate()
-    await edit("ACC_UPDATE", account.message, account=account)
+    await display.ACC_UPDATE.send(account.message, account=account)

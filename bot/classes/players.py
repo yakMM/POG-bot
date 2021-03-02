@@ -7,8 +7,8 @@
 # Custom modules
 import modules.config as cfg
 from modules.asynchttp import api_request_and_retry as http_request
-from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound,\
-CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable, AccountNotFound
+from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, \
+    CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable, AccountNotFound
 from modules.enumerations import PlayerStatus
 from lib.tasks import loop
 from modules.roles import role_update
@@ -20,7 +20,6 @@ from datetime import datetime as dt
 log = getLogger("pog_bot")
 
 WORLD_ID = 19  # Jaeger ID
-
 
 _all_players = dict()
 # to store VS, NC and TR names to check for duplicates
@@ -41,10 +40,11 @@ def remove_player(p):
         name_check_remove(p)
     del _all_players[p.id]
 
+
 def name_check_add(p):
     for i in range(3):
         _names_checking[i][p.ig_ids[i]] = p
-    
+
 
 def name_check_remove(p):
     for i in range(3):
@@ -52,6 +52,7 @@ def name_check_remove(p):
             del _names_checking[i][p.ig_ids[i]]
         except KeyError:
             log.warning(f"name_check_remove KeyError for player [id={p.id}], [key={p.ig_ids[i]}]")
+
 
 def get_all_players_list():
     return _all_players.values()
@@ -96,7 +97,7 @@ class Player:
             await update_player(self, {"notify": self.__notify})
         elif arg == "register":
             await update_player(self, {"ig_names": self.__ig_names, "ig_ids": self.__ig_ids,
-                                      "rank": self.__rank, "has_own_account": self.__has_own_account})
+                                       "rank": self.__rank, "has_own_account": self.__has_own_account})
         elif arg == "timeout":
             await update_player(self, {"timeout": self.__timeout})
 
@@ -144,7 +145,6 @@ class Player:
             if self.__ig_ids[i] == 0:
                 accs.append(self.__ig_names[i])
         return accs
-
 
     def update_role(self, i=0):
         try:
@@ -317,7 +317,6 @@ class Player:
         await self.db_update("register")
         return True
 
-
     async def _add_characters(self, char_list: list) -> bool:
         """ Add Jaeger character names to the player.
             Check if characters are valid thanks to ps2 api.
@@ -353,7 +352,7 @@ class Player:
 
         # If only 1 string, we add faction names
         if len(char_list) == 1:
-            char_list = [char_list[0] + 'VS', char_list[0] + 'NC',\
+            char_list = [char_list[0] + 'VS', char_list[0] + 'NC', \
                          char_list[0] + 'TR']
 
         # Else it should be 3 strings
@@ -369,9 +368,9 @@ class Player:
             try:
                 # Query API
                 url = \
-                f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}'\
-                f'/get/ps2:v2/character/?name.first_lower={i_name.lower()}'\
-                f'&c:show=character_id,faction_id,name&c:resolve=world'
+                    f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}' \
+                    f'/get/ps2:v2/character/?name.first_lower={i_name.lower()}' \
+                    f'&c:show=character_id,faction_id,name&c:resolve=world'
                 jdata = await http_request(url)
 
                 # Check if something returned
@@ -379,7 +378,12 @@ class Player:
                     raise CharNotFound(i_name)
 
                 # Check char world
-                world = int(jdata["character_list"][0]["world_id"])
+                try:
+                    world = int(jdata["character_list"][0]["world_id"])
+                except ValueError:
+                    log.error(f'Received unexpected value for world_id: {jdata["character_list"][0]["world_id"]}')
+                    # TODO: test, uncomment this
+                    raise ApiNotReachable(url)
                 if world != WORLD_ID:
                     raise CharInvalidWorld(jdata["character_list"][0]["name"]["first"])
 
@@ -387,7 +391,7 @@ class Player:
                 faction = int(jdata["character_list"][0]["faction_id"])
                 curr_id = int(jdata["character_list"][0]["character_id"])
                 curr_name = jdata["character_list"][0]["name"]["first"]
-                
+
                 # Check if the char is already registered:
                 if curr_id in _names_checking[faction - 1]:
                     p = _names_checking[faction - 1][curr_id]
@@ -425,12 +429,14 @@ class Player:
 
         return updated
 
+
 class DataPlayer:
 
     def __init__(self, p_id, ig_name, ig_id):
         self.id = p_id
-        self.ig_names = [ig_name]*3
-        self.ig_ids = [ig_id]*3
+        self.ig_names = [ig_name] * 3
+        self.ig_ids = [ig_id] * 3
+
 
 class ActivePlayer:
     """ ActivePlayer class, with more data than Player class, for when match is happening
@@ -465,7 +471,6 @@ class ActivePlayer:
         obj.__ill_weapons_fromData(data["ill_weapons"])
         return obj
 
-
     def clean(self):
         self.__player.on_player_clean()
 
@@ -485,9 +490,9 @@ class ActivePlayer:
     def __get_ill_weaponsDoc(self):
         data = list()
         for weap_id in self.__illegal_weapons.keys():
-            doc =  {"weap_id": weap_id,
-                    "kills": self.__illegal_weapons[weap_id]
-                    }
+            doc = {"weap_id": weap_id,
+                   "kills": self.__illegal_weapons[weap_id]
+                   }
             data.append(doc)
         return data
 
@@ -536,7 +541,7 @@ class ActivePlayer:
     def on_resign(self):
         self.__player.on_resign()
         return self.__player
-    
+
     def on_team_ready(self):
         self.__player.on_team_ready()
 
@@ -558,7 +563,7 @@ class ActivePlayer:
     def ig_name(self):
         faction = self.__team.faction
         if faction != 0:
-            return self.__player.ig_names[faction-1]
+            return self.__player.ig_names[faction - 1]
 
     @property
     def account(self):
