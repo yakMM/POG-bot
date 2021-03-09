@@ -8,7 +8,7 @@ from pymongo import MongoClient
 from asyncio import get_event_loop
 
 # Custom modules:
-from modules.exceptions import DatabaseError
+from general.exceptions import DatabaseError
 
 # dict for the collections
 collections = dict()
@@ -86,8 +86,8 @@ def _replace_player(p):
     else:
         collections["users"].insert_one(p.get_data())
 
-def _update_map(m):
-    """ Update map m into db
+def _update_base(m):
+    """ Update base m into db
     """
     if collections["s_bases"].count_documents({"_id": m.id}) != 0:
         collections["s_bases"].update_one({"_id": m.id}, {"$set": m.get_data()})

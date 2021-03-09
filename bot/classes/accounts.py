@@ -24,7 +24,7 @@ from lib.tasks import loop
 import modules.config as cfg
 from display.strings import AllStrings as display
 from display.classes import ContextWrapper
-from modules.exceptions import AccountsNotEnough
+from general.exceptions import AccountsNotEnough
 from modules.reactions import ReactionHandler, add_handler, rem_handler
 
 X_OFFSET = 3

@@ -10,7 +10,8 @@ class AllStrings(Enum):
 
     REG_NOT_REGISTERED = Message("You are not registered!", embed=embeds.register_help)
     REG_IS_REGISTERED_OWN = Message("You are already registered with the following Jaeger characters: `{}`, `{}`, `{}`")
-    REG_IS_REGISTERED_NOA = Message("You are already registered without a Jaeger account! If you have your own account, please re-register with your Jaeger characters.")
+    REG_IS_REGISTERED_NOA = Message("You are already registered without a Jaeger account! If you have your own "
+                                    "account, please re-register with your Jaeger characters.")
     REG_HELP = Message("Registration help:", embed=embeds.register_help)
     REG_NO_ACCOUNT = Message("You successfully registered without a Jaeger account!")
     REG_INVALID = Message("Invalid registration!", embed=embeds.register_help)
@@ -65,10 +66,10 @@ class AllStrings(Enum):
     PK_FACTION_CHANGED = Message("{} changed to {}!", ping=False)
     PK_FACTION_NOT_PLAYER = Message("Pick a faction, not a player!")
     PK_FACTION_HELP = Message("Waiting for {} to pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting bellow!", ping=False)
-    PK_WAIT_MAP =  Message("{} {} Pick an available map!", ping=False, embed=embeds.jaeger_calendar)
-    PK_MAP_OK_CONFIRM = Message("Picked **{}**! {} confirm with if you agree! (use `=p confirm` or react below)")
+    PK_WAIT_BASE =  Message("{} {} Pick an available base!", ping=False, embed=embeds.jaeger_calendar)
+    PK_BASE_OK_CONFIRM = Message("Picked **{}**! {} confirm with if you agree! (use `=p confirm` or react below)")
     PK_OVER_READY = Message("Can't do that if your team is ready!")
-    PK_NO_MAP = Message("No map selected!")
+    PK_NO_BASE = Message("No base selected!")
     PK_RESIGNED = Message("Successfully resigned! {} is the new captain for {}!", embed=embeds.team_update)
 
     EXT_NOT_REGISTERED = Message("You are not registered! Check <#{}>")
@@ -100,47 +101,51 @@ class AllStrings(Enum):
 
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ping=False)
-    MATCH_MAP_AUTO = Message("Match will be on **{}**", ping=False)
+    MATCH_BASE_AUTO = Message("Match will be on **{}**", ping=False)
     MATCH_CONFIRM = Message("{} {} Type `=ready` when your team is inside their sundy, ready to start",
                              embed=embeds.team_update)
     MATCH_NOT_READY = Message("You can't use command {}, the match is not ready to start!")
     MATCH_TEAM_READY = Message("{} is now ready!", embed=embeds.team_update)
     MATCH_TEAM_UNREADY = Message("{} is no longer ready!", embed=embeds.team_update)
-    MATCH_STARTING_1 = Message("Everyone is ready, round {} is starting in {} seconds!\nAll players will be pinged on round start")
+    MATCH_STARTING_1 = Message("Everyone is ready, round {} is starting in {} seconds!\nAll players will be pinged on "
+                               "round start")
     MATCH_STARTING_2 = Message("Round {} is starting in {} seconds!")
     MATCH_STARTED = Message("{}\n{}\nRound {} is starting now!")
     MATCH_NO_MATCH = Message("Can't use command `={}`, no match is happening here!")
     MATCH_NO_COMMAND = Message("Can't use command `={}` now!")
     MATCH_CLEARED = Message("Successfully cleared!")
     MATCH_PLAYERS_NOT_READY = Message("Can't get {} ready, {} did not accept their Jaeger accounts", ping=False)
-    MATCH_PLAYERS_OFFLINE = Message("Can't get {} ready, {} are not online in game!", ping=False, embed=embeds.offline_list)
+    MATCH_PLAYERS_OFFLINE = Message("Can't get {} ready, {} are not online in game!", ping=False,
+                                    embed=embeds.offline_list)
     MATCH_CLEAR = Message("Clearing match...", ping=False)
-    MATCH_MAP_SELECTED = Message("Successfully selected **{}**", embed=embeds.map_pool)
+    MATCH_BASE_SELECTED = Message("Successfully selected **{}**", embed=embeds.base_pool)
     MATCH_ROUND_OVER = Message("{}\n{}\nRound {} is over!")
     MATCH_OVER = Message("The match is over!\nClearing channel...")
     MATCH_ALREADY = Message("The match is already started!")
     MATCH_SWAP = Message("Swap sundy placement for the next round!")
 
-    MAP_HELP = Message("Here is how to choose a map:", embed=embeds.map_help)
-    MAP_TOO_MUCH = Message("Too many maps found! Try to be more precise")
-    MAP_NOT_FOUND = Message("Couldn't find a result for your search!")
-    MAP_SHOW_LIST = Message("Here are the maps found:", embed=embeds.selected_maps)
-    MAP_SHOW_POOL = Message("Map list:", ping=False, embed=embeds.map_pool)
-    MAP_SELECTED = Message("The current map is **{}**")
-    MAP_BOOKED = Message("{} WARNING: **{}** is currently reserved in the Jaeger Calendar. Please check availability before confirming this map.", ping=False,
-                          embed=embeds.jaeger_calendar)
-
-    MP_ADDED = Message("Added {} to the map pool")
-    MP_REMOVED = Message("Removed {} from the map pool")
+    BASE_HELP = Message("Here is how to choose a base:", embed=embeds.base_help)
+    BASE_TOO_MUCH = Message("Too many bases found! Try to be more precise")
+    BASE_NOT_FOUND = Message("Couldn't find a result for your search!")
+    BASE_SHOW_LIST = Message("Here are the bases found:", embed=embeds.selected_bases)
+    BASE_SHOW_POOL = Message("Base list:", ping=False, embed=embeds.base_pool)
+    BASE_SELECTED = Message("Here is the selected base for this match:", embed=embeds.base_display)
+    BASE_NO_SELECTED = Message("No base was chosen yet!")
+    BASE_BOOKED = Message("{} WARNING: **{}** is currently reserved in the Jaeger Calendar. Please check availability "
+                         "before confirming this base.", ping=False, embed=embeds.jaeger_calendar)
+    BASE_ADDED = Message("Added {} to the base pool")
+    BASE_REMOVED = Message("Removed {} from the base pool")
 
     ACC_NOT_ENOUGH = Message("Not enough accounts are available for this match!\n**Match has been canceled!**")
     ACC_ERROR = Message("Error when giving out Jaeger accounts!\n**Match has been canceled!**")
     ACC_UPDATE = Message(None, ping=False, embed=embeds.account)
-    ACC_STAFF = Message("{}, couldn't send the account to {}, please send it manually...", ping=False, embed=embeds.account)
+    ACC_STAFF = Message("{}, couldn't send the account to {}, please send it manually...", ping=False,
+                        embed=embeds.account)
     ACC_SENT = Message("**Successfully sent jaeger accounts  in DMs!**")
     ACC_SENDING = Message("Loading Jaeger accounts...")
     ACC_OVER = Message("Match is over, please log out of your Jaeger account!")
-    ACC_CLOSED = Message("{}'s DMS are locked, couldn't send them a Jaeger account after 3 retries!\nSending the account to staff instead.")
+    ACC_CLOSED = Message("{}'s DMS are locked, couldn't send them a Jaeger account after 3 retries!\nSending the "
+                         "account to staff instead.")
     ACC_LOG = Message("Player [name:{}], [id:{}] will receive {}")
 
     NOTIFY_REMOVED = Message("You left Notify!")
@@ -177,7 +182,8 @@ class AllStrings(Enum):
     SUB_NO_PLAYER = Message("No player is available to substitute!")
     SUB_OKAY_TEAM = Message("{} replaced {} in {}", ping=False, embed=embeds.team_update)
     SUB_OKAY_CAP = Message("{} replaced {} as {}'s captain", ping=False, embed=embeds.team_update)
-    SUB_OKAY_NO_CAP = Message("{} replaced {} in {}.\n{} is the new captain for {}", ping=False, embed=embeds.team_update)
+    SUB_OKAY_NO_CAP = Message("{} replaced {} in {}.\n{} is the new captain for {}", ping=False,
+                              embed=embeds.team_update)
     SUB_OKAY = Message("{} replaced {}!", ping=False, embed=embeds.team_update)
     SUB_LOBBY = Message("{} you have been designated as a substitute, join <#{}>!", embed=embeds.lobby_list)
 

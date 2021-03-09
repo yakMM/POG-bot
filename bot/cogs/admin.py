@@ -5,10 +5,10 @@ from logging import getLogger
 from datetime import datetime as dt
 
 import modules.config as cfg
-from modules.enumerations import SelStatus, MatchStatus, PlayerStatus
+from general.enumerations import SelStatus, MatchStatus, PlayerStatus
 from display.strings import AllStrings as display
 from display.classes import ContextWrapper
-from modules.exceptions import ElementNotFound, DatabaseError
+from general.exceptions import ElementNotFound, DatabaseError
 from modules.database import remove_player as db_remove
 from modules.loader import lock_all, unlock_all, is_all_locked
 from modules.roles import force_info, role_update, is_admin, perms_muted, channel_freeze
@@ -17,10 +17,7 @@ from modules.lobby import clear_lobby, get_all_names_in_lobby, remove_from_lobby
 
 from match_process import Match
 
-from classes.players import remove_player, get_player, Player, TeamCaptain
-
-
-
+from classes.players import remove_player, get_player, Player
 
 log = getLogger("pog_bot")
 
@@ -40,7 +37,7 @@ class AdminCog(commands.Cog, name='admin'):
     Admin Commands
 
     =clear (clear lobby or match)
-    =map (select a map)
+    =base (select a base)
 
     """
 
@@ -63,13 +60,13 @@ class AdminCog(commands.Cog, name='admin'):
                 await display.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
                 return
             await display.MATCH_CLEAR.send(ctx)
-            await match.clear()
+            await match.clear(ctx)
             return
         await display.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
 
     @commands.command()
     @commands.guild_only()
-    async def map(self, ctx, *args):
+    async def basea(self, ctx, *args):
         channel_id = ctx.channel.id
         if channel_id not in cfg.channels["matches"]:
             await display.WRONG_CHANNEL.send(ctx, ctx.command.name, " channels " + ", ".join(f'<#{id}>' for id in cfg.channels["matches"]))
@@ -81,21 +78,21 @@ class AdminCog(commands.Cog, name='admin'):
         if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT, MatchStatus.IS_RUNNING):
             await display.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
             return
-        sel = match.map_selector
+        sel = match.base_selector
         if len(args) == 1 and args[0] ==  "confirm":
-            match.confirm_map()
-            await display.MATCH_MAP_SELECTED.send(ctx, sel.map.name, sel=sel)
+            match.confirm_base()
+            await display.MATCH_BASE_SELECTED.send(ctx, sel.base.name, sel=sel)
             return
-        # Handle the actual map selection
+        # Handle the actual base selection
         result = await sel.do_selection_process(ctx, args)
         if sel.status is not SelStatus.IS_SELECTED:
             return
         if sel.is_booked:
-            await display.MAP_BOOKED.send(ctx, ctx.author.mention, sel.map.name)
+            await display.BASE_BOOKED.send(ctx, ctx.author.mention, sel.base.name)
             return
         elif result:
-            match.confirm_map()
-            await display.MATCH_MAP_SELECTED.send(ctx, sel.map.name, sel=sel)
+            match.confirm_base()
+            await display.MATCH_BASE_SELECTED.send(ctx, sel.base.name, sel=sel)
 
     @commands.command()
     @commands.guild_only()

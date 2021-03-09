@@ -7,6 +7,7 @@ from logging import getLogger
 
 log = getLogger("pog_bot")
 
+
 class AudioBot:
     # TODO: Add some checks so we don't have several lines at the same time
     # in the lobby for example
@@ -14,7 +15,7 @@ class AudioBot:
     # conflict)
 
     def __init__(self, match):
-        self.num = cfg.channels["matches"].index(match.channel.id)+1
+        self.num = cfg.channels["matches"].index(match.channel.id) + 1
         self.lobby = False
 
     def drop_match(self):
@@ -23,38 +24,37 @@ class AudioBot:
 
     def select_teams(self):
         _TaskAudio(self).task_audio.start("select_teams", lobby=False, wait=10)
-    
+
     def select_factions(self):
         _TaskAudio(self).task_audio.start("select_factions")
 
     def faction_pick(self, team):
-        audio_string = f"team_{team.id+1}_{cfg.factions[team.faction]}"
+        audio_string = f"team_{team.id + 1}_{cfg.factions[team.faction]}"
         _TaskAudio(self).task_audio.start(audio_string)
 
-    def select_map(self):
-        _TaskAudio(self).task_audio.start("select_map")
-    
-    def map_selected(self, map):
-        _TaskAudio(self).task_audio.start("map_selected")
-        _TaskAudio(self).task_audio.start(f'map_{cfg.id_to_map[map.id]}', wait=1)
+    def select_base(self):
+        _TaskAudio(self).task_audio.start("select_base")
+
+    def base_selected(self, base):
+        _TaskAudio(self).task_audio.start("base_selected")
+        _TaskAudio(self).task_audio.start(f'base_{cfg.id_to_base[base.id]}', wait=1)
 
     def match_confirm(self):
         _TaskAudio(self).task_audio.start("type_ready")
 
     def team_ready(self, team):
-        audio_string = f"team_{team.id+1}_ready"
+        audio_string = f"team_{team.id + 1}_ready"
         _TaskAudio(self).task_audio.start(audio_string)
 
     def countdown(self):
-        # Because of Asyncio not really being full asynchronous stuff, these timings will
-        # be fine anyways
+        # Timing tested
         _TaskAudio(self).task_audio.start("30s")
         _TaskAudio(self).task_audio.start("10s", wait=20)
         _TaskAudio(self).task_audio.start("5s", wait=25)
-    
+
     def round_over(self):
         _TaskAudio(self).task_audio.start("round_over")
-    
+
     def switch_sides(self):
         _TaskAudio(self).task_audio.start("switch_sides")
 
@@ -70,7 +70,7 @@ class _TaskAudio:
             await sleep(wait)
         await self.__lobby(lobby)
         url = f'http://localhost:58913/api/bot/template/{self.bot.num}(/xecute(/add/{string}.mp3)(/play))'
-        await self.__send_url(url)
+        await _send_url(url)
 
     async def __lobby(self, bl):
         if self.bot.lobby == bl:
@@ -81,9 +81,10 @@ class _TaskAudio:
         else:
             self.bot.lobby = False
             url = f'http://localhost:58913/api/bot/template/{self.bot.num}(/unsubscribe/channel/281)'
-        await self.__send_url(url)
+        await _send_url(url)
 
-    async def __send_url(self, url):
-        code = await http_request(url)
-        if(code != 204):
-            log.warning(f'TS3Bot API: Recieved code {code} on {url}')
+
+async def _send_url(url):
+    code = await http_request(url)
+    if code != 204:
+        log.warning(f'TS3Bot API: Received code {code} on {url}')

@@ -1,18 +1,18 @@
 from display.strings import AllStrings as display
-from display.classes import ContextWrapper
 from lib.tasks import loop
 
-from modules.enumerations import MatchStatus, PlayerStatus
-from modules.exceptions import ElementNotFound
+from general.enumerations import MatchStatus, PlayerStatus
+from general.exceptions import ElementNotFound
 from random import choice as random_choice
 
 from classes.teams import Team
 from classes.players import TeamCaptain, ActivePlayer, get_player
 
 import match_process.common as common
+import match_process.meta as meta
 
 
-class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
+class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
 
     def __init__(self, match, p_list):
         self.match = match
@@ -25,14 +25,17 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
 
         super().__init__(match)
 
-
-    @common.is_public
+    @meta.public
     def get_left_players_pings(self) -> list:
         """ The list of mentions of all players left to pick.
         """
         pings = [p.mention for p in self.players.values()]
         return pings
 
+    @meta.public
+    async def clear(self, ctx):
+        self.match.clean()
+        await display.MATCH_CLEARED.send(ctx)
 
     def find_captain(self):
         """ Pick at random a captain.
@@ -45,8 +48,7 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
         """
         return random_choice(list(self.players))
 
-
-    @common.init_loop
+    @meta.init_loop
     async def init(self):
         """ Init the match channel, ping players, find two captains \
             and ask them to start picking players.
@@ -69,12 +71,11 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
 
         # Ready for players to pick
         self.match.audio_bot.select_teams()
-        await display.MATCH_SHOW_PICKS.send(self.match.channel,\
-            self.match.teams[0].captain.mention, match=self.match.proxy)
+        await display.MATCH_SHOW_PICKS.send(self.match.channel, self.match.teams[0].captain.mention,
+                                            match=self.match.proxy)
 
-
-    @common.is_public
-    def demote(self, captain : TeamCaptain):
+    @meta.public
+    def demote(self, captain: TeamCaptain):
         """ Demote player from its TeamCaptain position.
             Put the demoted player in the team as a regular player.
             
@@ -101,8 +102,7 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
         # Check if no player left to pick
         self.pick_check(other)
 
-
-    @common.is_public
+    @meta.public
     async def sub(self, subbed):
         """ Substitute a player by another one picked at random \
             in the lobby.
@@ -125,19 +125,17 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
             self.players[new_player.id] = new_player
             # Clean subbed one and send message
             subbed.on_player_clean()
-            await display.SUB_OKAY.send(self.match.channel, new_player.mention,\
-                                   subbed.mention, match=self.match.proxy)
-            return 
+            await display.SUB_OKAY.send(self.match.channel, new_player.mention, subbed.mention, match=self.match.proxy)
+            return
 
-        # If subbed one has already been picked
+            # If subbed one has already been picked
         if subbed.status is PlayerStatus.IS_PICKED:
             # Get active version of the player and clean the player object
             a_sub = subbed.active
             subbed.on_player_clean()
             team = a_sub.team
             # Args for the display later
-            args = [self.match.channel, new_player.mention, a_sub.mention,\
-                    team.name]
+            args = [self.match.channel, new_player.mention, a_sub.mention, team.name]
             # If subbed is a captain
             if a_sub.is_captain:
                 # Add the new player in the pool of players
@@ -148,23 +146,19 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
                 team.sub(a_sub, self.players.pop(key))
                 # If new player is captain
                 if key == new_player.id:
-                    display = "SUB_OKAY_CAP"
+                    await display.SUB_OKAY_CAP.send(*args, match=self.match.proxy)
                 # Else if captain is someone else
                 else:
                     args.append(team.captain.mention)
                     args.append(team.name)
-                    display = "SUB_OKAY_NO_CAP"
+                    await display.SUB_OKAY_NO_CAP.send(*args, match=self.match.proxy)
             # If subbed is not a captain, just replace them by new player
             # in their team
             else:
                 team.sub(a_sub, new_player)
-                display = "SUB_OKAY_TEAM"
+                await display.SUB_OKAY_TEAM.send(*args, match=self.match.proxy)
 
-            # Display what happened
-            await send(display, *args, match=self.match.proxy)
-
-
-    @common.is_public
+    @meta.public
     async def pick_status(self, ctx):
         """ Displays the picking status/help
             
@@ -175,8 +169,7 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
         """
         await display.PK_PLAYERS_HELP.send(ctx, self.picking_captain.mention)
 
-
-    @common.is_public
+    @meta.public
     async def pick(self, ctx, captain, args):
         """ Pick a player, and display what happened.
             
@@ -225,8 +218,7 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
             other = self.match.teams[team.id - 1]
             await display.PK_OK.send(ctx, other.captain.mention, match=self.match.proxy)
 
-
-    def do_pick(self, team : Team, player) -> TeamCaptain:
+    def do_pick(self, team: Team, player) -> TeamCaptain:
         """ Pick a player.
             
             Parameters
@@ -245,7 +237,6 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
 
         # Check if no player left to pick
         self.pick_check(other)
-
 
     def pick_check(self, other):
         """ Check pick progress, auto pick players if needed.
@@ -274,7 +265,6 @@ class PlayerPicking(common.Process, status = MatchStatus.IS_PICKING):
         elif len(self.players) == 0:
             # Start next step
             self.match.on_player_pick_over()
-
 
     @loop(count=1)
     async def ping_last_player(self, team, p):

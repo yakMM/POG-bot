@@ -9,7 +9,7 @@ class MatchStatus(Enum):
     IS_RUNNING = "Processing..."
     IS_PICKING = "Waiting for captains to pick players"
     IS_FACTION = "Waiting for captains to pick factions"
-    IS_MAPPING = "Waiting for map pick"
+    IS_BASING = "Waiting for base pick"
     IS_WAITING = "Waiting for teams"
     IS_STARTING = "Match starting"
     IS_PLAYING = "Match is being played"

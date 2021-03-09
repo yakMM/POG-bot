@@ -5,15 +5,12 @@ from discord import Status as discord_status
 from logging import getLogger
 
 from display.strings import AllStrings as display
-from display.classes import ContextWrapper
 import modules.config as cfg
-from modules.exceptions import UnexpectedError, ElementNotFound, LobbyStuck
+from general.exceptions import ElementNotFound
 
 from classes.players import PlayerStatus, get_player
 
 from modules.lobby import get_lobby_len, is_lobby_stuck, remove_from_lobby, add_to_lobby, get_all_names_in_lobby
-
-from match_process import Match
 
 log = getLogger("pog_bot")
 

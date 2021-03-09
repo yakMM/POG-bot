@@ -4,8 +4,8 @@ from gspread import service_account
 from numpy import array
 import modules.config as cfg
 from classes.players import Player, _all_players, get_player
-from modules.database import force_update, get_all_items, _replace_player, _update_map, init as db_init, get_one_item, collections, _remove
-from classes.maps import _all_maps_list, Map
+from modules.database import force_update, get_all_items, _replace_player, _update_base, init as db_init, get_one_item, collections, _remove
+from classes.bases import _all_bases_list, Base
 from match_process import Match
 import requests
 import json
@@ -23,7 +23,7 @@ else:
 cfg.get_config(f"config{LAUNCHSTR}.cfg")
 db_init(cfg.database)
 get_all_items(Player.new_from_data, "users")
-get_all_items(Map, "s_bases")
+get_all_items(Base, "s_bases")
 get_all_items(Weapon, "s_weapons")
 
 class DbPlayer(Player):
@@ -130,8 +130,8 @@ def push_accounts():
     loop.close()
 
 
-def get_all_maps_from_api():
-    url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2/map_region/?c:limit=400&c:show=facility_id,facility_name,zone_id,facility_type_id'
+def get_all_bases_from_api():
+    url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2/base_region/?c:limit=400&c:show=facility_id,facility_name,zone_id,facility_type_id'
     response = requests.get(url)
     jdata = json.loads(response.content)
 
@@ -139,22 +139,22 @@ def get_all_maps_from_api():
         print("Error")
         return
 
-    ids = cfg.map_to_id.values()
+    ids = cfg.base_to_id.values()
 
-    all_maps = list()
+    all_bases = list()
 
-    for mp in jdata["map_region_list"]:
+    for mp in jdata["base_region_list"]:
         try:
             new_data = dict()
             new_data["_id"] = int(mp["facility_id"])
             new_data["name"] = mp["facility_name"]
-            new_data["in_map_pool"] = new_data["_id"] in ids
+            new_data["in_base_pool"] = new_data["_id"] in ids
             new_data["zone_id"] = int(mp["zone_id"])
             new_data["type_id"] = int(mp["facility_type_id"])
-            all_maps.append(new_data)
+            all_bases.append(new_data)
         except KeyError:
             print(mp)
-    force_update("s_bases", all_maps)
+    force_update("s_bases", all_bases)
 
 
 def players_db_update():

@@ -23,9 +23,9 @@
 # v2.0:
 Major feature implementations!
 - Added jaeger calendar integration
-- Added a warning if a chosen map is currently reserved in the jaeger calendar
+- Added a warning if a chosen base is currently reserved in the jaeger calendar
 - Added a proper reaction framework:
-    - Improved map pool and map selection process with reactions
+    - Improved base pool and base selection process with reactions
 - Implemented a teamspeak bot:
     - Bot announces match start and end, and informs captains on steps during pre-match
 - Various code viewability enhancements, PEP8 formatting, and typo fixes
@@ -86,8 +86,8 @@ Major feature implementations!
 - Fixed a bug with afk players in queue
 - Overhauled player status code
 - Tweaked the conditions for the bot to ping @Notify
-- Fixed a bug allowing the one captain to choose a map and confirm it
-- Added default map pool: players can't choose any map in the game anymore
+- Fixed a bug allowing the one captain to choose a base and confirm it
+- Added default base pool: players can't choose any base in the game anymore
 
 # v1.9:
 - Updated Jaeger Calendar Link
@@ -104,7 +104,7 @@ Major feature implementations!
 - freeze/unfreeze command is now working as expected
 
 # v1.7:
-- =map command should now work in all situations
+- =base command should now work in all situations
 - Fixed match status message on faction selection
 - Added possibility to freeze and unfreeze channels
 
@@ -129,8 +129,8 @@ Major feature implementations!
 
 # v1.3:
 - It is no longer possible to register with a character that is already registered
-- Team captains can now select a map
-- Added =confirm command for Team Captains to agree on a map
+- Team captains can now select a base
+- Added =confirm command for Team Captains to agree on a base
 - Added role updates when agreeing with the rules
 - Added notify feature
 - Added =unregister @player to remove a player from the system (including db)
@@ -156,8 +156,8 @@ Major feature implementations!
 - Captains selected at random temp
 - Picking feature
 - Faction picking feature
-- Map is chosen at random within the PIL map pool temp
-- Staff can change the map to any ps2 base (linked to ps2 api)
+- Map is chosen at random within the PIL base pool temp
+- Staff can change the base to any ps2 base (linked to ps2 api)
 - Automatic handing of Jaeger accounts with precise tracking in a google sheet for good human visibility
 - Ability for staff to clear a match anytime before it actually starts
 - Each captain can toggle their "ready state"

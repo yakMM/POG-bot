@@ -3,8 +3,7 @@
 """ Basic team object, should be explicit
 """
 
-from modules.enumerations import PlayerStatus
-from classes.players import ActivePlayer, TeamCaptain # ok
+from classes.players import ActivePlayer  # ok
 
 
 class Team:
@@ -119,6 +118,10 @@ class Team:
     
     def clear(self):
         self.__players.clear()
+
+    def clean(self):
+        for a_player in self.__players:
+            a_player.clean()
 
     def add_cap(self, points):
         self.__cap += points

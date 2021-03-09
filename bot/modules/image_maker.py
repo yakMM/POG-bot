@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 from asyncio import get_event_loop
 from display.strings import AllStrings as display
 from display.classes import ContextWrapper
-from modules.enumerations import MatchStatus
+from general.enumerations import MatchStatus
 import modules.config as cfg
 from datetime import datetime as dt
 
@@ -89,7 +89,7 @@ def _make_image(match):
     x = X_OFFSET+1100
     x_title = (3600-big_font.getsize(f"Planetside Open Games - Match {match.number}")[0])//2
     draw.text((x_title,100), f"Planetside Open Games - Match {match.number}", font=big_font, fill=white)
-    draw.text((x,200+100), f"Base: {match.map.name}", font=small_font, fill=white)
+    draw.text((x,200+100), f"Base: {match.base.name}", font=small_font, fill=white)
     for i in range(len(match.round_stamps)):
         rs = match.round_stamps[i]
         text = dt.utcfromtimestamp(rs).strftime("%Y-%m-%d %H:%M")

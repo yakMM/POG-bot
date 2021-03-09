@@ -1,7 +1,7 @@
 # @CHECK 2.0 features OK
 
 from modules.asynchttp import api_request_and_retry as http_request
-from modules.exceptions import ApiNotReachable, ElementNotFound
+from general.exceptions import ApiNotReachable, ElementNotFound
 from classes.weapons import get_weapon
 from display.strings import AllStrings as display
 from display.classes import ContextWrapper
@@ -71,7 +71,7 @@ async def get_captures(match, start, end):
             f'?world_id=19&after={start}&before={end}&c:limit=500'
     jdata = await http_request(url)
     if jdata["returned"] == 0:
-        log.warning(f'No event found for map! (url={url})')
+        log.warning(f'No event found for base! (url={url})')
         return
 
     event_list = jdata["world_event_list"]
@@ -79,7 +79,7 @@ async def get_captures(match, start, end):
     # Loop through all events from older to newer
     for event in event_list[::-1]:
         base_id = int(event["facility_id"])
-        if base_id != match.map.id:
+        if base_id != match.base.id:
             # Not match base, to be ignored
             continue
         faction = int(event["faction_new"])

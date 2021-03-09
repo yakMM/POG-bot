@@ -1,6 +1,6 @@
 # @CHECK 2.0 features OK
 
-from modules.exceptions import ElementNotFound
+from general.exceptions import ElementNotFound
 
 _all_weapons = dict()
 

@@ -6,7 +6,7 @@ import requests
 import json
 import os
 from classes.weapons import Weapon, get_weapon
-from modules.exceptions import ElementNotFound
+from general.exceptions import ElementNotFound
 
 if os.path.isfile("test"):
     LAUNCHSTR = "_test"

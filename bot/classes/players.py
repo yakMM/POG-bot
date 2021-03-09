@@ -7,9 +7,9 @@
 # Custom modules
 import modules.config as cfg
 from modules.asynchttp import api_request_and_retry as http_request
-from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, \
+from general.exceptions import UnexpectedError, ElementNotFound, CharNotFound, \
     CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable, AccountNotFound
-from modules.enumerations import PlayerStatus
+from general.enumerations import PlayerStatus
 from lib.tasks import loop
 from modules.roles import role_update
 from modules.database import update_player
@@ -61,6 +61,10 @@ def get_all_players_list():
 class Player:
     """ Basic player class, every registered user matches a Player object contained in the dictionary
     """
+
+    @classmethod
+    def get(cls, p_id):
+        return _all_players.get(p_id)
 
     def __init__(self, id, name):
         self.__name = name

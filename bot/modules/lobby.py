@@ -3,7 +3,7 @@ from display.strings import AllStrings as display
 from display.classes import ContextWrapper
 
 from random import choice as random_choice
-from lib.tasks import loop
+from lib.tasks import Loop, loop
 from logging import getLogger
 
 log = getLogger("pog_bot")
@@ -12,7 +12,7 @@ _lobby_list = list()
 _lobby_stuck = False
 MatchClass = None
 
-def lobby_init(m_cls):
+def init(m_cls):
     global MatchClass
     MatchClass = m_cls
 
@@ -83,7 +83,7 @@ def remove_from_lobby(player):
 def _on_match_free():
     _auto_ping.already = True
     if len(_lobby_list) == cfg.general["lobby_size"]:
-        _start_match_from_full_lobby
+        _start_match_from_full_lobby()
 
 
 def _on_lobby_remove():
@@ -96,14 +96,13 @@ def _start_match_from_full_lobby():
     _auto_ping_cancel()
     if match is None:
         set_lobby_stuck(True)
-        _start_match_display.start(match)
+        Loop(coro=_start_match_display, count=1).start(match)
     else:
         set_lobby_stuck(False)
         match.spin_up(_lobby_list)
         _lobby_list.clear()
-        _start_match_display.start(match)
+        Loop(coro=_start_match_display, count=1).start(match)
 
-@loop(count=1)
 async def _start_match_display(match):
     if not match:
         await display.LB_STUCK.send(ContextWrapper.channel(cfg.channels["lobby"]))

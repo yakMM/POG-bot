@@ -53,7 +53,7 @@ Pymongo is used for interaction with the mongodb. As of now, the database should
 - One for the weapons.
 - One for the matches.
 Check `script.py` to populate the databases.
-The mapping of these can be configured at the `[Collections]` part of the config.
+The baseping of these can be configured at the `[Collections]` part of the config.
 
 There are two common ways to get MongoDB running: [Atlas](#Atlas) and [Manual Deployment](#manual-deployment).
 

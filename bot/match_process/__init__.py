@@ -1,9 +1,8 @@
-from modules.exceptions import ElementNotFound
-from modules.enumerations import MatchStatus
+from general.exceptions import ElementNotFound
+from general.enumerations import MatchStatus
 from modules.database import get_one_item
 
-
-from classes.maps import Map, MapSelection
+from classes.bases import Base, MapSelection
 from classes.teams import Team
 from classes.audio_bot import AudioBot
 from classes.accounts import AccountHander
@@ -11,25 +10,25 @@ from classes.accounts import AccountHander
 from logging import getLogger
 
 from match_process.player_picking import PlayerPicking
-from match_process.faction_picking import  FactionPicking
-from match_process.map_picking import  MapPicking
-from match_process.common import Process
+from match_process.faction_picking import FactionPicking
+from match_process.base_picking import MapPicking
+from match_process.base_selector import BaseSelector
+from match_process.meta import Process
 
 log = getLogger("pog_bot")
 
 
 class Match:
-
     __bound_matches = dict()
 
     @classmethod
-    def get(cls, m_id : int):
+    def get(cls, m_id: int):
         if m_id not in cls.__bound_matches:
             raise ElementNotFound(m_id)
         return cls.__bound_matches[m_id]
 
     @classmethod
-    def init_channels(cls, client, ch_list : list):
+    def init_channels(cls, client, ch_list: list):
         for ch_id in ch_list:
             channel = client.get_channel(ch_id)
             instance = cls()
@@ -44,7 +43,7 @@ class Match:
         return None
 
     @classmethod
-    async def get_from_database(cls, m_id : int):
+    async def get_from_database(cls, m_id: int):
         data = await get_one_item("matches", m_id)
         instance = cls(data)
         return instance
@@ -64,17 +63,21 @@ class Match:
         return self.__objects.channel
 
     @property
+    def base_selector(self):
+        if not self.__objects:
+            raise AttributeError("Match instance is not bound, no attribute 'match_selector'")
+        return self.__objects.base_selector
+
+    @property
     def status(self):
         if not self.__objects:
-            raise AttributeError("Match instance is not bound,\
-                                  no attribute 'status'")
+            raise AttributeError("Match instance is not bound, no attribute 'status'")
         return self.__objects.status
 
     @property
     def status_str(self):
         if not self.__objects:
-            raise AttributeError("Match instance is not bound,\
-                                  no attribute 'status_str'")
+            raise AttributeError("Match instance is not bound, no attribute 'status_str'")
         return self.__objects.status_str
 
     @property
@@ -90,11 +93,18 @@ class Match:
         return self.__data.round_no
 
     @property
-    def map(self):
-        if self.__objects and self.__objects.map_selector:
-            return self.__objects.map_selector.map
-        else:
-            return self.__data.map
+    def is_picking_allowed(self):
+        if not self.__objects:
+            raise AttributeError("Match instance is not bound, no attribute 'is_picking_allowed'")
+        try:
+            self.__objects.get_process_attr("pick_status")
+            return True
+        except AttributeError:
+            return False
+
+    @property
+    def base(self):
+        return self.__data.base
 
     def spin_up(self, p_list):
         self.__objects.on_spin_up(p_list)
@@ -106,22 +116,55 @@ class Match:
         return self.__objects.get_process_attr(name)
 
 
+class MatchData:
+    def __init__(self, match: Match, data: dict):
+        self.match = match
+        if data:
+            self.id = data["_id"]
+            self.teams = [Team.from_data(self.match, 0, data["teams"][0]), Team.from_data(self.match, 1, data["teams"][1])]
+            self.base = Base.get(data["base_id"])
+            self.round_stamps = data["round_stamps"]
+        else:
+            self.id = 0
+            self.teams = [None, None]
+            self.base = None
+            self.round_stamps = list()
+
+    def clean(self):
+        # Clean players if in teams
+        for tm in self.teams:
+            if tm is not None:
+                tm.clean()
+
+        self.id = 0
+        self.teams = [None, None]
+        self.base = None
+        self.round_stamps = list()
+
+    @property
+    def round_no(self):
+        if self.match.status is MatchStatus.IS_PLAYING:
+            return len(self.round_stamps)
+        if self.match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_WAITING):
+            return len(self.round_stamps) + 1
+        return 0
+
 
 class MatchObjects:
-    def __init__(self, match, data, channel):
+    def __init__(self, match: Match, data: MatchData, channel: int):
         self.status = MatchStatus.IS_FREE
         self.data = data
         self.proxy = match
         self.channel = channel
         self.current_process = None
-        self.map_selector = None
+        self.base_selector = None
         self.audio_bot = None
         self.result_msg = None
         self.account_hander = None
 
     def on_spin_up(self, p_list):
         self.status = MatchStatus.IS_RUNNING
-        self.map_selector = MapSelection(self.proxy, map_pool=True)
+        self.base_selector = BaseSelector(self.proxy, base_pool=True)
         self.audio_bot = AudioBot(self.proxy)
         self.account_hander = AccountHander(self.proxy)
         self.data.id = self.account_hander.number
@@ -141,6 +184,15 @@ class MatchObjects:
         else:
             raise AttributeError(f"Current process has no attribute '{name}'")
 
+    def clean(self):
+        self.data.clean()
+        self.current_process = None
+        self.base_selector = None
+        self.audio_bot = None
+        self.result_msg = None
+        self.account_hander = None
+        self.status = MatchStatus.IS_FREE
+
     @property
     def status_str(self):
         if not self.current_process:
@@ -153,27 +205,3 @@ class MatchObjects:
             return getattr(self.data, name)
         except AttributeError:
             raise AttributeError(f"'MatchObjects' object has no attribute '{name}'")
-
-
-class MatchData:
-    def __init__(self, match, data):
-        self.match = match
-        if data:
-            self.id = data["_id"]
-            self.teams = [Team.from_data(self.match, 0, data["teams"][0]),\
-                          Team.from_data(self.match, 1, data["teams"][1])]
-            self.map = Map.get(data["base_id"])
-            self.round_stamps = data["round_stamps"]
-        else:
-            self.id = 0
-            self.teams = [None, None]
-            self.map = None
-            self.round_stamps = list()
-
-    @property
-    def round_no(self):
-        if self.match.status is MatchStatus.IS_PLAYING:
-            return len(self.round_stamps)
-        if self.match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_WAITING):
-            return len(self.round_stamps) + 1
-        return 0

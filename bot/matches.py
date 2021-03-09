@@ -1,18 +1,17 @@
 import modules.config as cfg
-from modules.exceptions import UnexpectedError, AccountsNotEnough, \
-    ElementNotFound, UserLackingPermission, AlreadyPicked
+from general.exceptions import AccountsNotEnough, \
+    ElementNotFound, AlreadyPicked
 from display import SendCtx, send
-from modules.enumerations import PlayerStatus, MatchStatus, SelStatus
+from general.enumerations import MatchStatus, SelStatus
 from modules.image_maker import publish_match_image
 from modules.census import process_score, get_offline_players
 from modules.database import update_match
 from datetime import datetime as dt, timezone as tz
 from modules.ts_interface import AudioBot
-from modules.reactions import ReactionHandler, add_handler
 
 from classes.teams import Team  # ok
-from classes.players import TeamCaptain, ActivePlayer  # ok
-from classes.maps import MapSelection, main_maps_pool  # ok
+from classes.players import TeamCaptain  # ok
+from classes.bases import MapSelection, bases_pool  # ok
 from classes.accounts import AccountHander  # ok
 
 from random import choice as random_choice
@@ -158,7 +157,7 @@ class Match():
         self.__id = m_id
         self.__players = dict()
         self.__teams = [None, None]
-        self.__map_selector = None
+        self.__base_selector = None
         self.__result_msg = None
         _all_matches[m_id] = self
         self.__accounts = None
@@ -175,7 +174,7 @@ class Match():
     def new_from_data(cls, data):
         obj = cls(data["_id"], None, from_data=True)
         obj.__round_stamps = data["round_stamps"]
-        obj.__map_selector = MapSelection.new_from_id(obj, data["base_id"])
+        obj.__base_selector = MapSelection.new_from_id(obj, data["base_id"])
         for i in range(len(data["teams"])):
             obj.__teams[i] = Team.new_from_data(i, data["teams"][i], obj)
         return obj
@@ -234,7 +233,7 @@ class Match():
         data = {"_id": self.__number,
                 "round_stamps": self.__round_stamps,
                 "round_length": cfg.general['round_length'],
-                "base_id": self.__map_selector.map.id,
+                "base_id": self.__base_selector.base.id,
                 "teams": teams_data
                 }
         return data
@@ -265,13 +264,13 @@ class Match():
     #         return self.__teams[1].captain
     #     return other.captain
 
-    def confirm_map(self):
-        self.__map_selector.confirm()
-        self.__audio_bot.map_selected(self.__map_selector.map)
-        if self.__status is MatchStatus.IS_MAPPING:
+    def confirm_base(self):
+        self.__base_selector.confirm()
+        self.__audio_bot.base_selected(self.__base_selector.base)
+        if self.__status is MatchStatus.IS_BASING:
             self.__ready.start()
 
-    def pick_map(self, captain):
+    def pick_base(self, captain):
         captain.is_turn = False
         other = self.__teams[captain.team.id - 1]
         other.captain.is_turn = True
@@ -324,8 +323,8 @@ class Match():
         self.__audio_bot.faction_pick(team)
         if other.faction != 0:
             msg = await send("PK_FACTION_OK", self.channel, team.name, cfg.factions[team.faction])
-            self.__status = MatchStatus.IS_MAPPING
-            self.__find_map.start()
+            self.__status = MatchStatus.IS_BASING
+            self.__find_base.start()
         else:
             other.captain.is_turn = True
             msg = await send("PK_FACTION_OK_NEXT", self.channel, team.name, cfg.factions[team.faction], other.captain.mention)
@@ -371,18 +370,18 @@ class Match():
             self.__start_match.start()
 
     @loop(count=1)
-    async def __find_map(self):
+    async def __find_base(self):
         for tm in self.__teams:
             tm.captain.is_turn = True
-        if self.__map_selector.status is SelStatus.IS_CONFIRMED:
-            await send("MATCH_MAP_AUTO", self.__channel, self.__map_selector.map.name)
+        if self.__base_selector.status is SelStatus.IS_CONFIRMED:
+            await send("MATCH_BASE_AUTO", self.__channel, self.__base_selector.base.name)
             self.__ready.start()
             return
         captain_pings = [tm.captain.mention for tm in self.__teams]
-        self.__status = MatchStatus.IS_MAPPING
-        self.__audio_bot.select_map()
-        await send("PK_WAIT_MAP", self.__channel, *captain_pings)
-        await self.__map_selector.on_pick_start()
+        self.__status = MatchStatus.IS_BASING
+        self.__audio_bot.select_base()
+        await send("PK_WAIT_BASE", self.__channel, *captain_pings)
+        await self.__base_selector.on_pick_start()
 
     @loop(count=1)
     async def __ready(self):
@@ -465,7 +464,7 @@ class Match():
         self.__audio_bot.drop_match()
         await send("MATCH_INIT", self.__channel, " ".join(self.player_pings))
         self.__accounts = AccountHander(self)
-        self.__map_selector = MapSelection(self, main_maps_pool)
+        self.__base_selector = MapSelection(self, bases_pool)
         for i in range(len(self.__teams)):
             self.__teams[i] = Team(i, f"Team {i + 1}", self)
             key = random_choice(list(self.__players))
@@ -498,12 +497,12 @@ class Match():
             for a_player in tm.players:
                 a_player.clean()
 
-        # Clean map_selector
-        self.__map_selector.clean()
+        # Clean base_selector
+        self.__base_selector.clean()
 
         # Release all objects:
         self.__accounts = None
-        self.__map_selector = None
+        self.__base_selector = None
         self.__teams = [None, None]
         self.__round_stamps.clear()
         self.__result_msg = None
@@ -513,9 +512,9 @@ class Match():
         _on_match_free()
 
     @property
-    def map(self):
-        if self.__map_selector.status is SelStatus.IS_CONFIRMED:
-            return self.__map_selector.map
+    def base(self):
+        if self.__base_selector.status is SelStatus.IS_CONFIRMED:
+            return self.__base_selector.base
 
     # TODO: testing only
     @property
@@ -539,8 +538,8 @@ class Match():
         return self.__round_stamps
 
     @property
-    def map_selector(self):
-        return self.__map_selector
+    def base_selector(self):
+        return self.__base_selector
 
     # # DEV
     # @teams.setter
@@ -553,9 +552,9 @@ class Match():
     #     self.__round_stamps = st
     
     # # DEV
-    # @map_selector.setter
-    # def map_selector(self, ms):
-    #     self.__map_selector = ms
+    # @base_selector.setter
+    # def base_selector(self, ms):
+    #     self.__base_selector = ms
 
     # # DEV
     # @msg.setter

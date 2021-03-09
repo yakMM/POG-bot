@@ -4,7 +4,7 @@
 from json import loads
 from requests import get
 from configparser import ConfigParser, ParsingError
-from modules.exceptions import ConfigError
+from general.exceptions import ConfigError
 from logging import getLogger
 
 log = getLogger("pog_bot")
@@ -37,8 +37,8 @@ facility_suffix = {
     4: "Tech Plant"
 }
 
-# http://census.daybreakgames.com/get/ps2/map_region/?c:limit=400&c:show=facility_id,facility_name,zone_id,facility_type_id
-map_to_id = {
+# http://census.daybreakgames.com/get/ps2/base_region/?c:limit=400&c:show=facility_id,facility_name,zone_id,facility_type_id
+base_to_id = {
     "acan" : 302030,
     "ghanan" : 305010,
     "chac" : 307010,
@@ -54,7 +54,7 @@ map_to_id = {
     "rime" : 244610
 }
 
-id_to_map = {v: k for k, v in map_to_id.items()}
+id_to_base = {v: k for k, v in base_to_id.items()}
 
 ## DYNAMIC PARAMETERS:
 # (pulled from the config file)
@@ -132,7 +132,7 @@ database = {
 }
 
 # Map Images
-map_images = dict()
+base_images = dict()
 
 
 ## Methods
@@ -258,9 +258,9 @@ def get_config(file):
 
     for key in config['Map_Images'].keys():
         try:
-            map_images[map_to_id[key]] = config['Map_Images'][key]
+            base_images[base_to_id[key]] = config['Map_Images'][key]
         except KeyError:
-            raise ConfigError(f"Missing map '{key}' in 'map_to_id' dictionary in 'config.py'")
+            raise ConfigError(f"Missing base '{key}' in 'base_to_id' dictionary in 'config.py'")
 
 
 def _check_section(config, section, file):

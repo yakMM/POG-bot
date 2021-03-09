@@ -5,16 +5,14 @@ from discord.ext import commands
 from logging import getLogger
 
 # Custom classes
-from classes.players import Player, get_player
+from classes.players import get_player
 
 # Custom modules
 import modules.config as cfg
-from display.strings import AllStrings
-from modules.enumerations import PlayerStatus
+from general.enumerations import PlayerStatus
 from display.strings import AllStrings as display
-from display.classes import ContextWrapper
-from modules.tools import is_al_num
-from modules.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
+from general.tools import is_al_num
+from general.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
 
 log = getLogger("pog_bot")
 
