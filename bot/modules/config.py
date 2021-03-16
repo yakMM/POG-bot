@@ -86,7 +86,8 @@ channels = {
     "results": 0,
     "rules": 0,
     "staff": 0,
-    "muted": 0
+    "muted": 0,
+    "spam": 0
 }
 
 channels_list = list()

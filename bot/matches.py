@@ -366,8 +366,6 @@ class Match():
         # If other is_turn, then not ready
         # Else everyone ready
         if not other.captain.is_turn:
-            if get_offline_players.bypass:
-                get_offline_players.bypass = False
             self.__status = MatchStatus.IS_STARTING
             self.__start_match.start()
 
@@ -501,6 +499,10 @@ class Match():
 
         # Clean base_selector
         self.__base_selector.clean()
+
+        # Reset ingame check
+        if get_offline_players.bypass:
+                get_offline_players.bypass = False
 
         # Release all objects:
         self.__accounts = None

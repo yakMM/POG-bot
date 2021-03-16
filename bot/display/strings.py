@@ -85,6 +85,7 @@ class AllStrings(Enum):
     API_ERROR = Message("Could not reach Planetside2 API, try again later!")
     GLOBAL_INFO = Message("Here is what's going on in POG at the moment:", embed=embeds.global_info)
     CHECK_ACCOUNT = Message("Your account password may have been flipped!\n Re-register in <#{}> to confirm you still have access to it!", embed=embeds.flip_accounts)
+    RDY = Message("Bot just started and is now ready. Version `{}`")
 
     BOT_UNLOCKED = Message("Unlocked!")
     BOT_LOCKED = Message("Locked!")

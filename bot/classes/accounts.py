@@ -17,7 +17,6 @@ from discord.errors import Forbidden
 from asyncio import get_event_loop
 from logging import getLogger
 
-import display
 from lib.tasks import loop
 
 # Custom modules
@@ -120,6 +119,7 @@ class AccountHander:
         AccountHander._current_number += 1
         self.__number = AccountHander._current_number
         self.__handing_stamp = 0  # timestamp: when have these accounts been given?
+        match.number = AccountHander._current_number
         self.__reaction_handler = ReactionHandler(rem_user_react=False, rem_bot_react=True)
         self.__reaction_handler.set_reaction('✅', on_account_reaction)
 
