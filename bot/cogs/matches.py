@@ -44,32 +44,43 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.max_concurrency(number=1, wait=True)
     async def pick(self, ctx, *args):
         match = Match.get(ctx.channel.id)
-        if not await is_match_picking(ctx, match):
+        if match.status is MatchStatus.IS_FREE:
+            # Match is not active
+            await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
+            return
+        if not match.is_picking_allowed:
+            await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
             return
         if len(args) == 0 or (len(args) == 1 and args[0] == "help"):
             # Display status
             await match.pick_status(ctx)
             return
 
-        a_player, msg = _test_player(ctx, match)
+        a_player, msg = _get_check_player(ctx, match)
         if msg:
             await msg
-        else:
-            await match.pick(ctx, a_player, args)
+            return
+
+        await match.pick(ctx, a_player, args)
 
     @commands.command()
     @commands.guild_only()
     async def resign(self, ctx):
         match = Match.get(ctx.channel.id)
-        if not await is_match_picking(ctx, match):
+        if match.status is MatchStatus.IS_FREE:
+            # Match is not active
+            await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
             return
-        a_player, msg = _test_player(ctx, match)
+        if match.status is not MatchStatus.IS_PICKING:
+            await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
+            return
+        a_player, msg = _get_check_player(ctx, match)
         if msg:
             await msg
-        else:
-            team = a_player.team
-            match.demote(a_player)
-            await disp.PK_RESIGNED.send(ctx, team.captain.mention, team.name, match=match)
+            return
+        team = a_player.team
+        match.demote(a_player)
+        await disp.PK_RESIGNED.send(ctx, team.captain.mention, team.name, match=match)
 
     @commands.command(aliases=['rdy'])
     @commands.guild_only()
@@ -85,7 +96,7 @@ class MatchesCog(commands.Cog, name='matches'):
             await disp.MATCH_NOT_READY.send(ctx, ctx.command.name)
             return
 
-        a_player, msg = _test_player(ctx, match, check_turn=False)
+        a_player, msg = _get_check_player(ctx, match, check_turn=False)
         if msg:
             await msg
             return
@@ -98,7 +109,8 @@ class MatchesCog(commands.Cog, name='matches'):
                 return
             result = await get_offline_players(a_player.team)
             if len(result) != 0:
-                await disp.MATCH_PLAYERS_OFFLINE.send(ctx, a_player.team.name, " ".join(p.mention for p in result), p_list=result)
+                await disp.MATCH_PLAYERS_OFFLINE.send(ctx, a_player.team.name, " ".join(p.mention for p in result),
+                                                      p_list=result)
                 return
             match.on_team_ready(a_player.team)
             await disp.MATCH_TEAM_READY.send(ctx, a_player.team.name, match=match)
@@ -110,7 +122,8 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.guild_only()
     async def squittal(self, ctx):
         match = Match.get(ctx.channel.id)
-        if match.status not in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
+        if match.status not in (
+        MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
             await disp.MATCH_NOT_READY.send(ctx, ctx.command.name)
             return
         await disp.SC_PLAYERS_STRING.send(ctx, "\n".join(tm.ig_string for tm in match.teams))
@@ -128,12 +141,12 @@ class MatchesCog(commands.Cog, name='matches'):
             await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
             return
 
-        if len(args) == 1 and args[0]=="help":
+        if len(args) == 1 and args[0] == "help":
             await disp.BASE_HELP.send(ctx)
             return
 
         # Check player status
-        a_player, msg = _test_player(ctx, match, check_turn=False)
+        a_player, msg = _get_check_player(ctx, match, check_turn=False)
 
         # If player doesn't have the proper status
         if msg:
@@ -142,22 +155,42 @@ class MatchesCog(commands.Cog, name='matches'):
                 if len(args) == 0:
                     # If player just want to get base status, we give him
                     await match.base_selector.show_base_status(ctx)
+                    # We will not use the message
+                    msg.close()
                 else:
                     # Else we display the error message
                     await msg
+                return
             # It's important to close the message in case we don't use it
             msg.close()
+
+        if len(args) == 0:
+            # If no arg in the command
+            await match.base_selector.display_all(ctx)
             return
 
-        await match.base_selector.on_base_command(ctx, args)
+        if len(args) == 1:
+            if args[0] == "confirm":
+                # If arg is "confirm"
+                await match.base_selector.confirm_base(ctx, a_player)
+                return
+            if args[0] == "list":
+                await match.base_selector.display_all(ctx, force=True)
+                return
+            if args[0].isnumeric():
+                # If arg is a number
+                await match.base_selector.select_by_index(ctx, a_player, int(args[0]) - 1)
+                return
 
+        # If any other arg (expecting base name)
+        await match.base_selector.select_by_name(ctx, a_player, args)
 
 
 def setup(client):
     client.add_cog(MatchesCog(client))
 
 
-def _test_player(ctx, match, check_turn=True):
+def _get_check_player(ctx, match, check_turn=True):
     """ Test if the player is in position to issue a match command
         Returns the player object if yes, None if not
     """
@@ -185,56 +218,3 @@ def _test_player(ctx, match, check_turn=True):
     else:
         a_player = player.active
     return a_player, msg
-
-
-async def is_match_picking(ctx, match):
-    # Step 1: Test match status
-    if match.status is MatchStatus.IS_FREE:
-        # Match is not active
-        await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
-        return False
-    if not match.is_picking_allowed:
-        # Match is not in right state
-        await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
-        return False
-    return True
-
-
-
-async def _faction_change(ctx, captain, args):
-    is_faction = await _faction_check(ctx, args)
-    if not is_faction:
-        return
-    team = captain.team
-    if not captain.is_turn:
-        await disp.PK_OVER_READY.send(ctx)
-        return
-    try:
-        if captain.match.faction_change(team, args[0]):
-            await disp.PK_FACTION_CHANGED.send(ctx, team.name, cfg.factions[team.faction])
-            return
-        await disp.PK_FACTION_ALREADY.send(ctx)
-        return
-    except KeyError:
-        await disp.PK_NOT_VALID_FACTION.send(ctx)
-
-async def _base(ctx, captain, args):
-    sel = captain.match.base_selector
-    match = captain.match
-    if len(args) == 1 and args[0] == "confirm":
-        if sel.status is not SelStatus.IS_SELECTED:
-            await disp.PK_NO_BASE.send(ctx)
-            return
-        if not captain.is_turn:
-            await disp.PK_NOT_TURN.send(ctx)
-            return
-        match.confirm_base()
-        await disp.MATCH_BASE_SELECTED.send(ctx, sel.base.name, sel=sel)
-        return
-    # Handle the actual base selection
-    base = await sel.do_selection_process(ctx, args)
-    if base:
-        new_picker = match.pick_base(captain)
-        await sel.wait_confirm(ctx, new_picker)
-        if sel.is_booked:
-            await disp.BASE_BOOKED.send(ctx, new_picker.mention, sel.base.name)

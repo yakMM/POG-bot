@@ -2,7 +2,7 @@ from general.exceptions import ElementNotFound
 from general.enumerations import MatchStatus
 from modules.database import get_one_item
 
-from classes.bases import Base, MapSelection
+from classes.bases import Base
 from classes.teams import Team
 from classes.audio_bot import AudioBot
 from classes.accounts import AccountHander
@@ -164,7 +164,7 @@ class MatchObjects:
 
     def on_spin_up(self, p_list):
         self.status = MatchStatus.IS_RUNNING
-        self.base_selector = BaseSelector(self.proxy, base_pool=True)
+        self.base_selector = BaseSelector(self, base_pool=True)
         self.audio_bot = AudioBot(self.proxy)
         self.account_hander = AccountHander(self.proxy)
         self.data.id = self.account_hander.number
@@ -184,9 +184,10 @@ class MatchObjects:
         else:
             raise AttributeError(f"Current process has no attribute '{name}'")
 
-    def clean(self):
+    async def clean(self):
         self.data.clean()
         self.current_process = None
+        await self.base_selector.clean()
         self.base_selector = None
         self.audio_bot = None
         self.result_msg = None

@@ -1,5 +1,6 @@
 from general.exceptions import UserLackingPermission
 from inspect import iscoroutinefunction as is_coroutine
+from discord.errors import NotFound
 
 _all_handlers = dict()
 
@@ -16,13 +17,14 @@ async def reaction_handler(reaction, user, player):
     if handler is None:
         return
     try:
-        result = await handler.run(reaction, player, user)
-        if result and handler.rem_bot_react:
-            await msg.remove_reaction(reaction.emoji, _client.user)
+        success = await handler.run(reaction, player, user)
     except UserLackingPermission:
-        pass
-    if handler.rem_user_react:
-        await msg.remove_reaction(reaction.emoji, user)
+        success = False
+    if msg.id in _all_handlers:
+        if success and handler.rem_bot_react:
+            await msg.remove_reaction(reaction.emoji, _client.user)
+        if handler.rem_user_react:
+            await msg.remove_reaction(reaction.emoji, user)
 
 
 def add_handler(m_id, handler):
@@ -35,7 +37,7 @@ def rem_handler(m_id):
         pass
 
 class ReactionHandler:
-    def __init__(self, rem_user_react = True, rem_bot_react = False):
+    def __init__(self, rem_user_react=True, rem_bot_react=False):
         self.__f_dict = dict()
         self.__rem_user_react = rem_user_react
         self.__rem_bot_react = rem_bot_react

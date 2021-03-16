@@ -8,7 +8,7 @@ from random import choice as random_choice
 from classes.teams import Team
 from classes.players import TeamCaptain, ActivePlayer, get_player
 
-import match_process.common as common
+import match_process.common_picking as common
 import match_process.meta as meta
 
 
@@ -34,7 +34,7 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
 
     @meta.public
     async def clear(self, ctx):
-        self.match.clean()
+        await self.match.clean()
         await display.MATCH_CLEARED.send(ctx)
 
     def find_captain(self):
@@ -103,7 +103,7 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
         self.pick_check(other)
 
     @meta.public
-    async def sub(self, subbed):
+    async def sub(self, ctx, subbed):
         """ Substitute a player by another one picked at random \
             in the lobby.
             
@@ -113,7 +113,7 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
                 Player to be substituted
         """
         # Get a new player for substitution
-        new_player = await common.get_substitute(self.match)
+        new_player = await common.get_substitute(ctx, self.match)
         if not new_player:
             return
 

@@ -19,6 +19,8 @@ from lib.tasks import loop
 from asyncio import sleep
 from logging import getLogger
 
+# THIS IS LEGACY CODE, WILL BE REMOVED IN A NEAR UPDATE
+
 log = getLogger("pog_bot")
 
 _lobby_list = list()

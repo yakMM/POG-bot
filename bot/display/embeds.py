@@ -210,13 +210,12 @@ def lobby_list(ctx, names_in_lobby):
     return embed
 
 
-def selected_bases(ctx, sel):
+def selected_bases(ctx, bases_list):
     """ Returns a list of bases currently selected
     """
     embed = Embed(colour=Color.blue())
-    bases = sel.string_list
-    embed.add_field(name=f"{len(bases)} bases found",
-                    value="\n".join(bases),
+    embed.add_field(name=f"{len(bases_list)} bases found",
+                    value="\n".join(bases_list),
                     inline=False)
     return embed
 
@@ -319,23 +318,6 @@ def jaeger_calendar(arg):
                     value=date.strftime("%Y-%m-%d %H:%M UTC"),
                     inline=False)
     return embed
-
-
-def base_pool(ctx, sel):
-    base = sel.navigator.current
-    if sel.navigator.is_booked:
-        embed = Embed(colour=Color.red(), title=base.name,
-                      description="WARNING! This base seems to be booked in the calendar!")
-    else:
-        embed = Embed(colour=Color.blue(), title=base.name)
-    if base.id in cfg.base_images:
-        embed.set_image(url=cfg.base_images[base.id])
-    else:
-        embed.add_field(name=f"Image",
-                        value="Not available for this base",
-                        inline=False)
-    return embed
-
 
 def base_display(ctx, base, is_booked):
     if is_booked:

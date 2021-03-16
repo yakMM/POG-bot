@@ -70,7 +70,7 @@ def _identify_base_from_name(name, base_class):
 
     # Use regex to clean the string from unwanted characters
     pattern = reg_compile("[^a-zA-Z0-9 ]")
-    string = reg_sub(" {2,}", " ", pattern.sub('', name)).strip()
+    name = reg_sub(" {2,}", " ", pattern.sub('', name)).strip()
 
     # Add all matching bases to list
     results = base_class.get_bases_from_name(name)
