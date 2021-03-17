@@ -18,8 +18,10 @@ class AllStrings(Enum):
     REG_CHAR_NOT_FOUND = Message("Invalid registration! Character `{}` is not valid!", embed=embeds.register_help)
     REG_NOT_JAEGER = Message("Invalid registration! Character `{}` doesn't belong to Jaeger!", embed=embeds.register_help)
     REG_ALREADY_EXIST = Message("Invalid registration! Character `{}` is already registered by {}!")
-    REG_MISSING_FACTION = Message("Invalid registration! Can't find a {} character in your list!", embed=embeds.register_help)
-    REG_UPDATE_OWN = Message("You successfully updated your profile with the following Jaeger characters: `{}`, `{}`, `{}`")
+    REG_MISSING_FACTION = Message("Invalid registration! Can't find a {} character in your list!",
+                                  embed=embeds.register_help)
+    REG_UPDATE_OWN = Message("You successfully updated your profile with the following Jaeger characters:"
+                             " `{}`, `{}`, `{}`")
     REG_UPDATE_NOA = Message("You successfully removed your Jaeger characters from your profile.")
     REG_WITH_CHARS = Message("You successfully registered with the following Jaeger characters: `{}`, `{}`, `{}`")
     REG_FROZEN = Message("You can't register while you're playing a match")
@@ -37,7 +39,8 @@ class AllStrings(Enum):
     LB_FULL = Message("Lobby is already full! Waiting for a match to start...")
     LB_STUCK = Message("Lobby is full, but can't start a new match yet. Please wait...", ping=False)
     LB_STUCK_JOIN = Message("You can't join the lobby, it is already full!")
-    LB_MATCH_STARTING = Message("Lobby full, match can start! Join <#{}> for team selection!", ping=False, embed=embeds.join_ts)
+    LB_MATCH_STARTING = Message("Lobby full, match can start! Join <#{}> for team selection!", ping=False,
+                                embed=embeds.join_ts)
     LB_WENT_INACTIVE = Message("{} was removed from the lobby because they went offline!", embed=embeds.lobby_list)
     LB_CLEARED = Message("Lobby has been cleared!", embed=embeds.lobby_list)
     LB_EMPTY = Message("Lobby is already empty!")
@@ -58,21 +61,26 @@ class AllStrings(Enum):
     PK_OK = Message("Player picked! {} your turn, pick a player!", embed=embeds.team_update, ping=False)
     PK_OK_2 = Message("Player picked!", ping=False)
     PK_LAST = Message("Assigned {} to {}!", embed=embeds.team_update)
-    PK_OK_FACTION = Message("Teams are ready! {} pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting bellow!", ping=False)
+    PK_OK_FACTION = Message("Teams are ready! {} pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting bellow!",
+                            ping=False)
     PK_NOT_VALID_FACTION = Message("Incorrect input!")
-    PK_FACTION_OK = Message("{} chose {}!")
+    PK_FACTION_OK = Message("{} chose {}!", ping=False)
     PK_FACTION_ALREADY = Message("Your team is already {}!")
     PK_FACTION_OTHER = Message("Faction already picked by the other team!")
-    PK_FACTION_OK_NEXT = Message("{} chose {}! {} pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting bellow!", ping=False)
-    PK_FACTION_CHANGED = Message("{} changed to {}!")
+    PK_FACTION_OK_NEXT = Message("{} chose {}! {} pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting bellow!",
+                                 ping=False)
+    PK_FACTION_CHANGED = Message("{} changed to {}!", ping=False)
     PK_FACTION_NOT_PLAYER = Message("Pick a faction, not a player!")
-    PK_FACTION_HELP = Message("Waiting for {} to pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting bellow!", ping=False)
+    PK_FACTION_INFO = Message("Captains can change faction with `=pick` `tr`/`vs`/`nc`!")
+    PK_FACTION_HELP = Message("Waiting for {} to pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting bellow!",
+                              ping=False)
     PK_OVER_READY = Message("Can't do that if your team is ready!")
     PK_RESIGNED = Message("Successfully resigned! {} is the new captain for {}!", embed=embeds.team_update)
     PK_BASING_INFO = Message("Waiting for captains to pick a base with `=base`!")
 
     EXT_NOT_REGISTERED = Message("You are not registered! Check <#{}>")
-    UNKNOWN_ERROR = Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\nDetails: *{}*")
+    UNKNOWN_ERROR = Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\n"
+                            "Details: *{}*")
     STOP_SPAM = Message("Please avoid spamming!")
     HELP = Message("Available commands:", embed=embeds.auto_help)
     INVALID_COMMAND = Message("Invalid command! Type `=help` for the list of available commands.")
@@ -84,7 +92,8 @@ class AllStrings(Enum):
     INVALID_STR = Message("You entered an invalid character! `{}`")
     API_ERROR = Message("Could not reach Planetside2 API, try again later!")
     GLOBAL_INFO = Message("Here is what's going on in POG at the moment:", embed=embeds.global_info)
-    CHECK_ACCOUNT = Message("Your account password may have been flipped!\n Re-register in <#{}> to confirm you still have access to it!", embed=embeds.flip_accounts)
+    CHECK_ACCOUNT = Message("Your account password may have been flipped!\n"
+                            "Re-register in <#{}> to confirm you still have access to it!", embed=embeds.flip_accounts)
     RDY = Message("Bot just started and is now ready. Version `{}`")
 
     BOT_UNLOCKED = Message("Unlocked!")
@@ -135,7 +144,8 @@ class AllStrings(Enum):
     BASE_ADDED = Message("Added {} to the base pool")
     BASE_REMOVED = Message("Removed {} from the base pool")
     BASE_CALENDAR = Message("{} Pick an available base!", ping=False, embed=embeds.jaeger_calendar)
-    BASE_NO_BASE = Message("No base selected!")
+    BASE_NO_BASE = Message("No base yet selected!")
+    BASE_NO_BASE_WAITING = Message("Waiting for captains to pick a base...")
     BASE_ALREADY = Message("Base already confirmed!")
     BASE_NO_CONFIRM = Message("Can't confirm the base! {} should do it!")
     BASE_OK_CONFIRM = Message("Picked **{}**! {} confirm with if you agree! (use `=p confirm` or react below)")

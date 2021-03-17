@@ -1,14 +1,19 @@
 # v3.0:
 - Match process rewrite [IN PROGRESS]
 - Changed how demote works:
-    - It's only possible to demote/resign a captain when it's their turn
-    - On resign, player is not put back in the picking pool but instead added to the team as a player
-    - It is now possible to demote/resign even after picking players
+  - It's only possible to demote/resign a captain when it's their turn
+  - On resign, player is not put back in the picking pool but instead added to the team as a player
+  - It is now possible to demote/resign even after picking players
 - Streamlined sub process
-    - Captains can now be substituted, a new captain will automatically get chosen
+  - Captains can now be substituted, a new captain will automatically get chosen
+  - It is now possible to sub players at any time before match start
+- Changed base selection:
+  - Bases are now selected with =base (=b) command
+  - Current base can now be modified at any time before match start by team captains (even before players are picked)
 - match command (=m) replaced by info command (=i)
 - =p or =p help will now give info on the picking progress instead of displaying generic command help
 - Code cleaning/commenting/documenting
+
 
 # v2.1:
 - Ingame online check feature now reactivates after each match
@@ -25,9 +30,9 @@ Major feature implementations!
 - Added jaeger calendar integration
 - Added a warning if a chosen base is currently reserved in the jaeger calendar
 - Added a proper reaction framework:
-    - Improved base pool and base selection process with reactions
+  - Improved base pool and base selection process with reactions
 - Implemented a teamspeak bot:
-    - Bot announces match start and end, and informs captains on steps during pre-match
+  - Bot announces match start and end, and informs captains on steps during pre-match
 - Various code viewability enhancements, PEP8 formatting, and typo fixes
 - Updated discord.py library
 - Fixed error handling in tasks
@@ -104,7 +109,7 @@ Major feature implementations!
 - freeze/unfreeze command is now working as expected
 
 # v1.7:
-- =base command should now work in all situations
+- =map command should now work in all situations
 - Fixed match status message on faction selection
 - Added possibility to freeze and unfreeze channels
 

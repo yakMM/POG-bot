@@ -8,8 +8,8 @@ import match_process.meta as meta
 import match_process.common_picking as common
 from asyncio import sleep
 
-class MapPicking(meta.Process, status=MatchStatus.IS_BASING):
-    
+class GettingReady(meta.Process, status=MatchStatus.IS_WAITING):
+
     def __init__(self, match):
         self.match = match
 
@@ -20,16 +20,9 @@ class MapPicking(meta.Process, status=MatchStatus.IS_BASING):
 
     @meta.init_loop
     async def init(self):
-        if not self.match.data.base:
-            await self.match.base_selector.display_all(self.match.channel,
-                                                       mentions=f"{self.match.teams[0].captain.mention} "
-                                                                f"{self.match.teams[1].captain.mention}")
-        else:
-            self.on_base_found()
-
-    @meta.public
-    def on_base_found(self):
-        self.match.on_base_pick_over()
+        # Give accounts here
+        print("GETTING READY")
+        pass
 
     @meta.public
     async def clear(self, ctx):
@@ -42,7 +35,6 @@ class MapPicking(meta.Process, status=MatchStatus.IS_BASING):
 
     @meta.public
     async def pick_status(self, ctx):
-        print(self.match.status)
         await disp.PK_FACTION_INFO.send(ctx)
 
     @meta.public

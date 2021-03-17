@@ -62,8 +62,8 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
         if self.last_msg:
             await self.last_msg.clear_reactions()
             rem_handler(self.last_msg.id)
-        add_handler(msg.id, self.reaction_handler)
         self.last_msg = msg
+        add_handler(msg.id, self.reaction_handler)
         await self.reaction_handler.auto_add_reactions(msg)
 
     @meta.public

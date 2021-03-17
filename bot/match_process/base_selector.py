@@ -73,7 +73,10 @@ class BaseSelector:
 
     async def show_base_status(self, ctx):
         if self.__selected is None:
-            await disp.BASE_NO_BASE.send(ctx)
+            if self.__match.status is MatchStatus.IS_BASING:
+                await disp.BASE_NO_BASE_WAITING.send(ctx)
+            else:
+                await disp.BASE_NO_BASE.send(ctx)
         else:
             await disp.BASE_SELECTED.send(ctx, base=self.__selected, is_booked=self.is_booked)
 

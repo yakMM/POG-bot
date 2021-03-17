@@ -12,6 +12,7 @@ from logging import getLogger
 from match_process.player_picking import PlayerPicking
 from match_process.faction_picking import FactionPicking
 from match_process.base_picking import MapPicking
+from match_process.getting_ready import GettingReady
 from match_process.base_selector import BaseSelector
 from match_process.meta import Process
 
@@ -96,6 +97,8 @@ class Match:
     def is_picking_allowed(self):
         if not self.__objects:
             raise AttributeError("Match instance is not bound, no attribute 'is_picking_allowed'")
+        if self.status is MatchStatus.IS_RUNNING:
+            return False
         try:
             self.__objects.get_process_attr("pick_status")
             return True
@@ -111,8 +114,9 @@ class Match:
 
     def __getattr__(self, name):
         if not self.__objects:
-            raise AttributeError(f"Match instance is not bound,\
-                                  no attribute '{name}'")
+            raise AttributeError(f"Match instance is not bound, no attribute '{name}'")
+        if self.status is MatchStatus.IS_RUNNING:
+            raise AttributeError(f"Process in progress, can not reach attribute '{name}'")
         return self.__objects.get_process_attr(name)
 
 
@@ -177,6 +181,10 @@ class MatchObjects:
     def on_faction_pick_over(self):
         self.status = MatchStatus.IS_RUNNING
         self.current_process = MapPicking(self)
+
+    def on_base_pick_over(self):
+        self.status = MatchStatus.IS_RUNNING
+        self.current_process = GettingReady(self)
 
     def get_process_attr(self, name):
         if name in self.current_process.attributes:

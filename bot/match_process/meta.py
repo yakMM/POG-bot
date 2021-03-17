@@ -5,45 +5,35 @@ log = getLogger("pog_bot")
 
 
 class PublicFunc:
-
-    @classmethod
-    def instantiate(cls, public_fct, base_object):
-        obj = cls(public_fct.function)
-        obj.base_object = base_object
-        return obj
-
     def __init__(self, func):
         self.function = func
         self.name = func.__name__
         self.base_object = None
 
+    def instantiate(self, base_object):
+        self.base_object = base_object
+
     def __call__(self, *args, **kwargs):
         return self.function(self.base_object, *args, **kwargs)
 
 
-class InitLoop:
-
-    @classmethod
-    def instantiate(cls, init_loop, base_object):
-        obj = cls(init_loop.loop)
-        obj.loop = Loop(coro=obj.loop, count=1)
-        obj.base_object = base_object
-        return obj
-
+class InitFunc:
     def __init__(self, func):
-        self.loop = func
+        self.func = func
         self.base_object = None
 
-    def start(self, *args):
-        self.loop.start(self.base_object, *args)
+    def instantiate(self, base_object):
+        self.base_object = base_object
+
+    async def __call__(self, *args):
+        await self.func(self.base_object, *args)
 
 
 def public(func):
     return PublicFunc(func)
 
-
 def init_loop(func):
-    return InitLoop(func)
+    return InitFunc(func)
 
 
 class MetaProcess(type):
@@ -52,16 +42,17 @@ class MetaProcess(type):
         return obj
 
     def __init__(cls, c_name, c_base, c_dict, status):
+        super().__init__(cls)
         cls.meta_status = status
         cls.meta_attributes = list()
-        cls.meta_init_loop = None
+        cls.meta_init_func = None
         for func in c_dict.values():
             if isinstance(func, PublicFunc):
                 cls.meta_attributes.append(func)
-            if isinstance(func, InitLoop):
-                if cls.meta_init_loop:
+            if isinstance(func, InitFunc):
+                if cls.meta_init_func:
                     raise ValueError(f"There can be only one init_loop for '{c_name}'")
-                cls.meta_init_loop = func
+                cls.meta_init_func = func
 
 
 class Process(metaclass=MetaProcess, status=None):
@@ -70,19 +61,24 @@ class Process(metaclass=MetaProcess, status=None):
         obj = super().__new__(cls)
         obj.attributes = dict()
         obj.status = None
-        obj.init_loop = None
+        obj.init_func = None
         for pub_func in obj.meta_attributes:
-            obj.attributes[pub_func.name] = PublicFunc.instantiate(pub_func, obj)
             log.debug(f"Instanciating {pub_func.name}!")
-        if obj.meta_init_loop:
-            obj.init_loop = InitLoop.instantiate(obj.meta_init_loop, obj)
+            pub_func.instantiate(obj)
+            obj.attributes[pub_func.name] = pub_func
+        if obj.meta_init_func:
+            obj.meta_init_func.instantiate(obj)
+            obj.init_func = obj.meta_init_func
         if obj.meta_status:
             obj.status = obj.meta_status
         return obj
 
     def __init__(self, match, *args):
         self.match = match
-        if self.init_loop:
-            self.init_loop.start(*args)
+        Loop(coro=self._async_init, count=1).start(*args)
+
+    async def _async_init(self, *args):
+        if self.init_func:
+            await self.init_func(*args)
         if self.status:
             self.match.status = self.status

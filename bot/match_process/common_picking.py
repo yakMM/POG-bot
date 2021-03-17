@@ -10,6 +10,13 @@ log = getLogger("pog_bot")
 
 
 async def get_substitute(ctx, match):
+    """
+    Get a substitute player from lobby, return it
+
+    :param ctx: Context used for displaying messages
+    :param match: Match calling this function
+    :return: Player found for subbing
+    """
     # Get a new player from the lobby, if None available, display
     new_player = get_sub()
     if new_player is None:
@@ -29,17 +36,12 @@ async def ping_sub_in_lobby(match, new_player):
 
 
 def switch_turn(process, team):
-    """ Change the team who can pick.
+    """
+    Change the team who can pick.
 
-        Parameters
-        ----------
-        team : Team
-            The team who is currently picking.
-
-        Returns
-        -------
-        other : Team
-            The other team who will pick now
+    :param process: Process object calling this function
+    :param team: The team who is currently picking
+    :return: Next team to pick
     """
     # Toggle turn
     team.captain.is_turn = False
@@ -52,13 +54,13 @@ def switch_turn(process, team):
 
 
 async def after_pick_sub(ctx, match, subbed):
-    """ Substitute a player by another one picked at random \
-        in the lobby.
+    """
+    Substitute a player by another one picked at random in the lobby.
 
-        Parameters
-        ----------
-        subbed : Player
-            Player to be substituted
+    :param ctx: Context used for displaying messages
+    :param match: Match calling this function
+    :param subbed: Player player to be subbed
+    :return: Nothing
     """
     # Get a new player for substitution
     new_player = await get_substitute(ctx, match)
@@ -83,6 +85,13 @@ async def after_pick_sub(ctx, match, subbed):
 
 
 async def check_faction(ctx, args):
+    """
+    Check if args contain a valid faction, if not display an error message
+
+    :param ctx: Context used for displaying messages
+    :param args: args to be examined
+    :return: Message that was sent (None if no error message)
+    """
     # Don't want a mentioned player
     if len(ctx.message.mentions) != 0:
         return await disp.PK_FACTION_NOT_PLAYER.send(ctx)
@@ -97,13 +106,26 @@ async def check_faction(ctx, args):
 
 
 async def faction_change(ctx, captain, args, match):
+    """
+    Change team faction to requested one
+
+    :param ctx: Context used for displaying messages
+    :param captain: Captain asking for the faction change
+    :param args: args sent by the captain
+    :param match: Match calling this function
+    :return: Nothing
+    """
+    # Check if faction is valid
     if await check_faction(ctx, args):
+        # If error, return
         return
 
+    # Get selected faction, get teams
     faction = cfg.i_factions[args[0].upper()]
     team = captain.team
     other = match.teams[team.id - 1]
 
+    # Check if faction is already used, update faction
     if team.faction == faction:
         await disp.PK_FACTION_ALREADY.send(ctx, cfg.factions[faction])
     elif other.faction == faction:

@@ -203,7 +203,7 @@ def _add_init_handlers(client):
         _add_main_handlers(client)
         modules.loader.unlock_all(client)
         log.info('Client is ready!')
-        await send("RDY", SendCtx.channel(cfg.channels["spam"]), cfg.VERSION)
+        await disp.RDY.send(ContextWrapper.channel(cfg.channels["spam"]), cfg.VERSION)
 
     @client.event
     async def on_message(message):
@@ -211,7 +211,7 @@ def _add_init_handlers(client):
 
 # TODO: testing, to be removed
 def _test(client):
-    from test2 import test_hand
+    from template_test_file import test_hand
     test_hand(client)
 
 def _define_log(launch_str):
