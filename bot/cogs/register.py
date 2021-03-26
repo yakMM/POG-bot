@@ -79,7 +79,7 @@ async def _register(player, ctx, args):
     ingame_names (str, list of str): If a list, will add each name one by one.
     If a string, will add the faction suffixes automatically.
     """
-    if player.match and player.match.is_started:  # Can't register if already playing
+    if player.active and player.active.is_playing:  # Can't register if already playing
         await display.REG_FROZEN.send(ctx)
         return
     for name in args:
@@ -91,9 +91,9 @@ async def _register(player, ctx, args):
             await display.REG_NOT_REGISTERED.send(ctx)
             return
         if player.has_own_account:
-            await display.REG_IS_REGISTERED_OWN.send(ctx, *player.ig_names)
+            await display.REG_IS_OWN.send(ctx, *player.ig_names)
             return
-        await display.REG_IS_REGISTERED_NOA.send(ctx)
+        await display.REG_IS_NOA.send(ctx)
         return
     # store previous status
     was_player_registered = player.is_registered
@@ -105,7 +105,7 @@ async def _register(player, ctx, args):
             # player.register return a boolean: has_the_profile_been_updated
             if not await player.register(args):
                 # if no update, say "you are already registered etc"
-                await display.REG_IS_REGISTERED_OWN.send(ctx, *player.ig_names)
+                await display.REG_ALREADY_OWN.send(ctx, *player.ig_names)
                 return
             if was_player_registered:
                 await display.REG_UPDATE_OWN.send(ctx, *player.ig_names)
@@ -133,7 +133,7 @@ async def _register(player, ctx, args):
     if len(args) == 2:  # if 2 args, it should be "no account", if not, invalid request.
         if args[0] == "no" and args[1] == "account":
             if not await player.register(None):
-                await display.REG_IS_REGISTERED_NOA.send(ctx)
+                await display.REG_ALREADY_NOA.send(ctx)
                 return
             if was_player_registered:
                 await display.REG_UPDATE_NOA.send(ctx)

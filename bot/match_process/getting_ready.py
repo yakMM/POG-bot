@@ -12,6 +12,7 @@ from asyncio import sleep
 import modules.accounts_handler as accounts
 import modules.database as db
 import modules.config as cfg
+import modules.census as census
 
 class GettingReady(meta.Process, status=MatchStatus.IS_WAITING):
 
@@ -48,6 +49,43 @@ class GettingReady(meta.Process, status=MatchStatus.IS_WAITING):
     async def clear(self, ctx):
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)
+
+    @meta.public
+    async def team_ready(self, ctx, captain):
+        if not captain.is_turn:
+            self.on_team_not_ready(captain.team)
+            await disp.MATCH_TEAM_UNREADY.send(ctx, captain.team.name, match=self.match.proxy)
+        if captain.is_turn:
+            if self.match.check_validated:
+                not_validated_players = accounts.get_not_validated_accounts(captain.team)
+                if len(not_validated_players) != 0:
+                    await disp.MATCH_PLAYERS_NOT_READY.send(ctx, captain.team.name,
+                                                            " ".join(p.mention for p in not_validated_players))
+                    return
+            if self.match.check_offline:
+                offline_players = await census.get_offline_players(captain.team)
+                if len(offline_players) != 0:
+                    await disp.MATCH_PLAYERS_OFFLINE.send(ctx, captain.team.name,
+                                                          " ".join(p.mention for p in offline_players),
+                                                          p_list=offline_players)
+                    return
+            self.on_team_ready(captain.team)
+            await disp.MATCH_TEAM_READY.send(ctx, captain.team.name, match=self.match.proxy)
+            return
+
+    def on_team_not_ready(self, team):
+        team.captain.is_turn = True
+        team.on_team_ready(False)
+
+    def on_team_ready(self, team):
+        team.captain.is_turn = False
+        team.on_team_ready(True)
+        other = self.match.teams[team.id-1]
+        # If other is_turn, then not ready
+        # Else everyone ready
+        if not other.captain.is_turn:
+            print("OK NEXT")
+            # START HERE
 
     @meta.public
     async def remove_account(self, a_player):

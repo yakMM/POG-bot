@@ -93,19 +93,18 @@ async def get_captures(match, start, end):
             capper.add_cap(cfg.scores["recapture"])
             base_owner = capper
 
+
 async def get_offline_players(team):
-    if get_offline_players.bypass:
-        return list()
     ig_dict = dict()
     for p in team.players:
         ig_dict[p.ig_id] = p
     id_string = ",".join(str(ig_id) for ig_id in ig_dict.keys())
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_online_status/?character_id={id_string}'
-    jdata = await http_request(url)
-    if jdata["returned"] == 0:
+    j_data = await http_request(url)
+    if j_data["returned"] == 0:
         raise ApiNotReachable(f"Empty answer on online_status call (url={url})")
 
-    char_list = jdata["characters_online_status_list"]
+    char_list = j_data["characters_online_status_list"]
 
     offline_players = list()
 
@@ -115,4 +114,3 @@ async def get_offline_players(team):
 
     return offline_players
 
-get_offline_players.bypass = False

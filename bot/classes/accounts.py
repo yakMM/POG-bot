@@ -17,17 +17,6 @@ QUIT_DELAY = 300
 
 log = getLogger("pog_bot")
 
-def get_not_ready_players(team):
-    not_ready = list()
-    for p in team.players:
-        if p.has_own_account:
-            continue
-        if p.account is None:
-            log.error(f"Debug: {p.name} has no account")  # Should not happen
-        if not p.account.is_validated:
-            not_ready.append(p)
-    return not_ready
-
 class Account:
     """ Account object, each of these represent one single account"""
 

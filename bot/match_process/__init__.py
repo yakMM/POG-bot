@@ -14,6 +14,7 @@ from display.strings import AllStrings as disp
 import modules.database as db
 import modules.roles
 import modules.accounts_handler as accounts
+from general.exceptions import UnexpectedError
 
 from match_process.player_picking import PlayerPicking
 from match_process.faction_picking import FactionPicking
@@ -131,6 +132,18 @@ class Match:
     def base(self):
         return self.__data.base
 
+    def change_check(self, arg):
+        if not self.__objects:
+            raise AttributeError("Match instance is not bound, no attribute 'change_check'")
+        if arg == "online":
+            self.__objects.check_offline = not self.__objects.check_offline
+            return self.__objects.check_offline
+        elif arg == "account":
+            self.__objects.check_validated = not self.__objects.check_validated
+            return self.__objects.check_validated
+        else:
+            raise KeyError
+
     def spin_up(self, p_list):
         Match._last_match_id += 1
         self.__objects.on_spin_up(p_list)
@@ -187,6 +200,8 @@ class MatchObjects:
         self.audio_bot = None
         self.result_msg = None
         self.clean_channel.start()
+        self.check_offline = True
+        self.check_validated = True
         self.players_with_account = list()
 
     def on_spin_up(self, p_list):
@@ -225,6 +240,8 @@ class MatchObjects:
         self.base_selector = None
         self.audio_bot = None
         self.result_msg = None
+        self.check_offline = True
+        self.check_validated = True
         self.status = MatchStatus.IS_FREE
         self.clean_channel.start()
 

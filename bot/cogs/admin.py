@@ -91,6 +91,27 @@ class AdminCog(commands.Cog, name='admin'):
             await disp.RM_OK.send(ctx)
             return
         await disp.RM_IN_MATCH.send(ctx)
+
+    @commands.command()
+    @commands.guild_only()
+    async def rename(self, ctx, *args):
+        msg = _check_channels(ctx, cfg.channels["register"])
+        if msg:
+            await msg
+            return
+        player = await _get_check_player(ctx)
+        if not player:
+            return
+        fields = list()
+        for arg in args:
+            if "@" not in arg:
+                fields.append(arg)
+        if len(fields) == 0:
+            await disp.WRONG_USAGE.send(ctx, ctx.command.name)
+            return
+        new_name = " ".join(fields)
+        await player.change_name(new_name)
+        await disp.RM_NAME_CHANGED.send(ctx, player.mention, new_name)
     
     @commands.command()
     @commands.guild_only()
@@ -107,8 +128,29 @@ class AdminCog(commands.Cog, name='admin'):
             await disp.RM_NOT_LOBBIED.send(ctx)
             return
         if ctx.channel.id == cfg.channels["register"]:
-            pass
+            player = await _get_check_player(ctx)
+            if not player:
+                return
             #TODO: do something
+
+    @commands.command()
+    @commands.guild_only()
+    async def check(self, ctx, *args):
+        msg = _check_channels(ctx, cfg.channels["matches"])
+        if msg:
+            await msg
+            return
+        match = Match.get(ctx.channel.id)
+        if match.status is MatchStatus.IS_FREE:
+            # Match is not active
+            await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
+            return
+        for arg in args:
+            try:
+                result = match.change_check(arg)
+                await disp.MATCH_CHECK_CHANGED.send(ctx, arg, "enabled" if result else "disabled")
+            except KeyError:
+                await disp.INVALID_STR.send(ctx, arg)
     
     @commands.command()
     @commands.guild_only()
@@ -155,6 +197,7 @@ class AdminCog(commands.Cog, name='admin'):
         match = Match.get(ctx.channel.id)
         match.ts3_test()
 
+
     @commands.command()
     @commands.guild_only()
     async def lobby(self, ctx, *args):
@@ -178,6 +221,7 @@ class AdminCog(commands.Cog, name='admin'):
             return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)
 
+
     @commands.command()
     @commands.guild_only()
     async def timeout(self, ctx, *args):
@@ -194,6 +238,7 @@ class AdminCog(commands.Cog, name='admin'):
         if not player:
             # player isn't even registered in the system...
             Player(ctx.message.mentions[0].id, ctx.message.mentions[0].name)
+            # TODO: CHANGE THIS
             return
         if player.is_lobbied:
             lobby.remove_from_lobby(player)

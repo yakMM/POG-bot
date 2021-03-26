@@ -13,7 +13,6 @@ from match_process import Match
 from general.enumerations import MatchStatus
 from modules.census import get_offline_players
 from modules.roles import is_admin
-from classes.accounts import get_not_ready_players
 
 log = getLogger("pog_bot")
 
@@ -41,7 +40,6 @@ class MatchesCog(commands.Cog, name='matches'):
 
     @commands.command(aliases=['p'])
     @commands.guild_only()
-    @commands.max_concurrency(number=1, wait=True)
     async def pick(self, ctx, *args):
         match = Match.get(ctx.channel.id)
         if match.status is MatchStatus.IS_FREE:
@@ -87,13 +85,16 @@ class MatchesCog(commands.Cog, name='matches'):
     async def ready(self, ctx):  # when ready
         match = Match.get(ctx.channel.id)
 
-        if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
+        if match.status is MatchStatus.IS_FREE:
+            # Match is not active
+            await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
+            return
+        if match.status in (MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
             # match not ready for this command
             await disp.MATCH_ALREADY.send(ctx, ctx.command.name)
             return
         if match.status is not MatchStatus.IS_WAITING:
-            # match not ready for this command
-            await disp.MATCH_NOT_READY.send(ctx, ctx.command.name)
+            await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
             return
 
         a_player, msg = _get_check_player(ctx, match, check_turn=False)
@@ -101,32 +102,18 @@ class MatchesCog(commands.Cog, name='matches'):
             await msg
             return
 
-        # Getting the "active" version of the player (version when player is in matched, more data inside)
-        if a_player.is_turn:
-            result = get_not_ready_players(a_player.team)
-            if len(result) != 0:
-                await disp.MATCH_PLAYERS_NOT_READY.send(ctx, a_player.team.name, " ".join(p.mention for p in result))
-                return
-            result = await get_offline_players(a_player.team)
-            if len(result) != 0:
-                await disp.MATCH_PLAYERS_OFFLINE.send(ctx, a_player.team.name, " ".join(p.mention for p in result),
-                                                      p_list=result)
-                return
-            match.on_team_ready(a_player.team)
-            await disp.MATCH_TEAM_READY.send(ctx, a_player.team.name, match=match)
-            return
-        a_player.is_turn = True
-        await disp.MATCH_TEAM_UNREADY.send(ctx, a_player.team.name, match=match)
+        await a_player.match.team_ready(ctx, a_player)
 
     @commands.command()
     @commands.guild_only()
     async def squittal(self, ctx):
         match = Match.get(ctx.channel.id)
-        if match.status not in (
-        MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
+        if match.next_status is MatchStatus.IS_WAITING:
+            await disp.SC_PLAYERS_STRING_DISC.send(ctx, "\n".join(tm.ig_string for tm in match.teams))
+        elif match.is_started:
+            await disp.SC_PLAYERS_STRING.send(ctx, "\n".join(tm.ig_string for tm in match.teams))
+        else:
             await disp.MATCH_NOT_READY.send(ctx, ctx.command.name)
-            return
-        await disp.SC_PLAYERS_STRING.send(ctx, "\n".join(tm.ig_string for tm in match.teams))
 
     @commands.command(aliases=['b', 'map'])
     @commands.guild_only()
@@ -197,7 +184,7 @@ def _get_check_player(ctx, match, check_turn=True):
     msg = None
     a_player = None
     player = classes.Player.get(ctx.author.id)
-    if player is None:
+    if player is None or (player and not player.is_registered):
         # player not registered
         msg = disp.EXT_NOT_REGISTERED.send(ctx, cfg.channels["register"])
     elif player.match is None:

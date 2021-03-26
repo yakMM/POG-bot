@@ -9,9 +9,12 @@ class AllStrings(Enum):
     """
 
     REG_NOT_REGISTERED = Message("You are not registered!", embed=embeds.register_help)
-    REG_IS_REGISTERED_OWN = Message("You are already registered with the following Jaeger characters: `{}`, `{}`, `{}`")
-    REG_IS_REGISTERED_NOA = Message("You are already registered without a Jaeger account! If you have your own "
-                                    "account, please re-register with your Jaeger characters.")
+    REG_IS_OWN = Message("You are registered with the following Jaeger characters: `{}`, `{}`, `{}`")
+    REG_ALREADY_OWN = Message("You are already registered with the following Jaeger characters: `{}`, `{}`, `{}`")
+    REG_IS_NOA = Message("You are registered without a Jaeger account! If you have your own "
+                         "account, please re-register with your Jaeger characters.")
+    REG_ALREADY_NOA = Message("You are already registered without a Jaeger account! If you have your own "
+                              "account, please re-register with your Jaeger characters.")
     REG_HELP = Message("Registration help:", embed=embeds.register_help)
     REG_NO_ACCOUNT = Message("You successfully registered without a Jaeger account!")
     REG_INVALID = Message("Invalid registration!", embed=embeds.register_help)
@@ -27,7 +30,6 @@ class AllStrings(Enum):
     REG_FROZEN = Message("You can't register while you're playing a match")
     REG_RULES = Message("{} You have accepted the rules, you may now register", embed=embeds.register_help)
     REG_NO_RULE = Message("You have to accept the rules before registering! Check <#{}>")
-    REG_FROZEN_2 = Message("Only a staff member can remove your account now!")
 
     LB_OFFLINE = Message("You can't queue if your Discord status is offline/invisible!")
     LB_ALREADY_IN = Message("You are already in queue!")
@@ -89,7 +91,7 @@ class AllStrings(Enum):
     WRONG_CHANNEL_2 = Message("The command `={}` can't be used in {}")
     NO_PERMISSION = Message("The command `={}` can only be used by staff members!")
     CHANNEL_INIT = Message("`Bot init`: Correctly hooked in channel <#{}>")
-    INVALID_STR = Message("You entered an invalid character! `{}`")
+    INVALID_STR = Message("You entered an invalid argument! `{}`")
     API_ERROR = Message("Could not reach Planetside2 API, try again later!")
     GLOBAL_INFO = Message("Here is what's going on in POG at the moment:", embed=embeds.global_info)
     CHECK_ACCOUNT = Message("Your account password may have been flipped!\n"
@@ -133,6 +135,7 @@ class AllStrings(Enum):
     MATCH_ALREADY = Message("The match is already started!")
     MATCH_SWAP = Message("Swap sundy placement for the next round!")
     MATCH_CHANNEL_OVER = Message("Locking channel until next match...")
+    MATCH_CHECK_CHANGED = Message("{} check is now {}")
 
     BASE_HELP = Message("Here is how to choose a base:", embed=embeds.base_help)
     BASE_TOO_MUCH = Message("Too many bases found! Try to be more precise")
@@ -190,12 +193,15 @@ class AllStrings(Enum):
     RM_DEMOTE_NO = Message("Can't demote this player!")
     RM_DEMOTE_OK = Message("Successfully demoted! {} is the new captain for {}!", ping=False, embed=embeds.team_update)
     RM_DEMOTE_NO_TURN = Message("Can't demote a captain if it's not their turn to pick!")
+    RM_NAME_CHANGED = Message("Changed {}'s name to `{}`!", ping=False)
 
     MUTE_SHOW = Message("You are muted from POG until {}!")
     MUTE_FREED = Message("You are no longer muted from POG!")
 
     SC_ILLEGAL_WE = Message("{} used {} during match {}! This weapon is banned! Ignoring {} kill(s)...")
-    SC_PLAYERS_STRING = Message("Here is player data for squittal script:\n{}")
+    SC_PLAYERS_STRING = Message("Here is player data for squittal script:\n{}\n")
+    SC_PLAYERS_STRING_DISC = Message("Here is player data for squittal script:\n{}\n"
+                                     "Disclaimer: This info might still change before the match actually starts!")
     SC_RESULT_HALF = Message("Match {} - **halftime**")
     SC_RESULT = Message("Match {}")
 

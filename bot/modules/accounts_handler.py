@@ -159,4 +159,14 @@ async def terminate_account(a_player):
     _available_accounts[acc.id] = acc
 
 
+def get_not_validated_accounts(team):
+    not_ready = list()
+    for p in team.players:
+        if p.has_own_account:
+            continue
+        if p.account is None:
+            log.error(f"Debug: {p.name} has no account")  # Should not happen
+        if not p.account.is_validated:
+            not_ready.append(p)
+    return not_ready
 

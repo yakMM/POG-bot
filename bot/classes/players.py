@@ -134,6 +134,10 @@ class Player:
         elif arg == "timeout":
             if self.__timeout != 0:
                 await db.async_db_call(db.update_element, "users", self.id, {"timeout": self.__timeout})
+        elif arg == "name":
+            await db.async_db_call(db.update_element, "users", self.id, {"name": self.__name})
+        else:
+            raise UnexpectedError("db_update: Unknown field!")
 
     @property
     def active(self):  # "Active player" object, when player is in a match, contains more info
@@ -142,6 +146,10 @@ class Player:
     @property
     def name(self):
         return self.__name
+
+    async def change_name(self, new_name):
+        self.__name = new_name
+        await self.db_update("name")
 
     @property
     def timeout(self):
@@ -469,6 +477,7 @@ class ActivePlayer:
         self.__team = team
         self.__account = None
         self.__unique_usages = None
+        self.__is_playing = False
         if from_data:
             return
         self.__player.on_picked(self)
@@ -519,6 +528,10 @@ class ActivePlayer:
     @property
     def is_captain(self):
         return False
+
+    @property
+    def is_playing(self):
+        return self.__is_playing
 
     @property
     def name(self):
@@ -613,6 +626,9 @@ class ActivePlayer:
     @property
     def illegal_weapons(self):
         return self.__illegal_weapons
+
+    def on_team_ready(self, ready):
+        self.__is_playing = ready
 
     def add_illegal_weapon(self, weap_id):
         if weap_id in self.__illegal_weapons:

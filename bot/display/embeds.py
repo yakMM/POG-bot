@@ -391,22 +391,22 @@ def usage(ctx, data):
             name = f'POG account {use["id"]}'
         lead = int(dt.timestamp(dt.now())) - use["time_stop"]
         if lead < 60:
-            lead_str = f"{lead} seconds ago"
+            lead_str = f"{lead} second(s) ago"
         elif lead < 3600:
             lead //= 60
-            lead_str = f"{lead} minutes ago"
+            lead_str = f"{lead} minute(s) ago"
         elif lead < 86400:
             lead //= 3600
-            lead_str = f"{lead} hours ago"
+            lead_str = f"{lead} hour(s) ago"
         elif lead < 604800:
             lead //= 86400
-            lead_str = f"{lead} days ago"
+            lead_str = f"{lead} day(s) ago"
         elif lead < 2419200:
             lead //= 604800
-            lead_str = f"{lead} weeks ago"
+            lead_str = f"{lead} week(s) ago"
         else:
             lead //= 2419200
-            lead_str = f"{lead} months ago"
+            lead_str = f"{lead} month(s) ago"
 
         embed.add_field(name=lead_str,
                         value=name+f'\nMatch {use["match_id"]}\n'

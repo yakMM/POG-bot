@@ -115,6 +115,10 @@ class Team:
     @property
     def match(self):
         return self.__match
+
+    def on_team_ready(self, ready):
+        for a_player in self.__players:
+            a_player.on_team_ready(ready)
     
     def clear(self):
         self.__players.clear()

@@ -178,11 +178,13 @@ def get_config(launch_str):
             _error_incorrect(key, 'General', file)
 
     # Testing api key
-    url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
-    jdata = loads(get(url).content)
-    if 'error' in jdata:
-        raise ConfigError(
-            f"Incorrect api key: {general['api_key']} in '{file}'")
+    skip_api_test = False
+    if not skip_api_test:
+        url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
+        j_data = loads(get(url).content)
+        if 'error' in j_data:
+            raise ConfigError(
+                f"Incorrect api key: {general['api_key']} in '{file}'")
 
     # Teamspeak section
     _check_section(config, "Teamspeak", file)
