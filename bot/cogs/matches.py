@@ -7,10 +7,10 @@ import modules.config as cfg
 from display.strings import AllStrings as disp
 from general.exceptions import ElementNotFound
 
-from classes.players import Player
+import classes
 
 from match_process import Match
-from general.enumerations import MatchStatus, SelStatus
+from general.enumerations import MatchStatus
 from modules.census import get_offline_players
 from modules.roles import is_admin
 from classes.accounts import get_not_ready_players
@@ -196,7 +196,7 @@ def _get_check_player(ctx, match, check_turn=True):
     """
     msg = None
     a_player = None
-    player = Player.get(ctx.author.id)
+    player = classes.Player.get(ctx.author.id)
     if player is None:
         # player not registered
         msg = disp.EXT_NOT_REGISTERED.send(ctx, cfg.channels["register"])

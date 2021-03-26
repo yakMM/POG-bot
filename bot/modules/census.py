@@ -1,8 +1,7 @@
 # @CHECK 2.0 features OK
 
-from modules.asynchttp import api_request_and_retry as http_request
-from general.exceptions import ApiNotReachable, ElementNotFound
-from classes.weapons import get_weapon
+from modules.asynchttp import api_request_and_retry as http_request, ApiNotReachable
+from classes.weapons import Weapon
 from display.strings import AllStrings as display
 from display.classes import ContextWrapper
 import modules.config as cfg
@@ -35,11 +34,10 @@ async def process_score(match):
                 continue
             opo = ig_dict[opo_id]
             weap_id = int(event["attacker_weapon_id"])
-            try:
-                weapon = get_weapon(weap_id)
-            except ElementNotFound:
+            weapon = Weapon.get(weap_id)
+            if not weapon:
                 log.error(f'Weapon not found in database: id={weap_id}')
-                weapon = get_weapon(0)
+                weapon = Weapon.get(0)
             if opo is a_player:
                 a_player.add_one_suicide()
             elif opo.team is a_player.team:
@@ -54,7 +52,7 @@ async def process_score(match):
                     a_player.add_illegal_weapon(weapon.id)
                     # TODO: Should we add penalty?
         for weap_id in a_player.illegal_weapons.keys():
-            weapon = get_weapon(weap_id)
+            weapon = Weapon.get(weap_id)
             await display.SC_ILLEGAL_WE.send(match.channel, a_player.mention, weapon.name,
                                                 match.number, a_player.illegal_weapons[weap_id])
             await display.SC_ILLEGAL_WE.send(ContextWrapper.channel(cfg.channels["staff"]), a_player.mention, weapon.name,

@@ -4,13 +4,14 @@ from discord.ext import commands
 from discord import Status as discord_status
 from logging import getLogger
 
-from display.strings import AllStrings as display
+from display import AllStrings as disp
 import modules.config as cfg
 from general.exceptions import ElementNotFound
 
-from classes.players import PlayerStatus, get_player
+from classes import Player
 
-from modules.lobby import get_lobby_len, is_lobby_stuck, remove_from_lobby, add_to_lobby, get_all_names_in_lobby
+
+import modules.lobby as lobby
 
 log = getLogger("pog_bot")
 
@@ -40,66 +41,64 @@ class LobbyCog(commands.Cog, name='lobby'):
     async def join(self, ctx):
         """ Join queue
         """
-        if get_lobby_len() > cfg.general["lobby_size"]:  # This should not happen EVER
-            await display.UNKNOWN_ERROR.send(ctx, "Lobby Overflow")
+        if lobby.get_lobby_len() > cfg.general["lobby_size"]:  # This should not happen EVER
+            await disp.UNKNOWN_ERROR.send(ctx, "Lobby Overflow")
             return
-        try:
-            player = get_player(ctx.message.author.id)
-        except ElementNotFound:
-            await display.EXT_NOT_REGISTERED.send(ctx,  cfg.channels["register"])
+        player = Player.get(ctx.message.author.id)
+        if not player:
+            await disp.EXT_NOT_REGISTERED.send(ctx,  cfg.channels["register"])
             return
-        if player.status is PlayerStatus.IS_NOT_REGISTERED:
-            await display.EXT_NOT_REGISTERED.send(ctx, cfg.channels["register"])
+        if not player.is_registered:
+            await disp.EXT_NOT_REGISTERED.send(ctx, cfg.channels["register"])
             return
         accs = player.accounts_flipped
         if len(accs) != 0:
-            await display.CHECK_ACCOUNT.send(ctx, cfg.channels["register"], account_names=accs)
+            await disp.CHECK_ACCOUNT.send(ctx, cfg.channels["register"], account_names=accs)
             return
         if ctx.author.status == discord_status.offline:
-            await display.LB_OFFLINE.send(ctx)
+            await disp.LB_OFFLINE.send(ctx)
             return
-        if player.status is PlayerStatus.IS_LOBBIED:
-            await display.LB_ALREADY_IN.send(ctx)
+        if player.is_lobbied:
+            await disp.LB_ALREADY_IN.send(ctx)
             return
-        if player.status is not PlayerStatus.IS_REGISTERED:
-            await display.LB_IN_MATCH.send(ctx)
+        if player.match:
+            await disp.LB_IN_MATCH.send(ctx)
             return
-        if is_lobby_stuck():
-            await display.LB_STUCK_JOIN.send(ctx)
+        if lobby.is_lobby_stuck():
+            await disp.LB_STUCK_JOIN.send(ctx)
             return
 
-        add_to_lobby(player)
-        await display.LB_ADDED.send(ctx, names_in_lobby=get_all_names_in_lobby())
+        lobby.add_to_lobby(player)
+        await disp.LB_ADDED.send(ctx, names_in_lobby=lobby.get_all_names_in_lobby())
 
     @commands.command(aliases=['l'])
     @commands.guild_only()
     async def leave(self, ctx):
         """ Leave queue
         """
-        try:
-            player = get_player(ctx.message.author.id)
-        except ElementNotFound:
-            await display.LB_NOT_IN.send(ctx)
+        player = Player.get(ctx.message.author.id)
+        if not player:
+            await disp.LB_NOT_IN.send(ctx)
             return
-        if player.status is PlayerStatus.IS_LOBBIED:
-            remove_from_lobby(player)
-            await display.LB_REMOVED.send(ctx, names_in_lobby=get_all_names_in_lobby())
+        if player.is_lobbied:
+            lobby.remove_from_lobby(player)
+            await disp.LB_REMOVED.send(ctx, names_in_lobby=lobby.get_all_names_in_lobby())
             return
-        await display.LB_NOT_IN.send(ctx)
+        await disp.LB_NOT_IN.send(ctx)
 
     @commands.command(aliases=['q'])
     @commands.guild_only()
     async def queue(self, ctx):
-        """ Display queue
+        """ disp queue
         """
-        if get_lobby_len() > cfg.general["lobby_size"]:
-            await display.UNKNOWN_ERROR.send(ctx, "Lobby Overflow")
+        if lobby.get_lobby_len() > cfg.general["lobby_size"]:
+            await disp.UNKNOWN_ERROR.send(ctx, "Lobby Overflow")
             return
-        if is_lobby_stuck():
-            await display.LB_QUEUE.send(ctx, names_in_lobby=get_all_names_in_lobby())
-            await display.LB_STUCK.send(ctx)
+        if lobby.is_lobby_stuck():
+            await disp.LB_QUEUE.send(ctx, names_in_lobby=lobby.get_all_names_in_lobby())
+            await disp.LB_STUCK.send(ctx)
             return
-        await display.LB_QUEUE.send(ctx, names_in_lobby=get_all_names_in_lobby())
+        await disp.LB_QUEUE.send(ctx, names_in_lobby=lobby.get_all_names_in_lobby())
 
 
 def setup(client):

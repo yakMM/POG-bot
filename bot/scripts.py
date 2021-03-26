@@ -3,28 +3,32 @@
 from gspread import service_account
 from numpy import array
 import modules.config as cfg
-from classes.players import Player, _all_players, get_player
-from modules.database import force_update, get_all_items, _replace_player, _update_base, init as db_init, get_one_item, collections, _remove
-from classes.bases import _all_bases_list, Base
+from classes import Player, Base
 from match_process import Match
 import requests
 import json
 import asyncio
-from modules.image_maker import _make_image
 from classes.weapons import Weapon
 import os
-from modules.census import process_score
+from datetime import datetime as dt
+
+from modules.stats import PlayerStat
+import modules.database as db
+import modules.accounts_handler as accounts
+from random import choice as random_choice
+
 
 if os.path.isfile("test"):
     LAUNCHSTR = "_test"
 else:
     LAUNCHSTR = ""
+cfg.get_config(LAUNCHSTR)
+db.init(cfg.database)
+#db.get_all_elements(Player.new_from_data, "users")
+db.get_all_elements(Base, "static_bases")
+db.get_all_elements(Weapon, "static_weapons")
 
-cfg.get_config(f"config{LAUNCHSTR}.cfg")
-db_init(cfg.database)
-get_all_items(Player.new_from_data, "users")
-get_all_items(Base, "s_bases")
-get_all_items(Weapon, "s_weapons")
+_match_played_dict = dict()
 
 class DbPlayer(Player):
     @classmethod
@@ -32,22 +36,13 @@ class DbPlayer(Player):
         new_data = dict()
         new_data["name"] = data["name"]
         new_data["_id"] = data["_id"]
-        new_data["rank"] = data["rank"]
         new_data["notify"] = data["notify"]
-        new_data["timeout"] = data["timeout"]
-        new_data["ig_names"] = data["ig_names"]
-        new_data["ig_ids"] = list()
-        for i in range(3):
-            ig = new_data["ig_names"][i]
-            bl = ord('0') <= ord(ig[-1]) <= ord('9')
-            bl = bl and ord('0') <= ord(ig[-2]) <= ord('9')
-            bl = bl and ig[-3] == 'x'
-            if bl: # is PIL char?
-                print(ig)
-                new_data["ig_ids"].append(0)
-            else:
-                new_data["ig_ids"].append(data["ig_ids"][i])
-        new_data["has_own_account"] = data["has_own_account"]
+        if data["timeout"]["time"] != 0:
+            new_data["timeout"] = data["timeout"]["time"]
+        new_data["is_registered"] = True
+        if data["has_own_account"]:
+            new_data["ig_names"] = data["ig_names"]
+            new_data["ig_ids"] = data["ig_ids"]
         super().new_from_data(new_data)
 
 _all_db_matches = list()
@@ -64,6 +59,24 @@ class DbMatch:
         self.data = data
         self.id = data["_id"]
 
+    def repair_field(self):
+        if "cfg.general['round_length']_min" in self.data:
+            print(f"Wrong match {self.data['_id']}")
+            self.data["round_length"] = self.data["cfg.general['round_length']_min"]
+            del self.data["cfg.general['round_length']_min"]
+
+
+    def get_played_time(self):
+        time = dt.utcfromtimestamp(self.data["round_stamps"][0])
+        var = (time.hour + time.minute/60.0 + 14) % 24
+        for tm in self.data["teams"]:
+            for p in tm["players"]:
+                if p["discord_id"] in _match_played_dict:
+                    _match_played_dict[p["discord_id"]].append(var)
+                else:
+                    _match_played_dict[p["discord_id"]] = [var]
+
+
     def do_change(self):
         dt = self.data
         for tm in dt["teams"]:
@@ -72,6 +85,7 @@ class DbMatch:
                     i_id = p["ig_id"]
                 except KeyError:
                     i_name = p["ig_name"]
+                    print(f"Couldn't find id for name {i_name}")
                     if i_name in convert_dict_2:
                         i_id = convert_dict_2[i_name]
                     else:
@@ -83,6 +97,7 @@ class DbMatch:
                 try:
                     i_name = p["ig_name"]
                 except KeyError:
+                    print(f"Couldn't find name for id {i_id}")
                     if i_id in convert_dict_1:
                         name = convert_dict_1[i_id]
                     else:
@@ -99,43 +114,71 @@ class DbMatch:
                     p["ig_name"] = name
 
 
+def get_Accounts():
 
-
-def push_accounts():
-    # Get all accounts
     gc = service_account(filename=f'google_api_secret{LAUNCHSTR}.json')
     sh = gc.open_by_key(cfg.database["accounts"])
-    raw_sheet = sh.get_worksheet(1)
-    visible_sheet = sh.get_worksheet(0)
+    raw_sheet = sh.worksheet("1")
     sheet_tab = array(raw_sheet.get_all_values())
 
-    num_accounts = sheet_tab.shape[1] - 3
+    num_accounts = sheet_tab.shape[0] - accounts.Y_OFFSET
 
-    accounts = list()
-    p_list = list()
+    accs = list()
 
     # Get all accounts
     for i in range(num_accounts):
-        accounts.append(sheet_tab[0][i + 3])
-    loop = asyncio.get_event_loop()
+        accs.append(sheet_tab[i + accounts.Y_OFFSET][accounts.X_OFFSET])
 
-    for acc in accounts:
+    return accs
+
+def push_accounts_to_usage():
+    accs = get_Accounts()
+    for acc in accs:
+        dta = dict()
+        dta["_id"] = int(acc)
+        dta["usages"] = list()
+        dta["unique_usages"] = list()
+        db.set_element("accounts_usage", int(acc), dta)
+
+
+def push2():
+    from test2 import id3s
+    t=int(dt.timestamp(dt.now()))
+    for id in id3s:
+        db.push_element("accounts_usage", 7, {"unique_usages": id})
+    for e in range(50):
+        dta = dict()
+        dta["id"] = random_choice(id3s)
+        dta["time_start"] = t - (50-e)*5000
+        dta["time_stop"] = dta["time_start"] + 200
+        dta["match_id"] = 1000-e
+        db.push_element("accounts_usage", 7, {"usages": dta})
+
+
+def push_accounts_to_users():
+    accs = get_Accounts()
+    loop = asyncio.get_event_loop()
+    p_list = list()
+
+    for acc in accs:
         p = Player(int(acc), f"_POG_ACC_{acc}")
         p_list.append(p)
         print(acc)
         char_list = [f"POGx{acc}VS", f"POGx{acc}TR", f"POGx{acc}NC"]
-        p._has_own_account = True
+        p.__has_own_account = True
+        p.__is_registered = True
         loop.run_until_complete(p._add_characters(char_list))
-        _replace_player(p)
+        db.set_element("users", p.id, p.get_data())
     loop.close()
 
 
 def get_all_bases_from_api():
-    url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2/base_region/?c:limit=400&c:show=facility_id,facility_name,zone_id,facility_type_id'
+    url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2/map_region/?c:limit=400&c:show=facility_id,facility_name,zone_id,facility_type_id'
+    print(f"url: {url}")
     response = requests.get(url)
-    jdata = json.loads(response.content)
+    j_data = json.loads(response.content)
 
-    if jdata["returned"] == 0:
+    if j_data["returned"] == 0:
         print("Error")
         return
 
@@ -143,30 +186,36 @@ def get_all_bases_from_api():
 
     all_bases = list()
 
-    for mp in jdata["base_region_list"]:
+    for mp in j_data["map_region_list"]:
         try:
             new_data = dict()
             new_data["_id"] = int(mp["facility_id"])
             new_data["name"] = mp["facility_name"]
-            new_data["in_base_pool"] = new_data["_id"] in ids
+            if new_data["_id"] in ids:
+                print(f"Adding to pool {new_data['name']}")
+                new_data["in_base_pool"] = True
+            else:
+                new_data["in_base_pool"] = False
             new_data["zone_id"] = int(mp["zone_id"])
             new_data["type_id"] = int(mp["facility_type_id"])
             all_bases.append(new_data)
+            if not Base.get_base_from_id(new_data["_id"]):
+                print(f"New base found: {new_data['name']}")
         except KeyError:
-            print(mp)
-    force_update("s_bases", all_bases)
+            print(f"Key error: {mp}")
+    db.force_update("static_bases", all_bases)
 
 
 def players_db_update():
-    get_all_items(DbPlayer.new_from_data, "users")
-    for p in _all_players.values():
-        _replace_player(p)
+    db.get_all_elements(DbPlayer.new_from_data, "users")
+    for p in Player._all_players.values():
+        db.set_element("users", p.id, p.get_data())
 
 def get_match_from_db(m_id):
-    if collections["matches"].count_documents({"_id": m_id}) == 0:
+    if db.collections["matches"].count_documents({"_id": m_id}) == 0:
         print(f'{m_id} cancelled!')
         return None
-    m=get_one_item("matches", Match.new_from_data, m_id)
+    m = Match.new_from_data(db.get_element("matches", m_id))
     # #print(m.get_data())
     # loop = asyncio.get_event_loop()
     # loop.run_until_complete(process_score(m))
@@ -174,28 +223,64 @@ def get_match_from_db(m_id):
     # print(f'Match {dta["_id"]}: team1: {dta["teams"][0]["score"]}, team2: {dta["teams"][1]["score"]}')
     # #return dta
 
-    _make_image(m)
+    #_make_image(m)
 
 def matches_db_update():
-    get_all_items(DbMatch.new_from_data, "matches")
+    all = dict()
+    db.get_all_elements(DbMatch.new_from_data, "matches")
     for m in _all_db_matches:
-        m.do_change()
-    for m in _all_db_matches:
-        collections["matches"].replace_one({"_id": m.id}, m.data)
+        for tm in m.data["teams"]:
+            for p in tm["players"]:
+                if p["discord_id"] not in all:
+                    all[p["discord_id"]] = PlayerStat(p["discord_id"])
+                all[p["discord_id"]].add_data(m.id, p)
+    la = list()
+    for x in all.values():
+        print(f"add {x.discord_id}")
+        la.append(x.get_data())
+    db.force_update("player_stats", la)
+
+
+
+
 
 def remove_old_accounts():
-    get_all_items(DbPlayer.new_from_data, "users")
-    ids = range(891, 915)
+    db.get_all_elements(DbPlayer.new_from_data, "users")
+    ids = range(1185, 1186)
     for pid in ids:
         print(str(pid))
-        p = get_player(pid)
-        _remove(p)
+        p = Player.get(pid)
+        db.remove_element("users", p.id)
 
 
-get_match_from_db(1103)
+def matches_time_stat():
+    db.get_all_elements(DbMatch.new_from_data, "matches")
+    for m in _all_db_matches:
+        m.get_played_time()
+    d = dict()
+    for p in _match_played_dict.keys():
+        d[p] = (min(_match_played_dict[p]), max(_match_played_dict[p]))
+    return d
+
+
+
+# k=matches_time_stat()
+# for p in k.keys():
+#     print(f"{p}: min:{(k[p][0]-14)%24}, max:{(k[p][1]-14)%24}")
+
+#matches_db_update()
+# d= dict()
+# d["_id"] = 0
+# d["last_match_id"] = 108
+# collections["restart_data"].insert_one(d)
+
+
+
+#get_match_from_db(1103)
 # ij = 817
 # while True:
 #     dta=get_match_from_db(ij)
 #     if dta:
 #         collections["matches"].replace_one({"_id": dta["_id"]}, dta)
 #     ij-=1
+push_accounts_to_users()

@@ -1,4 +1,3 @@
-from general.exceptions import UserLackingPermission
 from inspect import iscoroutinefunction as is_coroutine
 from discord.errors import NotFound
 
@@ -9,6 +8,9 @@ _client = None
 def init(client):
     global _client
     _client = client
+
+class UserLackingPermission(Exception):
+    pass
 
 
 async def reaction_handler(reaction, user, player):

@@ -106,6 +106,17 @@ def base_help(ctx):
                     inline=False)
     return embed
 
+def usage_help(ctx):
+    """ Returns base help embed
+    """
+    embed = Embed(colour=Color.blurple())
+    embed.add_field(name='Get the last POG account usages by id or by mention',
+                    value=f'`=usage 2` - Get last usages of POG account 2\n'
+                          f'`=usage user_id` - Get last usages of the user matching the provided discord ID\n'
+                          f'`=usage @user` - Get last usages of the mentioned user',
+                    inline=False)
+    return embed
+
 
 def timeout_help(ctx):
     """ Returns timeout help embed
@@ -166,7 +177,8 @@ def account(ctx, account):
         desc = "This account token is no longer valid"
         color = Color.dark_grey()
     elif account.is_validated:
-        desc = f'Id: `{account.str_id}`\n' + f'Username: `{account.ident}`\n' + f'Password: `{account.pwd}`\n' + 'Note: This account is given to you only for the time of **ONE** match'
+        desc = f'Id: `{account.str_id}`\n' + f'Username: `{account.username}`\n' + f'Password: `{account.password}`\n'\
+                'Note: This account is given to you only for the time of **ONE** match'
         color = Color.green()
     else:
         desc = "Accept the rules by reacting with a checkmark to get your account details."
@@ -196,6 +208,8 @@ def auto_help(ctx):
         return muted_help(ctx)
     if ctx.channel_id == cfg.channels['staff']:
         return admin_help(ctx)
+    if ctx.channel_id == cfg.channels['usage']:
+        return usage_help(ctx)
     return default_help(ctx)
 
 
@@ -243,17 +257,17 @@ def global_info(ctx, lobby, match_list):
     embed.add_field(name=lb_embed.name, value=lb_embed.value, inline=lb_embed.inline)
     for m in match_list:
         desc = ""
-        if m.status is not MatchStatus.IS_FREE:
+        if m.next_status is not MatchStatus.IS_FREE:
             if m.round_no != 0:
                 desc += f"*Match {m.number} - Round {m.round_no}*"
             else:
                 desc += f"*Match {m.number}*"
             desc += "\n"
         desc += f"Status: {m.status_str}"
-        if m.status in (MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
+        if m.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
             desc += f"\nBase: **{m.base.name}**\n"
             desc += " / ".join(f"{tm.name}: **{cfg.factions[tm.faction]}**" for tm in m.teams)
-        if m.status is MatchStatus.IS_PLAYING:
+        if m.next_status is MatchStatus.IS_PLAYING:
             desc += f"\nTime Remaining: **{m.formated_time_to_round_end}**"
         embed.add_field(name=m.channel.name, value=desc, inline=False)
     return embed
@@ -277,7 +291,7 @@ def team_update(arg, match):
     else:
         title = f"Match {match.number}"
     desc = match.status_str
-    if match.status is MatchStatus.IS_PLAYING:
+    if match.next_status is MatchStatus.IS_PLAYING:
         desc += f"\nTime Remaining: **{match.formated_time_to_round_end}**"
     embed = Embed(colour=Color.blue(), title=title, description=desc)
     if match.base is not None:
@@ -285,12 +299,12 @@ def team_update(arg, match):
     for tm in match.teams:
         value = ""
         name = ""
-        if tm.captain.is_turn and match.status in (MatchStatus.IS_FACTION, MatchStatus.IS_PICKING):
-            value = f"Captain **[pick]**: {tm.captain.mention}\n"
+        if tm.captain.is_turn and match.next_status in (MatchStatus.IS_FACTION, MatchStatus.IS_PICKING):
+            value = f"Captain **[pick]**: {tm.captain.mention} ({tm.captain.name})\n"
         else:
-            value = f"Captain: {tm.captain.mention}\n"
+            value = f"Captain: {tm.captain.mention} ({tm.captain.name})\n"
         value += "Players:\n" + '\n'.join(tm.player_pings)
-        if match.status is MatchStatus.IS_WAITING:
+        if match.next_status is MatchStatus.IS_WAITING:
             if tm.captain.is_turn:
                 name = f"{tm.name} [{cfg.factions[tm.faction]}] - not ready"
             else:
@@ -302,7 +316,7 @@ def team_update(arg, match):
         embed.add_field(name=name,
                         value=value,
                         inline=False)
-    if match.status is MatchStatus.IS_PICKING:
+    if match.next_status is MatchStatus.IS_PICKING:
         embed.add_field(name=f'Remaining', value="\n".join(match.get_left_players_pings()), inline=False)
     return embed
 
@@ -347,4 +361,56 @@ def direct_message(ctx, msg):
     embed.add_field(name=f"Message:",
                     value=msg.content,
                     inline=False)
+    return embed
+
+
+def usage(ctx, data):
+    is_account = data["_id"] < 1000
+    if is_account:
+        description = f'Last 20 usages for POG account {data["_id"]}'
+    else:
+        description = f'Last 20 usages for <@{data["_id"]}>'
+    embed = Embed(
+        colour=Color.blue(),
+        title='Last account usages',
+        description=description
+    )
+    if is_account:
+        embed.add_field(name="Account used by:",
+                        value="\n".join(f'<@{user}>' for user in data["unique_usages"]),
+                        inline=False)
+    else:
+        embed.add_field(name="Accounts used:",
+                        value="\n".join(f'POG account {a_id}' for a_id in data["unique_usages"]),
+                        inline=False)
+
+    for use in data["usages"][19::-1]:
+        if is_account:
+            name = f'User: <@{use["id"]}>'
+        else:
+            name = f'POG account {use["id"]}'
+        lead = int(dt.timestamp(dt.now())) - use["time_stop"]
+        if lead < 60:
+            lead_str = f"{lead} seconds ago"
+        elif lead < 3600:
+            lead //= 60
+            lead_str = f"{lead} minutes ago"
+        elif lead < 86400:
+            lead //= 3600
+            lead_str = f"{lead} hours ago"
+        elif lead < 604800:
+            lead //= 86400
+            lead_str = f"{lead} days ago"
+        elif lead < 2419200:
+            lead //= 604800
+            lead_str = f"{lead} weeks ago"
+        else:
+            lead //= 2419200
+            lead_str = f"{lead} months ago"
+
+        embed.add_field(name=lead_str,
+                        value=name+f'\nMatch {use["match_id"]}\n'
+                        f'Starting time: {dt.utcfromtimestamp(use["time_start"]).strftime("%Y-%m-%d %H:%M UTC")}\n'
+                        f'Stopping time: {dt.utcfromtimestamp(use["time_stop"]).strftime("%Y-%m-%d %H:%M UTC")}\n',
+                        inline=False)
     return embed

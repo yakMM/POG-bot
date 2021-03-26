@@ -19,10 +19,15 @@ class Base:
     _base_pool = list()
 
     @classmethod
+    def clear_all(cls):
+        cls._all_bases_list.clear()
+        cls._base_pool.clear()
+
+    @classmethod
     def get(cls, m_id: int):
-        if m_id not in cls._all_bases_list:
-            raise ElementNotFound(m_id)
-        return cls._all_bases_list[m_id]
+        if m_id in cls._all_bases_list:
+            return cls._all_bases_list[m_id]
+        return None
 
     @classmethod
     def get_bases_from_name(cls, name, base_pool=False):
@@ -51,7 +56,7 @@ class Base:
         self.__name = data["name"]
         self.__zone_id = data["zone_id"]
         self.__type_id = data["type_id"]
-        self.__in_pool = data["in_map_pool"]
+        self.__in_pool = data["in_base_pool"]
         if self.__in_pool:
             Base._base_pool.append(self)
         Base._all_bases_list.append(self)

@@ -1,18 +1,15 @@
-# @CHECK 2.0 features OK
-
-from general.exceptions import ElementNotFound
-
-_all_weapons = dict()
-
-
-def get_weapon(id):
-    we = _all_weapons.get(id)
-    if we is None:
-        raise ElementNotFound(id)
-    return we
-
 
 class Weapon:
+    _all_weapons = dict()
+
+    @classmethod
+    def get(cls, w_id):
+        return cls._all_weapons.get(w_id)
+
+    @classmethod
+    def clear_all(cls):
+        cls._all_weapons.clear()
+
     def __init__(self, data):
         self.__id = data["_id"]
         self.__name = data["name"]
@@ -20,7 +17,7 @@ class Weapon:
         self.__points = data["points"]
         self.__banned = data["banned"]
         self.__faction = data["faction"]
-        _all_weapons[self.__id] = self
+        Weapon._all_weapons[self.__id] = self
 
     def get_data(self):  # get data for database push
         data = {"_id": self.__id,

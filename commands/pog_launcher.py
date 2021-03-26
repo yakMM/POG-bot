@@ -44,7 +44,7 @@ class ProcessGroup:
         logging.info("======================================")
         logging.info("Periodic task triggered!")
         self.restart_ts3()
-        self.clear_lobby()
+        # self.clear_lobby()
         logging.info("======================================")
 
 

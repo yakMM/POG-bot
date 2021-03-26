@@ -27,7 +27,7 @@ class AllStrings(Enum):
     REG_FROZEN = Message("You can't register while you're playing a match")
     REG_RULES = Message("{} You have accepted the rules, you may now register", embed=embeds.register_help)
     REG_NO_RULE = Message("You have to accept the rules before registering! Check <#{}>")
-    REG_FROZEN_2 = Message("You can't remove your account while being in a match!")
+    REG_FROZEN_2 = Message("Only a staff member can remove your account now!")
 
     LB_OFFLINE = Message("You can't queue if your Discord status is offline/invisible!")
     LB_ALREADY_IN = Message("You are already in queue!")
@@ -107,6 +107,7 @@ class AllStrings(Enum):
     BOT_BP_ON = Message("Ingame status check is now disabled!")
     BOT_DM = Message(None, embed=embeds.direct_message)
     BOT_DM_RECEIVED = Message("Thanks for your message, it was forwarded to POG staff!", ping=False)
+    BOT_RELOAD = Message("{} reloaded!")
 
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ping=False)
@@ -131,6 +132,7 @@ class AllStrings(Enum):
     MATCH_OVER = Message("The match is over!\nClearing channel...")
     MATCH_ALREADY = Message("The match is already started!")
     MATCH_SWAP = Message("Swap sundy placement for the next round!")
+    MATCH_CHANNEL_OVER = Message("Locking channel until next match...")
 
     BASE_HELP = Message("Here is how to choose a base:", embed=embeds.base_help)
     BASE_TOO_MUCH = Message("Too many bases found! Try to be more precise")
@@ -155,12 +157,17 @@ class AllStrings(Enum):
     ACC_UPDATE = Message(None, ping=False, embed=embeds.account)
     ACC_STAFF = Message("{}, couldn't send the account to {}, please send it manually...", ping=False,
                         embed=embeds.account)
-    ACC_SENT = Message("**Successfully sent jaeger accounts  in DMs!**")
+    ACC_SENT = Message("**Successfully sent all jaeger accounts!**")
     ACC_SENDING = Message("Loading Jaeger accounts...")
-    ACC_OVER = Message("Match is over, please log out of your Jaeger account!")
+    ACC_OVER = Message("Match is over, please log out of your Jaeger account!", ping=False)
     ACC_CLOSED = Message("{}'s DMS are locked, couldn't send them a Jaeger account after 3 retries!\nSending the "
                          "account to staff instead.")
     ACC_LOG = Message("Player [name:{}], [id:{}] will receive {}")
+    ACC_GIVING = Message("Sent a Jaeger account for {}!", ping=False)
+
+    USAGE_NOT_FOUND = Message("No database entry for this id!")
+    USAGE_NO = Message("No usage found for this id!")
+    ACCOUNT_USAGE = Message("Here is the POG account usage for this user:", embed=embeds.usage)
 
     NOTIFY_REMOVED = Message("You left Notify!")
     NOTIFY_ADDED = Message("You joined Notify!")

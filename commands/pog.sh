@@ -46,7 +46,7 @@ function my_start
     mkdir -p ../../POG-data
     mkdir -p ../../POG-data/logging
     mkdir -p ../../POG-data/matches
-    nohup python3 -u pog_launcher.py > ../../POG-data/logging/launcher.out 2>&1 &
+    nohup python3 -u pog_launcher.py >> ../../POG-data/logging/launcher.out 2>&1 &
     echo "Bot started..."
   fi
 }

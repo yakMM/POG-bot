@@ -5,14 +5,15 @@ from discord.ext import commands
 from logging import getLogger
 
 # Custom classes
-from classes.players import get_player
+import classes
 
 # Custom modules
 import modules.config as cfg
-from general.enumerations import PlayerStatus
 from display.strings import AllStrings as display
 from general.tools import is_al_num
-from general.exceptions import UnexpectedError, ElementNotFound, CharNotFound, CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable
+from general.exceptions import UnexpectedError, ElementNotFound
+from general.enumerations import MatchStatus
+from modules.asynchttp import ApiNotReachable
 
 log = getLogger("pog_bot")
 
@@ -40,9 +41,8 @@ class RegisterCog(commands.Cog, name='register'):
         if len(ctx.message.mentions) != 0:  # Don't want a mention here
             await display.REG_INVALID.send(ctx)
             return
-        try:
-            player = get_player(ctx.author.id)
-        except ElementNotFound:
+        player = classes.Player.get(ctx.author.id)
+        if not player:
             await display.REG_NO_RULE.send(ctx, cfg.channels["rules"])
             return
 
@@ -51,9 +51,8 @@ class RegisterCog(commands.Cog, name='register'):
     @commands.command()
     @commands.guild_only()
     async def notify(self, ctx):
-        try:
-            player = get_player(ctx.author.id)
-        except ElementNotFound:
+        player = classes.Player.get(ctx.author.id)
+        if not player:
             await display.REG_NO_RULE.send(ctx, cfg.channels["rules"])
             return
         if player.is_notify:
@@ -80,7 +79,7 @@ async def _register(player, ctx, args):
     ingame_names (str, list of str): If a list, will add each name one by one.
     If a string, will add the faction suffixes automatically.
     """
-    if player.status is PlayerStatus.IS_PLAYING:  # Can't register if already playing
+    if player.match and player.match.is_started:  # Can't register if already playing
         await display.REG_FROZEN.send(ctx)
         return
     for name in args:
@@ -88,7 +87,7 @@ async def _register(player, ctx, args):
             await display.INVALID_STR.send(ctx, name)
             return
     if len(args) == 0:  # If user did not input any arg, display. their current registration status
-        if player.status is PlayerStatus.IS_NOT_REGISTERED:
+        if not player.is_registered:
             await display.REG_NOT_REGISTERED.send(ctx)
             return
         if player.has_own_account:
@@ -97,9 +96,9 @@ async def _register(player, ctx, args):
         await display.REG_IS_REGISTERED_NOA.send(ctx)
         return
     # store previous status
-    was_player_registered = player.status is not PlayerStatus.IS_NOT_REGISTERED
+    was_player_registered = player.is_registered
     if len(args) == 1 or len(args) == 3:  # if 1 or 3 args
-        if len(args) == 1 and args[0] == "help":  # =r help display.s hel^p
+        if len(args) == 1 and args[0] == "help":  # =r help display the help
             await display.REG_HELP.send(ctx)
             return
         try:
@@ -113,16 +112,16 @@ async def _register(player, ctx, args):
                 return
             await display.REG_WITH_CHARS.send(ctx, *player.ig_names)
             return
-        except CharNotFound as e:  # if problems with chars
+        except classes.CharNotFound as e:  # if problems with chars
             await display.REG_CHAR_NOT_FOUND.send(ctx, e.char)
             return
-        except CharInvalidWorld as e:
+        except classes.CharInvalidWorld as e:
             await display.REG_NOT_JAEGER.send(ctx, e.char)
             return
-        except CharMissingFaction as e:
+        except classes.CharMissingFaction as e:
             await display.REG_MISSING_FACTION.send(ctx, e.faction)
             return
-        except CharAlreadyExists as e:
+        except classes.CharAlreadyExists as e:
             await display.REG_ALREADY_EXIST.send(ctx, e.char, e.player.mention)
             return
         except ApiNotReachable:
@@ -131,11 +130,8 @@ async def _register(player, ctx, args):
         except UnexpectedError as e:
             await display.UNKNOWN_ERROR.send(ctx, e.reason)
             return
-    if len(args) == 2:  # if 2 args, it should be "no account", if not, invalid request. Again, check if update and push db if that's the case
+    if len(args) == 2:  # if 2 args, it should be "no account", if not, invalid request.
         if args[0] == "no" and args[1] == "account":
-            if player.status is PlayerStatus.IS_WAITING:  # Can't register if already playing
-                await display.REG_FROZEN_2.send(ctx)
-                return
             if not await player.register(None):
                 await display.REG_IS_REGISTERED_NOA.send(ctx)
                 return

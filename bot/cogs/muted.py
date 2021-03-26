@@ -6,18 +6,18 @@ from logging import getLogger
 from datetime import datetime as dt
 
 # Custom classes
-from classes.players import get_player
+from classes import Player
 
 # Custom modules
 import modules.config as cfg
-from modules.roles import perms_muted, force_info, role_update
+from modules.roles import perms_muted, remove_roles, role_update
 from display.strings import AllStrings as display
 from general.exceptions import ElementNotFound
 
 log = getLogger("pog_bot")
 
 
-class RegisterCog(commands.Cog, name='muted'):
+class MutedCog(commands.Cog, name='muted'):
     """
     Muted cog, handle the commands from register channel
     """
@@ -31,11 +31,10 @@ class RegisterCog(commands.Cog, name='muted'):
     @commands.command()
     @commands.guild_only()
     async def escape(self, ctx):
-        try:
-            player = get_player(ctx.author.id)
-        except ElementNotFound:
+        player = Player.get(ctx.author.id)
+        if not player:
             await perms_muted(False, ctx.author.id)
-            await force_info(ctx.author.id)
+            await remove_roles(ctx.author.id)
             return
         if player.is_timeout:
             await display.MUTE_SHOW.send(ctx, dt.utcfromtimestamp(player.timeout).strftime("%Y-%m-%d %H:%M UTC"))
@@ -46,4 +45,4 @@ class RegisterCog(commands.Cog, name='muted'):
 
 
 def setup(client):
-    client.add_cog(RegisterCog(client))
+    client.add_cog(MutedCog(client))

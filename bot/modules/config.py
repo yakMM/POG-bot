@@ -4,10 +4,15 @@
 from json import loads
 from requests import get
 from configparser import ConfigParser, ParsingError
-from general.exceptions import ConfigError
 from logging import getLogger
 
 log = getLogger("pog_bot")
+
+
+class ConfigError(Exception):
+    def __init__(self, msg):
+        self.message = "Error in config file: " + msg
+        super().__init__(self.message)
 
 ## STATIC PARAMETERS:
 
@@ -39,19 +44,19 @@ facility_suffix = {
 
 # http://census.daybreakgames.com/get/ps2/base_region/?c:limit=400&c:show=facility_id,facility_name,zone_id,facility_type_id
 base_to_id = {
-    "acan" : 302030,
-    "ghanan" : 305010,
-    "chac" : 307010,
-    "pale" : 239000,
-    "peris" : 3430,
-    "rashnu" : 3620,
-    "xeno" : 230,
-    "ns_material" : 224,
-    "ceres" : 219,
-    "kessel" : 266000,
-    "nettlemire" : 283000,
-    "bridgewater" : 272000,
-    "rime" : 244610
+    "acan": 302030,
+    "ghanan": 305010,
+    "chac": 307010,
+    "pale": 239000,
+    "peris": 3430,
+    "rashnu": 3620,
+    "xeno": 230,
+    "ns_material": 224,
+    "ceres": 219,
+    "kessel": 266000,
+    "nettlemire": 283000,
+    "bridgewater": 272000,
+    "rime": 244610
 }
 
 id_to_base = {v: k for k, v in base_to_id.items()}
@@ -60,6 +65,10 @@ id_to_base = {v: k for k, v in base_to_id.items()}
 # (pulled from the config file)
 
 VERSION = "0"
+
+LAUNCH_STR = ""
+
+GAPI_JSON = ""
 
 # General
 general = {
@@ -87,7 +96,8 @@ channels = {
     "rules": 0,
     "staff": 0,
     "muted": 0,
-    "spam": 0
+    "spam": 0,
+    "usage": 0
 }
 
 channels_list = list()
@@ -95,7 +105,6 @@ channels_list = list()
 # Roles
 roles = {
     "admin": 0,
-    "info": 0,
     "registered": 0,
     "notify": 0
 }
@@ -118,9 +127,12 @@ scores = {
 # Collections
 _collections = {
     "users": "",
-    "s_bases": "",
-    "s_weapons" : "",
-    "matches" : ""
+    "static_bases": "",
+    "static_weapons": "",
+    "matches": "",
+    "player_stats": "",
+    "restart_data": "",
+    "accounts_usage": ""
 }
 
 # Database
@@ -138,7 +150,13 @@ base_images = dict()
 
 ## Methods
 
-def get_config(file):
+def get_config(launch_str):
+    global LAUNCH_STR
+    global GAPI_JSON
+    LAUNCH_STR = launch_str
+    GAPI_JSON = f"google_api_secret{launch_str}.json"
+
+    file = f"config{launch_str}.cfg"
     config = ConfigParser()
     try:
         config.read(file)

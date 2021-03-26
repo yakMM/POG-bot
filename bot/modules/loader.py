@@ -3,7 +3,7 @@
 from discord.ext.commands.errors import ExtensionAlreadyLoaded
 
 main_cogs = ["cogs.admin"]
-standard_cogs = ["cogs.register", "cogs.matches", "cogs.lobby", "cogs.muted", "cogs.common"]
+standard_cogs = ["cogs.register", "cogs.matches", "cogs.lobby", "cogs.muted", "cogs.common", "cogs.usage"]
 __is_global_locked = True  # Lock the bot from getting messages
 
 

@@ -95,7 +95,7 @@ class Team:
     @property
     def player_pings(self):
         # Excluding captain
-        pings = [p.mention for p in self.__players[1:]]
+        pings = [f"{p.mention} ({p.name})" for p in self.__players[1:]]
         return pings
 
     @property
@@ -143,19 +143,11 @@ class Team:
     def add_player(self, p_class, player):
         active = p_class(player, self)
         self.__players.append(active)
-    
-    def on_team_ready(self):
-        for aP in self.__players:
-            aP.on_team_ready()
-
-    def on_match_ready(self):
-        for p in self.__players:
-            p.on_match_ready()
 
     def sub(self, subbed, new_player):
         i = 0
         while self.__players[i] is not subbed:
-            i+=1
+            i += 1
         active = type(subbed)(new_player, self)
         if subbed.is_captain:
             active.is_turn = subbed.is_turn

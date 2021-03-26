@@ -3,8 +3,7 @@
 """Tiny module used as a slight spam protector
 """
 
-from display.strings import AllStrings as display
-from display.classes import ContextWrapper
+from display import AllStrings as disp, ContextWrapper
 from discord import DMChannel
 import modules.config as cfg
 from modules.loader import is_all_locked
@@ -24,7 +23,9 @@ async def is_spam(msg):
     if __spam_list[id] == 1:
         return False
     if __spam_list[id] % __SPAM_MSG_FREQUENCY == 0:
-        await display.STOP_SPAM.send(msg)
+        ctx = ContextWrapper.wrap(msg.channel)
+        ctx.author = msg.author
+        await disp.STOP_SPAM.send(ctx)
     return True
 
 
@@ -48,8 +49,8 @@ async def on_message(client, message):
 
     # if dm, send in staff
     if isinstance(message.channel, DMChannel):
-        await display.BOT_DM.send(ContextWrapper.channel(cfg.channels["staff"]), msg=message)
-        await display.BOT_DM_RECEIVED.send(message.author)
+        await disp.BOT_DM.send(ContextWrapper.channel(cfg.channels["staff"]), msg=message)
+        await disp.BOT_DM_RECEIVED.send(message.author)
         return
 
     
@@ -72,7 +73,7 @@ async def on_message(client, message):
                 message.content = message.content[i+1:]
                 await client.process_commands(message)
             except ValueError:
-                await display.WRONG_USAGE.send(message.channel, "as")
+                await disp.WRONG_USAGE.send(message.channel, "as")
     else:
         await client.process_commands(message)  # if not spam, process
     await sleep(0.5)

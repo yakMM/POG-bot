@@ -5,14 +5,13 @@ from random import randint
 
 from classes.bases import Base
 
-from general.exceptions import ElementNotFound, UserLackingPermission
 from general.enumerations import MatchStatus
 
 from display.strings import AllStrings as disp
 from display.classes import ContextWrapper
 
 from modules.jaeger_calendar import get_booked_bases
-from modules.reactions import ReactionHandler, add_handler, rem_handler
+import modules.reactions as reactions
 from modules.roles import is_admin
 
 log = getLogger("pog_bot")
@@ -145,7 +144,7 @@ class BaseSelector:
             self.__match.proxy.on_base_found()
 
     async def __wait_confirm(self, ctx):
-        rh = ReactionHandler(rem_bot_react=True)
+        rh = reactions.ReactionHandler(rem_bot_react=True)
 
         @rh.reaction('✅')
         async def reaction_confirm(reaction, player, user):
@@ -154,15 +153,15 @@ class BaseSelector:
                 ctx2.author = user
                 await self.__do_confirm(ctx2)
             else:
-                raise UserLackingPermission
+                raise reactions.UserLackingPermission
 
         self.__confirm_msg = await disp.BASE_OK_CONFIRM.send(ctx, self.__selected.name, self.__picking_captain.mention)
-        add_handler(self.__confirm_msg.id, rh)
+        reactions.add_handler(self.__confirm_msg.id, rh)
         await rh.auto_add_reactions(self.__confirm_msg)
 
     async def __remove_confirm_msg(self):
         if self.__confirm_msg:
-            rem_handler(self.__confirm_msg.id)
+            reactions.rem_handler(self.__confirm_msg.id)
             await self.__confirm_msg.clear_reactions()
             self.__confirm_msg = None
 
@@ -179,7 +178,7 @@ class BaseNavigator:
         self.channel = match_channel
         self.index = 0
         self.length = 0
-        self.reaction_handler = ReactionHandler()
+        self.reaction_handler = reactions.ReactionHandler()
         self.reaction_handler.set_reaction("◀️", self.check_auth, self.go_left, self.refresh_message)
         self.reaction_handler.set_reaction("⏺️", self.check_auth, self.select)
         self.reaction_handler.set_reaction("▶️", self.check_auth, self.go_right, self.refresh_message)
@@ -196,7 +195,7 @@ class BaseNavigator:
 
     async def remove_msg(self):
         if self.last_msg:
-            rem_handler(self.last_msg.id)
+            reactions.rem_handler(self.last_msg.id)
             await self.last_msg.delete()
             self.last_msg = None
 
@@ -210,7 +209,7 @@ class BaseNavigator:
 
         msg = await disp.BASE_DISPLAY.send(self.channel, base=self.current_base, is_booked=self.is_booked)
         self.last_msg = msg
-        add_handler(msg.id, self.reaction_handler)
+        reactions.add_handler(msg.id, self.reaction_handler)
         await self.reaction_handler.auto_add_reactions(msg)
 
     def go_right(self, *args):
@@ -243,7 +242,7 @@ class BaseNavigator:
             return
         if is_admin(user):
             return
-        raise UserLackingPermission
+        raise reactions.UserLackingPermission
 
     async def refresh_message(self, *args):
         await disp.BASE_DISPLAY.edit(self.last_msg, base=self.current_base, is_booked=self.is_booked)

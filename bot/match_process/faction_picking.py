@@ -3,9 +3,8 @@ from display.classes import ContextWrapper
 
 import modules.config as cfg
 
-from general.enumerations import MatchStatus, PlayerStatus
-from modules.reactions import ReactionHandler, add_handler, rem_handler
-from general.exceptions import UserLackingPermission
+from general.enumerations import MatchStatus
+import modules.reactions as reactions
 
 import match_process.common_picking as common
 import match_process.meta as meta
@@ -17,7 +16,7 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
     def __init__(self, match):
         self.match = match
         self.last_msg = None
-        self.reaction_handler = ReactionHandler()
+        self.reaction_handler = reactions.ReactionHandler()
         self.add_callbacks(self.reaction_handler)
 
         self.match.teams[1].captain.is_turn = True
@@ -37,15 +36,15 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
 
         @rh.reaction(cfg.emojis["vs"], cfg.emojis["nc"], cfg.emojis["tr"])
         def check(reaction, player, user):
-            if player.status is not PlayerStatus.IS_PICKED:
-                raise UserLackingPermission
+            if not player.active:
+                raise reactions.UserLackingPermission
             if player.match is not self.match.proxy:
-                raise UserLackingPermission
+                raise reactions.UserLackingPermission
             a_p = player.active
             if not a_p.is_captain:
-                raise UserLackingPermission
+                raise reactions.UserLackingPermission
             if not a_p.is_turn:
-                raise UserLackingPermission
+                raise reactions.UserLackingPermission
 
         @rh.reaction(cfg.emojis["vs"], cfg.emojis["nc"], cfg.emojis["tr"])
         async def pick_faction(reaction, player, user):
@@ -61,9 +60,9 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
     async def set_faction_msg(self, msg):
         if self.last_msg:
             await self.last_msg.clear_reactions()
-            rem_handler(self.last_msg.id)
+            reactions.rem_handler(self.last_msg.id)
         self.last_msg = msg
-        add_handler(msg.id, self.reaction_handler)
+        reactions.add_handler(msg.id, self.reaction_handler)
         await self.reaction_handler.auto_add_reactions(msg)
 
     @meta.public
@@ -86,7 +85,7 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
     async def clear(self, ctx):
         if self.last_msg is not None:
             await self.last_msg.clear_reactions()
-            rem_handler(self.last_msg.id)
+            reactions.rem_handler(self.last_msg.id)
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)
 
@@ -127,5 +126,5 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
         # Else, over, all teams have selected a faction
         await disp.PK_FACTION_OK.send(ctx, team.name, cfg.factions[team.faction])
         await self.last_msg.clear_reactions()
-        rem_handler(self.last_msg.id)
+        reactions.rem_handler(self.last_msg.id)
         self.match.on_faction_pick_over()

@@ -1,10 +1,13 @@
 # This file is an example of test script for an easier development
 
 from modules.lobby import add_to_lobby
-from classes.players import get_player
+from classes import Player
 import asyncio
 from discord.ext import commands
 from logging import getLogger
+import modules.config as cfg
+
+from display import ContextWrapper
 
 log = getLogger("pog_bot")
 
@@ -28,10 +31,9 @@ def test_hand(client):
         else:
             await launch(ctx, ids, int(args[0]))
 
-
 async def launch(ctx, id_list, tier):
 
-    players = [get_player(id) for id in id_list]
+    players = [Player.get(id) for id in id_list]
 
     for p in players:
         add_to_lobby(p)
@@ -56,14 +58,19 @@ async def launch(ctx, id_list, tier):
     if tier == 2:
         return
 
+    context = ContextWrapper.wrap(match.channel)
+    context.author = ctx.author
+    context.message = ctx.message
+
     await asyncio.sleep(3)
-    await match.pick(ctx, cap2, ["VS"])
+    await match.pick(context, cap2, ["VS"])
     await asyncio.sleep(1)
-    await match.pick(ctx, cap1, ["TR"])
+    await match.pick(context, cap1, ["TR"])
 
     if tier == 3:
         return
 
     await asyncio.sleep(3)
-    await match.base_selector.select_by_index(ctx, cap1, 0)
+
+    await match.base_selector.select_by_index(context, cap1, 0)
 

@@ -1,11 +1,11 @@
 # @CHECK 2.0 features OK
 
 import modules.config as cfg
-from modules.database import force_update, init as db_init, get_all_items
+from modules.database import force_update, init as db_init, get_all_elements
 import requests
 import json
 import os
-from classes.weapons import Weapon, get_weapon
+import classes
 from general.exceptions import ElementNotFound
 
 if os.path.isfile("test"):
@@ -13,9 +13,9 @@ if os.path.isfile("test"):
 else:
     LAUNCHSTR = ""
 
-cfg.get_config(f"config{LAUNCHSTR}.cfg")
+cfg.get_config(LAUNCHSTR)
 db_init(cfg.database)
-get_all_items(Weapon, "s_weapons")
+get_all_elements(classes.Weapon, "static_weapons")
 
 item_type_id = 26 #weapon
 
@@ -278,14 +278,12 @@ def push_all_weapons(find_new = False):
             giga_list.append(n_data)
             # To find new weapons:
             if find_new:
-                try:
-                    get_weapon(n_data["_id"])
-                except ElementNotFound:
+                if not classes.Weapon.get(n_data["_id"]):
                     print(f'Weapon not found in database: cat : {n_data["cat_id"]}, name: {n_data["name"]}, id: {n_data["_id"]}')
     giga_list.append(get_unknown_weapon())
     if not find_new:
         print("DB updated!")
-        force_update("s_weapons", giga_list)
+        force_update("static_weapons", giga_list)
     else:
         print("DB not updated! Use arg find_new=False to update")
 

@@ -18,8 +18,7 @@ import logging, logging.handlers, sys, os
 from time import gmtime
 
 # General Enum and Exceptions
-from general.enumerations import PlayerStatus
-from general.exceptions import ElementNotFound, UnexpectedError
+from general.exceptions import UnexpectedError
 
 # Display
 from display.strings import AllStrings as disp
@@ -34,13 +33,11 @@ import modules.loader
 import modules.lobby
 import modules.database
 import modules.message_filter
+import modules.accounts_handler
 
 # Classes
 from match_process import Match
-from classes.players import Player, get_player, get_all_players_list
-from classes.accounts import AccountHander
-from classes.bases import Base
-from classes.weapons import Weapon
+from classes import Player, Base, Weapon
 
 
 rules_msg = None  # Will contain message object representing the rules message, global variable
@@ -128,15 +125,19 @@ def _add_main_handlers(client):
             # TODO: remove (test)
             print(str(payload.emoji))
             if str(payload.emoji) == "✅":
-                try:
-                    p = get_player(payload.member.id)
-                except ElementNotFound:  # if new player
+                p = Player.get(payload.member.id)
+                if not p:  # if new player
                     # create a new profile
                     p = Player(payload.member.id, payload.member.name)
-                await modules.roles.role_update(p)
-                if p.status is PlayerStatus.IS_NOT_REGISTERED:
-                    # they can now register
+                    await modules.roles.role_update(p)
+                    await modules.database.async_db_call(modules.database.set_element, "users", p.id, p.get_data())
                     await disp.REG_RULES.send(ContextWrapper.channel(cfg.channels["register"]), payload.member.mention)
+                else:
+                    await modules.roles.role_update(p)
+
+                # if not p.is_registered:
+                #     # they can now register
+                #     await disp.REG_RULES.send(ContextWrapper.channel(cfg.channels["register"]), payload.member.mention)
             # In any case remove the reaction, message is to stay clean
             await rules_msg.remove_reaction(payload.emoji, payload.member)
 
@@ -149,17 +150,15 @@ def _add_main_handlers(client):
         # If the reaction is not to a message of the bot
         if reaction.message.author != client.user:
             return
-        try:
-            player = get_player(user.id)
-        except ElementNotFound:
+        player = Player.get(user.id)
+        if not player:
             return
         await modules.reactions.reaction_handler(reaction, user, player)
 
     @client.event
     async def on_member_join(member):
-        try:
-            player = get_player(member.id)
-        except ElementNotFound:
+        player = Player.get(member.id)
+        if not player:
             return
         await modules.roles.role_update(player)
 
@@ -170,9 +169,8 @@ def _add_main_handlers(client):
 
     # Status update handler (for inactivity)
     async def on_status_update(user):
-        try:
-            player = get_player(user.id)
-        except ElementNotFound:
+        player = Player.get(user.id)
+        if not player:
             return
         if user.status == Status.offline:
             player.on_inactive(modules.lobby.on_inactive_confirmed)
@@ -198,9 +196,24 @@ def _add_init_handlers(client):
         await rules_msg.add_reaction('✅')
 
         # Update all players roles
-        for p in get_all_players_list():
+        for p in Player.get_all_players_list():
             await modules.roles.role_update(p)
         _add_main_handlers(client)
+
+        try:
+            last_lobby = modules.database.get_specific("restart_data", 0, "last_lobby")
+        except KeyError:
+            pass
+        else:
+            for p_id in last_lobby:
+                try:
+                    player = Player.get(int(p_id))
+                    if player and not modules.lobby.is_lobby_stuck() and player.is_registered:
+                        modules.lobby.add_to_lobby(player)
+                except ValueError:
+                    pass
+        await disp.LB_QUEUE.send(ContextWrapper.channel(cfg.channels["lobby"]),
+                                 names_in_lobby=modules.lobby.get_all_names_in_lobby())
         modules.loader.unlock_all(client)
         log.info('Client is ready!')
         await disp.RDY.send(ContextWrapper.channel(cfg.channels["spam"]), cfg.VERSION)
@@ -268,7 +281,7 @@ def main(launch_str=""):
     log.info("Starting init...")
 
     # Get data from the config file
-    cfg.get_config(f"config{launch_str}.cfg")
+    cfg.get_config(launch_str)
 
     # Set up command prefix
     client = commands.Bot(command_prefix=cfg.general["command_prefix"], intents=Intents.all())
@@ -278,15 +291,15 @@ def main(launch_str=""):
 
     # Initialise db and get all the registered users and all bases from it
     modules.database.init(cfg.database)
-    modules.database.get_all_items(Player.new_from_data, "users")
-    modules.database.get_all_items(Base, "s_bases")
-    modules.database.get_all_items(Weapon, "s_weapons")
+    modules.database.get_all_elements(Player.new_from_data, "users")
+    modules.database.get_all_elements(Base, "static_bases")
+    modules.database.get_all_elements(Weapon, "static_weapons")
 
     # Get Account sheet from drive
-    AccountHander.init(f"google_api_secret{launch_str}.json")
+    modules.accounts_handler.init(cfg.GAPI_JSON)
 
     # Establish connection with Jaeger Calendar
-    modules.jaeger_calendar.init(f"google_api_secret{launch_str}.json")
+    modules.jaeger_calendar.init(cfg.GAPI_JSON)
 
     # Initialise display module
     ContextWrapper.init(client)
@@ -295,7 +308,7 @@ def main(launch_str=""):
     modules.reactions.init(client)
 
     # Init lobby
-    modules.lobby.init(Match)
+    modules.lobby.init(Match, client)
 
     # Add init handlers
     _add_init_handlers(client)

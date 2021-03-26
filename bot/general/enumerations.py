@@ -16,19 +16,11 @@ class MatchStatus(Enum):
     IS_RESULT = "Result"
 
 
-class SelStatus(Enum):
-    IS_EMPTY = 0
-    IS_SELECTED = 1
-    IS_SELECTION = 2
-    IS_TOO_MUCH = 3
-    IS_CONFIRMED = 4
-
-
-class PlayerStatus(Enum):
-    IS_NOT_REGISTERED = 0
-    IS_REGISTERED = 1
-    IS_LOBBIED = 2
-    IS_MATCHED = 3
-    IS_PICKED = 4
-    IS_WAITING = 5
-    IS_PLAYING = 6
+# class PlayerStatus(Enum):
+#     IS_NOT_REGISTERED = 0
+#     IS_REGISTERED = 1
+#     IS_LOBBIED = 2
+#     IS_MATCHED = 3
+#     IS_PICKED = 4
+#     IS_WAITING = 5
+#     IS_PLAYING = 6

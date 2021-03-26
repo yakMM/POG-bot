@@ -14,11 +14,18 @@ from json.decoder import JSONDecodeError
 from logging import getLogger
 
 # Custom modules
-from general.exceptions import UnexpectedError, ApiNotReachable
+from general.exceptions import UnexpectedError
 
 log = getLogger("pog_bot")
 
 # PUBLIC:
+
+class ApiNotReachable(Exception):
+    def __init__(self, url):
+        self.url = url
+        message = f"Cannot resolve Api ({url})!"
+        log.error(message)
+        super().__init__(message)
 
 async def request(url):
     async with ClientSession() as client:

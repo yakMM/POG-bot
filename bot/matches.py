@@ -21,137 +21,6 @@ from logging import getLogger
 
 # THIS IS LEGACY CODE, WILL BE REMOVED IN A NEAR UPDATE
 
-log = getLogger("pog_bot")
-
-_lobby_list = list()
-_lobby_stuck = False
-_all_matches = dict()
-
-
-def get_match(id):
-    if id not in _all_matches:
-        raise ElementNotFound(id)  # should never happen
-    return _all_matches[id]
-
-
-def is_lobby_stuck():
-    return _lobby_stuck
-
-
-def _auto_ping_threshold():
-    thresh = cfg.general["lobby_size"] - cfg.general["lobby_size"] // 3
-    return thresh
-
-
-def _auto_ping_cancel():
-    _auto_ping.cancel()
-    _auto_ping.already = False
-
-def _get_sub():
-    if len(_lobby_list) == 0:
-        return
-    player = random_choice(_lobby_list)
-    _lobby_list.remove(player)
-    _on_lobby_remove()
-    return player
-
-
-def add_to_lobby(player):
-    _lobby_list.append(player)
-    player.on_lobby_add()
-    if len(_lobby_list) == cfg.general["lobby_size"]:
-        start_match_from_full_lobby.start()
-    elif len(_lobby_list) >= _auto_ping_threshold():
-        if not _auto_ping.is_running() and not _auto_ping.already:
-            _auto_ping.start()
-            _auto_ping.already = True
-
-
-@loop(minutes=3, delay=1, count=2)
-async def _auto_ping():
-    if _find_spot_for_match() is None:
-        return
-    await send("LB_NOTIFY", SendCtx.channel(cfg.channels["lobby"]), f'<@&{cfg.roles["notify"]}>')
-_auto_ping.already = False
-
-
-def get_lobby_len():
-    return len(_lobby_list)
-
-
-def get_all_names_in_lobby():
-    names = [p.mention for p in _lobby_list]
-    return names
-
-
-def get_all_ids_in_lobby():
-    ids = [str(p.id) for p in _lobby_list]
-    return ids
-
-
-def remove_from_lobby(player):
-    _lobby_list.remove(player)
-    _on_lobby_remove()
-    player.on_lobby_leave()
-
-
-def _on_match_free():
-    _auto_ping.already = True
-    if len(_lobby_list) == cfg.general["lobby_size"]:
-        start_match_from_full_lobby.start()
-
-
-def _on_lobby_remove():
-    global _lobby_stuck
-    _lobby_stuck = False
-    if len(_lobby_list) < _auto_ping_threshold():
-        _auto_ping_cancel()
-
-
-@loop(count=1)
-async def start_match_from_full_lobby():
-    global _lobby_stuck
-    match = _find_spot_for_match()
-    _auto_ping_cancel()
-    if match is None:
-        _lobby_stuck = True
-        await send("LB_STUCK", SendCtx.channel(cfg.channels["lobby"]))
-        return
-    _lobby_stuck = False
-    match._set_player_list(_lobby_list)
-    for p in _lobby_list:
-        p.on_match_selected(match)
-    _lobby_list.clear()
-    match._launch.start()
-    await send("LB_MATCH_STARTING", SendCtx.channel(cfg.channels["lobby"]), match.id)
-
-async def on_inactive_confirmed(player):
-    remove_from_lobby(player)
-    await send("LB_WENT_INACTIVE", SendCtx.channel(cfg.channels["lobby"]), player.mention, names_in_lobby=get_all_names_in_lobby())
-
-
-def clear_lobby():
-    if len(_lobby_list) == 0:
-        return False
-    for p in _lobby_list:
-        p.on_lobby_leave()
-    _lobby_list.clear()
-    _on_lobby_remove()
-    return True
-
-
-def _find_spot_for_match():
-    for match in _all_matches.values():
-        if match.status is MatchStatus.IS_FREE:
-            return match
-    return None
-
-
-def init(client, list):
-    for m_id in list:
-        ch = client.get_channel(m_id)
-        Match(m_id, ch)
-
 
 class Match():
 
@@ -266,17 +135,17 @@ class Match():
     #         return self.__teams[1].captain
     #     return other.captain
 
-    def confirm_base(self):
-        self.__base_selector.confirm()
-        self.__audio_bot.base_selected(self.__base_selector.base)
-        if self.__status is MatchStatus.IS_BASING:
-            self.__ready.start()
-
-    def pick_base(self, captain):
-        captain.is_turn = False
-        other = self.__teams[captain.team.id - 1]
-        other.captain.is_turn = True
-        return other.captain
+    # def confirm_base(self):
+    #     self.__base_selector.confirm()
+    #     self.__audio_bot.base_selected(self.__base_selector.base)
+    #     if self.__status is MatchStatus.IS_BASING:
+    #         self.__ready.start()
+    #
+    # def pick_base(self, captain):
+    #     captain.is_turn = False
+    #     other = self.__teams[captain.team.id - 1]
+    #     other.captain.is_turn = True
+    #     return other.captain
 
     # def resign(self, captain):
     #     team = captain.team
@@ -315,30 +184,30 @@ class Match():
     #     add_handler(msg.id, rh)
     #     await rh.auto_add_reactions(msg)
 
-    async def faction_pick(self, team, arg):
-        faction = cfg.i_factions[arg.upper()]
-        other = self.__teams[team.id-1]
-        if other.faction == faction:
-            raise AlreadyPicked
-        team.faction = faction
-        team.captain.is_turn = False
-        self.__audio_bot.faction_pick(team)
-        if other.faction != 0:
-            msg = await send("PK_FACTION_OK", self.channel, team.name, cfg.factions[team.faction])
-            self.__status = MatchStatus.IS_BASING
-            self.__find_base.start()
-        else:
-            other.captain.is_turn = True
-            msg = await send("PK_FACTION_OK_NEXT", self.channel, team.name, cfg.factions[team.faction], other.captain.mention)
-        return msg
-
-    def faction_change(self, team, arg):
-        faction = cfg.i_factions[arg.upper()]
-        other = self.__teams[team.id-1]
-        if other.faction == faction:
-            return False
-        team.faction = faction
-        return True
+    # async def faction_pick(self, team, arg):
+    #     faction = cfg.i_factions[arg.upper()]
+    #     other = self.__teams[team.id-1]
+    #     if other.faction == faction:
+    #         raise AlreadyPicked
+    #     team.faction = faction
+    #     team.captain.is_turn = False
+    #     self.__audio_bot.faction_pick(team)
+    #     if other.faction != 0:
+    #         msg = await send("PK_FACTION_OK", self.channel, team.name, cfg.factions[team.faction])
+    #         self.__status = MatchStatus.IS_BASING
+    #         self.__find_base.start()
+    #     else:
+    #         other.captain.is_turn = True
+    #         msg = await send("PK_FACTION_OK_NEXT", self.channel, team.name, cfg.factions[team.faction], other.captain.mention)
+    #     return msg
+    #
+    # def faction_change(self, team, arg):
+    #     faction = cfg.i_factions[arg.upper()]
+    #     other = self.__teams[team.id-1]
+    #     if other.faction == faction:
+    #         return False
+    #     team.faction = faction
+    #     return True
 
     # def on_player_sub(self, subbed):
     #     new_player = _get_sub()
@@ -387,7 +256,6 @@ class Match():
     async def __ready(self):
         self.__status = MatchStatus.IS_RUNNING
         for tm in self.__teams:
-            tm.on_match_ready()
             tm.captain.is_turn = True
         captain_pings = [tm.captain.mention for tm in self.__teams]
         try:

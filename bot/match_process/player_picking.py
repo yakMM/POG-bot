@@ -1,15 +1,19 @@
 from display.strings import AllStrings as display
+from display.classes import ContextWrapper
 from lib.tasks import loop
 
-from general.enumerations import MatchStatus, PlayerStatus
+from general.enumerations import MatchStatus
 from general.exceptions import ElementNotFound
 from random import choice as random_choice
 
 from classes.teams import Team
-from classes.players import TeamCaptain, ActivePlayer, get_player
+from classes import TeamCaptain, ActivePlayer, Player
 
 import match_process.common_picking as common
 import match_process.meta as meta
+
+from modules.roles import modify_match_channel
+import modules.config as cfg
 
 
 class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
@@ -29,7 +33,7 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
     def get_left_players_pings(self) -> list:
         """ The list of mentions of all players left to pick.
         """
-        pings = [p.mention for p in self.players.values()]
+        pings = [f"{p.mention} ({p.name})" for p in self.players.values()]
         return pings
 
     @meta.public
@@ -53,6 +57,10 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
         """ Init the match channel, ping players, find two captains \
             and ask them to start picking players.
         """
+        # Open match channel
+        await modify_match_channel(self.match.channel, view=True)
+        await display.LB_MATCH_STARTING.send(ContextWrapper.channel(cfg.channels["lobby"]), self.match.channel.id)
+
         # Inform players of match init
         players_ping = " ".join(p.mention for p in self.players.values())
         self.match.audio_bot.drop_match()
@@ -118,7 +126,7 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
             return
 
         # If subbed one has not been picked
-        if subbed.status is PlayerStatus.IS_MATCHED:
+        if not subbed.active:
             # Remove them fro the player list
             del self.players[subbed.id]
             # Put the new player instead
@@ -128,8 +136,8 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
             await display.SUB_OKAY.send(self.match.channel, new_player.mention, subbed.mention, match=self.match.proxy)
             return
 
-            # If subbed one has already been picked
-        if subbed.status is PlayerStatus.IS_PICKED:
+        # If subbed one has already been picked
+        else:
             # Get active version of the player and clean the player object
             a_sub = subbed.active
             subbed.on_player_clean()
@@ -194,9 +202,8 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
             return
 
         # Try to get the player object from the mention
-        try:
-            picked = get_player(ctx.message.mentions[0].id)
-        except ElementNotFound:
+        picked = Player.get(ctx.message.mentions[0].id)
+        if not picked:
             # Player isn't even registered in the system...
             await display.PK_INVALID.send(ctx)
             return

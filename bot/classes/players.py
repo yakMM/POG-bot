@@ -6,13 +6,11 @@
 
 # Custom modules
 import modules.config as cfg
-from modules.asynchttp import api_request_and_retry as http_request
-from general.exceptions import UnexpectedError, ElementNotFound, CharNotFound, \
-    CharInvalidWorld, CharMissingFaction, CharAlreadyExists, ApiNotReachable, AccountNotFound
-from general.enumerations import PlayerStatus
+from modules.asynchttp import api_request_and_retry as http_request, ApiNotReachable
+from general.exceptions import UnexpectedError, ElementNotFound
 from lib.tasks import loop
 from modules.roles import role_update
-from modules.database import update_player
+import modules.database as db
 
 from logging import getLogger
 from datetime import datetime as dt
@@ -21,89 +19,121 @@ log = getLogger("pog_bot")
 
 WORLD_ID = 19  # Jaeger ID
 
-_all_players = dict()
-# to store VS, NC and TR names to check for duplicates
-_names_checking = [dict(), dict(), dict()]
 
 
-def get_player(id):
-    player = _all_players.get(id)
-    if player is None:
-        raise ElementNotFound(id)
-    return player
+
+class CharNotFound(Exception):
+    def __init__(self, char):
+        self.char = char
+        super().__init__(f"Character not found: {char}")
 
 
-def remove_player(p):
-    if p.id not in _all_players:
-        raise ElementNotFound(p.id)
-    if p.has_own_account:
-        name_check_remove(p)
-    del _all_players[p.id]
+class CharInvalidWorld(Exception):
+    def __init__(self, char):
+        self.char = char
+        super().__init__(f"Character in invalid world: {char}")
 
 
-def name_check_add(p):
-    for i in range(3):
-        _names_checking[i][p.ig_ids[i]] = p
+class CharAlreadyExists(Exception):
+    def __init__(self, char, p):
+        self.char = char
+        self.player = p  # player who already registered the char
+        super().__init__(f"Character {char} is already registered!")
 
 
-def name_check_remove(p):
-    for i in range(3):
-        try:
-            del _names_checking[i][p.ig_ids[i]]
-        except KeyError:
-            log.warning(f"name_check_remove KeyError for player [id={p.id}], [key={p.ig_ids[i]}]")
+class CharMissingFaction(Exception):
+    def __init__(self, faction):
+        self.faction = faction
+        super().__init__(f"Can't find a character for faction: {faction}")
 
 
-def get_all_players_list():
-    return _all_players.values()
+class AccountNotFound(Exception):
+    def __init__(self, id):
+        self.id = id
+        super().__init__(f"Account not found in database: {id}")
+
+
+
 
 
 class Player:
     """ Basic player class, every registered user matches a Player object contained in the dictionary
     """
 
+    _all_players = dict()
+    # to store VS, NC and TR names to check for duplicates
+    _names_checking = [dict(), dict(), dict()]
+
     @classmethod
     def get(cls, p_id):
-        return _all_players.get(p_id)
+        return cls._all_players.get(p_id)
+
+    def remove(self):
+        if self.__has_own_account:
+            Player.name_check_remove(self)
+        del Player._all_players[self.__id]
+
+    @classmethod
+    def get_all_players_list(cls):
+        return cls._all_players.values()
+
+    @classmethod
+    def name_check_add(cls, p):
+        for i in range(3):
+            cls._names_checking[i][p.ig_ids[i]] = p
+
+    @classmethod
+    def name_check_remove(cls, p):
+        for i in range(3):
+            try:
+                del cls._names_checking[i][p.ig_ids[i]]
+            except KeyError:
+                log.warning(f"name_check_remove KeyError for player [id={p.id}], [key={p.ig_ids[i]}]")
 
     def __init__(self, id, name):
         self.__name = name
         self.__id = id
-        self.__rank = 0
         self.__ig_names = ["N/A", "N/A", "N/A"]
         self.__ig_ids = [0, 0, 0]
         self.__notify = False
-        self.__timeout = {"time": 0, "reason": ""}
-        self.__status = PlayerStatus.IS_NOT_REGISTERED
+        self.__timeout = 0
+        self.__is_registered = False
         self.__has_own_account = False
+        self.__lobby_stamp = 0
         self.__active = None
         self.__match = None
-        _all_players[id] = self  # Add to dictionary on creation
+        Player._all_players[id] = self  # Add to dictionary on creation
 
     @classmethod
     def new_from_data(cls, data):  # make a new Player object from database data
         obj = cls(data["_id"], data["name"])
-        obj.__rank = data["rank"]
-        if obj.__rank == 0:
-            obj.__status = PlayerStatus.IS_NOT_REGISTERED
-        else:
-            obj.__status = PlayerStatus.IS_REGISTERED
         obj.__notify = data["notify"]
-        obj.__timeout = data["timeout"]
-        obj.__ig_names = data["ig_names"]
-        obj.__ig_ids = data["ig_ids"]
-        obj.__has_own_account = data["has_own_account"]
-        name_check_add(obj)
+        obj.__is_registered = data["is_registered"]
+        if "ig_ids" in data:
+            obj.__has_own_account = True
+            obj.__ig_names = data["ig_names"]
+            obj.__ig_ids = data["ig_ids"]
+            Player.name_check_add(obj)
+        else:
+            obj.__has_own_account = False
+            obj.__ig_names = ["N/A", "N/A", "N/A"]
+            obj.__ig_ids = [0, 0, 0]
+        if "timeout" in data:
+            obj.__timeout = data["timeout"]
         return obj
 
     async def db_update(self, arg):
         if arg == "notify":
-            await update_player(self, {"notify": self.__notify})
+            await db.async_db_call(db.update_element, "users", self.id, {"notify": self.__notify})
         elif arg == "register":
-            await update_player(self, {"ig_names": self.__ig_names, "ig_ids": self.__ig_ids,
-                                       "rank": self.__rank, "has_own_account": self.__has_own_account})
+            doc = {"is_registered": self.__is_registered}
+            if self.__has_own_account:
+                doc["ig_names"] = self.__ig_names
+                doc["ig_ids"] = self.__ig_ids
+            await db.async_db_call(db.update_element, "users", self.id, doc)
         elif arg == "timeout":
-            await update_player(self, {"timeout": self.__timeout})
+            if self.__timeout != 0:
+                await db.async_db_call(db.update_element, "users", self.id, {"timeout": self.__timeout})
 
     @property
     def active(self):  # "Active player" object, when player is in a match, contains more info
@@ -115,12 +145,11 @@ class Player:
 
     @property
     def timeout(self):
-        return self.__timeout["time"]
+        return self.__timeout
 
     @timeout.setter
-    def timeout(self, time, reason=""):
-        self.__timeout["time"] = time
-        self.__timeout["reason"] = reason
+    def timeout(self, time):
+        self.__timeout = time
 
     # TODO
     # DEV
@@ -129,7 +158,7 @@ class Player:
 
     @property
     def is_timeout(self):
-        return self.__timeout["time"] > int(dt.timestamp(dt.now()))
+        return self.__timeout > int(dt.timestamp(dt.now()))
 
     @property
     def is_notify(self):
@@ -139,6 +168,10 @@ class Player:
     def is_notify(self, value):
         self.__notify = value
         self.update_role()
+
+    @property
+    def is_lobbied(self):
+        return self.__lobby_stamp != 0
 
     @property
     def accounts_flipped(self):
@@ -162,19 +195,13 @@ class Player:
         await role_update(self)
 
     def on_lobby_leave(self):
-        self.__status = PlayerStatus.IS_REGISTERED
+        self.__lobby_stamp = 0
         self.inactive_task.stop()
         self.update_role()
 
     def on_lobby_add(self):
-        self.__status = PlayerStatus.IS_LOBBIED
+        self.__lobby_stamp = int(dt.timestamp(dt.now()))
         self.update_role()
-
-    def on_match_ready(self):
-        self.__status = PlayerStatus.IS_WAITING
-
-    def on_team_ready(self):
-        self.__status = PlayerStatus.IS_PLAYING
 
     def on_player_clean(self):
         self.__match = None
@@ -182,29 +209,25 @@ class Player:
         if not self.__has_own_account:
             self.__ig_names = ["N/A", "N/A", "N/A"]
             self.__ig_ids = [0, 0, 0]
-        self.__status = PlayerStatus.IS_REGISTERED
         self.update_role()
 
     def on_picked(self, active):
         self.__active = active
-        self.__status = PlayerStatus.IS_PICKED
 
     def on_match_selected(self, m):
         self.__match = m
-        self.__status = PlayerStatus.IS_MATCHED
         self.inactive_task.cancel()
 
     def on_inactive(self, fct):
-        if self.__status is PlayerStatus.IS_LOBBIED:
+        if self.__lobby_stamp != 0:
             self.inactive_task.start(fct)
 
     def on_active(self):
-        if self.__status is PlayerStatus.IS_LOBBIED:
+        if self.__lobby_stamp != 0:
             self.inactive_task.cancel()
 
     def on_resign(self):
         self.__active = None
-        self.__status = PlayerStatus.IS_MATCHED
 
     @loop(minutes=cfg.AFK_TIME, delay=1, count=2)
     async def inactive_task(self, fct):  # when inactive for cfg.AFK_TIME, execute fct
@@ -219,14 +242,6 @@ class Player:
         return f"<@{self.__id}>"
 
     @property
-    def rank(self):
-        return self.__rank
-
-    @rank.setter
-    def rank(self, rank):
-        self.__rank = rank
-
-    @property
     def ig_names(self):
         return self.__ig_names
 
@@ -235,8 +250,8 @@ class Player:
         return self.__ig_ids
 
     @property
-    def status(self):
-        return self.__status
+    def is_registered(self):
+        return self.__is_registered
 
     @property
     def match(self):  # when in match
@@ -251,15 +266,12 @@ class Player:
         self.__ig_ids = player.ig_ids.copy()
 
     def get_data(self):  # get data for database push
-        data = {"_id": self.__id,
-                "name": self.__name,
-                "rank": self.__rank,
-                "notify": self.__notify,
-                "timeout": self.__timeout,
-                "ig_names": self.__ig_names,
-                "ig_ids": self.__ig_ids,
-                "has_own_account": self.__has_own_account
-                }
+        data = {"_id": self.__id, "name": self.__name, "notify": self.__notify, "is_registered": self.__is_registered}
+        if self.__has_own_account:
+            data["ig_names"] = self.__ig_names
+            data["ig_ids"] = self.__ig_ids
+        if self.__timeout != 0:
+            data["timeout"] = self.__timeout
         return data
 
     async def register(self, char_list: list) -> bool:
@@ -280,46 +292,48 @@ class Player:
                 Wether there was an update in the player profile.
 
         """
-
         # If "no account"
         if char_list is None:
-
-            # If player had an account, updated = True
             if self.__has_own_account:
+                # If player had an account, updated = True
                 # Remove old chars from name check
-                name_check_remove(self)
-
-            # If player was not registered, updated = True
-            elif self.__status is PlayerStatus.IS_NOT_REGISTERED:
-                self.__status = PlayerStatus.IS_REGISTERED
-                self.__rank = 1
-
-            # Else updated = False
+                Player.name_check_remove(self)
+                # "no account" data
+                self.__ig_ids = [0, 0, 0]
+                self.__ig_names = ["N/A", "N/A", "N/A"]
+                self.__has_own_account = False
+                await self.db_update("register")
+                try:
+                    await self.__match.give_account(self.active)
+                except AttributeError:
+                    pass
+                return True
+            elif not self.__is_registered:
+                # If player was not registered, updated = True
+                self.__is_registered = True
+                await self.db_update("register")
+                return True
             else:
+                # Else updated = False
                 return False
+        else:
+            # Else there are characters
+            # If not updated, return
+            if not await self._add_characters(char_list):
+                return False
+            else:
+                # Push to db
+                await self.db_update("register")
 
-            # "no account" data
-            self.__ig_ids = [0, 0, 0]
-            self.__ig_names = ["N/A", "N/A", "N/A"]
-            self.__has_own_account = False
-
-            # Push to db
-            await self.db_update("register")
-            return True
-
-        # Else there are characters
-        # If not updated, return
-        if not await self._add_characters(char_list):
-            return False
-
-        # Else if updated
-        if self.__status is PlayerStatus.IS_NOT_REGISTERED:
-            self.__status = PlayerStatus.IS_REGISTERED
-            self.__rank = 1
-
-        # Push to db
-        await self.db_update("register")
-        return True
+                # If updated
+                if not self.__is_registered:
+                    self.__is_registered = True
+                else:
+                    try:
+                        await self.__match.remove_account(self.active)
+                    except AttributeError:
+                        pass
+                return True
 
     async def _add_characters(self, char_list: list) -> bool:
         """ Add Jaeger character names to the player.
@@ -356,8 +370,7 @@ class Player:
 
         # If only 1 string, we add faction names
         if len(char_list) == 1:
-            char_list = [char_list[0] + 'VS', char_list[0] + 'NC', \
-                         char_list[0] + 'TR']
+            char_list = [char_list[0] + 'VS', char_list[0] + 'NC', char_list[0] + 'TR']
 
         # Else it should be 3 strings
         if len(char_list) != 3:
@@ -375,30 +388,30 @@ class Player:
                     f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}' \
                     f'/get/ps2:v2/character/?name.first_lower={i_name.lower()}' \
                     f'&c:show=character_id,faction_id,name&c:resolve=world'
-                jdata = await http_request(url)
+                j_data = await http_request(url)
 
                 # Check if something returned
-                if jdata["returned"] == 0:
+                if j_data["returned"] == 0:
                     raise CharNotFound(i_name)
 
                 # Check char world
                 try:
-                    world = int(jdata["character_list"][0]["world_id"])
+                    world = int(j_data["character_list"][0]["world_id"])
                 except ValueError:
-                    log.error(f'Received unexpected value for world_id: {jdata["character_list"][0]["world_id"]}')
+                    log.error(f'Received unexpected value for world_id: {j_data["character_list"][0]["world_id"]}')
                     # TODO: test, uncomment this
                     raise ApiNotReachable(url)
                 if world != WORLD_ID:
-                    raise CharInvalidWorld(jdata["character_list"][0]["name"]["first"])
+                    raise CharInvalidWorld(j_data["character_list"][0]["name"]["first"])
 
                 # Get faction, id and name from API
-                faction = int(jdata["character_list"][0]["faction_id"])
-                curr_id = int(jdata["character_list"][0]["character_id"])
-                curr_name = jdata["character_list"][0]["name"]["first"]
+                faction = int(j_data["character_list"][0]["faction_id"])
+                curr_id = int(j_data["character_list"][0]["character_id"])
+                curr_name = j_data["character_list"][0]["name"]["first"]
 
                 # Check if the char is already registered:
-                if curr_id in _names_checking[faction - 1]:
-                    p = _names_checking[faction - 1][curr_id]
+                if curr_id in Player._names_checking[faction - 1]:
+                    p = Player._names_checking[faction - 1][curr_id]
                     if p != self:
                         raise CharAlreadyExists(curr_name, p)
 
@@ -409,7 +422,7 @@ class Player:
                 updated = updated or new_ids[faction - 1] != self.__ig_ids[faction - 1]
 
                 # Add current name to new names list
-                new_names[faction - 1] = jdata["character_list"][0]["name"]["first"]
+                new_names[faction - 1] = j_data["character_list"][0]["name"]["first"]
             except IndexError:
                 # Should not happen, we checked earlier
                 raise UnexpectedError(f'IndexError when setting player name: {i_name}')
@@ -425,10 +438,10 @@ class Player:
         # If updated, we validate
         if updated:
             if self.__has_own_account:
-                name_check_remove(self)
+                Player.name_check_remove(self)
             self.__ig_ids = new_ids.copy()
             self.__ig_names = new_names.copy()
-            name_check_add(self)
+            Player.name_check_add(self)
             self.__has_own_account = True
 
         return updated
@@ -455,6 +468,7 @@ class ActivePlayer:
         self.__score = 0
         self.__team = team
         self.__account = None
+        self.__unique_usages = None
         if from_data:
             return
         self.__player.on_picked(self)
@@ -471,7 +485,6 @@ class ActivePlayer:
         obj.__net = data["net"]
         obj.__deaths = data["deaths"]
         obj.__kills = data["kills"]
-        obj.rank = data["rank"]
         obj.__ill_weapons_fromData(data["ill_weapons"])
         return obj
 
@@ -487,7 +500,6 @@ class ActivePlayer:
                 "net": self.__net,
                 "deaths": self.__deaths,
                 "kills": self.__kills,
-                "rank": self.rank
                 }
         return data
 
@@ -509,20 +521,8 @@ class ActivePlayer:
         return False
 
     @property
-    def rank(self):
-        return self.__player.rank
-
-    @rank.setter
-    def rank(self, value):
-        self.__player.rank = value
-
-    @property
     def name(self):
         return self.__player.name
-
-    @property
-    def status(self):
-        return self.__player.status
 
     @property
     def id(self):
@@ -532,22 +532,31 @@ class ActivePlayer:
     def has_own_account(self):
         return self.__player.has_own_account
 
-    def accept_account(self):
+    @property
+    def unique_usages(self):
+        return self.__unique_usages
+
+    @unique_usages.setter
+    def unique_usages(self, value):
+        self.__unique_usages = value
+
+    async def accept_account(self):
         account_id = self.__account.id
-        fake_player = get_player(account_id)
+        if account_id not in self.__unique_usages:
+            self.__unique_usages.append(account_id)
+            try:
+                await db.async_db_call(db.push_element, "accounts_usage", self.id,
+                                                        {"unique_usages": account_id})
+            except db.DatabaseError:
+                pass
+        fake_player = Player.get(account_id)
         if fake_player is None:
             raise AccountNotFound(account_id)
         self.__player.copy_ig_info(fake_player)
 
-    def on_match_ready(self):
-        self.__player.on_match_ready()
-
     def on_resign(self):
         self.__player.on_resign()
         return self.__player
-
-    def on_team_ready(self):
-        self.__player.on_team_ready()
 
     @property
     def mention(self):

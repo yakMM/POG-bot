@@ -53,10 +53,11 @@ def switch_turn(process, team):
     return other
 
 
-async def after_pick_sub(ctx, match, subbed):
+async def after_pick_sub(ctx, match, subbed, clean_subbed=True):
     """
     Substitute a player by another one picked at random in the lobby.
 
+    :param clean_subbed: Specify if subbed player should be cleaned
     :param ctx: Context used for displaying messages
     :param match: Match calling this function
     :param subbed: Player player to be subbed
@@ -69,7 +70,8 @@ async def after_pick_sub(ctx, match, subbed):
 
     # Get active version of the player and clean the player object
     a_sub = subbed.active
-    subbed.on_player_clean()
+    if clean_subbed:
+        subbed.on_player_clean()
     team = a_sub.team
     # Args for the display later
     args = [match.channel, new_player.mention, a_sub.mention, team.name]
@@ -82,6 +84,8 @@ async def after_pick_sub(ctx, match, subbed):
         await disp.SUB_OKAY_CAP.send(*args, match=match.proxy)
     else:
         await disp.SUB_OKAY_TEAM.send(*args, match=match.proxy)
+
+    return new_player
 
 
 async def check_faction(ctx, args):

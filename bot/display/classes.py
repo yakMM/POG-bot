@@ -1,4 +1,5 @@
 from discord import File
+import modules.config as cfg
 
 
 class Message:
@@ -54,11 +55,11 @@ class Message:
 
 class ContextWrapper:
 
-    _client = None
+    client = None
 
     @classmethod
     def init(cls, client):
-        cls._client = client
+        cls.client = client
 
     @classmethod
     def wrap(cls, ctx):
@@ -74,20 +75,25 @@ class ContextWrapper:
             author = ctx.author
         except AttributeError:
             author = None
-        return cls(author, cmd_name, channel_id, ctx.send)
+        try:
+            message = ctx.message
+        except AttributeError:
+            message = None
+        return cls(author, cmd_name, channel_id, message, ctx.send)
 
     @classmethod
     def user(cls, user_id):
-        user = cls._client.get_user(user_id)
-        return cls(user, "x", user_id, user.send)
+        user = cls.client.get_user(user_id)
+        return cls(user, "x", user_id, None, user.send)
 
     @classmethod
     def channel(cls, channel_id, cmd_name="x"):
-        channel = cls._client.get_channel(channel_id)
-        return cls(None, cmd_name, channel_id, channel.send)
+        channel = cls.client.get_channel(channel_id)
+        return cls(None, cmd_name, channel_id, None, channel.send)
 
-    def __init__(self, author, cmd_name, channel_id, send):
+    def __init__(self, author, cmd_name, channel_id, message, send):
         self.author = author
         self.cmd_name = cmd_name
         self.channel_id = channel_id
         self.send = send
+        self.message = message

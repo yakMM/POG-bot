@@ -6,16 +6,29 @@
 # External modules
 from pymongo import MongoClient
 from asyncio import get_event_loop
+from logging import getLogger
 
-# Custom modules:
-from general.exceptions import DatabaseError
+log = getLogger("pog_bot")
 
 # dict for the collections
 collections = dict()
 
 
-# Public
-def get_all_items(init_class_method, db_name):
+class DatabaseError(Exception):
+    def __init__(self, msg):
+        message = "Error in database: " + msg
+        super().__init__(message)
+
+
+def init(config):
+    """ Init"""
+    cluster = MongoClient(config["url"])
+    db = cluster[config["cluster"]]
+    for collection in config["collections"]:
+        collections[collection] = db[config["collections"][collection]]
+
+
+def get_all_elements(init_class_method, db_name):
     items = collections[db_name].find()
     # Adding them
     try:
@@ -24,33 +37,10 @@ def get_all_items(init_class_method, db_name):
     except KeyError as e:
         raise DatabaseError(f"KeyError when retrieving {db_name} from database: {e}")
 
-async def get_one_item(db_name, item_id):
+
+async def async_db_call(call, *args):
     loop = get_event_loop()
-    await loop.run_in_executor(None, _get_one_item, db_name, item_id)
-
-async def update_player(p, doc):
-    """ Launch the task updating player p in database
-    """
-    loop = get_event_loop()
-    await loop.run_in_executor(None, _update_player, p, doc)
-
-async def update_match(m):
-    loop = get_event_loop()
-    await loop.run_in_executor(None, _add_match, m)
-
-async def remove_player(p):
-    """ Launch the task updating player p in database
-    """
-    loop = get_event_loop()
-    await loop.run_in_executor(None, _remove, p)
-
-
-def init(config):
-    """ Init"""
-    cluster = MongoClient(config["url"])
-    db = cluster[config["cluster"]]
-    for collec in config["collections"]:
-        collections[collec] = db[config["collections"][collec]]
+    return await loop.run_in_executor(None, call, *args)
 
 
 def force_update(db_name, elements):
@@ -60,51 +50,45 @@ def force_update(db_name, elements):
     collections[db_name].insert_many(elements)
 
 
-# Private
-def _update_player(p, doc):
+def update_element(collection, e_id, doc):
     """ Update player p into db
     """
-    if collections["users"].count_documents({"_id": p.id}) != 0:
-        collections["users"].update_one({"_id": p.id}, {"$set": doc})
+    if collections[collection].count_documents({"_id": e_id}) != 0:
+        collections[collection].update_one({"_id": e_id}, {"$set": doc})
     else:
-        collections["users"].insert_one(p.get_data())
+        raise DatabaseError(f"update_element: Element {e_id} doesn't exist in collection {collection}")
 
-def _get_one_item(db_name, item_id):
-    if collections[db_name].count_documents({"_id": item_id}) == 0:
-        raise DatabaseError(f"Item [id:{item_id}] not found in collection 'db_name'")
-    item = collections[db_name].find_one({"_id": item_id})
-    try:
-        return item
-    except KeyError as e:
-        raise DatabaseError(f"KeyError when retrieving {db_name} from database: {e}")
 
-def _replace_player(p):
-    """ Update player p into db
-    """
-    if collections["users"].count_documents({"_id": p.id}) != 0:
-        collections["users"].replace_one({"_id": p.id}, p.get_data())
+def push_element(collection, e_id, doc):
+    if collections[collection].count_documents({"_id": e_id}) != 0:
+        collections[collection].update_one({"_id": e_id}, {"$push": doc})
     else:
-        collections["users"].insert_one(p.get_data())
+        raise DatabaseError(f"update_element: Element {e_id} doesn't exist in collection {collection}")
 
-def _update_base(m):
-    """ Update base m into db
-    """
-    if collections["s_bases"].count_documents({"_id": m.id}) != 0:
-        collections["s_bases"].update_one({"_id": m.id}, {"$set": m.get_data()})
+
+def get_element(collection, item_id):
+    if collections[collection].count_documents({"_id": item_id}) == 0:
+        return
+    item = collections[collection].find_one({"_id": item_id})
+    return item
+
+
+def get_specific(collection, e_id, specific):
+    if collections[collection].count_documents({"_id": e_id}) == 0:
+        return
+    item = collections[collection].find_one({"_id": e_id}, {"_id": 0, specific: 1})[specific]
+    return item
+
+
+def set_element(collection, e_id, data):
+    if collections[collection].count_documents({"_id": e_id}) != 0:
+        collections[collection].replace_one({"_id": e_id}, data)
     else:
-        raise DatabaseError(f"Map {m.id} not in database")
+        collections[collection].insert_one(data)
 
 
-def _remove(p):
-    if collections["users"].count_documents({"_id": p.id}) != 0:
-        collections["users"].delete_one({"_id": p.id})
+def remove_element(collection, e_id):
+    if collections[collection].count_documents({"_id": e_id}) != 0:
+        collections[collection].delete_one({"_id": e_id})
     else:
-        raise DatabaseError(f"Player {p.id} not in database")
-
-def _add_match(m):
-    """ Update player p into db
-    """
-    if collections["matches"].count_documents({"_id": m.number}) != 0:
-        raise DatabaseError(f"Match {m.number} already in database!")
-    else:
-        collections["matches"].insert_one(m.get_data())
+        raise DatabaseError(f"Element {e_id} doesn't exist in collection {collection}")

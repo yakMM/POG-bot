@@ -6,15 +6,21 @@ from random import choice as random_choice
 from lib.tasks import Loop, loop
 from logging import getLogger
 
+import modules.database
+
 log = getLogger("pog_bot")
 
 _lobby_list = list()
 _lobby_stuck = False
-MatchClass = None
+_MatchClass = None
+_client = None
 
-def init(m_cls):
-    global MatchClass
-    MatchClass = m_cls
+def init(m_cls, client):
+    global _MatchClass
+    global _client
+    global _lobby_list
+    _MatchClass = m_cls
+    _client = client
 
 def is_lobby_stuck():
     return _lobby_stuck
@@ -40,7 +46,6 @@ def get_sub():
     _on_lobby_remove()
     return player
 
-
 def add_to_lobby(player):
     _lobby_list.append(player)
     player.on_lobby_add()
@@ -54,7 +59,7 @@ def add_to_lobby(player):
 
 @loop(minutes=3, delay=1, count=2)
 async def _auto_ping():
-    if MatchClass.find_empty() is None:
+    if _MatchClass.find_empty() is None:
         return
     await display.LB_NOTIFY.send(ContextWrapper.channel(cfg.channels["lobby"]), f'<@&{cfg.roles["notify"]}>')
 _auto_ping.already = False
@@ -70,7 +75,7 @@ def get_all_names_in_lobby():
 
 
 def get_all_ids_in_lobby():
-    ids = [str(p.id) for p in _lobby_list]
+    ids = [p.id for p in _lobby_list]
     return ids
 
 
@@ -92,22 +97,19 @@ def _on_lobby_remove():
         _auto_ping_cancel()
 
 def _start_match_from_full_lobby():
-    match = MatchClass.find_empty()
+    match = _MatchClass.find_empty()
     _auto_ping_cancel()
     if match is None:
         set_lobby_stuck(True)
-        Loop(coro=_start_match_display, count=1).start(match)
+        Loop(coro=_send_stuck_msg, count=1).start()
     else:
         set_lobby_stuck(False)
         match.spin_up(_lobby_list)
         _lobby_list.clear()
-        Loop(coro=_start_match_display, count=1).start(match)
 
-async def _start_match_display(match):
-    if not match:
-        await display.LB_STUCK.send(ContextWrapper.channel(cfg.channels["lobby"]))
-    else:
-        await display.LB_MATCH_STARTING.send(ContextWrapper.channel(cfg.channels["lobby"]), match.channel.id)
+async def _send_stuck_msg():
+    await display.LB_STUCK.send(ContextWrapper.channel(cfg.channels["lobby"]))
+
 
 async def on_inactive_confirmed(player):
     remove_from_lobby(player)
