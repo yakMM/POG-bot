@@ -6,7 +6,6 @@ import requests
 import json
 import os
 import classes
-from general.exceptions import ElementNotFound
 
 if os.path.isfile("test"):
     LAUNCHSTR = "_test"

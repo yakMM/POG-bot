@@ -12,7 +12,6 @@ from classes import Player
 import modules.config as cfg
 from modules.roles import perms_muted, remove_roles, role_update
 from display.strings import AllStrings as display
-from general.exceptions import ElementNotFound
 
 log = getLogger("pog_bot")
 

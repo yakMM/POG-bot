@@ -18,9 +18,10 @@ _client = None
 def init(m_cls, client):
     global _MatchClass
     global _client
-    global _lobby_list
     _MatchClass = m_cls
     _client = client
+    _lobby_loop.start()
+
 
 def is_lobby_stuck():
     return _lobby_stuck
@@ -29,6 +30,10 @@ def set_lobby_stuck(bl):
     global _lobby_stuck
     _lobby_stuck = bl
 
+
+@loop(minutes=5)
+async def _lobby_loop():
+    pass
 
 def _auto_ping_threshold():
     thresh = cfg.general["lobby_size"] - cfg.general["lobby_size"] // 3

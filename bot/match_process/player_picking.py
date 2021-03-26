@@ -3,7 +3,6 @@ from display.classes import ContextWrapper
 from lib.tasks import loop
 
 from general.enumerations import MatchStatus
-from general.exceptions import ElementNotFound
 from random import choice as random_choice
 
 from classes.teams import Team

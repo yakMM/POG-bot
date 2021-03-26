@@ -286,6 +286,7 @@ def team_update(arg, match):
     """ Returns the current teams
     """
     # title = ""
+    print(match)
     if match.round_no != 0:
         title = f"Match {match.number} - Round {match.round_no}"
     else:

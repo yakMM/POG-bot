@@ -1,4 +1,3 @@
-from general.exceptions import ElementNotFound
 from general.enumerations import MatchStatus
 
 from classes.bases import Base
@@ -33,7 +32,7 @@ class Match:
     @classmethod
     def get(cls, m_id: int):
         if m_id not in cls.__bound_matches:
-            raise ElementNotFound(m_id)
+            raise UnexpectedError(f"Can't find bound match {m_id}")
         return cls.__bound_matches[m_id]
 
     @classmethod

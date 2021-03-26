@@ -50,7 +50,7 @@ class Loop:
         if self.delay is None:
             raise ValueError('delay can not be None.')
 
-        if self.delay < 0 or self.delay >= self.count:
+        if self.delay < 0 or (self.count is not None and self.delay >= self.count):
             raise ValueError('delay must be positive and lower than count.')
 
         self.change_interval(seconds=seconds, minutes=minutes, hours=hours)

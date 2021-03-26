@@ -6,7 +6,6 @@ from logging import getLogger
 
 from display import AllStrings as disp
 import modules.config as cfg
-from general.exceptions import ElementNotFound
 
 from classes import Player
 

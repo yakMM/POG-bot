@@ -31,6 +31,14 @@ def test_hand(client):
         else:
             await launch(ctx, ids, int(args[0]))
 
+    @client.command()
+    @commands.guild_only()
+    async def y(ctx):
+        await launch(ctx, [20, 21, 22, 23], 0)
+        await launch(ctx, ids, 1)
+
+
+
 async def launch(ctx, id_list, tier):
 
     players = [Player.get(id) for id in id_list]

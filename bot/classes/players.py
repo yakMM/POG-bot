@@ -7,7 +7,7 @@
 # Custom modules
 import modules.config as cfg
 from modules.asynchttp import api_request_and_retry as http_request, ApiNotReachable
-from general.exceptions import UnexpectedError, ElementNotFound
+from general.exceptions import UnexpectedError
 from lib.tasks import loop
 from modules.roles import role_update
 import modules.database as db

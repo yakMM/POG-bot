@@ -3,7 +3,6 @@
 """
 
 import modules.config as cfg
-from general.exceptions import ElementNotFound
 
 
 from logging import getLogger

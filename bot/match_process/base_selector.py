@@ -17,6 +17,8 @@ from modules.roles import is_admin
 log = getLogger("pog_bot")
 MAX_SELECTED = 15
 
+_pog_selected_bases = dict()
+
 
 class BaseSelector:
 
@@ -33,6 +35,7 @@ class BaseSelector:
         self.__booked = list()
         self.__confirm_msg = None
         self.__nav = BaseNavigator(self, match.channel)
+        _pog_selected_bases[self.__match.id] = None
         self._get_booked_from_calendar.start()
 
     @loop(count=1)
@@ -43,13 +46,21 @@ class BaseSelector:
     async def clean(self):
         await self.__remove_confirm_msg()
         await self.__nav.remove_msg()
+        _pog_selected_bases[self.__match.id] = None
+
+    def __is_used(self, base):
+        for key in _pog_selected_bases.keys():
+            if key != self.__match.id:
+                if base is _pog_selected_bases[key]:
+                    return True
+        return False
 
     @property
     def is_booked(self):
-        return self.__selected in self.__booked
+        return self.__selected in self.__booked or self.__is_used(self.__selected)
 
     def is_base_booked(self, base):
-        return base in self.__booked
+        return base in self.__booked or self.__is_used(base)
 
     @property
     def string_list(self):
@@ -137,6 +148,7 @@ class BaseSelector:
     async def __do_confirm(self, ctx):
         self.__reset_selection()
         self.__picking_captain = None
+        _pog_selected_bases[self.__match.id] = self.__selected
         self.__match.data.base = self.__selected
         await self.__nav.remove_msg()
         await disp.BASE_ON_SELECT.send(ctx, self.__selected.name, base=self.__selected, is_booked=self.is_booked)

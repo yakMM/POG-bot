@@ -5,13 +5,11 @@ from logging import getLogger
 
 import modules.config as cfg
 from display.strings import AllStrings as disp
-from general.exceptions import ElementNotFound
 
 import classes
 
 from match_process import Match
 from general.enumerations import MatchStatus
-from modules.census import get_offline_players
 from modules.roles import is_admin
 
 log = getLogger("pog_bot")

@@ -6,7 +6,6 @@ from datetime import datetime as dt
 
 from display import AllStrings as disp, ContextWrapper
 from general.enumerations import MatchStatus
-from general.exceptions import ElementNotFound
 
 import classes
 import modules.config as cfg

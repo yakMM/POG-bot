@@ -11,8 +11,7 @@ import classes
 import modules.config as cfg
 from display.strings import AllStrings as display
 from general.tools import is_al_num
-from general.exceptions import UnexpectedError, ElementNotFound
-from general.enumerations import MatchStatus
+from general.exceptions import UnexpectedError
 from modules.asynchttp import ApiNotReachable
 
 log = getLogger("pog_bot")

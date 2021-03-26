@@ -13,9 +13,3 @@ class UnexpectedError(Exception):
         message = "Encountered unexpected error: " + msg
         log.error(message)
         super().__init__(message)
-
-
-class ElementNotFound(Exception):
-    def __init__(self, id):
-        self.id = id
-        super().__init__(f"Element not found: {id}")
