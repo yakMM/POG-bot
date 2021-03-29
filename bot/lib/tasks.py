@@ -78,7 +78,7 @@ class Loop:
         self._last_iteration_failed = False
         self._next_iteration = datetime.datetime.now(datetime.timezone.utc)
         try:
-            await asyncio.sleep(0) # allows canceling in before_loop
+            await asyncio.sleep(0)  # allows canceling in before_loop
             while True:
                 if not self._last_iteration_failed:
                     self._last_iteration = self._next_iteration

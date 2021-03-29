@@ -7,7 +7,7 @@
 # Custom modules
 import modules.config as cfg
 from modules.asynchttp import api_request_and_retry as http_request, ApiNotReachable
-from general.exceptions import UnexpectedError
+from modules.tools import UnexpectedError
 from lib.tasks import loop
 from modules.roles import role_update
 import modules.database as db
@@ -90,9 +90,9 @@ class Player:
             except KeyError:
                 log.warning(f"name_check_remove KeyError for player [id={p.id}], [key={p.ig_ids[i]}]")
 
-    def __init__(self, id, name):
+    def __init__(self, p_id, name):
         self.__name = name
-        self.__id = id
+        self.__id = p_id
         self.__ig_names = ["N/A", "N/A", "N/A"]
         self.__ig_ids = [0, 0, 0]
         self.__notify = False
@@ -102,7 +102,7 @@ class Player:
         self.__lobby_stamp = 0
         self.__active = None
         self.__match = None
-        Player._all_players[id] = self  # Add to dictionary on creation
+        Player._all_players[p_id] = self  # Add to dictionary on creation
 
     @classmethod
     def new_from_data(cls, data):  # make a new Player object from database data
@@ -124,18 +124,21 @@ class Player:
 
     async def db_update(self, arg):
         if arg == "notify":
-            await db.async_db_call(db.update_element, "users", self.id, {"notify": self.__notify})
+            await db.async_db_call(db.set_field, "users", self.id, {"notify": self.__notify})
         elif arg == "register":
             doc = {"is_registered": self.__is_registered}
+            await db.async_db_call(db.set_field, "users", self.id, doc)
+        elif arg == "account":
+            doc = {"ig_names": self.__ig_names, "ig_ids": self.__ig_ids}
             if self.__has_own_account:
-                doc["ig_names"] = self.__ig_names
-                doc["ig_ids"] = self.__ig_ids
-            await db.async_db_call(db.update_element, "users", self.id, doc)
+                await db.async_db_call(db.set_field, "users", self.id, doc)
+            else:
+                await db.async_db_call(db.unset_field, "users", self.id, doc)
         elif arg == "timeout":
             if self.__timeout != 0:
-                await db.async_db_call(db.update_element, "users", self.id, {"timeout": self.__timeout})
+                await db.async_db_call(db.set_field, "users", self.id, {"timeout": self.__timeout})
         elif arg == "name":
-            await db.async_db_call(db.update_element, "users", self.id, {"name": self.__name})
+            await db.async_db_call(db.set_field, "users", self.id, {"name": self.__name})
         else:
             raise UnexpectedError("db_update: Unknown field!")
 
@@ -310,7 +313,7 @@ class Player:
                 self.__ig_ids = [0, 0, 0]
                 self.__ig_names = ["N/A", "N/A", "N/A"]
                 self.__has_own_account = False
-                await self.db_update("register")
+                await self.db_update("account")
                 try:
                     await self.__match.give_account(self.active)
                 except AttributeError:
@@ -330,17 +333,17 @@ class Player:
             if not await self._add_characters(char_list):
                 return False
             else:
-                # Push to db
-                await self.db_update("register")
-
-                # If updated
                 if not self.__is_registered:
                     self.__is_registered = True
+                    # Push to db
+                    await self.db_update("register")
                 else:
                     try:
                         await self.__match.remove_account(self.active)
                     except AttributeError:
                         pass
+                # If updated
+                await self.db_update("account")
                 return True
 
     async def _add_characters(self, char_list: list) -> bool:

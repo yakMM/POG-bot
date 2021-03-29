@@ -14,7 +14,7 @@ from json.decoder import JSONDecodeError
 from logging import getLogger
 
 # Custom modules
-from general.exceptions import UnexpectedError
+from modules.tools import UnexpectedError
 
 log = getLogger("pog_bot")
 

@@ -55,6 +55,7 @@ async def launch(ctx, id_list, tier):
     teams = match.teams
     cap1, cap2 = None, None
 
+    await asyncio.sleep(1)
     for tm in teams:
         if tm.captain.is_turn:
             cap1 = tm.captain
@@ -70,7 +71,7 @@ async def launch(ctx, id_list, tier):
     context.author = ctx.author
     context.message = ctx.message
 
-    await asyncio.sleep(3)
+    await asyncio.sleep(2)
     await match.pick(context, cap2, ["VS"])
     await asyncio.sleep(1)
     await match.pick(context, cap1, ["TR"])
@@ -81,4 +82,15 @@ async def launch(ctx, id_list, tier):
     await asyncio.sleep(3)
 
     await match.base_selector.select_by_index(context, cap1, 0)
+
+    if tier == 4:
+        return
+
+    await asyncio.sleep(2)
+
+    match.change_check("online")
+    match.change_check("account")
+
+    await match.team_ready(context, cap1)
+    await match.team_ready(context, cap2)
 

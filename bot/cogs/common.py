@@ -4,9 +4,9 @@ from logging import getLogger
 import modules.config as cfg
 import modules.lobby as lobby
 
-from match_process import Match
+from match_process.match import Match
 from display import AllStrings as disp
-from general.enumerations import MatchStatus
+from match_process import MatchStatus
 
 log = getLogger("pog_bot")
 
@@ -33,12 +33,12 @@ class MatchesCog(commands.Cog, name='common'):
             match = Match.get(ctx.channel.id)
             if match.status is MatchStatus.IS_FREE:
                 await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
-            elif match.status is MatchStatus.IS_RUNNING:
-                await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
             else:
-                await disp.PK_SHOW_TEAMS.send(ctx, match=match)
+                try:
+                    await match.info()
+                except AttributeError:
+                    await disp.PK_SHOW_TEAMS.send(ctx, match=match)
             return
-
         await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
 
 

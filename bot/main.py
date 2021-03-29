@@ -18,7 +18,7 @@ import logging, logging.handlers, sys, os
 from time import gmtime
 
 # General Enum and Exceptions
-from general.exceptions import UnexpectedError
+from modules.tools import UnexpectedError
 
 # Display
 from display.strings import AllStrings as disp
@@ -36,7 +36,7 @@ import modules.message_filter
 import modules.accounts_handler
 
 # Classes
-from match_process import Match
+from match_process.match import Match
 from classes import Player, Base, Weapon
 
 
@@ -201,7 +201,7 @@ def _add_init_handlers(client):
         _add_main_handlers(client)
 
         try:
-            last_lobby = modules.database.get_specific("restart_data", 0, "last_lobby")
+            last_lobby = modules.database.get_field("restart_data", 0, "last_lobby")
         except KeyError:
             pass
         else:

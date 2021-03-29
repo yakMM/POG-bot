@@ -1,4 +1,4 @@
-from general.enumerations import MatchStatus
+from match_process import MatchStatus
 from modules.reactions import ReactionHandler
 
 from display import AllStrings as disp, ContextWrapper
@@ -45,6 +45,9 @@ class GettingReady(meta.Process, status=MatchStatus.IS_WAITING):
 
         await disp.ACC_SENT.send(self.match.channel)
 
+        await disp.MATCH_CONFIRM.send(self.match.channel, self.match.teams[0].captain.mention,
+                                      self.match.teams[1].captain.mention, match=self.match.proxy)
+
     @meta.public
     async def clear(self, ctx):
         await self.match.clean()
@@ -53,7 +56,7 @@ class GettingReady(meta.Process, status=MatchStatus.IS_WAITING):
     @meta.public
     async def team_ready(self, ctx, captain):
         if not captain.is_turn:
-            self.on_team_not_ready(captain.team)
+            self.on_team_ready(captain.team, False)
             await disp.MATCH_TEAM_UNREADY.send(ctx, captain.team.name, match=self.match.proxy)
         if captain.is_turn:
             if self.match.check_validated:
@@ -69,23 +72,19 @@ class GettingReady(meta.Process, status=MatchStatus.IS_WAITING):
                                                           " ".join(p.mention for p in offline_players),
                                                           p_list=offline_players)
                     return
-            self.on_team_ready(captain.team)
+            self.on_team_ready(captain.team, True)
             await disp.MATCH_TEAM_READY.send(ctx, captain.team.name, match=self.match.proxy)
             return
 
-    def on_team_not_ready(self, team):
-        team.captain.is_turn = True
-        team.on_team_ready(False)
-
-    def on_team_ready(self, team):
-        team.captain.is_turn = False
-        team.on_team_ready(True)
-        other = self.match.teams[team.id-1]
-        # If other is_turn, then not ready
-        # Else everyone ready
-        if not other.captain.is_turn:
-            print("OK NEXT")
-            # START HERE
+    def on_team_ready(self, team, ready):
+        team.captain.is_turn = not ready
+        team.on_team_ready(ready)
+        if ready:
+            other = self.match.teams[team.id-1]
+            # If other is_turn, then not ready
+            # Else everyone ready
+            if not other.captain.is_turn:
+                self.match.on_ready()
 
     @meta.public
     async def remove_account(self, a_player):

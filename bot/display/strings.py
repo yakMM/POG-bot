@@ -55,7 +55,7 @@ class AllStrings(Enum):
     PK_WRONG_CHANNEL = Message("You are in the wrong channel! Check <#{}> instead")
     PK_NOT_TURN = Message("It's not your turn!")
     PK_NOT_CAPTAIN = Message("You are not Team Captain!")
-    PK_SHOW_TEAMS = Message("Match status:", embed=embeds.team_update)
+    PK_SHOW_TEAMS = Message("Match status:", embed=embeds.team_update, ping=False)
     PK_PLAYERS_HELP = Message("Waiting for {} to pick a player with `=p @mention`", ping=False)
     PK_NO_ARG = Message("@ mention a player to pick!")
     PK_TOO_MUCH = Message("You can't pick more than one player at the same time!")
@@ -97,6 +97,8 @@ class AllStrings(Enum):
     CHECK_ACCOUNT = Message("Your account password may have been flipped!\n"
                             "Re-register in <#{}> to confirm you still have access to it!", embed=embeds.flip_accounts)
     RDY = Message("Bot just started and is now ready. Version `{}`")
+    CONFIRM_NOT_CAPTAIN = Message("You can't confirm! {} should do it!")
+    CONFIRM_NOTHING = Message("Nothing to confirm!")
 
     BOT_UNLOCKED = Message("Unlocked!")
     BOT_LOCKED = Message("Locked!")
@@ -114,8 +116,8 @@ class AllStrings(Enum):
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ping=False)
     MATCH_BASE_AUTO = Message("Match will be on **{}**", ping=False)
-    MATCH_CONFIRM = Message("{} {} Type `=ready` when your team is inside their sundy, ready to start",
-                             embed=embeds.team_update)
+    MATCH_CONFIRM = Message("{} {} Type `=ready` when your team is inside their sunderer, ready to start",
+                            embed=embeds.team_update)
     MATCH_NOT_READY = Message("You can't use command {}, the match is not ready to start!")
     MATCH_TEAM_READY = Message("{} is now ready!", embed=embeds.team_update)
     MATCH_TEAM_UNREADY = Message("{} is no longer ready!", embed=embeds.team_update)
@@ -144,16 +146,15 @@ class AllStrings(Enum):
     BASE_SHOW_LIST = Message("Here are the bases found:", ping=False, embed=embeds.selected_bases)
     BASE_SELECTED = Message("Here is the selected base for this match:", embed=embeds.base_display)
     BASE_DISPLAY = Message("Base navigator:", ping=False, embed=embeds.base_display)
-    BASE_BOOKED = Message("{} WARNING: **{}** is currently reserved in the Jaeger Calendar. Please check availability "
-                         "before confirming this base.", ping=False, embed=embeds.jaeger_calendar)
+    BASE_BOOKED = Message("{} WARNING: **{}** seems unavailable. Please check occupation "
+                          "before confirming this base.", ping=False, embed=embeds.jaeger_calendar)
     BASE_ADDED = Message("Added {} to the base pool")
     BASE_REMOVED = Message("Removed {} from the base pool")
     BASE_CALENDAR = Message("{} Pick an available base!", ping=False, embed=embeds.jaeger_calendar)
     BASE_NO_BASE = Message("No base yet selected!")
     BASE_NO_BASE_WAITING = Message("Waiting for captains to pick a base...")
-    BASE_ALREADY = Message("Base already confirmed!")
-    BASE_NO_CONFIRM = Message("Can't confirm the base! {} should do it!")
     BASE_OK_CONFIRM = Message("Picked **{}**! {} confirm with if you agree! (use `=p confirm` or react below)")
+    BASE_NO_CHANGE = Message("It's not possible to change the match base anymore!")
 
     ACC_NOT_ENOUGH = Message("Not enough accounts are available for this match!\n**Match has been canceled!**")
     ACC_ERROR = Message("Error when giving out Jaeger accounts!\n**Match has been canceled!**")

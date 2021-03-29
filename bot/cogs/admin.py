@@ -5,7 +5,7 @@ from logging import getLogger
 from datetime import datetime as dt
 
 from display import AllStrings as disp, ContextWrapper
-from general.enumerations import MatchStatus
+from match_process import MatchStatus
 
 import classes
 import modules.config as cfg
@@ -17,7 +17,7 @@ import modules.lobby as lobby
 import modules.accounts_handler as accounts_sheet
 import asyncio
 
-from match_process import Match
+from match_process.match import Match
 
 from classes import Player
 
@@ -58,7 +58,7 @@ class AdminCog(commands.Cog, name='admin'):
             if match.status is MatchStatus.IS_FREE:
                 await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
                 return
-            if match.status in (MatchStatus.IS_STARTING, MatchStatus.IS_RESULT, MatchStatus.IS_RUNNING):
+            if match.status in (MatchStatus.IS_RESULT, MatchStatus.IS_RUNNING):
                 await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
                 return
             await disp.MATCH_CLEAR.send(ctx)
@@ -215,7 +215,7 @@ class AdminCog(commands.Cog, name='admin'):
             return
         if len(args) > 0 and args[0] == "get":
             lb = lobby.get_all_ids_in_lobby()
-            db.update_element("restart_data", 0, {"last_lobby": lb})
+            db.set_field("restart_data", 0, {"last_lobby": lb})
             await disp.LB_GET.send(ctx, " ".join([str(p_id) for p_id in lb]))
             return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)

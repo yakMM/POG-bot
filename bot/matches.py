@@ -1,8 +1,6 @@
 import modules.config as cfg
-from general.exceptions import AccountsNotEnough, \
-    ElementNotFound, AlreadyPicked
 from display import SendCtx, send
-from general.enumerations import MatchStatus, SelStatus
+from match_process import MatchStatus, SelStatus
 from modules.image_maker import publish_match_image
 from modules.census import process_score, get_offline_players
 from modules.database import update_match
@@ -226,17 +224,17 @@ class Match():
     def ts3_test(self):
         self.__audio_bot.drop_match()
 
-
-    def on_team_ready(self, team):
-        team.captain.is_turn = False
-        team.on_team_ready()
-        self.__audio_bot.team_ready(team)
-        other = self.__teams[team.id-1]
-        # If other is_turn, then not ready
-        # Else everyone ready
-        if not other.captain.is_turn:
-            self.__status = MatchStatus.IS_STARTING
-            self.__start_match.start()
+    #
+    # def on_team_ready(self, team):
+    #     team.captain.is_turn = False
+    #     team.on_team_ready()
+    #     self.__audio_bot.team_ready(team)
+    #     other = self.__teams[team.id-1]
+    #     # If other is_turn, then not ready
+    #     # Else everyone ready
+    #     if not other.captain.is_turn:
+    #         self.__status = MatchStatus.IS_STARTING
+    #         self.__start_match.start()
 
     @loop(count=1)
     async def __find_base(self):
@@ -252,27 +250,27 @@ class Match():
         await send("PK_WAIT_BASE", self.__channel, *captain_pings)
         await self.__base_selector.on_pick_start()
 
-    @loop(count=1)
-    async def __ready(self):
-        self.__status = MatchStatus.IS_RUNNING
-        for tm in self.__teams:
-            tm.captain.is_turn = True
-        captain_pings = [tm.captain.mention for tm in self.__teams]
-        try:
-            await self.__accounts.give_accounts()
-        except AccountsNotEnough:
-            await send("ACC_NOT_ENOUGH", self.__channel)
-            await self.clear()
-            return
-        except Exception as e:
-            log.error(f"Error in account giving function!\n{e}")
-            await send("ACC_ERROR", self.__channel)
-            await self.clear()
-            return
-
-        self.__status = MatchStatus.IS_WAITING
-        self.__audio_bot.match_confirm()
-        await send("MATCH_CONFIRM", self.__channel, *captain_pings, match=self)
+    # @loop(count=1)
+    # async def __ready(self):
+    #     self.__status = MatchStatus.IS_RUNNING
+    #     for tm in self.__teams:
+    #         tm.captain.is_turn = True
+    #     captain_pings = [tm.captain.mention for tm in self.__teams]
+    #     try:
+    #         await self.__accounts.give_accounts()
+    #     except AccountsNotEnough:
+    #         await send("ACC_NOT_ENOUGH", self.__channel)
+    #         await self.clear()
+    #         return
+    #     except Exception as e:
+    #         log.error(f"Error in account giving function!\n{e}")
+    #         await send("ACC_ERROR", self.__channel)
+    #         await self.clear()
+    #         return
+    #
+    #     self.__status = MatchStatus.IS_WAITING
+    #     self.__audio_bot.match_confirm()
+    #     await send("MATCH_CONFIRM", self.__channel, *captain_pings, match=self)
 
     @loop(minutes=10, delay=1, count=2)
     async def _on_match_over(self):
@@ -312,20 +310,20 @@ class Match():
             log.error(f"Error in score or publish function!\n{e}")
 
 
-    @loop(count=1)
-    async def __start_match(self):
-        self.__audio_bot.countdown()
-        await send("MATCH_STARTING_1", self.__channel, self.round_no, "30")
-        await sleep(10)
-        await send("MATCH_STARTING_2", self.__channel, self.round_no, "20")
-        await sleep(10)
-        await send("MATCH_STARTING_2", self.__channel, self.round_no, "10")
-        await sleep(10)
-        player_pings = [" ".join(tm.all_pings) for tm in self.__teams]
-        await send("MATCH_STARTED", self.__channel, *player_pings, self.round_no)
-        self.__round_stamps.append(int(dt.timestamp(dt.now())))
-        self.__status = MatchStatus.IS_PLAYING
-        self._on_match_over.start()
+    # @loop(count=1)
+    # async def __start_match(self):
+    #     self.__audio_bot.countdown()
+    #     await send("MATCH_STARTING_1", self.__channel, self.round_no, "30")
+    #     await sleep(10)
+    #     await send("MATCH_STARTING_2", self.__channel, self.round_no, "20")
+    #     await sleep(10)
+    #     await send("MATCH_STARTING_2", self.__channel, self.round_no, "10")
+    #     await sleep(10)
+    #     player_pings = [" ".join(tm.all_pings) for tm in self.__teams]
+    #     await send("MATCH_STARTED", self.__channel, *player_pings, self.round_no)
+    #     self.__round_stamps.append(int(dt.timestamp(dt.now())))
+    #     self.__status = MatchStatus.IS_PLAYING
+    #     self._on_match_over.start()
 
     @loop(count=1)
     async def _launch(self):

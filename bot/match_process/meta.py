@@ -77,6 +77,9 @@ class Process(metaclass=MetaProcess, status=None):
         self.match = match
         Loop(coro=self._async_init, count=1).start(*args)
 
+    def change_status(self, status):
+        self.status = status
+
     async def _async_init(self, *args):
         if self.init_func:
             await self.init_func(*args)

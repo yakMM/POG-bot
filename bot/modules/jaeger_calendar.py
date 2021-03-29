@@ -3,7 +3,7 @@ from datetime import datetime as dt, timezone as tz, timedelta as td
 from numpy import array as np_array
 from re import compile as reg_compile, sub as reg_sub
 
-from general.tools import date_parser
+from modules.tools import date_parser
 
 import modules.config as cfg
 

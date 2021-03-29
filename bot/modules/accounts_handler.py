@@ -4,7 +4,7 @@ from logging import getLogger
 from gspread import service_account
 from gspread.exceptions import APIError
 from numpy import array, vstack
-from general.exceptions import UnexpectedError
+from modules.tools import UnexpectedError
 from display import AllStrings as disp, ContextWrapper
 
 from datetime import datetime as dt
@@ -53,14 +53,14 @@ def init(secret_file):
         elif a_id in _busy_accounts:
             _busy_accounts[a_id].update(a_username, a_password)
         else:
-            unique_usages = db.get_specific("accounts_usage", a_id, "unique_usages")
+            unique_usages = db.get_field("accounts_usage", a_id, "unique_usages")
             if unique_usages is None:
                 raise UnexpectedError(f"Can't find usage for account {a_id}")
             _available_accounts[a_id] = classes.Account(a_id_str, a_username, a_password, unique_usages)
 
 
 async def give_account(a_player):
-    unique_usages = await db.async_db_call(db.get_specific, "accounts_usage", a_player.id, "unique_usages")
+    unique_usages = await db.async_db_call(db.get_field, "accounts_usage", a_player.id, "unique_usages")
     if not unique_usages:
         unique_usages = list()
 

@@ -50,20 +50,28 @@ def force_update(db_name, elements):
     collections[db_name].insert_many(elements)
 
 
-def update_element(collection, e_id, doc):
+def set_field(collection, e_id, doc):
     """ Update player p into db
     """
     if collections[collection].count_documents({"_id": e_id}) != 0:
         collections[collection].update_one({"_id": e_id}, {"$set": doc})
     else:
-        raise DatabaseError(f"update_element: Element {e_id} doesn't exist in collection {collection}")
+        raise DatabaseError(f"set_field: Element {e_id} doesn't exist in collection {collection}")
 
+
+def unset_field(collection, e_id, doc):
+    """ Update player p into db
+    """
+    if collections[collection].count_documents({"_id": e_id}) != 0:
+        collections[collection].update_one({"_id": e_id}, {"$unset": doc})
+    else:
+        raise DatabaseError(f"set_field: Element {e_id} doesn't exist in collection {collection}")
 
 def push_element(collection, e_id, doc):
     if collections[collection].count_documents({"_id": e_id}) != 0:
         collections[collection].update_one({"_id": e_id}, {"$push": doc})
     else:
-        raise DatabaseError(f"update_element: Element {e_id} doesn't exist in collection {collection}")
+        raise DatabaseError(f"set_field: Element {e_id} doesn't exist in collection {collection}")
 
 
 def get_element(collection, item_id):
@@ -73,7 +81,7 @@ def get_element(collection, item_id):
     return item
 
 
-def get_specific(collection, e_id, specific):
+def get_field(collection, e_id, specific):
     if collections[collection].count_documents({"_id": e_id}) == 0:
         return
     item = collections[collection].find_one({"_id": e_id}, {"_id": 0, specific: 1})[specific]

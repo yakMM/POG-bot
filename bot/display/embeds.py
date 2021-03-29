@@ -4,7 +4,7 @@ from datetime import datetime as dt
 from datetime import timezone as tz
 
 from modules.roles import is_admin
-from general.enumerations import MatchStatus
+from match_process import MatchStatus
 
 
 def register_help(ctx):
@@ -267,8 +267,8 @@ def global_info(ctx, lobby, match_list):
         if m.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
             desc += f"\nBase: **{m.base.name}**\n"
             desc += " / ".join(f"{tm.name}: **{cfg.factions[tm.faction]}**" for tm in m.teams)
-        if m.next_status is MatchStatus.IS_PLAYING:
-            desc += f"\nTime Remaining: **{m.formated_time_to_round_end}**"
+        if m.status is MatchStatus.IS_PLAYING:
+            desc += f"\nTime Remaining: **{m.get_formatted_time_to_round_end()}**"
         embed.add_field(name=m.channel.name, value=desc, inline=False)
     return embed
 
@@ -286,14 +286,13 @@ def team_update(arg, match):
     """ Returns the current teams
     """
     # title = ""
-    print(match)
     if match.round_no != 0:
         title = f"Match {match.number} - Round {match.round_no}"
     else:
         title = f"Match {match.number}"
     desc = match.status_str
-    if match.next_status is MatchStatus.IS_PLAYING:
-        desc += f"\nTime Remaining: **{match.formated_time_to_round_end}**"
+    if match.status is MatchStatus.IS_PLAYING:
+        desc += f"\nTime Remaining: **{match.get_formatted_time_to_round_end()}**"
     embed = Embed(colour=Color.blue(), title=title, description=desc)
     if match.base is not None:
         embed.add_field(name="Map", value=match.base.name, inline=False)
@@ -337,7 +336,7 @@ def jaeger_calendar(arg):
 def base_display(ctx, base, is_booked):
     if is_booked:
         embed = Embed(colour=Color.red(), title=base.name,
-                      description="WARNING! This base seems to be booked in the calendar!")
+                      description="WARNING! This base seems to be unavailable!")
     else:
         embed = Embed(colour=Color.blue(), title=base.name)
     if base.id in cfg.base_images:

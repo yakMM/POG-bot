@@ -2,7 +2,7 @@ from display.strings import AllStrings as display
 from display.classes import ContextWrapper
 from lib.tasks import loop
 
-from general.enumerations import MatchStatus
+from match_process import MatchStatus
 from random import choice as random_choice
 
 from classes.teams import Team
@@ -27,29 +27,6 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
             p.on_match_selected(self.match.proxy)
 
         super().__init__(match)
-
-    @meta.public
-    def get_left_players_pings(self) -> list:
-        """ The list of mentions of all players left to pick.
-        """
-        pings = [f"{p.mention} ({p.name})" for p in self.players.values()]
-        return pings
-
-    @meta.public
-    async def clear(self, ctx):
-        await self.match.clean()
-        await display.MATCH_CLEARED.send(ctx)
-
-    def find_captain(self):
-        """ Pick at random a captain.
-            TODO: Base this pick on some kind of stats or a role
-
-            Returns
-            -------
-            captain : Player
-                The player designated as captain.
-        """
-        return random_choice(list(self.players))
 
     @meta.init_loop
     async def init(self):
@@ -80,6 +57,29 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
         self.match.audio_bot.select_teams()
         await display.MATCH_SHOW_PICKS.send(self.match.channel, self.match.teams[0].captain.mention,
                                             match=self.match.proxy)
+
+    @meta.public
+    def get_left_players_pings(self) -> list:
+        """ The list of mentions of all players left to pick.
+        """
+        pings = [f"{p.mention} ({p.name})" for p in self.players.values()]
+        return pings
+
+    @meta.public
+    async def clear(self, ctx):
+        await self.match.clean()
+        await display.MATCH_CLEARED.send(ctx)
+
+    def find_captain(self):
+        """ Pick at random a captain.
+            TODO: Base this pick on some kind of stats or a role
+
+            Returns
+            -------
+            captain : Player
+                The player designated as captain.
+        """
+        return random_choice(list(self.players))
 
     @meta.public
     def demote(self, captain: TeamCaptain):

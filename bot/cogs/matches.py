@@ -8,8 +8,8 @@ from display.strings import AllStrings as disp
 
 import classes
 
-from match_process import Match
-from general.enumerations import MatchStatus
+from match_process.match import Match
+from match_process import MatchStatus
 from modules.roles import is_admin
 
 log = getLogger("pog_bot")
@@ -108,7 +108,7 @@ class MatchesCog(commands.Cog, name='matches'):
         match = Match.get(ctx.channel.id)
         if match.next_status is MatchStatus.IS_WAITING:
             await disp.SC_PLAYERS_STRING_DISC.send(ctx, "\n".join(tm.ig_string for tm in match.teams))
-        elif match.is_started:
+        elif not match.is_picking_allowed:
             await disp.SC_PLAYERS_STRING.send(ctx, "\n".join(tm.ig_string for tm in match.teams))
         else:
             await disp.MATCH_NOT_READY.send(ctx, ctx.command.name)
@@ -124,6 +124,12 @@ class MatchesCog(commands.Cog, name='matches'):
             return
         elif match.status is MatchStatus.IS_RUNNING:
             await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
+            return
+        elif not match.is_picking_allowed:
+            if len(args) != 0:
+                await disp.BASE_NO_CHANGE.send(ctx)
+                return
+            await disp.BASE_SELECTED.send(ctx, base=match.base, is_booked=False)
             return
 
         if len(args) == 1 and args[0] == "help":
@@ -148,27 +154,7 @@ class MatchesCog(commands.Cog, name='matches'):
                 return
             # It's important to close the message in case we don't use it
             msg.close()
-
-        if len(args) == 0:
-            # If no arg in the command
-            await match.base_selector.display_all(ctx)
-            return
-
-        if len(args) == 1:
-            if args[0] == "confirm":
-                # If arg is "confirm"
-                await match.base_selector.confirm_base(ctx, a_player)
-                return
-            if args[0] == "list":
-                await match.base_selector.display_all(ctx, force=True)
-                return
-            if args[0].isnumeric():
-                # If arg is a number
-                await match.base_selector.select_by_index(ctx, a_player, int(args[0]) - 1)
-                return
-
-        # If any other arg (expecting base name)
-        await match.base_selector.select_by_name(ctx, a_player, args)
+        await match.base_selector.process_request(ctx, a_player, args)
 
 
 def setup(client):

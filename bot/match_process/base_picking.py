@@ -1,4 +1,4 @@
-from general.enumerations import MatchStatus
+from match_process import MatchStatus
 from modules.reactions import ReactionHandler
 
 from display.strings import AllStrings as disp
@@ -25,6 +25,7 @@ class MapPicking(meta.Process, status=MatchStatus.IS_BASING):
                                                        mentions=f"{self.match.teams[0].captain.mention} "
                                                                 f"{self.match.teams[1].captain.mention}")
         else:
+            await self.match.base_selector.show_base_status(self.match.channel)
             self.on_base_found()
 
     @meta.public

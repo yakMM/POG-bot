@@ -5,7 +5,8 @@ from random import randint
 
 from classes.bases import Base
 
-from general.enumerations import MatchStatus
+from .match_status import MatchStatus
+from .captain_validator import CaptainValidator
 
 from display.strings import AllStrings as disp
 from display.classes import ContextWrapper
@@ -31,9 +32,9 @@ class BaseSelector:
         self.__reset_selection()
         self.__match = match
         self.__selected = None
-        self.__picking_captain = None
         self.__booked = list()
-        self.__confirm_msg = None
+        self.__validator = CaptainValidator(match.teams[0].captain, match.teams[1].captain, self.__match.channel)
+        self.add_callbacks(self.__validator)
         self.__nav = BaseNavigator(self, match.channel)
         _pog_selected_bases[self.__match.id] = None
         self._get_booked_from_calendar.start()
@@ -44,8 +45,8 @@ class BaseSelector:
         await lp.run_in_executor(None, get_booked_bases, Base, self.__booked)
 
     async def clean(self):
-        await self.__remove_confirm_msg()
-        await self.__nav.remove_msg()
+        await self.__validator.clean()
+        await self.__nav.reaction_handler.destroy()
         _pog_selected_bases[self.__match.id] = None
 
     def __is_used(self, base):
@@ -81,6 +82,24 @@ class BaseSelector:
     def get_base_from_selection(self, index):
         return self.__selection[index]
 
+    def add_callbacks(self, validator):
+        @validator.is_invalid()
+        async def is_confirm_invalid(ctx, captain):
+            if not self.__selected:
+                await disp.BASE_NO_BASE.send(ctx)
+                return True
+            return False
+
+        @validator.confirm()
+        async def do_confirm(ctx, captain):
+            self.__reset_selection()
+            _pog_selected_bases[self.__match.id] = self.__selected
+            self.__match.data.base = self.__selected
+            await self.__nav.reaction_handler.destroy()
+            await disp.BASE_ON_SELECT.send(ctx, self.__selected.name, base=self.__selected, is_booked=self.is_booked)
+            if self.__match.status is MatchStatus.IS_BASING:
+                self.__match.proxy.on_base_found()
+
     async def show_base_status(self, ctx):
         if self.__selected is None:
             if self.__match.status is MatchStatus.IS_BASING:
@@ -89,6 +108,26 @@ class BaseSelector:
                 await disp.BASE_NO_BASE.send(ctx)
         else:
             await disp.BASE_SELECTED.send(ctx, base=self.__selected, is_booked=self.is_booked)
+
+    async def process_request(self, ctx, a_player, args):
+        if await self.__validator.check_message(ctx, a_player, args):
+            return
+
+        if len(args) == 0:
+            # If no arg in the command
+            await self.display_all(ctx)
+            return
+        if len(args) == 1:
+            if args[0] == "list":
+                await self.display_all(ctx, force=True)
+                return
+            if args[0].isnumeric():
+                # If arg is a number
+                await self.select_by_index(ctx, a_player, int(args[0]) - 1)
+                return
+
+        # If any other arg (expecting base name)
+        await self.select_by_name(ctx, a_player, args)
 
     async def display_all(self, ctx, force=False, mentions=None):
         if self.__selected and not force:
@@ -112,7 +151,7 @@ class BaseSelector:
             await disp.BASE_TOO_MUCH.send(ctx)
         else:
             self.__selection = current_list
-            await self.__remove_confirm_msg()
+            await self.__validator.clean()
             await disp.BASE_SHOW_LIST.send(ctx, bases_list=self.string_list)
             await self.__nav.reload()
 
@@ -122,60 +161,17 @@ class BaseSelector:
             return
         await disp.BASE_NOT_FOUND.send(ctx)
 
-    async def confirm_base(self, ctx, captain):
-        if not self.__selected:
-            await disp.BASE_NO_BASE.send(ctx)
-            return
-        if not self.__picking_captain:
-            await disp.BASE_ALREADY.send(ctx)
-            return
-        if captain is not self.__picking_captain:
-            await disp.BASE_NO_CONFIRM.send(ctx, self.__picking_captain.mention)
-            return
-        await self.__do_confirm(ctx)
-
     async def __select_base(self, ctx, picker, base):
         self.__selected = base
-        await self.__remove_confirm_msg()
+        await self.__validator.clean()
         if is_admin(ctx.author):
-            await self.__do_confirm(ctx)
+            await self.__validator.force_confirm(ctx, picker)
             return
-        self.__picking_captain = self.__match.teams[picker.team.id - 1].captain
-        await self.__wait_confirm(ctx)
+        other_captain = self.__match.teams[picker.team.id - 1].captain
+        msg = await disp.BASE_OK_CONFIRM.send(ctx, self.__selected.name, other_captain.mention)
+        await self.__validator.wait_valid(picker, msg)
         if self.is_booked:
-            await disp.BASE_BOOKED.send(ctx, self.__picking_captain.mention, base.name)
-
-    async def __do_confirm(self, ctx):
-        self.__reset_selection()
-        self.__picking_captain = None
-        _pog_selected_bases[self.__match.id] = self.__selected
-        self.__match.data.base = self.__selected
-        await self.__nav.remove_msg()
-        await disp.BASE_ON_SELECT.send(ctx, self.__selected.name, base=self.__selected, is_booked=self.is_booked)
-        if self.__match.status is MatchStatus.IS_BASING:
-            self.__match.proxy.on_base_found()
-
-    async def __wait_confirm(self, ctx):
-        rh = reactions.ReactionHandler(rem_bot_react=True)
-
-        @rh.reaction('✅')
-        async def reaction_confirm(reaction, player, user):
-            if player.active and player.active is self.__picking_captain:
-                ctx2 = ContextWrapper.wrap(self.__match.channel)
-                ctx2.author = user
-                await self.__do_confirm(ctx2)
-            else:
-                raise reactions.UserLackingPermission
-
-        self.__confirm_msg = await disp.BASE_OK_CONFIRM.send(ctx, self.__selected.name, self.__picking_captain.mention)
-        reactions.add_handler(self.__confirm_msg.id, rh)
-        await rh.auto_add_reactions(self.__confirm_msg)
-
-    async def __remove_confirm_msg(self):
-        if self.__confirm_msg:
-            reactions.rem_handler(self.__confirm_msg.id)
-            await self.__confirm_msg.clear_reactions()
-            self.__confirm_msg = None
+            await disp.BASE_BOOKED.send(ctx, other_captain.mention, base.name)
 
     def __reset_selection(self):
         if len(self.__all_bases) <= MAX_SELECTED:
@@ -190,12 +186,11 @@ class BaseNavigator:
         self.channel = match_channel
         self.index = 0
         self.length = 0
-        self.reaction_handler = reactions.ReactionHandler()
+        self.reaction_handler = reactions.SingleMessageReactionHandler(remove_msg=True)
         self.reaction_handler.set_reaction("◀️", self.check_auth, self.go_left, self.refresh_message)
         self.reaction_handler.set_reaction("⏺️", self.check_auth, self.select)
         self.reaction_handler.set_reaction("▶️", self.check_auth, self.go_right, self.refresh_message)
         self.reaction_handler.set_reaction("🔀", self.check_auth, self.shuffle, self.refresh_message)
-        self.last_msg = None
 
     @property
     def current_base(self):
@@ -205,14 +200,7 @@ class BaseNavigator:
     def is_booked(self):
         return self.selector.is_base_booked(self.current_base)
 
-    async def remove_msg(self):
-        if self.last_msg:
-            reactions.rem_handler(self.last_msg.id)
-            await self.last_msg.delete()
-            self.last_msg = None
-
     async def reload(self):
-        await self.remove_msg()
         self.length = len(self.selector.current_selection)
         try:
             self.index = randint(0, self.length - 1)
@@ -220,9 +208,7 @@ class BaseNavigator:
             self.index = 0
 
         msg = await disp.BASE_DISPLAY.send(self.channel, base=self.current_base, is_booked=self.is_booked)
-        self.last_msg = msg
-        reactions.add_handler(msg.id, self.reaction_handler)
-        await self.reaction_handler.auto_add_reactions(msg)
+        await self.reaction_handler.set_new_msg(msg)
 
     def go_right(self, *args):
         self.index += 1
@@ -246,8 +232,7 @@ class BaseNavigator:
         ctx = ContextWrapper.wrap(self.channel)
         ctx.author = user
         await self.selector.select_by_index(ctx, player.active, self.index)
-        if self.last_msg:
-            await self.last_msg.clear_reactions()
+        await self.reaction_handler.clear_reactions()
 
     def check_auth(self, reaction, player, user):
         if player.active and player.active.is_captain:
@@ -257,4 +242,4 @@ class BaseNavigator:
         raise reactions.UserLackingPermission
 
     async def refresh_message(self, *args):
-        await disp.BASE_DISPLAY.edit(self.last_msg, base=self.current_base, is_booked=self.is_booked)
+        await disp.BASE_DISPLAY.edit(self.reaction_handler.msg, base=self.current_base, is_booked=self.is_booked)

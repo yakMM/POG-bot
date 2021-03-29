@@ -3,7 +3,7 @@ from display.classes import ContextWrapper
 
 import modules.config as cfg
 
-from general.enumerations import MatchStatus
+from match_process import MatchStatus
 import modules.reactions as reactions
 
 import match_process.common_picking as common
@@ -15,8 +15,8 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
 
     def __init__(self, match):
         self.match = match
-        self.last_msg = None
-        self.reaction_handler = reactions.ReactionHandler()
+
+        self.reaction_handler = reactions.SingleMessageReactionHandler()
         self.add_callbacks(self.reaction_handler)
 
         self.match.teams[1].captain.is_turn = True
@@ -30,7 +30,7 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
         await sleep(0)
         self.match.audio_bot.select_factions()
         msg = await disp.PK_OK_FACTION.send(self.match.channel, picker.mention, match=self.match.proxy)
-        await self.set_faction_msg(msg)
+        await self.reaction_handler.set_new_msg(msg)
 
     def add_callbacks(self, rh):
 
@@ -54,16 +54,8 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
                     ctx.author = user
                     msg = await self.do_pick(ctx, player.active.team, faction)
                     if msg:
-                        await self.set_faction_msg(msg)
+                        await self.reaction_handler.set_new_msg(msg)
                     break
-
-    async def set_faction_msg(self, msg):
-        if self.last_msg:
-            await self.last_msg.clear_reactions()
-            reactions.rem_handler(self.last_msg.id)
-        self.last_msg = msg
-        reactions.add_handler(msg.id, self.reaction_handler)
-        await self.reaction_handler.auto_add_reactions(msg)
 
     @meta.public
     async def sub(self, ctx, subbed):
@@ -79,13 +71,11 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
                 discord command context, contains the message received
         """
         msg = await disp.PK_FACTION_HELP.send(ctx, self.picking_captain.mention)
-        await self.set_faction_msg(msg)
+        await self.reaction_handler.set_new_msg(msg)
 
     @meta.public
     async def clear(self, ctx):
-        if self.last_msg is not None:
-            await self.last_msg.clear_reactions()
-            reactions.rem_handler(self.last_msg.id)
+        await self.reaction_handler.destroy()
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)
 
@@ -99,7 +89,7 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
 
         # If a msg was sent, set it for reaction handling
         if msg:
-            await self.set_faction_msg(msg)
+            await self.reaction_handler.set_new_msg(msg)
 
     async def do_pick(self, ctx, team, arg):
         # Get the faction an other team
@@ -125,6 +115,5 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
 
         # Else, over, all teams have selected a faction
         await disp.PK_FACTION_OK.send(ctx, team.name, cfg.factions[team.faction])
-        await self.last_msg.clear_reactions()
-        reactions.rem_handler(self.last_msg.id)
+        await self.reaction_handler.destroy()
         self.match.on_faction_pick_over()

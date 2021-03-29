@@ -1,6 +1,3 @@
-"""Custom enumerations classes to define status of the objects
-"""
-
 from enum import Enum
 
 
@@ -11,6 +8,6 @@ class MatchStatus(Enum):
     IS_FACTION = "Waiting for captains to pick factions"
     IS_BASING = "Waiting for base pick"
     IS_WAITING = "Waiting for teams"
+    IS_STARTING = "Match starting..."
     IS_PLAYING = "Match is being played"
     IS_RESULT = "Result"
-

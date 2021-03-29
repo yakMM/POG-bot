@@ -4,7 +4,7 @@ from gspread import service_account
 from numpy import array
 import modules.config as cfg
 from classes import Player, Base
-from match_process import Match
+from match_process.match import Match
 import requests
 import json
 import asyncio
