@@ -49,41 +49,46 @@ async def launch(ctx, id_list, tier):
     if tier == 1:
         return
 
-    await asyncio.sleep(2)
+    await asyncio.sleep(3)
 
     match = players[0].match
-    teams = match.teams
-    cap1, cap2 = None, None
 
-    await asyncio.sleep(1)
-    for tm in teams:
-        if tm.captain.is_turn:
-            cap1 = tm.captain
-        else:
-            cap2 = tm.captain
+    await match.on_volunteer(players[0])
+    await match.on_volunteer(players[1])
 
-    match.demote(cap1)
+    cap1, cap2 = players[0].active, players[1].active
 
     if tier == 2:
         return
 
+    await asyncio.sleep(1)
+
     context = ContextWrapper.wrap(match.channel)
     context.author = ctx.author
     context.message = ctx.message
+
+    ctx.message.mentions.append(context.author)
+
+    await match.pick(context, cap1, [""])
+
+    if tier == 3:
+        return
+
+    ctx.message.mentions.clear()
 
     await asyncio.sleep(2)
     await match.pick(context, cap2, ["VS"])
     await asyncio.sleep(1)
     await match.pick(context, cap1, ["TR"])
 
-    if tier == 3:
+    if tier == 4:
         return
 
     await asyncio.sleep(3)
 
     await match.base_selector.select_by_index(context, cap1, 0)
 
-    if tier == 4:
+    if tier == 5:
         return
 
     await asyncio.sleep(2)

@@ -57,3 +57,4 @@ def date_parser(string):
         pass
     dtx = dtx.astimezone(pytz.timezone("UTC"))
     return dtx
+

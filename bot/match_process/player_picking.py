@@ -1,5 +1,4 @@
-from display.strings import AllStrings as display
-from display.classes import ContextWrapper
+from display import AllStrings as disp, ContextWrapper
 from lib.tasks import loop
 
 from match_process import MatchStatus
@@ -10,6 +9,9 @@ from classes import TeamCaptain, ActivePlayer, Player
 
 import match_process.common_picking as common
 import match_process.meta as meta
+from .captain_validator import CaptainValidator
+
+import modules.roles as roles
 
 from modules.roles import modify_match_channel
 import modules.config as cfg
@@ -22,9 +24,10 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
         self.players = dict()
         self.picking_captain = None
 
+        self.sub_handler = common.SubHandler(self.match.proxy, self.do_sub)
+
         for p in p_list:
             self.players[p.id] = p
-            p.on_match_selected(self.match.proxy)
 
         super().__init__(match)
 
@@ -33,30 +36,41 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
         """ Init the match channel, ping players, find two captains \
             and ask them to start picking players.
         """
-        # Open match channel
-        await modify_match_channel(self.match.channel, view=True)
-        await display.LB_MATCH_STARTING.send(ContextWrapper.channel(cfg.channels["lobby"]), self.match.channel.id)
 
-        # Inform players of match init
-        players_ping = " ".join(p.mention for p in self.players.values())
-        self.match.audio_bot.drop_match()
-        await display.MATCH_INIT.send(self.match.channel, players_ping)
-
-        # Initialize teams
-        self.match.teams[0] = Team(0, f"Team 1", self.match.proxy)
-        self.match.teams[1] = Team(1, f"Team 2", self.match.proxy)
-
-        # Find two captains, first one will pick first
-        for i in range(2):
-            p_key = self.find_captain()
-            self.match.teams[i].add_player(TeamCaptain, self.players.pop(p_key))
         self.match.teams[0].captain.is_turn = True
+        self.match.teams[1].captain.is_turn = False
         self.picking_captain = self.match.teams[0].captain
 
         # Ready for players to pick
-        self.match.audio_bot.select_teams()
-        await display.MATCH_SHOW_PICKS.send(self.match.channel, self.match.teams[0].captain.mention,
-                                            match=self.match.proxy)
+        await disp.MATCH_SHOW_PICKS.send(self.match.channel, self.match.teams[0].captain.mention,
+                                         match=self.match.proxy)
+
+    async def do_sub(self, subbed, force_player=None):
+        """ Substitute a player by another one picked at random \
+            in the lobby.
+
+            Parameters
+            ----------
+            subbed : Player
+                Player to be substituted
+        """
+
+        # If subbed one has already been picked
+        if subbed.active:
+            await common.after_pick_sub(self.match, subbed, force_player)
+        else:
+            # Get a new player for substitution
+            new_player = await common.get_substitute(self.match, subbed, force_player)
+            if not new_player:
+                return
+            # Remove them fro the player list
+            del self.players[subbed.id]
+            # Put the new player instead
+            self.players[new_player.id] = new_player
+            # Clean subbed one and send message
+            subbed.on_player_clean()
+            await disp.SUB_OKAY.send(self.match.channel, new_player.mention, subbed.mention, match=self.match.proxy)
+            return
 
     @meta.public
     def get_left_players_pings(self) -> list:
@@ -67,103 +81,13 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
 
     @meta.public
     async def clear(self, ctx):
+        await self.sub_handler.clean()
         await self.match.clean()
-        await display.MATCH_CLEARED.send(ctx)
-
-    def find_captain(self):
-        """ Pick at random a captain.
-            TODO: Base this pick on some kind of stats or a role
-
-            Returns
-            -------
-            captain : Player
-                The player designated as captain.
-        """
-        return random_choice(list(self.players))
+        await disp.MATCH_CLEARED.send(ctx)
 
     @meta.public
-    def demote(self, captain: TeamCaptain):
-        """ Demote player from its TeamCaptain position.
-            Put the demoted player in the team as a regular player.
-            
-            Parameters
-            ----------
-            captain : TeamCaptain
-                Player to be demoted
-        """
-        # Check if some players were already picked
-        team = captain.team
-
-        # Get a new captain
-        key = self.find_captain()
-        # Sub the old captain for the new one
-        team.sub(captain, self.players.pop(key))
-
-        # Add demoted player to team, update its status
-        player = captain.on_resign()
-        team.add_player(ActivePlayer, player)
-
-        # It's other team captain's time to pick
-        other = common.switch_turn(self, team)
-
-        # Check if no player left to pick
-        self.pick_check(other)
-
-    @meta.public
-    async def sub(self, ctx, subbed):
-        """ Substitute a player by another one picked at random \
-            in the lobby.
-            
-            Parameters
-            ----------
-            subbed : Player
-                Player to be substituted
-        """
-        # Get a new player for substitution
-        new_player = await common.get_substitute(ctx, self.match)
-        if not new_player:
-            return
-
-        # If subbed one has not been picked
-        if not subbed.active:
-            # Remove them fro the player list
-            del self.players[subbed.id]
-            # Put the new player instead
-            self.players[new_player.id] = new_player
-            # Clean subbed one and send message
-            subbed.on_player_clean()
-            await display.SUB_OKAY.send(self.match.channel, new_player.mention, subbed.mention, match=self.match.proxy)
-            return
-
-        # If subbed one has already been picked
-        else:
-            # Get active version of the player and clean the player object
-            a_sub = subbed.active
-            subbed.on_player_clean()
-            team = a_sub.team
-            # Args for the display later
-            args = [self.match.channel, new_player.mention, a_sub.mention, team.name]
-            # If subbed is a captain
-            if a_sub.is_captain:
-                # Add the new player in the pool of players
-                self.players[new_player.id] = new_player
-                # Elect a new captain from the list
-                key = self.find_captain()
-                # Replace subbed by the new captain
-                team.sub(a_sub, self.players.pop(key))
-                # If new player is captain
-                if key == new_player.id:
-                    await display.SUB_OKAY_CAP.send(*args, match=self.match.proxy)
-                # Else if captain is someone else
-                else:
-                    args.append(team.captain.mention)
-                    args.append(team.name)
-                    await display.SUB_OKAY_NO_CAP.send(*args, match=self.match.proxy)
-            # If subbed is not a captain, just replace them by new player
-            # in their team
-            else:
-                team.sub(a_sub, new_player)
-                await display.SUB_OKAY_TEAM.send(*args, match=self.match.proxy)
+    async def sub_request(self, ctx, captain, args):
+        await self.sub_handler.sub_request(ctx, captain, args)
 
     @meta.public
     async def pick_status(self, ctx):
@@ -174,7 +98,7 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
             ctx : Context
                 discord command context, contains the message received
         """
-        await display.PK_PLAYERS_HELP.send(ctx, self.picking_captain.mention)
+        await disp.PK_PLAYERS_HELP.send(ctx, self.picking_captain.mention)
 
     @meta.public
     async def pick(self, ctx, captain, args):
@@ -192,24 +116,24 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
 
         # If no mention, can't pick a player
         if len(ctx.message.mentions) == 0:
-            await display.PK_NO_ARG.send(ctx)
+            await disp.PK_NO_ARG.send(ctx)
             return
 
-        # If more than one mention, can'pick a player
+        # If more than one mention, can't pick a player
         if len(ctx.message.mentions) > 1:
-            await display.PK_TOO_MUCH.send(ctx)
+            await disp.PK_TOO_MUCH.send(ctx)
             return
 
         # Try to get the player object from the mention
         picked = Player.get(ctx.message.mentions[0].id)
         if not picked:
             # Player isn't even registered in the system...
-            await display.PK_INVALID.send(ctx)
+            await disp.PK_INVALID.send(ctx)
             return
 
         # If the player is not in the list, can'be picked
         if picked.id not in self.players:
-            await display.PK_INVALID.send(ctx)
+            await disp.PK_INVALID.send(ctx)
             return
 
         # Do selection
@@ -218,13 +142,13 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
 
         # If player pick is over
         if len(self.players) == 0:
-            await display.PK_OK_2.send(ctx, match=self.match.proxy)
+            await disp.PK_OK_2.send(ctx, match=self.match.proxy)
         # Else ping the other captain
         else:
             other = self.match.teams[team.id - 1]
-            await display.PK_OK.send(ctx, other.captain.mention, match=self.match.proxy)
+            await disp.PK_OK.send(ctx, other.captain.mention, match=self.match.proxy)
 
-    def do_pick(self, team: Team, player) -> TeamCaptain:
+    def do_pick(self, team: Team, player):
         """ Pick a player.
             
             Parameters
@@ -274,4 +198,4 @@ class PlayerPicking(meta.Process, status=MatchStatus.IS_PICKING):
 
     @loop(count=1)
     async def ping_last_player(self, team, p):
-        await display.PK_LAST.send(self.match.channel, p.mention, team.name, match=self.match.proxy)
+        await disp.PK_LAST.send(self.match.channel, p.mention, team.name, match=self.match.proxy)

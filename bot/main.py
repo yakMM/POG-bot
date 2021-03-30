@@ -103,13 +103,18 @@ def _add_main_handlers(client):
             await disp.INVALID_STR.send(ctx, '"')
             return
 
-        if isinstance(error.original, UnexpectedError):
+        try:
+            original = error.original
+        except AttributeError:
+            original = error
+
+        if isinstance(original, UnexpectedError):
             log.error(str(error))
-            await disp.UNKNOWN_ERROR.send(ctx, error.original.reason)
+            await disp.UNKNOWN_ERROR.send(ctx, original.reason)
         else:
             # Print unhandled error
             log.error(str(error))
-            await disp.UNKNOWN_ERROR.send(ctx, type(error.original).__name__)
+            await disp.UNKNOWN_ERROR.send(ctx, type(original).__name__)
         raise error
 
     # Reaction update handler (for rule acceptance)
@@ -172,10 +177,6 @@ def _add_main_handlers(client):
         player = Player.get(user.id)
         if not player:
             return
-        if user.status == Status.offline:
-            player.on_inactive(modules.lobby.on_inactive_confirmed)
-        else:
-            player.on_active()
         await modules.roles.role_update(player)
 
 

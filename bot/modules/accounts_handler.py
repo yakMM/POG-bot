@@ -27,7 +27,7 @@ Y_OFFSET = 2
 
 
 @_reaction_handler.reaction('✅')
-async def on_account_reaction(reaction, player, user):
+async def on_account_reaction(reaction, player, user, msg):
     account = player.active.account
     await account.validate()
     await disp.ACC_UPDATE.edit(account.message, account=account)
@@ -101,7 +101,7 @@ def _set_account(acc, a_player):
     del _available_accounts[acc.id]
     _busy_accounts[acc.id] = acc
     acc.a_player = a_player
-    acc.add_usage(a_player.id, a_player.match.number)
+    acc.add_usage(a_player.id, a_player.match.id)
     a_player.account = acc
 
 
@@ -141,7 +141,7 @@ async def terminate_account(a_player):
         p_usage["id"] = acc.id
         p_usage["time_start"] = acc.last_usage["time_start"]
         p_usage["time_stop"] = acc.last_usage["time_stop"]
-        p_usage["match_id"] = a_player.match.number
+        p_usage["match_id"] = a_player.match.id
         # Account entry
         await db.async_db_call(db.push_element, "accounts_usage", acc.id, {"usages": acc.last_usage})
         try:

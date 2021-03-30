@@ -207,7 +207,6 @@ class Player:
 
     def on_lobby_leave(self):
         self.__lobby_stamp = 0
-        self.inactive_task.stop()
         self.update_role()
 
     def on_lobby_add(self):
@@ -227,22 +226,10 @@ class Player:
 
     def on_match_selected(self, m):
         self.__match = m
-        self.inactive_task.cancel()
-
-    def on_inactive(self, fct):
-        if self.__lobby_stamp != 0:
-            self.inactive_task.start(fct)
-
-    def on_active(self):
-        if self.__lobby_stamp != 0:
-            self.inactive_task.cancel()
+        self.__lobby_stamp = 0
 
     def on_resign(self):
         self.__active = None
-
-    @loop(minutes=cfg.AFK_TIME, delay=1, count=2)
-    async def inactive_task(self, fct):  # when inactive for cfg.AFK_TIME, execute fct
-        await fct(self)
 
     @property
     def id(self):

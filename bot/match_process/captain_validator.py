@@ -9,45 +9,41 @@ class CaptainValidator:
         self.rh = reactions.SingleMessageReactionHandler(rem_bot_react=True)
         self.captains = [cap_1, cap_2]
         self.expected = None
+        self.kwargs = dict()
         self.channel = channel
-        self.is_invalid_func = None
         self.confirm_func = None
 
     async def clean(self):
         await self.rh.destroy()
         self.expected = None
+        self.kwargs = dict()
 
-    def is_invalid(self, *args):
-        def decorator(func):
-            self.is_invalid_func = func
-            return func
-        return decorator
-
-    def confirm(self, *args):
+    def confirm(self):
         def decorator(func):
             self.confirm_func = func
             return func
         return decorator
 
-    async def force_confirm(self, ctx, captain):
+    async def force_confirm(self, ctx, captain, **kwargs):
         if self.confirm_func:
-            await self.confirm_func(ctx, captain)
+            await self.confirm_func(ctx, captain, **kwargs)
             await self.clean()
 
-    async def wait_valid(self, captain, msg):
+    async def wait_valid(self, captain, msg, **kwargs):
         if captain not in self.captains:
             raise UnexpectedError("Request from unknown player!")
         for cap in self.captains:
             if captain is not cap:
                 self.expected = cap
+                self.kwargs = kwargs
 
         @self.rh.reaction('✅')
-        async def reaction_confirm(reaction, player, user):
+        async def reaction_confirm(reaction, player, user, msg):
             if player.active and player.active is self.expected:
                 ctx = ContextWrapper.wrap(self.channel)
                 ctx.author = user
                 if self.confirm_func:
-                    await self.confirm_func(ctx, player.active)
+                    await self.confirm_func(ctx, player.active, **self.kwargs)
                     await self.clean()
             else:
                 raise reactions.UserLackingPermission
@@ -56,14 +52,12 @@ class CaptainValidator:
 
     async def check_message(self, ctx, captain, args):
         if len(args) == 1 and args[0] == "confirm":
-            if self.is_invalid_func and await self.is_invalid_func(ctx, captain):
-                pass
-            elif not self.expected:
+            if not self.expected:
                 await disp.CONFIRM_NOTHING.send(ctx)
             elif captain is not self.expected:
                 await disp.CONFIRM_NOT_CAPTAIN.send(ctx, self.expected.mention)
             elif self.confirm_func:
-                await self.confirm_func(ctx, captain)
+                await self.confirm_func(ctx, captain, **self.kwargs)
                 await self.clean()
             else:
                 raise UnexpectedError("Confirm Function is None!")

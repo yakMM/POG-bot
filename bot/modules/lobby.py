@@ -53,6 +53,7 @@ def get_sub():
 
 def add_to_lobby(player):
     _lobby_list.append(player)
+    all_names = get_all_names_in_lobby()
     player.on_lobby_add()
     if len(_lobby_list) == cfg.general["lobby_size"]:
         _start_match_from_full_lobby()
@@ -60,6 +61,7 @@ def add_to_lobby(player):
         if not _auto_ping.is_running() and not _auto_ping.already:
             _auto_ping.start()
             _auto_ping.already = True
+    return all_names
 
 
 @loop(minutes=3, delay=1, count=2)
@@ -109,17 +111,11 @@ def _start_match_from_full_lobby():
         Loop(coro=_send_stuck_msg, count=1).start()
     else:
         set_lobby_stuck(False)
-        match.spin_up(_lobby_list)
+        match.spin_up(_lobby_list.copy())
         _lobby_list.clear()
 
 async def _send_stuck_msg():
     await display.LB_STUCK.send(ContextWrapper.channel(cfg.channels["lobby"]))
-
-
-async def on_inactive_confirmed(player):
-    remove_from_lobby(player)
-    await display.LB_WENT_INACTIVE.send(ContextWrapper.channel(cfg.channels["lobby"]), player.mention, names_in_lobby=get_all_names_in_lobby())
-
 
 def clear_lobby():
     if len(_lobby_list) == 0:

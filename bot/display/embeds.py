@@ -106,6 +106,18 @@ def base_help(ctx):
                     inline=False)
     return embed
 
+
+def captain_help(ctx):
+    """ Returns base help embed
+    """
+    embed = Embed(colour=Color.blurple())
+    embed.add_field(name='Map selection commands',
+                    value=f'`=cap volunteer` - Display all the bases containing *nanite realm* in their name\n'
+                          f'`=cap confirm` - Chooses the base number 3 from the selection\n'
+                          f'`=cap decline` - Display the current selection or show the help',
+                    inline=False)
+    return embed
+
 def usage_help(ctx):
     """ Returns base help embed
     """
@@ -259,9 +271,9 @@ def global_info(ctx, lobby, match_list):
         desc = ""
         if m.next_status is not MatchStatus.IS_FREE:
             if m.round_no != 0:
-                desc += f"*Match {m.number} - Round {m.round_no}*"
+                desc += f"*Match {m.id} - Round {m.round_no}*"
             else:
-                desc += f"*Match {m.number}*"
+                desc += f"*Match {m.id}*"
             desc += "\n"
         desc += f"Status: {m.status_str}"
         if m.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
@@ -287,9 +299,9 @@ def team_update(arg, match):
     """
     # title = ""
     if match.round_no != 0:
-        title = f"Match {match.number} - Round {match.round_no}"
+        title = f"Match {match.id} - Round {match.round_no}"
     else:
-        title = f"Match {match.number}"
+        title = f"Match {match.id}"
     desc = match.status_str
     if match.status is MatchStatus.IS_PLAYING:
         desc += f"\nTime Remaining: **{match.get_formatted_time_to_round_end()}**"
@@ -297,27 +309,34 @@ def team_update(arg, match):
     if match.base is not None:
         embed.add_field(name="Map", value=match.base.name, inline=False)
     for tm in match.teams:
-        value = ""
-        name = ""
-        if tm.captain.is_turn and match.next_status in (MatchStatus.IS_FACTION, MatchStatus.IS_PICKING):
-            value = f"Captain **[pick]**: {tm.captain.mention} ({tm.captain.name})\n"
-        else:
-            value = f"Captain: {tm.captain.mention} ({tm.captain.name})\n"
-        value += "Players:\n" + '\n'.join(tm.player_pings)
-        if match.next_status is MatchStatus.IS_WAITING:
-            if tm.captain.is_turn:
-                name = f"{tm.name} [{cfg.factions[tm.faction]}] - not ready"
+        if tm.captain:
+            value = ""
+            name = ""
+            if tm.captain.is_turn and match.next_status in (MatchStatus.IS_FACTION, MatchStatus.IS_PICKING):
+                value = f"Captain **[pick]**: {tm.captain.mention} ({tm.captain.name})\n"
             else:
-                name = f"{tm.name} [{cfg.factions[tm.faction]}] - ready"
-        elif tm.faction != 0:
-            name = f"{tm.name} [{cfg.factions[tm.faction]}]"
-        else:
-            name = f"{tm.name}"
-        embed.add_field(name=name,
-                        value=value,
-                        inline=False)
+                value = f"Captain: {tm.captain.mention} ({tm.captain.name})\n"
+            if tm.player_pings:
+                value += "Players:\n" + '\n'.join(tm.player_pings)
+            if match.next_status is MatchStatus.IS_WAITING:
+                if tm.captain.is_turn:
+                    name = f"{tm.name} [{cfg.factions[tm.faction]}] - not ready"
+                else:
+                    name = f"{tm.name} [{cfg.factions[tm.faction]}] - ready"
+            elif tm.faction != 0:
+                name = f"{tm.name} [{cfg.factions[tm.faction]}]"
+            else:
+                name = f"{tm.name}"
+            embed.add_field(name=name,
+                            value=value,
+                            inline=False)
+    name = ""
     if match.next_status is MatchStatus.IS_PICKING:
-        embed.add_field(name=f'Remaining', value="\n".join(match.get_left_players_pings()), inline=False)
+        name = "Remaining"
+    if match.next_status is MatchStatus.IS_CAPTAIN:
+        name = "Players"
+    if name:
+        embed.add_field(name=name, value="\n".join(match.get_left_players_pings()), inline=False)
     return embed
 
 

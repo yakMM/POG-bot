@@ -106,7 +106,10 @@ class Team:
 
     @property
     def captain(self):
-        return self.__players[0]
+        try:
+            return self.__players[0]
+        except IndexError:
+            return None
 
     @property
     def is_players(self):

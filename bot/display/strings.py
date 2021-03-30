@@ -112,7 +112,22 @@ class AllStrings(Enum):
     BOT_DM = Message(None, embed=embeds.direct_message)
     BOT_DM_RECEIVED = Message("Thanks for your message, it was forwarded to POG staff!", ping=False)
     BOT_RELOAD = Message("{} reloaded!")
+    BOT_U_DUMB = Message("That's not really nice, I'm doing my best to bring 24/7 Jaeger matches in a friendly "
+                         "environment and all the rewards that I get are insults and wickedness :(")
 
+    CAP_WAITING = Message("Waiting for captain(s), use `=captain volunteer` or react below if you want to be one",
+                          ping=False, embed=embeds.team_update)
+    CAP_AUTO_ANNOUNCE = Message("Captains will be automatically chosen in 1 minute!")
+    CAP_OK = Message("{} will be captain for {}!", ping=False)
+    CAP_AUTO = Message("{} has been designated as captain for {}\n"
+                       "Accept or decline with `=captain accept/decline` or by reacting below!")
+    CAP_HELP = Message("Here are the available captain commands:", embed=embeds.captain_help)
+    CAP_ALREADY = Message("You can't do that! You are already a team captain!")
+    CAP_ACCEPT_NO = Message("You can't do that! Volunteer if you want to be captain!")
+    CAP_DENY_NO = Message("You can't do that, you were not designed as team captain!")
+    CAP_DENY_OK = Message("You declined the team captain role!")
+
+    MATCH_DM_PING = Message("Lobby filled! Your POG match is starting!", ping=False)
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ping=False)
     MATCH_BASE_AUTO = Message("Match will be on **{}**", ping=False)
@@ -148,12 +163,12 @@ class AllStrings(Enum):
     BASE_DISPLAY = Message("Base navigator:", ping=False, embed=embeds.base_display)
     BASE_BOOKED = Message("{} WARNING: **{}** seems unavailable. Please check occupation "
                           "before confirming this base.", ping=False, embed=embeds.jaeger_calendar)
-    BASE_ADDED = Message("Added {} to the base pool")
-    BASE_REMOVED = Message("Removed {} from the base pool")
+    # BASE_ADDED = Message("Added {} to the base pool")
+    # BASE_REMOVED = Message("Removed {} from the base pool")
     BASE_CALENDAR = Message("{} Pick an available base!", ping=False, embed=embeds.jaeger_calendar)
     BASE_NO_BASE = Message("No base yet selected!")
     BASE_NO_BASE_WAITING = Message("Waiting for captains to pick a base...")
-    BASE_OK_CONFIRM = Message("Picked **{}**! {} confirm with if you agree! (use `=p confirm` or react below)")
+    BASE_OK_CONFIRM = Message("Picked **{}**! {} confirm if you agree! (use `=b confirm` or react below)")
     BASE_NO_CHANGE = Message("It's not possible to change the match base anymore!")
 
     ACC_NOT_ENOUGH = Message("Not enough accounts are available for this match!\n**Match has been canceled!**")
@@ -208,13 +223,12 @@ class AllStrings(Enum):
 
     SUB_NO = Message("This player can't be subbed!")
     SUB_NOT_OK = Message("Can't sub a player at this stage!")
-    SUB_NO_PLAYER = Message("No player is available to substitute!")
+    SUB_NO_PLAYER = Message("Subbing {}: no player is available to substitute!")
     SUB_OKAY_TEAM = Message("{} replaced {} in {}", ping=False, embed=embeds.team_update)
     SUB_OKAY_CAP = Message("{} replaced {} as {}'s captain", ping=False, embed=embeds.team_update)
-    SUB_OKAY_NO_CAP = Message("{} replaced {} in {}.\n{} is the new captain for {}", ping=False,
-                              embed=embeds.team_update)
     SUB_OKAY = Message("{} replaced {}!", ping=False, embed=embeds.team_update)
     SUB_LOBBY = Message("{} you have been designated as a substitute, join <#{}>!", embed=embeds.lobby_list)
+    SUB_OK_CONFIRM = Message("Subbing {}! {} confirm if you agree! (use `=sub confirm` or react below)", ping=False)
 
     async def send(self, ctx, *args, **kwargs):
         """ Send the message string_name in context ctx,

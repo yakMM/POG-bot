@@ -16,6 +16,8 @@ class MapPicking(meta.Process, status=MatchStatus.IS_BASING):
         self.match.teams[1].captain.is_turn = True
         self.match.teams[0].captain.is_turn = True
 
+        self.sub_handler = common.SubHandler(self.match.proxy)
+
         super().__init__(match)
 
     @meta.init_loop
@@ -33,17 +35,17 @@ class MapPicking(meta.Process, status=MatchStatus.IS_BASING):
         self.match.on_base_pick_over()
 
     @meta.public
+    async def sub_request(self, ctx, captain, args):
+        await self.sub_handler.sub_request(ctx, captain, args)
+
+    @meta.public
     async def clear(self, ctx):
+        await self.sub_handler.clean()
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)
 
     @meta.public
-    async def sub(self, ctx, subbed):
-        await common.after_pick_sub(ctx, self.match, subbed)
-
-    @meta.public
     async def pick_status(self, ctx):
-        print(self.match.status)
         await disp.PK_FACTION_INFO.send(ctx)
 
     @meta.public

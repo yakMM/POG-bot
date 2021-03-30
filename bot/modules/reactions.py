@@ -1,9 +1,13 @@
 from inspect import iscoroutinefunction as is_coroutine
 from discord.errors import NotFound
+from logging import getLogger
 
 _all_handlers = dict()
 
 _client = None
+
+log = getLogger("pog_bot")
+
 
 def init(client):
     global _client
@@ -16,13 +20,10 @@ class UserLackingPermission(Exception):
 async def reaction_handler(reaction, user, player):
     msg = reaction.message
     handler = _all_handlers.get(msg.id)
+    log.debug(f"Handler dict size: {len(_all_handlers)}")
     if handler is None:
         return
-    success = await handler.run(reaction, player, user, msg)
-    if success and handler.rem_bot_react:
-        await msg.remove_reaction(reaction.emoji, _client.user)
-    if handler.rem_user_react:
-        await msg.remove_reaction(reaction.emoji, user)
+    await handler.run(reaction, player, user, msg)
 
 
 def add_handler(m_id, handler):
@@ -37,18 +38,11 @@ def rem_handler(m_id):
 
 
 class ReactionHandler:
-    def __init__(self, rem_user_react=True, rem_bot_react=False):
+    def __init__(self, rem_user_react=True, rem_bot_react=False, auto_destroy=False):
         self.__f_dict = dict()
         self.__rem_user_react = rem_user_react
         self.__rem_bot_react = rem_bot_react
-    
-    @property
-    def rem_user_react(self):
-        return self.__rem_user_react
-
-    @property
-    def rem_bot_react(self):
-        return self.__rem_bot_react
+        self.__auto_destroy = auto_destroy
 
     def is_reaction(self, react):
         return str(react.emoji) in self.__f_dict
@@ -68,21 +62,23 @@ class ReactionHandler:
 
     async def run(self, reaction, player, user, msg):
         try:
-            fcts = self.__f_dict[str(reaction.emoji)]
-            for fct in fcts:
-                if is_coroutine(fct):
-                    await fct(reaction, player, user)
+            funcs = self.__f_dict[str(reaction.emoji)]
+            for func in funcs:
+                if is_coroutine(func):
+                    await func(reaction, player, user, msg)
                 else:
-                    fct(reaction, player, user)
+                    func(reaction, player, user, msg)
         except (KeyError, UserLackingPermission):
             pass
         else:
-            if self.rem_bot_react:
-                del self.__f_dict[str(reaction.emoji)]
-                if not self.__f_dict:
-                    rem_handler(msg.id)
+            if self.__auto_destroy:
+                rem_handler(msg.id)
+                await msg.clear_reactions()
+                return
+            if self.__rem_bot_react:
+                rem_handler(msg.id)
                 await msg.remove_reaction(reaction.emoji, _client.user)
-        if self.rem_user_react:
+        if self.__rem_user_react:
             await msg.remove_reaction(reaction.emoji, user)
 
     async def auto_add_reactions(self, msg):

@@ -3,27 +3,33 @@ from display.classes import ContextWrapper
 from modules.lobby import get_sub, get_all_names_in_lobby
 import modules.config as cfg
 from lib.tasks import Loop
+from .captain_validator import CaptainValidator
+from classes import Player
 
 from logging import getLogger
+
+import modules.roles as roles
 
 log = getLogger("pog_bot")
 
 
-async def get_substitute(ctx, match):
+async def get_substitute(match, subbed, force_player=None):
     """
     Get a substitute player from lobby, return it
 
-    :param ctx: Context used for displaying messages
+    :param subbed: Player who will be subbed
     :param match: Match calling this function
     :return: Player found for subbing
     """
     # Get a new player from the lobby, if None available, display
-    new_player = get_sub()
-    if new_player is None:
-        await disp.SUB_NO_PLAYER.send(ctx, match.channel)
-        return
+    if not force_player:
+        new_player = get_sub()
+        if new_player is None:
+            await disp.SUB_NO_PLAYER.send(match.channel, subbed.mention)
+            return
+    else:
+        new_player = force_player
 
-    # We have a player. Ping them in the lobby and change their status
     Loop(coro=ping_sub_in_lobby, count=1).start(match, new_player)
 
     new_player.on_match_selected(match.proxy)
@@ -31,8 +37,11 @@ async def get_substitute(ctx, match):
 
 
 async def ping_sub_in_lobby(match, new_player):
-    await disp.SUB_LOBBY.send(ContextWrapper.channel(cfg.channels["lobby"]), new_player.mention, match.channel.id,
-                              names_in_lobby=get_all_names_in_lobby())
+    if new_player.is_lobbied:
+        await disp.SUB_LOBBY.send(ContextWrapper.channel(cfg.channels["lobby"]), new_player.mention, match.channel.id,
+                                  names_in_lobby=get_all_names_in_lobby())
+    ctx = ContextWrapper.user(new_player.id)
+    await disp.MATCH_DM_PING.send(ctx)
 
 
 def switch_turn(process, team):
@@ -53,7 +62,7 @@ def switch_turn(process, team):
     return other
 
 
-async def after_pick_sub(ctx, match, subbed, clean_subbed=True):
+async def after_pick_sub(match, subbed, force_player, clean_subbed=True):
     """
     Substitute a player by another one picked at random in the lobby.
 
@@ -64,9 +73,12 @@ async def after_pick_sub(ctx, match, subbed, clean_subbed=True):
     :return: Nothing
     """
     # Get a new player for substitution
-    new_player = await get_substitute(ctx, match)
-    if not new_player:
-        return
+    if force_player:
+        new_player = force_player
+    else:
+        new_player = await get_substitute(match, subbed)
+        if not new_player:
+            return
 
     # Get active version of the player and clean the player object
     a_sub = subbed.active
@@ -86,6 +98,61 @@ async def after_pick_sub(ctx, match, subbed, clean_subbed=True):
         await disp.SUB_OKAY_TEAM.send(*args, match=match.proxy)
 
     return new_player
+
+
+class SubHandler:
+    def __init__(self, match, custom_sub=None):
+        self.match = match
+        self.validator = CaptainValidator(match.teams[0].captain, match.teams[1].captain, match.channel)
+        self.sub_func = custom_sub
+
+        @self.validator.confirm()
+        async def do_sub(ctx, captain, subbed, force_player=None):
+            if self.sub_func:
+                await self.sub_func(subbed, force_player)
+            else:
+                await after_pick_sub(self.match, subbed, force_player)
+
+    async def sub_request(self, ctx, captain, args):
+        if await self.validator.check_message(ctx, captain, args):
+            return
+
+        subbed = None
+        if len(ctx.message.mentions) > 0:
+            subbed = Player.get(ctx.message.mentions[0].id)
+            if not subbed:
+                await disp.RM_NOT_IN_DB.send(ctx)
+                return
+            if not(subbed.match and subbed.match.id == self.match.id):
+                await disp.SUB_NO.send(ctx)
+                return
+        else:
+            await disp.RM_MENTION_ONE.send(ctx)
+            return
+
+        if roles.is_admin(ctx.author):
+            player = None
+            if len(ctx.message.mentions) > 1:
+                player = Player.get(ctx.message.mentions[1].id)
+                if not player:
+                    await disp.RM_NOT_IN_DB.send(ctx)
+                    return
+                elif player.match:
+                    await disp.SUB_NO.send(ctx)
+                    return
+            await self.validator.force_confirm(ctx, captain, subbed=subbed, force_player=player)
+            return
+        else:
+            if len(ctx.message.mentions) > 1:
+                await disp.RM_MENTION_ONE.send(ctx)
+                return
+
+        other_captain = self.match.teams[captain.team.id - 1].captain
+        msg = await disp.SUB_OK_CONFIRM.send(self.match.channel, subbed.mention, other_captain.mention)
+        await self.validator.wait_valid(captain, msg, subbed=subbed)
+
+    async def clean(self):
+        await self.validator.clean()
 
 
 async def check_faction(ctx, args):

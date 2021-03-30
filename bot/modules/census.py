@@ -54,9 +54,9 @@ async def process_score(match):
         for weap_id in a_player.illegal_weapons.keys():
             weapon = Weapon.get(weap_id)
             await display.SC_ILLEGAL_WE.send(match.channel, a_player.mention, weapon.name,
-                                                match.number, a_player.illegal_weapons[weap_id])
+                                             match.id, a_player.illegal_weapons[weap_id])
             await display.SC_ILLEGAL_WE.send(ContextWrapper.channel(cfg.channels["staff"]), a_player.mention, weapon.name,
-                                                match.number, a_player.illegal_weapons[weap_id])
+                                             match.id, a_player.illegal_weapons[weap_id])
 
     await get_captures(match, start, end)
 

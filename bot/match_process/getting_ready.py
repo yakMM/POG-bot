@@ -22,6 +22,8 @@ class GettingReady(meta.Process, status=MatchStatus.IS_WAITING):
         self.match.teams[1].captain.is_turn = True
         self.match.teams[0].captain.is_turn = True
 
+        self.sub_handler = common.SubHandler(self.match.proxy, self.do_sub)
+
         super().__init__(match)
 
     @meta.init_loop
@@ -50,6 +52,7 @@ class GettingReady(meta.Process, status=MatchStatus.IS_WAITING):
 
     @meta.public
     async def clear(self, ctx):
+        await self.sub_handler.clean()
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)
 
@@ -103,8 +106,11 @@ class GettingReady(meta.Process, status=MatchStatus.IS_WAITING):
             await self.clear()
 
     @meta.public
-    async def sub(self, ctx, subbed):
-        new_player = await common.after_pick_sub(ctx, self.match, subbed, clean_subbed=False)
+    async def sub_request(self, ctx, captain, args):
+        await self.sub_handler.sub_request(ctx, captain, args)
+
+    async def do_sub(self, subbed, force_player):
+        new_player = await common.after_pick_sub(self.match, subbed, force_player, clean_subbed=False)
         if not new_player:
             return
         if not subbed.active.has_own_account:
@@ -112,7 +118,6 @@ class GettingReady(meta.Process, status=MatchStatus.IS_WAITING):
             subbed.on_player_clean()
         if not new_player.active.has_own_account:
             await self.give_account(new_player.active)
-
 
     @meta.public
     async def pick_status(self, ctx):

@@ -85,6 +85,10 @@ async def on_message(client, message):
         except ValueError:
             pass
 
+    # Meme
+    if client.user in message.mentions and "u dumb" in message.content:
+        await disp.BOT_U_DUMB.send(message.channel)
+
     # Check for =as command
     if is_admin(message.author) and message.content[0:3] == "=as":
         if message.mentions:

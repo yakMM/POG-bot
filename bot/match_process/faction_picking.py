@@ -23,6 +23,8 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
         self.match.teams[0].captain.is_turn = False
         self.picking_captain = self.match.teams[1].captain
 
+        self.sub_handler = common.SubHandler(self.match.proxy)
+
         super().__init__(match, self.picking_captain)
 
     @meta.init_loop
@@ -35,7 +37,7 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
     def add_callbacks(self, rh):
 
         @rh.reaction(cfg.emojis["vs"], cfg.emojis["nc"], cfg.emojis["tr"])
-        def check(reaction, player, user):
+        def check(reaction, player, user, msg):
             if not player.active:
                 raise reactions.UserLackingPermission
             if player.match is not self.match.proxy:
@@ -47,7 +49,7 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
                 raise reactions.UserLackingPermission
 
         @rh.reaction(cfg.emojis["vs"], cfg.emojis["nc"], cfg.emojis["tr"])
-        async def pick_faction(reaction, player, user):
+        async def pick_faction(reaction, player, user, msg):
             for faction in ["vs", "nc", "tr"]:
                 if str(reaction) == cfg.emojis[faction]:
                     ctx = ContextWrapper.wrap(self.match.channel)
@@ -58,8 +60,8 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
                     break
 
     @meta.public
-    async def sub(self, ctx, subbed):
-        await common.after_pick_sub(ctx, self.match, subbed)
+    async def sub_request(self, ctx, captain, args):
+        await self.sub_handler.sub_request(ctx, captain, args)
 
     @meta.public
     async def pick_status(self, ctx):
@@ -75,6 +77,7 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
 
     @meta.public
     async def clear(self, ctx):
+        await self.sub_handler.clean()
         await self.reaction_handler.destroy()
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)

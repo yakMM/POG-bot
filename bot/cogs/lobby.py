@@ -67,8 +67,8 @@ class LobbyCog(commands.Cog, name='lobby'):
             await disp.LB_STUCK_JOIN.send(ctx)
             return
 
-        lobby.add_to_lobby(player)
-        await disp.LB_ADDED.send(ctx, names_in_lobby=lobby.get_all_names_in_lobby())
+        names = lobby.add_to_lobby(player)
+        await disp.LB_ADDED.send(ctx, names_in_lobby=names)
 
     @commands.command(aliases=['l'])
     @commands.guild_only()

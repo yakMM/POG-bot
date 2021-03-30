@@ -170,7 +170,7 @@ class Match():
     #     rh = ReactionHandler(rem_bot_react = True)
 
     #     @rh.reaction(cfg.emojis["vs"], cfg.emojis["nc"], cfg.emojis["tr"])
-    #     def pick_faction(reaction, player, user):
+    #     def pick_faction(reaction, player, user, msg):
     #         if player.active and isinstance(player.active, TeamCaptain) and player.active.is_turn:
     #             for faction in ["vs", "nc", "tr"]:
     #                 if str(reaction) == cfg.emojis[faction]:

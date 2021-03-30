@@ -26,7 +26,7 @@ class MatchPlaying(meta.Process, status=MatchStatus.IS_STARTING):
         self.rh = reactions.SingleMessageReactionHandler(remove_msg=True)
 
         @self.rh.reaction('🔁')
-        async def refresh_info(reaction, player, user):
+        async def refresh_info(reaction, player, user, msg):
             await disp.PK_SHOW_TEAMS.edit(self.rh.msg, match=self.match.proxy)
 
         super().__init__(match)

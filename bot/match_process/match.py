@@ -21,6 +21,7 @@ from .base_picking import MapPicking
 from .getting_ready import GettingReady
 from .base_selector import BaseSelector
 from .match_playing import MatchPlaying
+from .captain_selection import CaptainSelection
 
 log = getLogger("pog_bot")
 
@@ -96,7 +97,7 @@ class Match:
         return self.__objects.status_str
 
     @property
-    def number(self):
+    def id(self):
         return self.__data.id
 
     @property
@@ -200,10 +201,14 @@ class MatchObjects:
         self.clean_channel.cancel()
         self.status = MatchStatus.IS_RUNNING
         self.audio_bot = AudioBot(self.proxy)
+        self.current_process = CaptainSelection(self, p_list)
+
+    def on_captain_over(self, p_list):
+        self.status = MatchStatus.IS_RUNNING
+        self.base_selector = BaseSelector(self, base_pool=True)
         self.current_process = PlayerPicking(self, p_list)
 
     def on_player_pick_over(self):
-        self.base_selector = BaseSelector(self, base_pool=True)
         self.status = MatchStatus.IS_RUNNING
         self.current_process = FactionPicking(self)
 

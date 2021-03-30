@@ -83,13 +83,6 @@ class BaseSelector:
         return self.__selection[index]
 
     def add_callbacks(self, validator):
-        @validator.is_invalid()
-        async def is_confirm_invalid(ctx, captain):
-            if not self.__selected:
-                await disp.BASE_NO_BASE.send(ctx)
-                return True
-            return False
-
         @validator.confirm()
         async def do_confirm(ctx, captain):
             self.__reset_selection()
@@ -163,7 +156,6 @@ class BaseSelector:
 
     async def __select_base(self, ctx, picker, base):
         self.__selected = base
-        await self.__validator.clean()
         if is_admin(ctx.author):
             await self.__validator.force_confirm(ctx, picker)
             return
@@ -228,13 +220,13 @@ class BaseNavigator:
             self.index = self.length - 1
         # Like so, the odds are even for all bases
 
-    async def select(self, reaction, player, user):
+    async def select(self, reaction, player, user, msg):
         ctx = ContextWrapper.wrap(self.channel)
         ctx.author = user
         await self.selector.select_by_index(ctx, player.active, self.index)
         await self.reaction_handler.clear_reactions()
 
-    def check_auth(self, reaction, player, user):
+    def check_auth(self, reaction, player, user, msg):
         if player.active and player.active.is_captain:
             return
         if is_admin(user):

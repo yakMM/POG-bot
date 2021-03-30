@@ -31,7 +31,8 @@ class MatchesCog(commands.Cog, name='matches'):
     Commands:
 
     =pick
-    =resign
+    =captain
+    =sub
     =ready
     =squittal
     """
@@ -52,37 +53,88 @@ class MatchesCog(commands.Cog, name='matches'):
             await match.pick_status(ctx)
             return
 
-        a_player, msg = _get_check_player(ctx, match)
+        a_player, msg = _get_check_captain(ctx, match)
         if msg:
             await msg
             return
 
         await match.pick(ctx, a_player, args)
 
-    @commands.command()
+    @commands.command(aliases=['c', 'cap'])
     @commands.guild_only()
-    async def resign(self, ctx):
+    async def captain(self, ctx, *args):
         match = Match.get(ctx.channel.id)
         if match.status is MatchStatus.IS_FREE:
             # Match is not active
             await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
             return
-        if match.status is not MatchStatus.IS_PICKING:
+        if match.status is not MatchStatus.IS_CAPTAIN:
             await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
             return
-        a_player, msg = _get_check_player(ctx, match)
-        if msg:
-            await msg
+        if len(args) == 1 and args[0] == "help":
+            await disp.CAP_HELP.send(ctx)
             return
-        team = a_player.team
-        match.demote(a_player)
-        await disp.PK_RESIGNED.send(ctx, team.captain.mention, team.name, match=match)
+        elif len(args) == 0:
+            await match.info()
+            return
+        player = classes.Player.get(ctx.author.id)
+        if player is None or (player and not player.is_registered):
+            # player not registered
+            await disp.EXT_NOT_REGISTERED.send(ctx, cfg.channels["register"])
+            return
+        elif player.match is None:
+            # if player not in match
+            await disp.PK_NO_LOBBIED.send(ctx, cfg.channels["lobby"])
+            return
+        elif player.match.channel.id != match.channel.id:
+            # if player not in the right match channel
+            await disp.PK_WRONG_CHANNEL.send(ctx, player.match.channel.id)
+            return
+        if len(args) == 1:
+            arg = args[0]
+            if player.active and player.active.is_captain:
+                await disp.CAP_ALREADY.send(ctx)
+                return
+            if arg in ("volunteer", "vol", "v"):
+                await match.on_volunteer(player)
+                return
+            elif arg in ("accept", "acc", "a"):
+                if not await match.on_answer(player, is_accept=True):
+                    await disp.CAP_ACCEPT_NO.send(ctx)
+                return
+            elif arg in ("decline", "dec", "d"):
+                if not await match.on_answer(player, is_accept=False):
+                    await disp.CAP_DENY_NO.send(ctx)
+                return
+        await disp.WRONG_USAGE.send(ctx, ctx.command.name)
+
+    @commands.command()
+    @commands.guild_only()
+    async def sub(self, ctx, *args):
+        match = Match.get(ctx.channel.id)
+        # Check match status
+        if match.status is MatchStatus.IS_FREE:
+            await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
+            return
+        elif not match.is_picking_allowed:
+            await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
+            return
+
+        captain, msg = _get_check_captain(ctx, match, check_turn=False)
+        if msg:
+            if is_admin(ctx.author):
+                msg.close()
+            else:
+                await msg
+                return
+
+        # display is handled in the sub method, nothing to display here
+        await match.sub_request(ctx, captain, args)
 
     @commands.command(aliases=['rdy'])
     @commands.guild_only()
     async def ready(self, ctx):  # when ready
         match = Match.get(ctx.channel.id)
-
         if match.status is MatchStatus.IS_FREE:
             # Match is not active
             await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
@@ -95,7 +147,7 @@ class MatchesCog(commands.Cog, name='matches'):
             await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
             return
 
-        a_player, msg = _get_check_player(ctx, match, check_turn=False)
+        a_player, msg = _get_check_captain(ctx, match, check_turn=False)
         if msg:
             await msg
             return
@@ -137,7 +189,7 @@ class MatchesCog(commands.Cog, name='matches'):
             return
 
         # Check player status
-        a_player, msg = _get_check_player(ctx, match, check_turn=False)
+        a_player, msg = _get_check_captain(ctx, match, check_turn=False)
 
         # If player doesn't have the proper status
         if msg:
@@ -161,7 +213,7 @@ def setup(client):
     client.add_cog(MatchesCog(client))
 
 
-def _get_check_player(ctx, match, check_turn=True):
+def _get_check_captain(ctx, match, check_turn=True):
     """ Test if the player is in position to issue a match command
         Returns the player object if yes, None if not
     """

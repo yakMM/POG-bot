@@ -73,7 +73,7 @@ class AdminCog(commands.Cog, name='admin'):
         if msg:
             await msg
             return
-        player = await _get_check_player(ctx)
+        player = await get_check_player(ctx)
         if not player:
             return
         if player.is_lobbied:
@@ -98,7 +98,7 @@ class AdminCog(commands.Cog, name='admin'):
         if msg:
             await msg
             return
-        player = await _get_check_player(ctx)
+        player = await get_check_player(ctx)
         if not player:
             return
         fields = list()
@@ -116,7 +116,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.guild_only()
     async def remove(self, ctx):
         if ctx.channel.id == cfg.channels["lobby"]:
-            player = await _get_check_player(ctx)
+            player = await get_check_player(ctx)
             if not player:
                 return
             if player.is_lobbied:
@@ -127,7 +127,7 @@ class AdminCog(commands.Cog, name='admin'):
             await disp.RM_NOT_LOBBIED.send(ctx)
             return
         if ctx.channel.id == cfg.channels["register"]:
-            player = await _get_check_player(ctx)
+            player = await get_check_player(ctx)
             if not player:
                 return
             #TODO: do something
@@ -166,7 +166,7 @@ class AdminCog(commands.Cog, name='admin'):
         if match.status is not MatchStatus.IS_PICKING:
             await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
             return
-        player = await _get_check_player(ctx)
+        player = await get_check_player(ctx)
         if not player:
             return
         if not player.active:
@@ -344,29 +344,6 @@ class AdminCog(commands.Cog, name='admin'):
                 return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)
 
-    @commands.command()
-    @commands.guild_only()
-    async def sub(self, ctx):
-        msg = _check_channels(ctx, cfg.channels["matches"])
-        if msg:
-            await msg
-            return
-        match = Match.get(ctx.channel.id)
-        if match.status is MatchStatus.IS_FREE:
-            # Match is not active
-            await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
-            return
-        if not match.is_picking_allowed:
-            await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
-            return
-        player = await _get_check_player(ctx)
-        if not player:
-            return
-        if not player.match:
-            await disp.SUB_NO.send(ctx)
-            return
-        # display is handled in the sub method, nothing to display here
-        await player.match.sub(ctx, player)
 
     @commands.command()
     @commands.guild_only()
@@ -402,7 +379,7 @@ def _check_channels(ctx, channels):
         return disp.WRONG_CHANNEL.send(ctx, ctx.command.name, ", ".join(f"<#{c_id}>" for c_id in channels))
 
 
-async def _get_check_player(ctx):
+async def get_check_player(ctx):
     if len(ctx.message.mentions) != 1:
         await disp.RM_MENTION_ONE.send(ctx)
         return

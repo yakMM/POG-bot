@@ -87,8 +87,8 @@ def _make_image(match):
     y_off = lambda t_id : 325+Y_SPACING*4+1200*t_id
     draw = ImageDraw.Draw(img)
     x = X_OFFSET+1100
-    x_title = (3600-big_font.getsize(f"Planetside Open Games - Match {match.number}")[0])//2
-    draw.text((x_title,100), f"Planetside Open Games - Match {match.number}", font=big_font, fill=white)
+    x_title = (3600 - big_font.getsize(f"Planetside Open Games - Match {match.id}")[0]) // 2
+    draw.text((x_title,100), f"Planetside Open Games - Match {match.id}", font=big_font, fill=white)
     draw.text((x,200+100), f"Base: {match.base.name}", font=small_font, fill=white)
     for i in range(len(match.round_stamps)):
         rs = match.round_stamps[i]
@@ -116,7 +116,7 @@ def _make_image(match):
     for tm in match.teams:
         draw.text((X_OFFSET+2200,200+100*(tm.id+2)), f"{tm.name}: {tm.cap} points", font=small_font, white=white)
         _team_display(draw, tm, y_off(tm.id))
-    img.save(f'../../POG-data/matches/match_{match.number}.png')
+    img.save(f'../../POG-data/matches/match_{match.id}.png')
 
 
 async def publish_match_image(match):
@@ -129,9 +129,9 @@ async def publish_match_image(match):
     
     if match.status is MatchStatus.IS_RESULT:
         msg = await display.SC_RESULT.imageSend(ContextWrapper.channel(cfg.channels["results"]),
-                f'../../POG-data/matches/match_{match.number}.png', match.number)
+                f'../../POG-data/matches/match_{match.id}.png', match.id)
     else:
         msg = await display.SC_RESULT_HALF.imageSend(ContextWrapper.channel(cfg.channels["results"]),
-                                          f'../../POG-data/matches/match_{match.number}.png', match.number)
+                                          f'../../POG-data/matches/match_{match.id}.png', match.id)
     return msg
 
