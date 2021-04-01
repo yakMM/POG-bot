@@ -1,18 +1,17 @@
 from display.strings import AllStrings as disp
 from display.classes import ContextWrapper
+from asyncio import sleep
 
 import modules.config as cfg
 
-from match_process import MatchStatus
+from match import MatchStatus
+from .process import Process
 import modules.reactions as reactions
 
-import match_process.common_picking as common
-import match_process.meta as meta
-from asyncio import sleep
+from match.common import check_faction, switch_turn
 
 
-class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
-
+class FactionPicking(Process, status=MatchStatus.IS_FACTION):
     def __init__(self, match):
         self.match = match
 
@@ -21,17 +20,13 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
 
         self.match.teams[1].captain.is_turn = True
         self.match.teams[0].captain.is_turn = False
-        self.picking_captain = self.match.teams[1].captain
 
-        self.sub_handler = common.SubHandler(self.match.proxy)
+        super().__init__(match)
 
-        super().__init__(match, self.picking_captain)
-
-    @meta.init_loop
-    async def init_loop(self, picker):
+    @Process.init_loop
+    async def init_loop(self):
         await sleep(0)
-        self.match.audio_bot.select_factions()
-        msg = await disp.PK_OK_FACTION.send(self.match.channel, picker.mention, match=self.match.proxy)
+        msg = await disp.PK_OK_FACTION.send(self.match.channel, self.picking_captain.mention, match=self.match.proxy)
         await self.reaction_handler.set_new_msg(msg)
 
     def add_callbacks(self, rh):
@@ -59,11 +54,7 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
                         await self.reaction_handler.set_new_msg(msg)
                     break
 
-    @meta.public
-    async def sub_request(self, ctx, captain, args):
-        await self.sub_handler.sub_request(ctx, captain, args)
-
-    @meta.public
+    @Process.public
     async def pick_status(self, ctx):
         """ Displays the picking status/help
             
@@ -75,16 +66,21 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
         msg = await disp.PK_FACTION_HELP.send(ctx, self.picking_captain.mention)
         await self.reaction_handler.set_new_msg(msg)
 
-    @meta.public
+    @property
+    def picking_captain(self):
+        for tm in self.match.teams:
+            if tm.captain.is_turn:
+                return tm.captain
+
+    @Process.public
     async def clear(self, ctx):
-        await self.sub_handler.clean()
         await self.reaction_handler.destroy()
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)
 
-    @meta.public
+    @Process.public
     async def pick(self, ctx, captain, args):
-        msg = await common.check_faction(ctx, args)
+        msg = await check_faction(ctx, args)
 
         # If no error msg, do the pick
         if not msg:
@@ -106,8 +102,7 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
 
         # If not, select the faction and give turn to other team
         team.faction = faction
-        common.switch_turn(self, team)
-        self.match.audio_bot.faction_pick(team)
+        switch_turn(self, team)
 
         # If other team didn't pick yet:
         if other.faction == 0:
@@ -119,4 +114,4 @@ class FactionPicking(meta.Process, status=MatchStatus.IS_FACTION):
         # Else, over, all teams have selected a faction
         await disp.PK_FACTION_OK.send(ctx, team.name, cfg.factions[team.faction])
         await self.reaction_handler.destroy()
-        self.match.on_faction_pick_over()
+        await self.match.next_process()

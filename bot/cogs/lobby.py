@@ -27,7 +27,7 @@ class LobbyCog(commands.Cog, name='lobby'):
         return ctx.channel.id == cfg.channels['lobby']
 
     """
-    Commands:
+    commands:
 
     =join
     =leave

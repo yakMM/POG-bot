@@ -8,7 +8,7 @@ The application should be launched from this file
 
 # discord.py
 from discord.ext import commands
-from discord import Status, Intents
+from discord import Intents
 
 # Other modules
 from asyncio import sleep
@@ -36,7 +36,7 @@ import modules.message_filter
 import modules.accounts_handler
 
 # Classes
-from match_process.match import Match
+from match.classes.match import Match
 from classes import Player, Base, Weapon
 
 

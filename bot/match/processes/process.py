@@ -3,37 +3,27 @@ from lib.tasks import Loop
 
 log = getLogger("pog_bot")
 
-
 class PublicFunc:
     def __init__(self, func):
         self.function = func
-        self.name = func.__name__
-        self.base_object = None
 
-    def instantiate(self, base_object):
-        self.base_object = base_object
+
+class InstantiatedPublicFunc:
+    def __init__(self, obj, func):
+        self.obj = obj
+        self.function = func
+        self.name = func.__name__
 
     def __call__(self, *args, **kwargs):
-        return self.function(self.base_object, *args, **kwargs)
+        return self.function(self.obj, *args, **kwargs)
 
 
 class InitFunc:
     def __init__(self, func):
         self.func = func
-        self.base_object = None
 
-    def instantiate(self, base_object):
-        self.base_object = base_object
-
-    async def __call__(self, *args):
-        await self.func(self.base_object, *args)
-
-
-def public(func):
-    return PublicFunc(func)
-
-def init_loop(func):
-    return InitFunc(func)
+    async def __call__(self, obj, *args):
+        await self.func(obj, *args)
 
 
 class MetaProcess(type):
@@ -56,18 +46,17 @@ class MetaProcess(type):
 
 
 class Process(metaclass=MetaProcess, status=None):
-
     def __new__(cls, *args, **kwargs):
         obj = super().__new__(cls)
         obj.attributes = dict()
         obj.status = None
         obj.init_func = None
         for pub_func in obj.meta_attributes:
-            log.debug(f"Instanciating {pub_func.name}!")
-            pub_func.instantiate(obj)
-            obj.attributes[pub_func.name] = pub_func
+            log.debug(f"Instantiating {pub_func.function.__name__}!")
+            i_func = InstantiatedPublicFunc(obj, pub_func.function)
+            obj.attributes[i_func.name] = i_func
+            setattr(obj, i_func.name, i_func)
         if obj.meta_init_func:
-            obj.meta_init_func.instantiate(obj)
             obj.init_func = obj.meta_init_func
         if obj.meta_status:
             obj.status = obj.meta_status
@@ -82,6 +71,14 @@ class Process(metaclass=MetaProcess, status=None):
 
     async def _async_init(self, *args):
         if self.init_func:
-            await self.init_func(*args)
+            await self.init_func(self, *args)
         if self.status:
-            self.match.status = self.status
+            await self.match.set_status(self.status)
+
+    @classmethod
+    def public(cls, func):
+        return PublicFunc(func)
+
+    @classmethod
+    def init_loop(cls, func):
+        return InitFunc(func)

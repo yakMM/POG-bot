@@ -101,7 +101,7 @@ async def on_message(client, message):
             except ValueError:
                 await disp.WRONG_USAGE.send(message.channel, "as")
     else:
-        await client.process_commands(message)  # if not spam, process
+        await client.process_commands(message)  # if not spam, processes
 
     # Call finished, we can release user
     await sleep(0.5)

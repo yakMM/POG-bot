@@ -1,23 +1,16 @@
-from match_process import MatchStatus
-
-from display import AllStrings as disp, ContextWrapper
-
-import discord.errors
-
-import match_process.meta as meta
-import match_process.common_picking as common
+from display import AllStrings as disp
 from asyncio import sleep
 from datetime import datetime as dt, timezone as tz
 from lib.tasks import Loop, loop
 
-import modules.accounts_handler as accounts
-import modules.database as db
+from match import MatchStatus
+from .process import Process
+
 import modules.config as cfg
-import modules.census as census
 import modules.reactions as reactions
 
 
-class MatchPlaying(meta.Process, status=MatchStatus.IS_STARTING):
+class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
 
     def __init__(self, match):
         self.match = match
@@ -31,7 +24,7 @@ class MatchPlaying(meta.Process, status=MatchStatus.IS_STARTING):
 
         super().__init__(match)
 
-    @meta.init_loop
+    @Process.init_loop
     async def init(self):
         await self.match.base_selector.clean()
         self.match.base_selector = None
@@ -48,8 +41,8 @@ class MatchPlaying(meta.Process, status=MatchStatus.IS_STARTING):
         self.match_loop.start()
         self.auto_info_loop.start()
 
-    @meta.public
-    async def info(self):
+    @Process.public
+    async def info(self, ctx=None):
         msg = await disp.PK_SHOW_TEAMS.send(self.match.channel, match=self.match.proxy)
         await self.rh.set_new_msg(msg)
 
@@ -60,7 +53,7 @@ class MatchPlaying(meta.Process, status=MatchStatus.IS_STARTING):
         else:
             await self.info()
 
-    @meta.public
+    @Process.public
     def get_formatted_time_to_round_end(self):
         secs = self.get_seconds_to_round_end()
         return f"{secs // 60}m {secs % 60}s"
@@ -98,8 +91,10 @@ class MatchPlaying(meta.Process, status=MatchStatus.IS_STARTING):
         #     log.error(f"Error in match database push!\n{e}")
         # await self.clear()
 
-    @meta.public
+    @Process.public
     async def clear(self, ctx):
+        self.auto_info_loop.cancel()
+        self.match_loop.cancel()
         await self.rh.destroy()
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)

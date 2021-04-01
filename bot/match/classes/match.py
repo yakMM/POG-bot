@@ -1,27 +1,16 @@
-from .match_status import MatchStatus
-
-from classes.bases import Base
-from classes.teams import Team
-from classes.audio_bot import AudioBot
-
 from logging import getLogger
-
-from lib.tasks import loop, Loop
-
+from lib.tasks import loop
 from display.strings import AllStrings as disp
 
+from classes import Base, Team
 import modules.database as db
-import modules.roles
+import modules.roles as roles
 import modules.accounts_handler as accounts
 from modules.tools import UnexpectedError
 
-from .player_picking import PlayerPicking
-from .faction_picking import FactionPicking
-from .base_picking import MapPicking
-from .getting_ready import GettingReady
-from .base_selector import BaseSelector
-from .match_playing import MatchPlaying
-from .captain_selection import CaptainSelection
+from match.processes import PlayerPicking, FactionPicking, BasePicking, GettingReady, MatchPlaying, CaptainSelection
+from match.commands import CommandFactory
+from match.match_status import MatchStatus
 
 log = getLogger("pog_bot")
 
@@ -31,10 +20,10 @@ class Match:
     _last_match_id = 0
 
     @classmethod
-    def get(cls, m_id: int):
-        if m_id not in cls.__bound_matches:
-            raise UnexpectedError(f"Can't find bound match {m_id}")
-        return cls.__bound_matches[m_id]
+    def get(cls, ch_id: int):
+        if ch_id not in cls.__bound_matches:
+            raise UnexpectedError(f"Can't find bound match {ch_id}")
+        return cls.__bound_matches[ch_id]
 
     @classmethod
     def init_channels(cls, client, ch_list: list):
@@ -73,12 +62,6 @@ class Match:
         return self.__objects.channel
 
     @property
-    def base_selector(self):
-        if not self.__objects.base_selector:
-            raise AttributeError("Match is not in the right status, cannot get object 'base_selector'")
-        return self.__objects.base_selector
-
-    @property
     def status(self):
         if not self.__objects:
             raise AttributeError("Match instance is not bound, no attribute 'status'")
@@ -109,18 +92,6 @@ class Match:
         return self.__data.round_no
 
     @property
-    def is_picking_allowed(self):
-        if not self.__objects:
-            raise AttributeError("Match instance is not bound, no attribute 'is_picking_allowed'")
-        if self.status is MatchStatus.IS_RUNNING:
-            return False
-        try:
-            self.__objects.get_process_attr("pick_status")
-            return True
-        except AttributeError:
-            return False
-
-    @property
     def base(self):
         return self.__data.base
 
@@ -140,6 +111,12 @@ class Match:
         Match._last_match_id += 1
         self.__objects.on_spin_up(p_list)
         db.set_field("restart_data", 0, {"last_match_id": Match._last_match_id})
+
+    @property
+    def command(self):
+        if not self.__objects:
+            raise AttributeError(f"Match instance is not bound, no attribute 'command'")
+        return self.__objects.command
 
     def __getattr__(self, name):
         if not self.__objects:
@@ -181,48 +158,45 @@ class MatchData:
         return 0
 
 
+_process_list = [CaptainSelection, PlayerPicking, FactionPicking, BasePicking, GettingReady, MatchPlaying]
+
+
 class MatchObjects:
     def __init__(self, match: Match, data: MatchData, channel: int):
-        self.status = MatchStatus.IS_FREE
+        self.__status = MatchStatus.IS_FREE
         self.data = data
         self.proxy = match
         self.channel = channel
         self.current_process = None
         self.base_selector = None
-        self.audio_bot = None
+        self.progress_index = 0
         self.result_msg = None
         self.clean_channel.start()
         self.check_offline = True
         self.check_validated = True
         self.players_with_account = list()
+        self.command_factory = CommandFactory(self)
+
+    @property
+    def status(self):
+        return self.__status
+
+    async def set_status(self, value):
+        self.__status = value
+        await self.match.command.on_status_update(value)
+
+    async def next_process(self, *args):
+        await self.set_status(MatchStatus.IS_RUNNING)
+        self.progress_index += 1
+        self.current_process = _process_list[self.progress_index](self, *args)
 
     def on_spin_up(self, p_list):
         self.data.id = Match._last_match_id
-        self.clean_channel.cancel()
-        self.status = MatchStatus.IS_RUNNING
-        self.audio_bot = AudioBot(self.proxy)
-        self.current_process = CaptainSelection(self, p_list)
+        self.current_process = _process_list[self.progress_index](self, p_list)
 
-    def on_captain_over(self, p_list):
-        self.status = MatchStatus.IS_RUNNING
-        self.base_selector = BaseSelector(self, base_pool=True)
-        self.current_process = PlayerPicking(self, p_list)
-
-    def on_player_pick_over(self):
-        self.status = MatchStatus.IS_RUNNING
-        self.current_process = FactionPicking(self)
-
-    def on_faction_pick_over(self):
-        self.status = MatchStatus.IS_RUNNING
-        self.current_process = MapPicking(self)
-
-    def on_base_pick_over(self):
-        self.status = MatchStatus.IS_RUNNING
-        self.current_process = GettingReady(self)
-
-    def on_ready(self):
-        self.status = MatchStatus.IS_STARTING
-        self.current_process = MatchPlaying(self)
+    @property
+    def command(self):
+        return self.command_factory
 
     def get_process_attr(self, name):
         if name in self.current_process.attributes:
@@ -239,17 +213,17 @@ class MatchObjects:
         self.data.clean()
         self.current_process = None
         self.players_with_account = list()
-        self.audio_bot = None
         self.result_msg = None
         self.check_offline = True
         self.check_validated = True
-        self.status = MatchStatus.IS_FREE
+        await self.set_status(MatchStatus.IS_FREE)
         self.clean_channel.start()
+        self.progress_index = 0
 
     @loop(count=1)
     async def clean_channel(self):
         await disp.MATCH_CHANNEL_OVER.send(self.channel)
-        await modules.roles.modify_match_channel(self.match.channel, view=False)
+        await roles.modify_match_channel(self.match.channel, view=False)
 
     @property
     def status_str(self):

@@ -43,6 +43,7 @@ class ReactionHandler:
         self.__rem_user_react = rem_user_react
         self.__rem_bot_react = rem_bot_react
         self.__auto_destroy = auto_destroy
+        self.lock = False
 
     def is_reaction(self, react):
         return str(react.emoji) in self.__f_dict
@@ -62,6 +63,8 @@ class ReactionHandler:
 
     async def run(self, reaction, player, user, msg):
         try:
+            if self.lock:
+                raise UserLackingPermission
             funcs = self.__f_dict[str(reaction.emoji)]
             for func in funcs:
                 if is_coroutine(func):
@@ -82,12 +85,16 @@ class ReactionHandler:
             await msg.remove_reaction(reaction.emoji, user)
 
     async def auto_add_reactions(self, msg):
+        self.lock = True
         for react in self.__f_dict.keys():
             await msg.add_reaction(react)
+        self.lock = False
 
     async def auto_remove_reactions(self, msg):
+        self.lock = True
         for react in self.__f_dict.keys():
             await msg.remove_reaction(react, _client.user)
+        self.lock = False
 
     def reaction(self, *args):
         def decorator(func):

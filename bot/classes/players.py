@@ -194,7 +194,7 @@ class Player:
                 accs.append(self.__ig_names[i])
         return accs
 
-    def update_role(self, i=0):
+    def update_role(self):
         try:
             self.role_task.start()
         except RuntimeError:  # if task is already active
@@ -227,9 +227,6 @@ class Player:
     def on_match_selected(self, m):
         self.__match = m
         self.__lobby_stamp = 0
-
-    def on_resign(self):
-        self.__active = None
 
     @property
     def id(self):
@@ -556,10 +553,6 @@ class ActivePlayer:
         if fake_player is None:
             raise AccountNotFound(account_id)
         self.__player.copy_ig_info(fake_player)
-
-    def on_resign(self):
-        self.__player.on_resign()
-        return self.__player
 
     @property
     def mention(self):

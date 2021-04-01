@@ -26,7 +26,7 @@ class RegisterCog(commands.Cog, name='register'):
         self.client = client
 
     """
-    Registered Commands:
+    Registered commands:
 
     =register
     """

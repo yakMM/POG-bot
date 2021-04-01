@@ -5,7 +5,7 @@ from logging import getLogger
 from datetime import datetime as dt
 
 from display import AllStrings as disp, ContextWrapper
-from match_process import MatchStatus
+from match import MatchStatus
 
 import classes
 import modules.config as cfg
@@ -17,7 +17,7 @@ import modules.lobby as lobby
 import modules.accounts_handler as accounts_sheet
 import asyncio
 
-from match_process.match import Match
+from match.classes.match import Match
 
 from classes import Player
 
@@ -36,7 +36,7 @@ class AdminCog(commands.Cog, name='admin'):
         return roles.is_admin(ctx.author)
 
     """
-    Admin Commands
+    Admin commands
 
     =clear (clear lobby or match)
     =base (select a base)
@@ -150,41 +150,6 @@ class AdminCog(commands.Cog, name='admin'):
                 await disp.MATCH_CHECK_CHANGED.send(ctx, arg, "enabled" if result else "disabled")
             except KeyError:
                 await disp.INVALID_STR.send(ctx, arg)
-    
-    @commands.command()
-    @commands.guild_only()
-    async def demote(self, ctx):
-        msg = _check_channels(ctx, cfg.channels["matches"])
-        if msg:
-            await msg
-            return
-        match = Match.get(ctx.channel.id)
-        if match.status is MatchStatus.IS_FREE:
-            # Match is not active
-            await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
-            return
-        if match.status is not MatchStatus.IS_PICKING:
-            await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
-            return
-        player = await get_check_player(ctx)
-        if not player:
-            return
-        if not player.active:
-            await disp.RM_DEMOTE_NO.send(ctx)
-            return
-        if player.match.channel.id != match.channel.id:
-            await disp.PK_WRONG_CHANNEL.send(ctx, player.match.channel.id)
-            return
-        a_player = player.active
-        if not a_player.is_captain:
-            await disp.RM_DEMOTE_NO.send(ctx)
-            return
-        if not a_player.is_turn:
-            await disp.RM_DEMOTE_NO_TURN.send(ctx)
-            return
-        team = a_player.team
-        match.demote(a_player)
-        await disp.RM_DEMOTE_OK.send(ctx, team.captain.mention, team.name, match=match)
 
     @commands.command()
     @commands.guild_only()
@@ -195,7 +160,6 @@ class AdminCog(commands.Cog, name='admin'):
             return
         match = Match.get(ctx.channel.id)
         match.ts3_test()
-
 
     @commands.command()
     @commands.guild_only()
@@ -219,7 +183,6 @@ class AdminCog(commands.Cog, name='admin'):
             await disp.LB_GET.send(ctx, " ".join([str(p_id) for p_id in lb]))
             return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)
-
 
     @commands.command()
     @commands.guild_only()
@@ -343,7 +306,6 @@ class AdminCog(commands.Cog, name='admin'):
                 await disp.BOT_UNFROZEN.send(ctx)
                 return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)
-
 
     @commands.command()
     @commands.guild_only()

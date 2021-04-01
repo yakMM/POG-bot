@@ -34,7 +34,7 @@ def test_hand(client):
     @client.command()
     @commands.guild_only()
     async def y(ctx):
-        await launch(ctx, [20, 21, 22, 23], 0)
+        await launch(ctx, [20, 21, 22, 23], 2)
         await launch(ctx, ids, 1)
 
 
@@ -49,7 +49,7 @@ async def launch(ctx, id_list, tier):
     if tier == 1:
         return
 
-    await asyncio.sleep(3)
+    await asyncio.sleep(5)
 
     match = players[0].match
 

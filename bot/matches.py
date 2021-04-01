@@ -1,6 +1,6 @@
 import modules.config as cfg
-from display import SendCtx, send
-from match_process import MatchStatus, SelStatus
+from display import send
+from match import MatchStatus, SelStatus
 from modules.image_maker import publish_match_image
 from modules.census import process_score, get_offline_players
 from modules.database import update_match
@@ -14,8 +14,7 @@ from classes.accounts import AccountHander  # ok
 
 from random import choice as random_choice
 from lib.tasks import loop
-from asyncio import sleep
-from logging import getLogger
+
 
 # THIS IS LEGACY CODE, WILL BE REMOVED IN A NEAR UPDATE
 

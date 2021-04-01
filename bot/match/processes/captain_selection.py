@@ -1,28 +1,24 @@
 from display import AllStrings as disp, ContextWrapper
-from lib.tasks import loop
-import discord.errors
 from logging import getLogger
-
-from .match_status import MatchStatus
 from random import choice as random_choice
+import discord
 
-from classes.teams import Team
-from classes import TeamCaptain, ActivePlayer, Player
+from match import MatchStatus
+from .process import Process
 
-import match_process.common_picking as common
-import match_process.meta as meta
+from classes import TeamCaptain, Player, Team
 
-from lib.tasks import Loop, loop
+from lib.tasks import loop
 
-from modules.roles import modify_match_channel
 import modules.config as cfg
 import modules.reactions as reactions
+import modules.roles as roles
 from modules.tools import UnexpectedError
 
 log = getLogger("pog_bot")
 
 
-class CaptainSelection(meta.Process, status=MatchStatus.IS_CAPTAIN):
+class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
     def __init__(self, match, p_list):
         self.match = match
@@ -61,10 +57,10 @@ class CaptainSelection(meta.Process, status=MatchStatus.IS_CAPTAIN):
 
         super().__init__(match)
 
-    @meta.init_loop
+    @Process.init_loop
     async def init(self):
         # Open match channel
-        await modify_match_channel(self.match.channel, view=True)
+        await roles.modify_match_channel(self.match.channel, view=True)
         await disp.LB_MATCH_STARTING.send(ContextWrapper.channel(cfg.channels["lobby"]), self.match.channel.id)
 
         for p in self.players.values():
@@ -86,7 +82,7 @@ class CaptainSelection(meta.Process, status=MatchStatus.IS_CAPTAIN):
         self.auto_captain.start()
         await disp.CAP_AUTO_ANNOUNCE.send(self.match.channel)
 
-    @meta.public
+    @Process.public
     async def clear(self, ctx):
         self.auto_captain.cancel()
         await self.clean_msg(0)
@@ -95,12 +91,12 @@ class CaptainSelection(meta.Process, status=MatchStatus.IS_CAPTAIN):
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)
 
-    @meta.public
-    async def info(self):
+    @Process.public
+    async def info(self, ctx=None):
         msg = await disp.CAP_WAITING.send(self.match.channel, match=self.match.proxy)
         await self.volunteer_rh.set_new_msg(msg)
 
-    @meta.public
+    @Process.public
     async def on_volunteer(self, player):
         if not self.captains[0]:
             i = 0
@@ -116,7 +112,7 @@ class CaptainSelection(meta.Process, status=MatchStatus.IS_CAPTAIN):
             raise UnexpectedError("Player not in player list!")
         await self.add_captain(i, player)
 
-    @meta.public
+    @Process.public
     async def on_answer(self, player, is_accept):
         if player is self.captains[0] and not player.active:
             i = 0
@@ -167,7 +163,7 @@ class CaptainSelection(meta.Process, status=MatchStatus.IS_CAPTAIN):
         if self.captains[i-1] and self.captains[i-1].active:
             self.auto_captain.cancel()
             await self.volunteer_rh.destroy()
-            self.match.on_captain_over(self.p_list)
+            await self.match.next_process(self.p_list)
         else:
             await self.info()
 
@@ -178,7 +174,7 @@ class CaptainSelection(meta.Process, status=MatchStatus.IS_CAPTAIN):
             await msg.clear_reactions()
             self.accept_msg[i] = None
 
-    @meta.public
+    @Process.public
     def get_left_players_pings(self) -> list:
         """ The list of mentions of all players left to pick.
         """

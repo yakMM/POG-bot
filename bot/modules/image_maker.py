@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 from asyncio import get_event_loop
 from display.strings import AllStrings as display
 from display.classes import ContextWrapper
-from match_process import MatchStatus
+from match import MatchStatus
 import modules.config as cfg
 from datetime import datetime as dt
 

@@ -4,9 +4,9 @@ from logging import getLogger
 import modules.config as cfg
 import modules.lobby as lobby
 
-from match_process.match import Match
+from match.classes.match import Match
 from display import AllStrings as disp
-from match_process import MatchStatus
+from match import MatchStatus
 
 log = getLogger("pog_bot")
 

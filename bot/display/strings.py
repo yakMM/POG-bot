@@ -17,17 +17,16 @@ class AllStrings(Enum):
                               "account, please re-register with your Jaeger characters.")
     REG_HELP = Message("Registration help:", embed=embeds.register_help)
     REG_NO_ACCOUNT = Message("You successfully registered without a Jaeger account!")
-    REG_INVALID = Message("Invalid registration!", embed=embeds.register_help)
-    REG_CHAR_NOT_FOUND = Message("Invalid registration! Character `{}` is not valid!", embed=embeds.register_help)
-    REG_NOT_JAEGER = Message("Invalid registration! Character `{}` doesn't belong to Jaeger!", embed=embeds.register_help)
+    REG_INVALID = Message("Invalid registration!")
+    REG_CHAR_NOT_FOUND = Message("Invalid registration! Character `{}` is not valid!")
+    REG_NOT_JAEGER = Message("Invalid registration! Character `{}` doesn't belong to Jaeger!")
     REG_ALREADY_EXIST = Message("Invalid registration! Character `{}` is already registered by {}!")
-    REG_MISSING_FACTION = Message("Invalid registration! Can't find a {} character in your list!",
-                                  embed=embeds.register_help)
+    REG_MISSING_FACTION = Message("Invalid registration! Can't find a {} character in your list!")
     REG_UPDATE_OWN = Message("You successfully updated your profile with the following Jaeger characters:"
                              " `{}`, `{}`, `{}`")
     REG_UPDATE_NOA = Message("You successfully removed your Jaeger characters from your profile.")
     REG_WITH_CHARS = Message("You successfully registered with the following Jaeger characters: `{}`, `{}`, `{}`")
-    REG_FROZEN = Message("You can't register while you're playing a match")
+    REG_FROZEN = Message("You can't register while you're playing a match!")
     REG_RULES = Message("{} You have accepted the rules, you may now register", embed=embeds.register_help)
     REG_NO_RULE = Message("You have to accept the rules before registering! Check <#{}>")
 
@@ -78,7 +77,8 @@ class AllStrings(Enum):
                               ping=False)
     PK_OVER_READY = Message("Can't do that if your team is ready!")
     PK_RESIGNED = Message("Successfully resigned! {} is the new captain for {}!", embed=embeds.team_update)
-    PK_BASING_INFO = Message("Waiting for captains to pick a base with `=base`!")
+    PK_BASING_INFO = Message("Waiting for captains to pick a base with `=base`!\n"
+                             "Captains can change faction with `=pick` `tr`/`vs`/`nc`!")
 
     EXT_NOT_REGISTERED = Message("You are not registered! Check <#{}>")
     UNKNOWN_ERROR = Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\n"
@@ -99,6 +99,10 @@ class AllStrings(Enum):
     RDY = Message("Bot just started and is now ready. Version `{}`")
     CONFIRM_NOT_CAPTAIN = Message("You can't confirm! {} should do it!")
     CONFIRM_NOTHING = Message("Nothing to confirm!")
+    DECLINE_NOTHING = Message("Nothing to decline!")
+    DECLINE_NOT_CAPTAIN = Message("You can't decline! {} should do it!")
+    CONFIRM_DECLINE = Message("You declined the request!")
+    CONFIRM_CANCELED = Message("You canceled the request!")
 
     BOT_UNLOCKED = Message("Unlocked!")
     BOT_LOCKED = Message("Locked!")
@@ -133,7 +137,6 @@ class AllStrings(Enum):
     MATCH_BASE_AUTO = Message("Match will be on **{}**", ping=False)
     MATCH_CONFIRM = Message("{} {} Type `=ready` when your team is inside their sunderer, ready to start",
                             embed=embeds.team_update)
-    MATCH_NOT_READY = Message("You can't use command {}, the match is not ready to start!")
     MATCH_TEAM_READY = Message("{} is now ready!", embed=embeds.team_update)
     MATCH_TEAM_UNREADY = Message("{} is no longer ready!", embed=embeds.team_update)
     MATCH_STARTING_1 = Message("Everyone is ready, round {} is starting in {} seconds!\nAll players will be pinged on "
@@ -149,7 +152,6 @@ class AllStrings(Enum):
     MATCH_CLEAR = Message("Clearing match...", ping=False)
     MATCH_ROUND_OVER = Message("{}\n{}\nRound {} is over!")
     MATCH_OVER = Message("The match is over!\nClearing channel...")
-    MATCH_ALREADY = Message("The match is already started!")
     MATCH_SWAP = Message("Swap sundy placement for the next round!")
     MATCH_CHANNEL_OVER = Message("Locking channel until next match...")
     MATCH_CHECK_CHANGED = Message("{} check is now {}")

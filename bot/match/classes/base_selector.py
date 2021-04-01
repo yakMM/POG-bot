@@ -5,11 +5,10 @@ from random import randint
 
 from classes.bases import Base
 
-from .match_status import MatchStatus
+from match.match_status import MatchStatus
 from .captain_validator import CaptainValidator
 
-from display.strings import AllStrings as disp
-from display.classes import ContextWrapper
+from display import AllStrings as disp, ContextWrapper
 
 from modules.jaeger_calendar import get_booked_bases
 import modules.reactions as reactions
@@ -33,7 +32,7 @@ class BaseSelector:
         self.__match = match
         self.__selected = None
         self.__booked = list()
-        self.__validator = CaptainValidator(match.teams[0].captain, match.teams[1].captain, self.__match.channel)
+        self.__validator = CaptainValidator(self.__match)
         self.add_callbacks(self.__validator)
         self.__nav = BaseNavigator(self, match.channel)
         _pog_selected_bases[self.__match.id] = None
@@ -91,7 +90,7 @@ class BaseSelector:
             await self.__nav.reaction_handler.destroy()
             await disp.BASE_ON_SELECT.send(ctx, self.__selected.name, base=self.__selected, is_booked=self.is_booked)
             if self.__match.status is MatchStatus.IS_BASING:
-                self.__match.proxy.on_base_found()
+                await self.__match.proxy.on_base_found()
 
     async def show_base_status(self, ctx):
         if self.__selected is None:

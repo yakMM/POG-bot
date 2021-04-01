@@ -4,7 +4,7 @@ from datetime import datetime as dt
 from datetime import timezone as tz
 
 from modules.roles import is_admin
-from match_process import MatchStatus
+from match import MatchStatus
 
 
 def register_help(ctx):
@@ -29,7 +29,7 @@ def register_help(ctx):
                     inline=False)
     try:
         if is_admin(ctx.author):
-            embed.add_field(name="Staff Commands",
+            embed.add_field(name="Staff commands",
                             value='`=unregister @player` - Permanently remove player profile from the system\n'
                                   '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                             inline=False)
@@ -42,14 +42,14 @@ def lobby_help(ctx):
     """ Returns lobby help embed
     """
     embed = Embed(colour=Color.blurple())
-    embed.add_field(name='Lobby Commands',
+    embed.add_field(name='Lobby commands',
                     value='`=j` - Join the lobby\n'
                           '`=l` - Leave the lobby\n'
                           '`=q` - See the current lobby\n'
                           '`=i` - Display the global information prompt',
                     inline=False)
     if is_admin(ctx.author):
-        embed.add_field(name="Staff Commands",
+        embed.add_field(name="Staff commands",
                         value='`=clear` - Clear the lobby\n'
                               '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages\n'
                               '`=remove @player` - Remove player from lobby',
@@ -61,22 +61,22 @@ def admin_help(ctx):
     """ Returns admin help embed
     """
     embed = Embed(colour=Color.blurple())
-    embed.add_field(name='Debug Commands',
+    embed.add_field(name='Debug commands',
                     value='`=channel (un)freeze` - Prevent users from typing in a channel\n'
                           '`=pog version` - Display current version and lock status\n'
                           '`=pog (un)lock` - Prevent users from interacting with the bot (but admins still can)\n',
                     inline=False)
-    embed.add_field(name='Lobby Commands',
+    embed.add_field(name='Lobby commands',
                     value='`=remove @player` - Remove the player from queue\n'
                           '`=clear` - Clear queue\n'
                           '`=lobby get` - Get all of the user IDs to restore the lobby\n'
                           '`=lobby restore id id ...` - Re-add all the users back to the lobby',
                     inline=False)
-    embed.add_field(name='Player Management Commands',
+    embed.add_field(name='Player Management commands',
                     value='`=timeout @player duration` - Mute the player from POF for a given time\n'
                           '`=unregister @player` - Forcibly unregisters and removes a user from the system',
                     inline=False)
-    embed.add_field(name='Match Commands',
+    embed.add_field(name='Match commands',
                     value='`=demote @player` - Force `=resign` the player\n'
                           '`=sub @player` - Pick someone in queue to replace the player\n'
                           '`=base name` - Force a base\n'
@@ -170,7 +170,7 @@ def match_help(ctx):
                           '`=ready` - To toggle the ready status of your team',
                     inline=False)
     if is_admin(ctx.author):
-        embed.add_field(name="Staff Commands",
+        embed.add_field(name="Staff commands",
                         value='`=clear` - Clear the match\n'
                               '`=base base name` - Force select a base\n'
                               '`=demote @player` - Remove Team Captain position from player\n'
