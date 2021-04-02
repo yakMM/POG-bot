@@ -26,8 +26,8 @@ class SubHandler(InstantiatedCommand):
         except AttributeError:
             self.sub_func = None
 
-        @self.validator.confirm()
-        async def do_sub(ctx, captain, subbed, force_player=None):
+        @self.validator.confirm
+        async def do_sub(ctx, subbed, force_player=None):
             if self.sub_func:
                 await self.sub_func(subbed, force_player)
             else:
@@ -39,33 +39,31 @@ class SubHandler(InstantiatedCommand):
 
     @Command.command(*picking_states)
     async def sub(self, ctx, args):
-        captain, msg = get_check_captain(ctx, self.match, check_turn=False)
-        if msg:
-            if roles.is_admin(ctx.author):
-                msg.close()
-            else:
+        captain = None
+        if not roles.is_admin(ctx.author):
+            captain, msg = get_check_captain(ctx, self.match, check_turn=False)
+            if msg:
                 await msg
                 return
 
-        if await self.validator.check_message(ctx, captain, args):
+            if await self.validator.check_message(ctx, captain, args):
+                return
+
+        if len(ctx.message.mentions) not in (1, 2):
+            await disp.RM_MENTION_ONE.send(ctx)
             return
 
-        subbed = None
-        if len(ctx.message.mentions) > 0:
-            subbed = Player.get(ctx.message.mentions[0].id)
-            if not subbed:
-                await disp.RM_NOT_IN_DB.send(ctx)
-                return
-            if not(subbed.match and subbed.match.id == self.match.id):
-                await disp.SUB_NO.send(ctx)
-                return
-        else:
-            await disp.RM_MENTION_ONE.send(ctx)
+        subbed = Player.get(ctx.message.mentions[0].id)
+        if not subbed:
+            await disp.RM_NOT_IN_DB.send(ctx)
+            return
+        if not(subbed.match and subbed.match.id == self.match.id):
+            await disp.SUB_NO.send(ctx)
             return
 
         if roles.is_admin(ctx.author):
             player = None
-            if len(ctx.message.mentions) > 1:
+            if len(ctx.message.mentions) == 2:
                 player = Player.get(ctx.message.mentions[1].id)
                 if not player:
                     await disp.RM_NOT_IN_DB.send(ctx)
@@ -73,13 +71,9 @@ class SubHandler(InstantiatedCommand):
                 elif player.match:
                     await disp.SUB_NO.send(ctx)
                     return
-            await self.validator.force_confirm(ctx, captain, subbed=subbed, force_player=player)
+            await self.validator.force_confirm(ctx, subbed=subbed, force_player=player)
             return
         else:
-            if len(ctx.message.mentions) > 1:
-                await disp.RM_MENTION_ONE.send(ctx)
-                return
-
-        other_captain = self.match.teams[captain.team.id - 1].captain
-        msg = await disp.SUB_OK_CONFIRM.send(self.match.channel, subbed.mention, other_captain.mention)
-        await self.validator.wait_valid(captain, msg, subbed=subbed)
+            other_captain = self.match.teams[captain.team.id - 1].captain
+            msg = await disp.SUB_OK_CONFIRM.send(self.match.channel, subbed.mention, other_captain.mention)
+            await self.validator.wait_valid(captain, msg, subbed=subbed)

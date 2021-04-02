@@ -14,7 +14,7 @@ MAX_SELECTED = 15
 
 
 class Base:
-    _all_bases_list = list()
+    _all_bases_list = dict()
     _base_pool = list()
 
     @classmethod
@@ -31,20 +31,14 @@ class Base:
     @classmethod
     def get_bases_from_name(cls, name, base_pool=False):
         results = list()
-        for base in (cls._base_pool if base_pool else cls._all_bases_list):
+        for base in (cls._base_pool if base_pool else cls._all_bases_list.values()):
             if name.lower() in base.name.lower():
                 results.append(base)
         return results
 
     @classmethod
-    def get_base_from_id(cls, base_id):
-        for base in cls._all_bases_list:
-            if base.id == base_id:
-                return base
-
-    @classmethod
     def get_bases(cls):
-        return cls._all_bases_list.copy()
+        return list(cls._all_bases_list.values())
 
     @classmethod
     def get_pool(cls):
@@ -58,7 +52,7 @@ class Base:
         self.__in_pool = data["in_base_pool"]
         if self.__in_pool:
             Base._base_pool.append(self)
-        Base._all_bases_list.append(self)
+        Base._all_bases_list[self.__id] = self
 
     def get_data(self):  # get data for database push
         data = {"_id": self.__id,

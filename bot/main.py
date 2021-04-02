@@ -34,6 +34,7 @@ import modules.lobby
 import modules.database
 import modules.message_filter
 import modules.accounts_handler
+import modules.signal
 
 # Classes
 from match.classes.match import Match
@@ -139,11 +140,6 @@ def _add_main_handlers(client):
                     await disp.REG_RULES.send(ContextWrapper.channel(cfg.channels["register"]), payload.member.mention)
                 else:
                     await modules.roles.role_update(p)
-
-                # if not p.is_registered:
-                #     # they can now register
-                #     await disp.REG_RULES.send(ContextWrapper.channel(cfg.channels["register"]), payload.member.mention)
-            # In any case remove the reaction, message is to stay clean
             await rules_msg.remove_reaction(payload.emoji, payload.member)
 
     # Reaction update handler (for accounts)
@@ -310,6 +306,9 @@ def main(launch_str=""):
 
     # Init lobby
     modules.lobby.init(Match, client)
+
+    # Init signal handler
+    modules.signal.init()
 
     # Add init handlers
     _add_init_handlers(client)

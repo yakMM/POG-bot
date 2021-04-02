@@ -58,3 +58,6 @@ def date_parser(string):
     dtx = dtx.astimezone(pytz.timezone("UTC"))
     return dtx
 
+
+def timestamp_now():
+    return int(dt.timestamp(dt.now()))

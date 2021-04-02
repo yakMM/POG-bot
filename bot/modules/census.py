@@ -12,21 +12,24 @@ log = getLogger("pog_bot")
 
 async def process_score(match):
     ig_dict = dict()
-    start = match.start_stamp
-    end = start + cfg.general['round_length'] * 60
+    current_ill_weapons = dict()
+    start = match.round_stamps[-1]
+    end = start + (match.round_length * 60)
     for tm in match.teams:
         for a_player in tm.players:
-            ig_dict[a_player.ig_id] = a_player
+            ig_dict[int(a_player.ig_id)] = a_player
     for a_player in ig_dict.values():
-        url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_event/?character_id=' + \
-        f'{a_player.ig_id}&type=KILL&after={start}&before={end}&c:limit=500'
-        jdata = await http_request(url)
-        if jdata["returned"] == 0:
+        url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_event/?character_id=' \
+              f'{a_player.ig_id}&type=KILL&after={start}&before={end}&c:limit=500'
+        j_data = await http_request(url)
+        print(url)
+        if j_data["returned"] == 0:
             log.error(f'No kill found for player: id={a_player.ig_name} (url={url})')
             continue
 
         # Loop through all events
-        event_list = jdata["characters_event_list"]
+        event_list = j_data["characters_event_list"]
+        current_ill_weapons.clear()
         for event in event_list:
             opo_id = int(event["character_id"])
             if opo_id not in ig_dict:
@@ -35,6 +38,8 @@ async def process_score(match):
             opo = ig_dict[opo_id]
             weap_id = int(event["attacker_weapon_id"])
             weapon = Weapon.get(weap_id)
+            opo.add_loadout_event(int(event["character_loadout_id"]))
+            a_player.add_loadout_event(int(event["attacker_loadout_id"]))
             if not weapon:
                 log.error(f'Weapon not found in database: id={weap_id}')
                 weapon = Weapon.get(0)
@@ -50,13 +55,17 @@ async def process_score(match):
                     opo.add_one_death(pts)
                 else:
                     a_player.add_illegal_weapon(weapon.id)
+                    if weapon.id in current_ill_weapons:
+                        current_ill_weapons[weapon.id] += 1
+                    else:
+                        current_ill_weapons[weapon.id] = 1
                     # TODO: Should we add penalty?
-        for weap_id in a_player.illegal_weapons.keys():
+        for weap_id in current_ill_weapons.keys():
             weapon = Weapon.get(weap_id)
             await display.SC_ILLEGAL_WE.send(match.channel, a_player.mention, weapon.name,
-                                             match.id, a_player.illegal_weapons[weap_id])
-            await display.SC_ILLEGAL_WE.send(ContextWrapper.channel(cfg.channels["staff"]), a_player.mention, weapon.name,
-                                             match.id, a_player.illegal_weapons[weap_id])
+                                             match.id, current_ill_weapons[weap_id])
+            await display.SC_ILLEGAL_WE.send(ContextWrapper.channel(cfg.channels["staff"]), a_player.mention,
+                                             weapon.name, match.id, current_ill_weapons[weap_id])
 
     await get_captures(match, start, end)
 

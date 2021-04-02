@@ -9,12 +9,18 @@ from .process import Process
 import modules.config as cfg
 import modules.reactions as reactions
 
+from match.classes.base_selector import push_last_bases
+
+import modules.census as census
+import modules.tools as tools
+import modules.image_maker as i_maker
+
 
 class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
 
     def __init__(self, match):
         self.match = match
-        self.match_loop = Loop(coro=self.on_match_over, minutes=cfg.general["round_length"], delay=1, count=2)
+        self.match_loop = Loop(coro=self.on_match_over, minutes=match.round_length, delay=1, count=2)
 
         self.rh = reactions.SingleMessageReactionHandler(remove_msg=True)
 
@@ -26,8 +32,10 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
 
     @Process.init_loop
     async def init(self):
-        await self.match.base_selector.clean()
-        self.match.base_selector = None
+        if self.match.base_selector:
+            await self.match.base_selector.clean()
+            push_last_bases(self.match.base)
+            self.match.base_selector = None
         await disp.MATCH_STARTING_1.send(self.match.channel, self.match.round_no, "30")
         await sleep(10)
         await disp.MATCH_STARTING_2.send(self.match.channel, self.match.round_no, "20")
@@ -36,7 +44,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         await sleep(10)
         player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
         await disp.MATCH_STARTED.send(self.match.channel, *player_pings, self.match.round_no)
-        self.match.round_stamps.append(int(dt.timestamp(dt.now())))
+        self.match.round_stamps.append(tools.timestamp_now())
         super().change_status(MatchStatus.IS_PLAYING)
         self.match_loop.start()
         self.auto_info_loop.start()
@@ -65,37 +73,21 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
     async def on_match_over(self):
         player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
         self.auto_info_loop.cancel()
-        await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, self.match.round_no)
+        await self.match.set_status(MatchStatus.IS_RUNNING)
         await self.rh.destroy()
-        # for tm in self.__teams:
-        #     tm.captain.is_turn = True
-        # if self.round_no < 2:
-        #     self.__audio_bot.switch_sides()
-        #     await send("MATCH_SWAP", self.__channel)
-        #     self.__status = MatchStatus.IS_WAITING
-        #     captain_pings = [tm.captain.mention for tm in self.__teams]
-        #     self.__audio_bot.match_confirm()
-        #     await send("MATCH_CONFIRM", self.__channel, *captain_pings, match=self)
-        #     self._score_calculation.start()
-        #     return
-        # await send("MATCH_OVER", self.__channel)
-        # self.__status = MatchStatus.IS_RESULT
-        # try:
-        #     await process_score(self)
-        #     self.__result_msg = await publish_match_image(self)
-        # except Exception as e:
-        #     log.error(f"Error in score or publish function!\n{e}")
-        # try:
-        #     await update_match(self)
-        # except Exception as e:
-        #     log.error(f"Error in match database push!\n{e}")
-        # await self.clear()
+        await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, self.match.round_no)
+        await census.process_score(self.match.proxy)
+        await i_maker.publish_match_image(self.match)
+        await self.match.next_process()
 
     @Process.public
     async def clear(self, ctx):
         self.auto_info_loop.cancel()
         self.match_loop.cancel()
         await self.rh.destroy()
+        player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
+        await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, self.match.round_no)
+        await disp.MATCH_OVER.send(self.match.channel)
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)
 

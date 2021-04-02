@@ -1,5 +1,6 @@
-from .command import Command, InstantiatedCommand, picking_states
+from .command import Command, InstantiatedCommand, picking_states, captains_ok_states
 from .sub_handler import SubHandler
+from .swap_handler import SwapHandler
 
 from display import AllStrings as disp, ContextWrapper
 from match import MatchStatus
@@ -8,7 +9,10 @@ import modules.roles as roles
 from classes import Player
 from match.common import check_faction, get_check_captain
 
-_external_commands = [SubHandler]
+import modules.accounts_handler as accounts
+import modules.census as census
+
+_external_commands = [SubHandler, SwapHandler]
 
 
 class MetaFactory(type):
@@ -111,16 +115,36 @@ class CommandFactory(metaclass=MetaFactory):
                 return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)
 
-    @Command.command(MatchStatus.IS_WAITING)
+    @Command.command(MatchStatus.IS_WAITING, MatchStatus.IS_WAITING_2)
     async def ready(self, ctx, args):
         match = self.match.proxy
-        a_player, msg = get_check_captain(ctx, match, check_turn=False)
+        captain, msg = get_check_captain(ctx, match, check_turn=False)
         if msg:
             await msg
             return
-        await match.team_ready(ctx, a_player)
+        if not captain.is_turn:
+            await match.on_team_ready(captain.team, False)
+            await disp.MATCH_TEAM_UNREADY.send(ctx, captain.team.name, match=self.match.proxy)
+            return
+        if captain.is_turn:
+            if self.match.check_validated:
+                not_validated_players = accounts.get_not_validated_accounts(captain.team)
+                if len(not_validated_players) != 0:
+                    await disp.MATCH_PLAYERS_NOT_READY.send(ctx, captain.team.name,
+                                                            " ".join(p.mention for p in not_validated_players))
+                    return
+            if self.match.check_offline:
+                offline_players = await census.get_offline_players(captain.team)
+                if len(offline_players) != 0:
+                    await disp.MATCH_PLAYERS_OFFLINE.send(ctx, captain.team.name,
+                                                          " ".join(p.mention for p in offline_players),
+                                                          p_list=offline_players)
+                    return
+            await match.on_team_ready(captain.team, True)
+            await disp.MATCH_TEAM_READY.send(ctx, captain.team.name, match=self.match.proxy)
+            return
 
-    @Command.command(MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT)
+    @Command.command(MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_WAITING_2)
     async def squittal(self, ctx, args):
         if self.match.status is MatchStatus.IS_WAITING:
             await disp.SC_PLAYERS_STRING_DISC.send(ctx, "\n".join(tm.ig_string for tm in self.match.teams))
@@ -128,10 +152,9 @@ class CommandFactory(metaclass=MetaFactory):
             await disp.SC_PLAYERS_STRING.send(ctx, "\n".join(tm.ig_string for tm in self.match.teams))
 
     @Command.has_help(disp.BASE_HELP)
-    @Command.command(MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_BASING, MatchStatus.IS_PICKING,
-                     MatchStatus.IS_FACTION, MatchStatus.IS_RESULT)
+    @Command.command(*captains_ok_states)
     async def base(self, ctx, args):
-        if self.match.status in (MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
+        if self.match.status in (MatchStatus.IS_PLAYING, MatchStatus.IS_WAITING_2):
             if len(args) != 0:
                 await disp.BASE_NO_CHANGE.send(ctx)
                 return
@@ -143,12 +166,11 @@ class CommandFactory(metaclass=MetaFactory):
             return
 
         # Check player status
-        a_player, msg = get_check_captain(ctx, self.match, check_turn=False)
-
-        # If player doesn't have the proper status
-        if msg:
-            # And is not admin
-            if not roles.is_admin(ctx.author):
+        a_player = None
+        if not roles.is_admin(ctx.author):
+            a_player, msg = get_check_captain(ctx, self.match, check_turn=False)
+            # If player doesn't have the proper status
+            if msg:
                 if len(args) == 0:
                     # If player just want to get base status, we give him
                     await self.match.base_selector.show_base_status(ctx)
@@ -158,6 +180,11 @@ class CommandFactory(metaclass=MetaFactory):
                     # Else we display the error message
                     await msg
                 return
-            # It's important to close the message in case we don't use it
-            msg.close()
+
         await self.match.base_selector.process_request(ctx, a_player, args)
+
+    @Command.command(*captains_ok_states, MatchStatus.IS_CAPTAIN)
+    async def clear(self, ctx):
+        match = self.match.proxy
+        await disp.MATCH_CLEAR.send(ctx)
+        await match.clear(ctx)

@@ -38,6 +38,12 @@ class MatchesCog(commands.Cog, name='matches'):
         match = Match.get(ctx.channel.id)
         await match.command.sub(ctx, args)
 
+    @commands.command()
+    @commands.guild_only()
+    async def swap(self, ctx, *args):
+        match = Match.get(ctx.channel.id)
+        await match.command.swap(ctx, args)
+
     @commands.command(aliases=['p'])
     @commands.guild_only()
     async def pick(self, ctx, *args):

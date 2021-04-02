@@ -30,7 +30,6 @@ class AllStrings(Enum):
     REG_RULES = Message("{} You have accepted the rules, you may now register", embed=embeds.register_help)
     REG_NO_RULE = Message("You have to accept the rules before registering! Check <#{}>")
 
-    LB_OFFLINE = Message("You can't queue if your Discord status is offline/invisible!")
     LB_ALREADY_IN = Message("You are already in queue!")
     LB_IN_MATCH = Message("You are already in a match!")
     LB_ADDED = Message("You've been added to the queue!", embed=embeds.lobby_list)
@@ -42,11 +41,13 @@ class AllStrings(Enum):
     LB_STUCK_JOIN = Message("You can't join the lobby, it is already full!")
     LB_MATCH_STARTING = Message("Lobby full, match can start! Join <#{}> for team selection!", ping=False,
                                 embed=embeds.join_ts)
-    LB_WENT_INACTIVE = Message("{} was removed from the lobby because they went offline!", embed=embeds.lobby_list)
+    LB_WARNING = Message("{} your lobby timeout is soon expiring! Use `=reset` to reset it!")
+    LB_TOO_LONG = Message("{} was removed from the lobby by timeout!", embed=embeds.lobby_list)
     LB_CLEARED = Message("Lobby has been cleared!", embed=embeds.lobby_list)
     LB_EMPTY = Message("Lobby is already empty!")
     LB_NOTIFY = Message("{} queue is almost full, join to start a match!")
-    LB_GET = Message("Restore the lobby with `=lobby restore {}`")
+    LB_GET = Message("Lobby status saved, will be restored on next restart!")
+    LB_REFRESHED = Message("You have reset your queue timeout!")
 
     PK_OVER = Message("The teams are already made. You can't pick!")
     PK_NO_LOBBIED = Message("You must first queue and wait for a match to begin. Check <#{}>")
@@ -97,6 +98,7 @@ class AllStrings(Enum):
     CHECK_ACCOUNT = Message("Your account password may have been flipped!\n"
                             "Re-register in <#{}> to confirm you still have access to it!", embed=embeds.flip_accounts)
     RDY = Message("Bot just started and is now ready. Version `{}`")
+    STOP = Message("Bot shutting down! Saving state...")
     CONFIRM_NOT_CAPTAIN = Message("You can't confirm! {} should do it!")
     CONFIRM_NOTHING = Message("Nothing to confirm!")
     DECLINE_NOTHING = Message("Nothing to decline!")
@@ -128,7 +130,7 @@ class AllStrings(Enum):
     CAP_HELP = Message("Here are the available captain commands:", embed=embeds.captain_help)
     CAP_ALREADY = Message("You can't do that! You are already a team captain!")
     CAP_ACCEPT_NO = Message("You can't do that! Volunteer if you want to be captain!")
-    CAP_DENY_NO = Message("You can't do that, you were not designed as team captain!")
+    CAP_DENY_NO = Message("You can't do that, you were not designated as team captain!")
     CAP_DENY_OK = Message("You declined the team captain role!")
 
     MATCH_DM_PING = Message("Lobby filled! Your POG match is starting!", ping=False)
@@ -151,7 +153,7 @@ class AllStrings(Enum):
                                     embed=embeds.offline_list)
     MATCH_CLEAR = Message("Clearing match...", ping=False)
     MATCH_ROUND_OVER = Message("{}\n{}\nRound {} is over!")
-    MATCH_OVER = Message("The match is over!\nClearing channel...")
+    MATCH_OVER = Message("The match is over!\nClearing...")
     MATCH_SWAP = Message("Swap sundy placement for the next round!")
     MATCH_CHANNEL_OVER = Message("Locking channel until next match...")
     MATCH_CHECK_CHANGED = Message("{} check is now {}")
@@ -196,7 +198,7 @@ class AllStrings(Enum):
     NOT_CODED = Message("The rest is not yet coded, work in progress. Clearing match...")
 
     RM_MENTION_ONE = Message("Invalid request! @ mention one player!")
-    RM_NOT_IN_DB = Message("Can't find this player in the database!")
+    RM_NOT_IN_DB = Message("Can't find player in the database!")
     RM_OK = Message("Player successfully removed from the system!")
     RM_IN_MATCH = Message("Can't remove a player who is in match!")
     RM_LOBBY = Message("{} have been removed by staff!", embed=embeds.lobby_list)
@@ -231,6 +233,13 @@ class AllStrings(Enum):
     SUB_OKAY = Message("{} replaced {}!", ping=False, embed=embeds.team_update)
     SUB_LOBBY = Message("{} you have been designated as a substitute, join <#{}>!", embed=embeds.lobby_list)
     SUB_OK_CONFIRM = Message("Subbing {}! {} confirm if you agree! (use `=sub confirm` or react below)", ping=False)
+
+    SWAP_OK = Message("Successfully swapped {} and {}", ping=False, embed=embeds.team_update)
+    SWAP_MENTION_2 = Message("Invalid request! @ mention two players to swap!")
+    SWAP_NO = Message("{} can't be swapped!", ping=False)
+    SWAP_CAP = Message("Invalid request! {} is a team captain!", ping=False)
+    SWAP_SAME_TEAM = Message("Invalid request! Can't swap two players of the same team!", ping=False)
+    SWAP_OK_CONFIRM = Message("Swapping players! {} confirm if you agree! (use `=sub confirm` or react below)")
 
     async def send(self, ctx, *args, **kwargs):
         """ Send the message string_name in context ctx,

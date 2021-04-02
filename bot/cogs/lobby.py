@@ -54,9 +54,6 @@ class LobbyCog(commands.Cog, name='lobby'):
         if len(accs) != 0:
             await disp.CHECK_ACCOUNT.send(ctx, cfg.channels["register"], account_names=accs)
             return
-        if ctx.author.status == discord_status.offline:
-            await disp.LB_OFFLINE.send(ctx)
-            return
         if player.is_lobbied:
             await disp.LB_ALREADY_IN.send(ctx)
             return
@@ -69,6 +66,18 @@ class LobbyCog(commands.Cog, name='lobby'):
 
         names = lobby.add_to_lobby(player)
         await disp.LB_ADDED.send(ctx, names_in_lobby=names)
+
+    @commands.command(aliases=['rst'])
+    @commands.guild_only()
+    async def reset(self, ctx):
+        """ Join queue
+        """
+        player = Player.get(ctx.message.author.id)
+        if not player or (player and not player.is_lobbied):
+            await disp.LB_NOT_IN.send(ctx)
+            return
+        player.reset_lobby_timestamp()
+        await disp.LB_REFRESHED.send(ctx)
 
     @commands.command(aliases=['l'])
     @commands.guild_only()

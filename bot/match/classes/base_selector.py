@@ -13,11 +13,30 @@ from display import AllStrings as disp, ContextWrapper
 from modules.jaeger_calendar import get_booked_bases
 import modules.reactions as reactions
 from modules.roles import is_admin
+import modules.tools as tools
+
 
 log = getLogger("pog_bot")
 MAX_SELECTED = 15
 
 _pog_selected_bases = dict()
+
+last_base = [(None, 0), (None, 0)]
+
+
+def push_last_bases(base):
+    last_base[1] = (last_base[0][0], last_base[0][1])
+    last_base[0] = (base, tools.timestamp_now())
+
+
+def is_last_used(base):
+    for i in range(2):
+        if base is last_base[i][0]:
+            if last_base[i][1] > (tools.timestamp_now() - 14400):
+                return True
+    return False
+
+
 
 
 class BaseSelector:
@@ -71,7 +90,10 @@ class BaseSelector:
                 base_string = f"~~{base.name}~~"
             else:
                 base_string = f"{base.name}"
-            result.append(f"**{str(i + 1)}**: {base_string}")
+            last_used = ""
+            if is_last_used(base):
+                last_used = " **(last played)**"
+            result.append(f"**{str(i + 1)}**: {base_string}{last_used}")
         return result
 
     @property
@@ -82,8 +104,8 @@ class BaseSelector:
         return self.__selection[index]
 
     def add_callbacks(self, validator):
-        @validator.confirm()
-        async def do_confirm(ctx, captain):
+        @validator.confirm
+        async def do_confirm(ctx):
             self.__reset_selection()
             _pog_selected_bases[self.__match.id] = self.__selected
             self.__match.data.base = self.__selected
@@ -102,8 +124,9 @@ class BaseSelector:
             await disp.BASE_SELECTED.send(ctx, base=self.__selected, is_booked=self.is_booked)
 
     async def process_request(self, ctx, a_player, args):
-        if await self.__validator.check_message(ctx, a_player, args):
-            return
+        if a_player:
+            if await self.__validator.check_message(ctx, a_player, args):
+                return
 
         if len(args) == 0:
             # If no arg in the command
@@ -156,7 +179,7 @@ class BaseSelector:
     async def __select_base(self, ctx, picker, base):
         self.__selected = base
         if is_admin(ctx.author):
-            await self.__validator.force_confirm(ctx, picker)
+            await self.__validator.force_confirm(ctx)
             return
         other_captain = self.__match.teams[picker.team.id - 1].captain
         msg = await disp.BASE_OK_CONFIRM.send(ctx, self.__selected.name, other_captain.mention)

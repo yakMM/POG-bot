@@ -11,6 +11,9 @@ from modules.tools import UnexpectedError
 from lib.tasks import loop
 from modules.roles import role_update
 import modules.database as db
+import modules.tools as tools
+
+from .stats import PlayerStat
 
 from logging import getLogger
 from datetime import datetime as dt
@@ -102,6 +105,7 @@ class Player:
         self.__lobby_stamp = 0
         self.__active = None
         self.__match = None
+        self.__stats = None
         Player._all_players[p_id] = self  # Add to dictionary on creation
 
     @classmethod
@@ -169,7 +173,7 @@ class Player:
 
     @property
     def is_timeout(self):
-        return self.__timeout > int(dt.timestamp(dt.now()))
+        return self.__timeout > tools.timestamp_now()
 
     @property
     def is_notify(self):
@@ -183,6 +187,13 @@ class Player:
     @property
     def is_lobbied(self):
         return self.__lobby_stamp != 0
+
+    def reset_lobby_timestamp(self):
+        self.__lobby_stamp = tools.timestamp_now()
+
+    @property
+    def lobby_stamp(self):
+        return self.__lobby_stamp
 
     @property
     def accounts_flipped(self):
@@ -210,12 +221,13 @@ class Player:
         self.update_role()
 
     def on_lobby_add(self):
-        self.__lobby_stamp = int(dt.timestamp(dt.now()))
+        self.__lobby_stamp = tools.timestamp_now()
         self.update_role()
 
     def on_player_clean(self):
         self.__match = None
         self.__active = None
+        self.__stats = None
         if not self.__has_own_account:
             self.__ig_names = ["N/A", "N/A", "N/A"]
             self.__ig_ids = [0, 0, 0]
@@ -227,6 +239,13 @@ class Player:
     def on_match_selected(self, m):
         self.__match = m
         self.__lobby_stamp = 0
+
+    async def get_stats(self):
+        self.__stats = await PlayerStat.get_from_database(self.__id)
+
+    @property
+    def stats(self):
+        return self.__stats
 
     @property
     def id(self):
@@ -446,6 +465,7 @@ class DataPlayer:
 
     def __init__(self, p_id, ig_name, ig_id):
         self.id = p_id
+        self.name = "unknsrtwrsadfasdfsdfasdfown"
         self.ig_names = [ig_name] * 3
         self.ig_ids = [ig_id] * 3
 
@@ -465,6 +485,7 @@ class ActivePlayer:
         self.__account = None
         self.__unique_usages = None
         self.__is_playing = False
+        self.__loadouts = dict()
         if from_data:
             return
         self.__player.on_picked(self)
@@ -487,11 +508,43 @@ class ActivePlayer:
     def clean(self):
         self.__player.on_player_clean()
 
+    def change_team(self, team):
+        self.__team = team
+
+    def add_loadout_event(self, loadout):
+        if loadout in self.__loadouts:
+            self.__loadouts[loadout] += 1
+        else:
+            self.__loadouts[loadout] = 1
+
+    def get_main_loadouts(self):
+        max2_v = 0
+        max2_k = 0
+        max_v = 0
+        max_k = 0
+        for k in self.__loadouts.keys():
+            if self.__loadouts[k] > max_v:
+                max2_k = max_k
+                max2_v = max_v
+                max_v = self.__loadouts[k]
+                max_k = k
+        return max_k, max2_k
+
+    def get_loadouts(self):
+        loadouts = list()
+        for k in self.__loadouts.keys():
+            try:
+                loadouts.append(cfg.loadout_id[k])
+            except KeyError:
+                pass
+        return loadouts
+
     def get_data(self):
         data = {"discord_id": self.__player.id,
                 "ig_id": self.ig_id,
                 "ig_name": self.ig_name,
                 "ill_weapons": self.__get_ill_weaponsDoc(),
+                "loadouts": self.get_loadouts(),
                 "score": self.__score,
                 "net": self.__net,
                 "deaths": self.__deaths,

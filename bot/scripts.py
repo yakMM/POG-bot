@@ -12,11 +12,14 @@ from classes.weapons import Weapon
 import os
 from datetime import datetime as dt
 
-from modules.stats import PlayerStat
+from classes.stats import PlayerStat
 import modules.database as db
 import modules.accounts_handler as accounts
 from random import choice as random_choice
+import modules.tools as tools
+from modules.image_maker import _make_image
 
+import modules.census as census
 
 if os.path.isfile("test"):
     LAUNCHSTR = "_test"
@@ -143,7 +146,7 @@ def push_accounts_to_usage():
 
 def push2():
     from test2 import id3s
-    t=int(dt.timestamp(dt.now()))
+    t=tools.timestamp_now()
     for id in id3s:
         db.push_element("accounts_usage", 7, {"unique_usages": id})
     for e in range(50):
@@ -199,7 +202,7 @@ def get_all_bases_from_api():
             new_data["zone_id"] = int(mp["zone_id"])
             new_data["type_id"] = int(mp["facility_type_id"])
             all_bases.append(new_data)
-            if not Base.get_base_from_id(new_data["_id"]):
+            if not Base.get(new_data["_id"]):
                 print(f"New base found: {new_data['name']}")
         except KeyError:
             print(f"Key error: {mp}")
@@ -212,11 +215,11 @@ def players_db_update():
         db.set_element("users", p.id, p.get_data())
 
 def get_match_from_db(m_id):
-    if db.collections["matches"].count_documents({"_id": m_id}) == 0:
-        print(f'{m_id} cancelled!')
-        return None
-    m = Match.new_from_data(db.get_element("matches", m_id))
-    # #print(m.get_data())
+    loop = asyncio.get_event_loop()
+    m = loop.run_until_complete(Match.get_from_database(m_id))
+
+    loop.run_until_complete(census.process_score(m))
+    _make_image(m)
     # loop = asyncio.get_event_loop()
     # loop.run_until_complete(process_score(m))
     # dta=m.get_data()
@@ -283,4 +286,4 @@ def matches_time_stat():
 #     if dta:
 #         collections["matches"].replace_one({"_id": dta["_id"]}, dta)
 #     ij-=1
-push_accounts_to_users()
+get_match_from_db(1800)

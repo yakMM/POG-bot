@@ -25,7 +25,7 @@ class CaptainValidator:
                         await self.clean()
                         return
                     elif self.confirm_func:
-                        await self.confirm_func(ctx, player.active, **self.kwargs)
+                        await self.confirm_func(ctx, **self.kwargs)
                         await self.clean()
                         return
                 elif self.is_captain(a_p) and str(reaction) == "❌":
@@ -45,15 +45,13 @@ class CaptainValidator:
         self.expected = None
         self.kwargs = dict()
 
-    def confirm(self):
-        def decorator(func):
-            self.confirm_func = func
-            return func
-        return decorator
+    def confirm(self, func):
+        self.confirm_func = func
+        return func
 
-    async def force_confirm(self, ctx, captain, **kwargs):
+    async def force_confirm(self, ctx, **kwargs):
         if self.confirm_func:
-            await self.confirm_func(ctx, captain, **kwargs)
+            await self.confirm_func(ctx, **kwargs)
             await self.clean()
 
     async def wait_valid(self, captain, msg, **kwargs):
@@ -72,7 +70,7 @@ class CaptainValidator:
                 elif captain is not self.expected:
                     await disp.CONFIRM_NOT_CAPTAIN.send(ctx, self.expected.mention)
                 elif self.confirm_func:
-                    await self.confirm_func(ctx, captain, **self.kwargs)
+                    await self.confirm_func(ctx, **self.kwargs)
                     await self.clean()
                 else:
                     raise UnexpectedError("Confirm Function is None!")

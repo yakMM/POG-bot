@@ -43,7 +43,7 @@ def _cut_off_string(string, font, treshold):
     res = _binary_search(0,len(string))
     return string[:res]+"..."
 
-def _team_display(draw, team, y_offset):
+def _team_display(img, draw, team, y_offset):
 
     # Titles:
     _draw_score_line(draw, X_OFFSET+2200, y_offset, ["Score","Net","Kills","Deaths"], font, yellow)
@@ -67,12 +67,35 @@ def _team_display(draw, team, y_offset):
         font, color[i%2])
 
         # Names:
-        name = _cut_off_string(a_player.name, font, 1000)
-        ig_name = _cut_off_string(a_player.ig_name, font, 1000)
+        name = _cut_off_string(a_player.name, font, 900)
+        ig_name = _cut_off_string(a_player.ig_name, font, 900)
+
+        # Loadout
+        loadouts = a_player.get_main_loadouts()
+        a_loadouts = list()
+        try:
+            for l in loadouts:
+                load = cfg.loadout_id[l]
+                if load not in a_loadouts:
+                    a_loadouts.append(cfg.loadout_id[l])
+        except KeyError:
+            pass
+
+        for j in range(len(a_loadouts)):
+            loadout_img = Image.open(f"../logos/{a_loadouts[j]}.png")
+            loadout_img = loadout_img.resize((80, 80))
+            if len(a_loadouts) == 1:
+                off = 90 // 2
+            else:
+                off = 90 * j
+            img.paste(loadout_img, (35 + X_OFFSET + off, Y_BIG_SPACE * 2 + Y_SPACING * i + y_offset + 25), loadout_img)
 
 
-        draw.text((X_OFFSET,Y_BIG_SPACE*2+Y_SPACING*i+y_offset), name, font=font, fill=color[i%2])
-        draw.text((X_OFFSET+1100,Y_BIG_SPACE*2+Y_SPACING*i+y_offset), ig_name, font=font, fill=color[i%2])
+
+
+
+        draw.text((X_OFFSET+250,Y_BIG_SPACE*2+Y_SPACING*i+y_offset), name, font=font, fill=color[i%2])
+        draw.text((X_OFFSET+1100+130,Y_BIG_SPACE*2+Y_SPACING*i+y_offset), ig_name, font=font, fill=color[i%2])
 
 
 
@@ -97,7 +120,7 @@ def _make_image(match):
     if len(match.round_stamps) < 2:
         draw.text((x,200+100*3), f"Round 2: ", font=small_font, fill=white)
         draw.text((x+small_font.getsize("Round 2: ")[0],200+100*3), f"In progress...", font=small_font, fill=yellow)
-    draw.text((x,200+100*4), f"Round length: {cfg.general['round_length']} minutes", font=small_font, fill=white)
+    draw.text((x,200+100*4), f"Round length: {match.round_length} minutes", font=small_font, fill=white)
 
     hal_size = 25
     x_max=3600
@@ -115,7 +138,7 @@ def _make_image(match):
     draw.text((X_OFFSET+2200,200+100), f"Captures:", font=small_font, fill=white)
     for tm in match.teams:
         draw.text((X_OFFSET+2200,200+100*(tm.id+2)), f"{tm.name}: {tm.cap} points", font=small_font, white=white)
-        _team_display(draw, tm, y_off(tm.id))
+        _team_display(img, draw, tm, y_off(tm.id))
     img.save(f'../../POG-data/matches/match_{match.id}.png')
 
 
@@ -123,15 +146,12 @@ async def publish_match_image(match):
     loop = get_event_loop()
     await loop.run_in_executor(None, _make_image, match)
 
-    msg = match.msg
-    if msg is not None:
-        await msg.delete()
-    
-    if match.status is MatchStatus.IS_RESULT:
-        msg = await display.SC_RESULT.imageSend(ContextWrapper.channel(cfg.channels["results"]),
-                f'../../POG-data/matches/match_{match.id}.png', match.id)
+    if match.result_msg is not None:
+        await match.result_msg.delete()
+        match.result_msg = await display.SC_RESULT.image_send(ContextWrapper.channel(cfg.channels["results"]),
+                                                f'../../POG-data/matches/match_{match.id}.png', match.id)
     else:
-        msg = await display.SC_RESULT_HALF.imageSend(ContextWrapper.channel(cfg.channels["results"]),
-                                          f'../../POG-data/matches/match_{match.id}.png', match.id)
-    return msg
+        match.result_msg = await display.SC_RESULT_HALF.image_send(ContextWrapper.channel(cfg.channels["results"]),
+                                               f'../../POG-data/matches/match_{match.id}.png', match.id)
+    
 

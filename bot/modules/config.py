@@ -42,6 +42,28 @@ facility_suffix = {
     4: "Tech Plant"
 }
 
+# http://census.daybreakgames.com/get/ps2:v2/loadout/?c:limit=500
+loadout_id = {
+    1: "infiltrator",
+    3: "light_assault",
+    4: "medic",
+    5: "engineer",
+    6: "heavy_assault",
+    7: "max",
+    8: "infiltrator",
+    10: "light_assault",
+    11: "medic",
+    12: "engineer",
+    13: "heavy_assault",
+    14: "max",
+    15: "infiltrator",
+    17: "light_assault",
+    18: "medic",
+    19: "engineer",
+    20: "heavy_assault",
+    21: "max"
+}
+
 # http://census.daybreakgames.com/get/ps2/base_region/?c:limit=400&c:show=facility_id,facility_name,zone_id,facility_type_id
 base_to_id = {
     "acan": 302030,

@@ -64,6 +64,8 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         await disp.LB_MATCH_STARTING.send(ContextWrapper.channel(cfg.channels["lobby"]), self.match.channel.id)
 
         for p in self.players.values():
+            await p.get_stats()
+            print(f"{p.name}, matches: {p.stats.nb_matches_played}")
             ctx = ContextWrapper.user(p.id)
             try:
                 await disp.MATCH_DM_PING.send(ctx)
@@ -85,6 +87,8 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
     @Process.public
     async def clear(self, ctx):
         self.auto_captain.cancel()
+        for p in self.p_list:
+            p.on_player_clean()
         await self.clean_msg(0)
         await self.clean_msg(1)
         await self.volunteer_rh.destroy()
@@ -183,11 +187,18 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
     def find_captain(self):
         """ Pick at random a captain.
-            TODO: Base this pick on some kind of stats or a role
 
             Returns
             -------
             captain : Player
                 The player designated as captain.
         """
-        return random_choice(list(self.players))
+        potential = list()
+        threshold = 20
+        while not potential:
+            for p in self.players.values():
+                if p.stats.nb_matches_played >= threshold:
+                    potential.append(p.id)
+            threshold -= 5
+
+        return random_choice(potential)

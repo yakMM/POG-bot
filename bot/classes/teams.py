@@ -33,9 +33,6 @@ class Team:
         return obj
 
     def get_data(self):
-        players_data = list()
-        for p in self.__players:
-            players_data.append(p.get_data())
         data = {"name": self.__name,
                 "faction_id": self.__faction,
                 "score": self.__score,
@@ -43,7 +40,7 @@ class Team:
                 "deaths": self.deaths,
                 "kills": self.__kills,
                 "cap_points": self.__cap,
-                "players": players_data
+                "players": [p.get_data() for p in self.__players]
                 }
         return data
 
@@ -159,3 +156,9 @@ class Team:
         if subbed.is_captain:
             active.is_turn = subbed.is_turn
         self.__players[i] = active
+
+    def swap_player(self, p_out, p_in):
+        i = 0
+        while self.__players[i] is not p_out:
+            i += 1
+        self.__players[i] = p_in

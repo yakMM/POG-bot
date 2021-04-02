@@ -77,6 +77,8 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
     @Process.public
     async def clear(self, ctx):
+        for p in self.players.values():
+            p.on_player_clean()
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)
 

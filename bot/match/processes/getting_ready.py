@@ -49,29 +49,6 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         await disp.MATCH_CLEARED.send(ctx)
 
     @Process.public
-    async def team_ready(self, ctx, captain):
-        if not captain.is_turn:
-            await self.on_team_ready(captain.team, False)
-            await disp.MATCH_TEAM_UNREADY.send(ctx, captain.team.name, match=self.match.proxy)
-            return
-        if captain.is_turn:
-            if self.match.check_validated:
-                not_validated_players = accounts.get_not_validated_accounts(captain.team)
-                if len(not_validated_players) != 0:
-                    await disp.MATCH_PLAYERS_NOT_READY.send(ctx, captain.team.name,
-                                                            " ".join(p.mention for p in not_validated_players))
-                    return
-            if self.match.check_offline:
-                offline_players = await census.get_offline_players(captain.team)
-                if len(offline_players) != 0:
-                    await disp.MATCH_PLAYERS_OFFLINE.send(ctx, captain.team.name,
-                                                          " ".join(p.mention for p in offline_players),
-                                                          p_list=offline_players)
-                    return
-            await self.on_team_ready(captain.team, True)
-            await disp.MATCH_TEAM_READY.send(ctx, captain.team.name, match=self.match.proxy)
-            return
-
     async def on_team_ready(self, team, ready):
         team.captain.is_turn = not ready
         team.on_team_ready(ready)
@@ -97,7 +74,6 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         else:
             await disp.ACC_NOT_ENOUGH.send(self.match.channel)
             await self.clear()
-
 
     @Process.public
     async def do_sub(self, subbed, force_player):

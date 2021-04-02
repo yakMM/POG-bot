@@ -1,11 +1,13 @@
 # This file is an example of test script for an easier development
 
-from modules.lobby import add_to_lobby
 from classes import Player
 import asyncio
 from discord.ext import commands
 from logging import getLogger
 import modules.config as cfg
+import modules.lobby as lobby
+
+from match import MatchStatus
 
 from display import ContextWrapper
 
@@ -40,62 +42,81 @@ def test_hand(client):
 
 
 async def launch(ctx, id_list, tier):
-
+    print("TIER 1")
     players = [Player.get(id) for id in id_list]
 
     for p in players:
-        add_to_lobby(p)
+        lobby.add_to_lobby(p)
 
     if tier == 1:
         return
 
-    await asyncio.sleep(5)
+    print("TIER 2")
+    await asyncio.sleep(1)
 
     match = players[0].match
 
-    await match.on_volunteer(players[0])
-    await match.on_volunteer(players[1])
+    while match.status is not MatchStatus.IS_CAPTAIN:
+        await asyncio.sleep(1)
 
-    cap1, cap2 = players[0].active, players[1].active
+    cap_1_ctx = ContextWrapper.user(players[0].id)
+    cap_1_ctx.channel = ctx.channel
+    cap_1_ctx.message = ctx.message
+    await match.command.captain(cap_1_ctx, ["v"])
+
+    cap_2_ctx = ContextWrapper.user(players[1].id)
+    cap_2_ctx.channel = ctx.channel
+    cap_2_ctx.message = ctx.message
+    await match.command.captain(cap_2_ctx, ["v"])
 
     if tier == 2:
         return
 
-    await asyncio.sleep(1)
+    print("TIER 3")
+    while match.status is not MatchStatus.IS_PICKING:
+        await asyncio.sleep(1)
 
-    context = ContextWrapper.wrap(match.channel)
-    context.author = ctx.author
-    context.message = ctx.message
+    picked = ContextWrapper.user(players[2].id)
+    cap_1_ctx.message.mentions.clear()
+    cap_1_ctx.message.mentions.append(picked.author)
 
-    ctx.message.mentions.append(context.author)
-
-    await match.pick(context, cap1, [""])
+    await match.command.pick(cap_1_ctx, [""])
 
     if tier == 3:
         return
 
-    ctx.message.mentions.clear()
+    print("TIER 4")
 
-    await asyncio.sleep(2)
-    await match.pick(context, cap2, ["VS"])
-    await asyncio.sleep(1)
-    await match.pick(context, cap1, ["TR"])
+    while match.status is not MatchStatus.IS_FACTION:
+        await asyncio.sleep(1)
+
+    cap_2_ctx.message.mentions.clear()
+    cap_1_ctx.message.mentions.clear()
+    await match.command.pick(cap_2_ctx, ["VS"])
+    await match.command.pick(cap_1_ctx, ["TR"])
 
     if tier == 4:
         return
 
-    await asyncio.sleep(3)
+    print("TIER 5")
 
-    await match.base_selector.select_by_index(context, cap1, 0)
+    while match.status is not MatchStatus.IS_BASING:
+        await asyncio.sleep(1)
+
+    # We assume tester is an admin
+    await match.command.base(ctx, ["1"])
 
     if tier == 5:
         return
 
-    await asyncio.sleep(2)
+    print("TIER 6")
+
+    while match.status is not MatchStatus.IS_WAITING:
+        await asyncio.sleep(1)
 
     match.change_check("online")
     match.change_check("account")
 
-    await match.team_ready(context, cap1)
-    await match.team_ready(context, cap2)
+    await match.command.ready(cap_1_ctx)
+    await match.command.ready(cap_2_ctx)
 

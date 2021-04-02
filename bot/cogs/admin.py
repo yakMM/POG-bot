@@ -14,6 +14,7 @@ import modules.loader as loader
 import modules.roles as roles
 import modules.census as census
 import modules.lobby as lobby
+import modules.tools as tools
 import modules.accounts_handler as accounts_sheet
 import asyncio
 
@@ -55,15 +56,7 @@ class AdminCog(commands.Cog, name='admin'):
         # clear a match channel
         if ctx.channel.id in cfg.channels["matches"]:
             match = Match.get(ctx.channel.id)
-            if match.status is MatchStatus.IS_FREE:
-                await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
-                return
-            if match.status in (MatchStatus.IS_RESULT, MatchStatus.IS_RUNNING):
-                await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
-                return
-            await disp.MATCH_CLEAR.send(ctx)
-            await match.clear(ctx)
-            return
+            await match.command.clear(ctx)
         await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
 
     @commands.command()
@@ -126,11 +119,13 @@ class AdminCog(commands.Cog, name='admin'):
                 return
             await disp.RM_NOT_LOBBIED.send(ctx)
             return
-        if ctx.channel.id == cfg.channels["register"]:
-            player = await get_check_player(ctx)
-            if not player:
-                return
-            #TODO: do something
+        # if ctx.channel.id == cfg.channels["register"]:
+        #     player = await get_check_player(ctx)
+        #     if not player:
+        #         return
+        #     #TODO: remove ig names
+        else:
+            await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
 
     @commands.command()
     @commands.guild_only()
@@ -153,16 +148,6 @@ class AdminCog(commands.Cog, name='admin'):
 
     @commands.command()
     @commands.guild_only()
-    async def ts3(self, ctx):
-        if ctx.channel.id not in cfg.channels["matches"]:
-            await disp.WRONG_CHANNEL.send(ctx, ctx.command.name,
-                                          ", ".join(f"<#{c_id}>" for c_id in cfg.channels["matches"]))
-            return
-        match = Match.get(ctx.channel.id)
-        match.ts3_test()
-
-    @commands.command()
-    @commands.guild_only()
     async def lobby(self, ctx, *args):
         if ctx.channel.id != cfg.channels["lobby"]:
             await disp.WRONG_CHANNEL.send(ctx, ctx.command.name, f'<#{cfg.channels["lobby"]}>')
@@ -179,7 +164,7 @@ class AdminCog(commands.Cog, name='admin'):
             return
         if len(args) > 0 and args[0] == "get":
             lb = lobby.get_all_ids_in_lobby()
-            db.set_field("restart_data", 0, {"last_lobby": lb})
+            await db.async_db_call(db.set_field, "restart_data", 0, {"last_lobby": lb})
             await disp.LB_GET.send(ctx, " ".join([str(p_id) for p_id in lb]))
             return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)
@@ -199,9 +184,8 @@ class AdminCog(commands.Cog, name='admin'):
         player = Player.get(ctx.message.mentions[0].id)
         if not player:
             # player isn't even registered in the system...
-            Player(ctx.message.mentions[0].id, ctx.message.mentions[0].name)
-            # TODO: CHANGE THIS
-            return
+            player = Player(ctx.message.mentions[0].id, ctx.message.mentions[0].name)
+            await db.async_db_call(db.set_element, "users", player.id, player.get_data())
         if player.is_lobbied:
             lobby.remove_from_lobby(player)
             await disp.RM_LOBBY.send(ContextWrapper.channel(cfg.channels["lobby"]), player.mention,
@@ -248,7 +232,7 @@ class AdminCog(commands.Cog, name='admin'):
         except ValueError:
             await disp.RM_TIMEOUT_INVALID.send(ctx)
             return
-        end_time = int(dt.timestamp(dt.now()))+time
+        end_time = tools.timestamp_now()+time
         player.timeout = end_time
         await roles.role_update(player)
         await player.db_update("timeout")
@@ -278,14 +262,6 @@ class AdminCog(commands.Cog, name='admin'):
                 return
             loader.unlock_all(self.client)
             await disp.BOT_UNLOCKED.send(ctx)
-            return
-        if arg == "ingame":
-            if census.get_offline_players.bypass:
-                census.get_offline_players.bypass = False
-                await disp.BOT_BP_OFF.send(ctx)
-            else:
-                census.get_offline_players.bypass = True
-                await disp.BOT_BP_ON.send(ctx)
             return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)
 
@@ -321,11 +297,6 @@ class AdminCog(commands.Cog, name='admin'):
                 classes.Weapon.clear_all()
                 await loop.run_in_executor(None, db.get_all_elements, classes.Weapon, "static_weapons")
                 await disp.BOT_RELOAD.send(ctx, "Weapons")
-                return
-            if arg == "bases":
-                classes.Base.clear_all()
-                await loop.run_in_executor(None, db.get_all_elements, classes.Base, "static_bases")
-                await disp.BOT_RELOAD.send(ctx, "Bases")
                 return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)
 

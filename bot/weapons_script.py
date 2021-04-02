@@ -310,3 +310,5 @@ def get_all_categories():
     for cat in jdata["item_category_list"]:
         di[int(cat["item_category_id"])] = cat["name"]["en"]
     return di
+
+push_all_weapons()

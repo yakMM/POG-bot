@@ -5,10 +5,11 @@ from display.strings import AllStrings as disp
 from classes import Base, Team
 import modules.database as db
 import modules.roles as roles
+import modules.config as cfg
 import modules.accounts_handler as accounts
 from modules.tools import UnexpectedError
 
-from match.processes import PlayerPicking, FactionPicking, BasePicking, GettingReady, MatchPlaying, CaptainSelection
+from match.processes import *
 from match.commands import CommandFactory
 from match.match_status import MatchStatus
 
@@ -95,6 +96,14 @@ class Match:
     def base(self):
         return self.__data.base
 
+    @property
+    def round_stamps(self):
+        return self.__data.round_stamps
+
+    @property
+    def round_length(self):
+        return self.__data.round_length
+
     def change_check(self, arg):
         if not self.__objects:
             raise AttributeError("Match instance is not bound, no attribute 'change_check'")
@@ -131,12 +140,23 @@ class MatchData:
             self.id = data["_id"]
             self.teams = [Team.from_data(self.match, 0, data["teams"][0]), Team.from_data(self.match, 1, data["teams"][1])]
             self.base = Base.get(data["base_id"])
+            self.round_length = data["round_length"]
             self.round_stamps = data["round_stamps"]
         else:
             self.id = 0
             self.teams = [None, None]
             self.base = None
+            self.round_length = cfg.general["round_length"]
             self.round_stamps = list()
+
+    def get_data(self):
+        dta = dict()
+        dta["_id"] = self.id
+        dta["round_stamps"] = self.round_stamps
+        dta["round_length"] = self.round_length
+        dta["base_id"] = self.base.id
+        dta["teams"] = [tm.get_data() for tm in self.teams]
+        return dta
 
     def clean(self):
         # Clean players if in teams
@@ -153,12 +173,17 @@ class MatchData:
     def round_no(self):
         if self.match.next_status is MatchStatus.IS_PLAYING:
             return len(self.round_stamps)
-        if self.match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING):
+        if self.match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_WAITING_2, MatchStatus.IS_STARTING):
             return len(self.round_stamps) + 1
         return 0
 
+    @property
+    def last_start_stamp(self):
+        return self.round_stamps[-1]
 
-_process_list = [CaptainSelection, PlayerPicking, FactionPicking, BasePicking, GettingReady, MatchPlaying]
+
+_process_list = [CaptainSelection, PlayerPicking, FactionPicking, BasePicking, GettingReady, MatchPlaying,
+                 GettingReady2, MatchPlaying]
 
 
 class MatchObjects:
@@ -188,11 +213,20 @@ class MatchObjects:
     async def next_process(self, *args):
         await self.set_status(MatchStatus.IS_RUNNING)
         self.progress_index += 1
+        if self.progress_index == len(_process_list):
+            await self.on_match_over()
+            return
         self.current_process = _process_list[self.progress_index](self, *args)
 
     def on_spin_up(self, p_list):
         self.data.id = Match._last_match_id
         self.current_process = _process_list[self.progress_index](self, p_list)
+
+    async def on_match_over(self):
+        await disp.MATCH_OVER.send(self.match.channel)
+        await db.async_db_call(db.set_element, "matches", self.data.id, self.data.get_data())
+        await self.clean()
+        await disp.MATCH_CLEARED.send(self.match.channel)
 
     @property
     def command(self):

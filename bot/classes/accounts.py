@@ -9,9 +9,9 @@
 """
 
 # Ext imports
-from datetime import datetime as dt
 from logging import getLogger
 import modules.database as db
+import modules.tools as tools
 
 QUIT_DELAY = 300
 
@@ -85,12 +85,12 @@ class Account:
     async def validate(self):
         self.__is_validated = True
         await self.a_player.accept_account()
-        self.__last_usage["time_start"] = int(dt.timestamp(dt.now()))
+        self.__last_usage["time_start"] = tools.timestamp_now()
         if self.a_player.id not in self.__unique_usages:
             self.__unique_usages.append(self.a_player.id)
             await db.async_db_call(db.push_element, "accounts_usage", self.__id,
                                                     {"unique_usages": self.a_player.id})
 
     def terminate(self):
-        self.__last_usage["time_stop"] = int(dt.timestamp(dt.now()))
+        self.__last_usage["time_stop"] = tools.timestamp_now()
         self.__is_destroyed = True

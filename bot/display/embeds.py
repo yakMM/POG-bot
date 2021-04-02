@@ -4,6 +4,7 @@ from datetime import datetime as dt
 from datetime import timezone as tz
 
 from modules.roles import is_admin
+import modules.tools as tools
 from match import MatchStatus
 
 
@@ -276,9 +277,11 @@ def global_info(ctx, lobby, match_list):
                 desc += f"*Match {m.id}*"
             desc += "\n"
         desc += f"Status: {m.status_str}"
-        if m.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_RESULT):
+        if m.base:
             desc += f"\nBase: **{m.base.name}**\n"
-            desc += " / ".join(f"{tm.name}: **{cfg.factions[tm.faction]}**" for tm in m.teams)
+        for tm in m.teams:
+            if tm and tm.faction != 0:
+                desc += f"\n{tm.name}: **{cfg.factions[tm.faction]}**"
         if m.status is MatchStatus.IS_PLAYING:
             desc += f"\nTime Remaining: **{m.get_formatted_time_to_round_end()}**"
         embed.add_field(name=m.channel.name, value=desc, inline=False)
@@ -318,7 +321,7 @@ def team_update(arg, match):
                 value = f"Captain: {tm.captain.mention} ({tm.captain.name})\n"
             if tm.player_pings:
                 value += "Players:\n" + '\n'.join(tm.player_pings)
-            if match.next_status is MatchStatus.IS_WAITING:
+            if match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_WAITING_2):
                 if tm.captain.is_turn:
                     name = f"{tm.name} [{cfg.factions[tm.faction]}] - not ready"
                 else:
@@ -351,6 +354,7 @@ def jaeger_calendar(arg):
                     value=date.strftime("%Y-%m-%d %H:%M UTC"),
                     inline=False)
     return embed
+
 
 def base_display(ctx, base, is_booked):
     if is_booked:
@@ -408,7 +412,7 @@ def usage(ctx, data):
             name = f'User: <@{use["id"]}>'
         else:
             name = f'POG account {use["id"]}'
-        lead = int(dt.timestamp(dt.now())) - use["time_stop"]
+        lead = tools.timestamp_now() - use["time_stop"]
         if lead < 60:
             lead_str = f"{lead} second(s) ago"
         elif lead < 3600:
