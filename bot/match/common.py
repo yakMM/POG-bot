@@ -65,7 +65,7 @@ async def get_substitute(match, subbed, force_player=None):
 
     Loop(coro=ping_sub_in_lobby, count=1).start(match, new_player, new_player.is_lobbied)
 
-    new_player.on_match_selected(match.proxy)
+    await new_player.on_match_selected(match.proxy)
     return new_player
 
 

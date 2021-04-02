@@ -25,10 +25,6 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         self.p_list = p_list
         self.players = dict()
 
-        for p in p_list:
-            self.players[p.id] = p
-            p.on_match_selected(self.match.proxy)
-
         self.captains = [None, None]
 
         self.volunteer_rh = reactions.SingleMessageReactionHandler()
@@ -59,18 +55,19 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
     @Process.init_loop
     async def init(self):
-        # Open match channel
-        await roles.modify_match_channel(self.match.channel, view=True)
-        await disp.LB_MATCH_STARTING.send(ContextWrapper.channel(cfg.channels["lobby"]), self.match.channel.id)
-
-        for p in self.players.values():
-            await p.get_stats()
-            print(f"{p.name}, matches: {p.stats.nb_matches_played}")
+        for p in self.p_list:
+            self.players[p.id] = p
+            await p.on_match_selected(self.match.proxy)
+            # print(f"{p.name}, matches: {p.stats.nb_matches_played}")
             # ctx = ContextWrapper.user(p.id)
             # try:
             #     await disp.MATCH_DM_PING.send(ctx)
             # except discord.errors.Forbidden:
             #     log.warning(f"Player id:[{p.id}], name:[{p.name}] is refusing DMs")
+
+        # Open match channel
+        await roles.modify_match_channel(self.match.channel, view=True)
+        await disp.LB_MATCH_STARTING.send(ContextWrapper.channel(cfg.channels["lobby"]), self.match.channel.id)
 
         players_ping = " ".join(p.mention for p in self.players.values())
         await disp.MATCH_INIT.send(self.match.channel, players_ping)

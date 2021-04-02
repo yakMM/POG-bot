@@ -236,11 +236,9 @@ class Player:
     def on_picked(self, active):
         self.__active = active
 
-    def on_match_selected(self, m):
+    async def on_match_selected(self, m):
         self.__match = m
         self.__lobby_stamp = 0
-
-    async def get_stats(self):
         self.__stats = await PlayerStat.get_from_database(self.__id)
 
     @property
