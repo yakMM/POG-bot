@@ -123,6 +123,7 @@ async def send_account(channel, a_player):
         msg = await disp.ACC_STAFF.send(ContextWrapper.channel(cfg.channels["staff"]),
                                         f'<@&{cfg.roles["admin"]}>', a_player.mention, account=a_player.account)
         a_player.account.message = msg
+    await disp.ACC_LOG.send(ContextWrapper.channel(cfg.channels["spam"]), a_player.name, a_player.id, a_player.account.id)
 
 
 async def terminate_account(a_player):

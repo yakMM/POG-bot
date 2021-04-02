@@ -182,7 +182,7 @@ class BaseSelector:
             await self.__validator.force_confirm(ctx, base=base)
             return
         other_captain = self.__match.teams[picker.team.id - 1].captain
-        msg = await disp.BASE_OK_CONFIRM.send(ctx, self.__selected.name, other_captain.mention)
+        msg = await disp.BASE_OK_CONFIRM.send(ctx, base.name, other_captain.mention)
         await self.__validator.wait_valid(picker, msg, base=base)
         if self.is_booked:
             await disp.BASE_BOOKED.send(ctx, other_captain.mention, base.name)

@@ -66,11 +66,11 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         for p in self.players.values():
             await p.get_stats()
             print(f"{p.name}, matches: {p.stats.nb_matches_played}")
-            ctx = ContextWrapper.user(p.id)
-            try:
-                await disp.MATCH_DM_PING.send(ctx)
-            except discord.errors.Forbidden:
-                log.warning(f"Player id:[{p.id}], name:[{p.name}] is refusing DMs")
+            # ctx = ContextWrapper.user(p.id)
+            # try:
+            #     await disp.MATCH_DM_PING.send(ctx)
+            # except discord.errors.Forbidden:
+            #     log.warning(f"Player id:[{p.id}], name:[{p.name}] is refusing DMs")
 
         players_ping = " ".join(p.mention for p in self.players.values())
         await disp.MATCH_INIT.send(self.match.channel, players_ping)
@@ -174,8 +174,8 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
     async def clean_msg(self, i):
         if self.accept_msg[i]:
             msg = self.accept_msg[i]
-            reactions.rem_handler(msg.id)
             await msg.clear_reactions()
+            reactions.rem_handler(msg.id)
             self.accept_msg[i] = None
 
     @Process.public

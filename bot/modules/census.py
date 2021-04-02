@@ -22,7 +22,6 @@ async def process_score(match):
         url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_event/?character_id=' \
               f'{a_player.ig_id}&type=KILL&after={start}&before={end}&c:limit=500'
         j_data = await http_request(url)
-        print(url)
         if j_data["returned"] == 0:
             log.error(f'No kill found for player: id={a_player.ig_name} (url={url})')
             continue
