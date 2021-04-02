@@ -4,7 +4,8 @@
 
 This repository contains POG bot, a discord bot used by [Planetside Open Games](https://docs.google.com/document/d/13rsrWA4r16gpB-F3gvx5HWf2T974mdHLraPSjh5DO1Q) to provide a community-driven matchmaking system for 6v6 infantry scrims in Planetside2.
 
-@TODO: write proper doc in the code
+@TODO: write pydoc in the code
+@TODO: 3.0: Update this readme
 
 ### Requirements:
 - This project uses a `requirements.txt` to relay its python dependencies that need to be installed.

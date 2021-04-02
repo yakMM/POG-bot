@@ -1,19 +1,62 @@
 # v3.0:
-- Match process rewrite [IN PROGRESS]
-- Changed how demote works:
-  - It's only possible to demote/resign a captain when it's their turn
-  - On resign, player is not put back in the picking pool but instead added to the team as a player
-  - It is now possible to demote/resign even after picking players
-- Streamlined sub process
-  - Captains can now be substituted, a new captain will automatically get chosen
-  - It is now possible to sub players at any time before match start
-- Changed base selection:
-  - Bases are now selected with =base (=b) command
-  - Current base can now be modified at any time before match start by team captains (even before players are picked)
-- match command (=m) replaced by info command (=i)
-- =p or =p help will now give info on the picking progress instead of displaying generic command help
-- Code cleaning/commenting/documenting
-
+- Code revamp:
+  - Added a process system to handle the different match events
+  - Added a command system to handle the match commands
+  - Database changes
+  - Reworked the architecture/location of python packages within the project
+  - Improved display classes
+  - Bugfixes
+- Accounts:
+  - Jaeger accounts can now be handed dynamically one by one
+  - Account usage is no longer reported to the account sheet, but logged inside the mongo database
+  - Account logging details are pulled from a google sheet. They can be updated dynamically with =reload command
+  - Players can receive accounts even when they are in hte "getting ready" phase.
+- TS3 bot:
+  - Because PSB teamspeak server was down, removed the TS3 interaction (could not test)
+  - Will be added back in a coming patch
+- Players:
+  - Added handling of player stats (nb of matches, nb of kills, deaths, net, score)
+  - Nb of matches is used to find potential Team captains
+  - Players can now be renamed with =rename command
+- Lobby:
+  - The command =lobby get now saves the lobby state in the db.
+  - The last lobby state is automatically used to fill the lobby on restart
+  - There is now a timeout for lobby joins: players will be warned after 2 hours and kicked after 2h10m
+  - Added =reset command to reset lobby timeout
+  - Players can now join the lobby even if their discord status is offline
+  - Players are no longer kicked of the lobby after they go offline in discord
+- Match result:
+  - The two most used classes of each player within the match are now displayed in the scoreboard
+  - The bot will no longer print the banned weapon message twice (was happening when the weapon was used in the first round)
+- General:
+  - It is now possible to use command directly with discord ID instead of mention. For example =p 75451215457875 instead of =p @pog will work
+  - Match channels are now closed (not visible any more) when no match is active, to reduce channel clutter
+- Match:
+  - match command (=m) has been replaced by info command (=i)
+  - The bot will send a DM to players when the lobby is filled and a match start
+  - Captains are no longer automatically selected. Rather, a step was added in which players can volunteer to be captains.
+    - Each minute, the bot will suggest new captains until some players accept the role
+  - Removed =resign =demote commands
+  - Sub command:  
+    - =sub should now work in all situations, until a round actually start: It is now possible to sub players in the getting ready phase
+    - Captains can now use the sub command. A successful sub will require both captains to confirm the action
+    - Admins can directly sub players in. (Whereas when captains use sub, a player is automatically picked form the lobby)
+  - Added =swap command
+    - It requires both captain confirmation
+    - Swap players form one team to the other
+  - Added =base command
+    - Captains can now select a base whenever they want, and change the base several times until the round actually start
+    - The bot will show if a base is currently used in another pog match
+  - =p command (with no argument) will now display the picking status
+  - Added reaction systems:
+    - Confirmation of action between captains
+    - Faction selection
+    - Captain selection
+    - Overhauled base selection system with reactions
+  - Match status is now displayed automatically and refreshed regularly to show the time remaining
+  - Added =check command for admins to disable account validation check or online check
+- Account usage: Changed the way admins can check for POG account usage (command instead of google sheet)
+- Register: players can now remove their account while in a match in the Getting ready phase. They will be given an account by the bot
 
 # v2.1:
 - Ingame online check feature now reactivates after each match

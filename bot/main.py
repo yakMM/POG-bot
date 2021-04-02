@@ -128,8 +128,6 @@ def _add_main_handlers(client):
             return
         # reaction to the rule message?
         if payload.message_id == cfg.general["rules_msg_id"]:
-            # TODO: remove (test)
-            print(str(payload.emoji))
             if str(payload.emoji) == "✅":
                 p = Player.get(payload.member.id)
                 if not p:  # if new player
@@ -220,10 +218,12 @@ def _add_init_handlers(client):
     async def on_message(message):
         return
 
+
 # TODO: testing, to be removed
 def _test(client):
     from template_test_file import test_hand
     test_hand(client)
+
 
 def _define_log(launch_str):
     # Logging config, logging outside the github repo

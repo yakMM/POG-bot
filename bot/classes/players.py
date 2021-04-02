@@ -413,7 +413,6 @@ class Player:
                     world = int(j_data["character_list"][0]["world_id"])
                 except ValueError:
                     log.error(f'Received unexpected value for world_id: {j_data["character_list"][0]["world_id"]}')
-                    # TODO: test, uncomment this
                     raise ApiNotReachable(url)
                 if world != WORLD_ID:
                     raise CharInvalidWorld(j_data["character_list"][0]["name"]["first"])
