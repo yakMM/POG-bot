@@ -105,12 +105,13 @@ class BaseSelector:
 
     def add_callbacks(self, validator):
         @validator.confirm
-        async def do_confirm(ctx):
+        async def do_confirm(ctx, base):
             self.__reset_selection()
-            _pog_selected_bases[self.__match.id] = self.__selected
-            self.__match.data.base = self.__selected
+            self.__selected = base
+            _pog_selected_bases[self.__match.id] = base
+            self.__match.data.base = base
             await self.__nav.reaction_handler.destroy()
-            await disp.BASE_ON_SELECT.send(ctx, self.__selected.name, base=self.__selected, is_booked=self.is_booked)
+            await disp.BASE_ON_SELECT.send(ctx, base.name, base=base, is_booked=self.is_booked)
             if self.__match.status is MatchStatus.IS_BASING:
                 await self.__match.proxy.on_base_found()
 
@@ -177,13 +178,12 @@ class BaseSelector:
         await disp.BASE_NOT_FOUND.send(ctx)
 
     async def __select_base(self, ctx, picker, base):
-        self.__selected = base
         if is_admin(ctx.author):
-            await self.__validator.force_confirm(ctx)
+            await self.__validator.force_confirm(ctx, base=base)
             return
         other_captain = self.__match.teams[picker.team.id - 1].captain
         msg = await disp.BASE_OK_CONFIRM.send(ctx, self.__selected.name, other_captain.mention)
-        await self.__validator.wait_valid(picker, msg)
+        await self.__validator.wait_valid(picker, msg, base=base)
         if self.is_booked:
             await disp.BASE_BOOKED.send(ctx, other_captain.mention, base.name)
 

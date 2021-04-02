@@ -283,4 +283,4 @@ def init_restart_data():
 #     if dta:
 #         collections["matches"].replace_one({"_id": dta["_id"]}, dta)
 #     ij-=1
-players_db_update()
+push_accounts_to_users()
