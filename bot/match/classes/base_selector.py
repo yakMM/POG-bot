@@ -133,7 +133,7 @@ class BaseSelector:
             await self.display_all(ctx)
             return
         if len(args) == 1:
-            if args[0] == "list":
+            if args[0] == "list" or args[0] == "l":
                 await self.display_all(ctx, force=True)
                 return
             if args[0].isnumeric():

@@ -99,8 +99,8 @@ class AllStrings(Enum):
                             "Re-register in <#{}> to confirm you still have access to it!", embed=embeds.flip_accounts)
     RDY = Message("Bot just started and is now ready. Version `{}`")
     STOP = Message("Bot shutting down! Saving state...")
-    CONFIRM_NOT_CAPTAIN = Message("You can't confirm! {} should do it!")
-    CONFIRM_NOTHING = Message("Nothing to confirm!")
+    CONFIRM_NOT_CAPTAIN = Message("You can't accept! {} should do it!")
+    CONFIRM_NOTHING = Message("Nothing to accept!")
     DECLINE_NOTHING = Message("Nothing to decline!")
     DECLINE_NOT_CAPTAIN = Message("You can't decline! {} should do it!")
     CONFIRM_DECLINE = Message("You declined the request!")
@@ -172,7 +172,7 @@ class AllStrings(Enum):
     BASE_CALENDAR = Message("{} Pick an available base!", ping=False, embed=embeds.jaeger_calendar)
     BASE_NO_BASE = Message("No base yet selected!")
     BASE_NO_BASE_WAITING = Message("Waiting for captains to pick a base...")
-    BASE_OK_CONFIRM = Message("Picked **{}**! {} confirm if you agree! (use `=b confirm` or react below)")
+    BASE_OK_CONFIRM = Message("Picked **{}**! {} confirm if you agree! (use `=b accept/decline` or react below)")
     BASE_NO_CHANGE = Message("It's not possible to change the match base anymore!")
 
     ACC_NOT_ENOUGH = Message("Not enough accounts are available for this match!\n**Match has been canceled!**")
@@ -232,14 +232,14 @@ class AllStrings(Enum):
     SUB_OKAY_CAP = Message("{} replaced {} as {}'s captain", ping=False, embed=embeds.team_update)
     SUB_OKAY = Message("{} replaced {}!", ping=False, embed=embeds.team_update)
     SUB_LOBBY = Message("{} you have been designated as a substitute, join <#{}>!", embed=embeds.lobby_list)
-    SUB_OK_CONFIRM = Message("Subbing {}! {} confirm if you agree! (use `=sub confirm` or react below)", ping=False)
+    SUB_OK_CONFIRM = Message("Subbing {}! {} accept if you agree! (use `=sub accept/decline` or react below)", ping=False)
 
     SWAP_OK = Message("Successfully swapped {} and {}", ping=False, embed=embeds.team_update)
     SWAP_MENTION_2 = Message("Invalid request! @ mention two players to swap!")
     SWAP_NO = Message("{} can't be swapped!", ping=False)
     SWAP_CAP = Message("Invalid request! {} is a team captain!", ping=False)
     SWAP_SAME_TEAM = Message("Invalid request! Can't swap two players of the same team!", ping=False)
-    SWAP_OK_CONFIRM = Message("Swapping players! {} confirm if you agree! (use `=sub confirm` or react below)")
+    SWAP_OK_CONFIRM = Message("Swapping players! {} confirm if you agree! (use `=sub accept/decline` or react below)")
 
     async def send(self, ctx, *args, **kwargs):
         """ Send the message string_name in context ctx,

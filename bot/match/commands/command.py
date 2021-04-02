@@ -74,7 +74,7 @@ class InstantiatedCommand:
 
     async def __call__(self, ctx, args=()):
         if self.__has_help:
-            if len(args) == 1 and args[0] == "help":
+            if len(args) == 1 and (args[0] == "help" or args[0] == "h"):
                 await self.__has_help.send(ctx)
                 return
         if self.__parent.match.status is MatchStatus.IS_FREE:
@@ -84,7 +84,7 @@ class InstantiatedCommand:
             await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
             return
         if self.__has_status:
-            if len(args) == 0 or (len(args) == 1 and args[0] == "help"):
+            if len(args) == 0 or (len(args) == 1 and (args[0] == "help" or args[0] == "h")):
                 try:
                     await self.__parent.match.get_process_attr(self.__has_status)(ctx)
                     return

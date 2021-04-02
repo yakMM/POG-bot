@@ -659,6 +659,10 @@ class ActivePlayer:
     def net(self):
         return self.__net
 
+    async def update_stats(self):
+        self.__player.stats.add_stats(self)
+        await db.async_db_call(db.set_element, "player_stats", self.id, self.__player.stats.get_data())
+
     @property
     def illegal_weapons(self):
         return self.__illegal_weapons

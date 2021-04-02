@@ -225,6 +225,9 @@ class MatchObjects:
     async def on_match_over(self):
         await disp.MATCH_OVER.send(self.match.channel)
         await db.async_db_call(db.set_element, "matches", self.data.id, self.data.get_data())
+        for tm in self.teams:
+            for p in tm.players:
+                await p.update_stats()
         await self.clean()
         await disp.MATCH_CLEARED.send(self.match.channel)
 

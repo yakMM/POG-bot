@@ -33,6 +33,13 @@ class PlayerStat:
         self.net += dta["net"]
         self.score += dta["score"]
 
+    def add_stats(self, a_player):
+        self.matches.append(a_player.match.id)
+        self.kills += a_player.kills
+        self.deaths += a_player.deaths
+        self.net += a_player.net
+        self.score += a_player.score
+
     def get_data(self):
         dta = dict()
         dta["_id"] = self.id

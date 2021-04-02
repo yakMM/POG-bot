@@ -64,7 +64,7 @@ class CaptainValidator:
 
     async def check_message(self, ctx, captain, args):
         if len(args) == 1:
-            if args[0] == "confirm":
+            if args[0] == "accept" or args[0] == "a":
                 if not self.expected:
                     await disp.CONFIRM_NOTHING.send(ctx)
                 elif captain is not self.expected:
@@ -75,7 +75,7 @@ class CaptainValidator:
                 else:
                     raise UnexpectedError("Confirm Function is None!")
                 return True
-            elif args[0] == "decline":
+            elif args[0] == "decline" or args[0] == "d":
                 if not self.expected:
                     await disp.DECLINE_NOTHING.send(ctx)
                 elif captain is not self.expected:
@@ -88,4 +88,8 @@ class CaptainValidator:
                     await disp.CONFIRM_DECLINE.send(ctx)
                     await self.clean()
                 return True
+            elif args[0] == "cancel" or args[0] == "c":
+                if self.is_captain(captain) and (captain is not self.expected):
+                    await disp.CONFIRM_CANCELED.send(ctx)
+                    await self.clean()
         return False

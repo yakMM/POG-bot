@@ -20,22 +20,21 @@ def register_help(ctx):
                     value='`=r no account`\n',
                     inline=False)
     embed.add_field(name='If you have a Jaeger account',
-                    value='`=r char_name` - If your character names have faction suffixes\n'
+                    value='`=r charName` - If your character names have faction suffixes '
+                          '(charNameVS, charNameTR, charNameNC)\n'
                           '`=r charName1 charName2 charName3` - If your character names don\'t have faction suffixes',
                     inline=False)
     embed.add_field(name='Notify feature',
                     value='`=notify` - To join or leave the Notify feature\n'
-                          f'When suscribed to Notify, you can be mentionned with <@&{cfg.roles["notify"]}> '
+                          f'When subscribed to Notify, you can be mentioned with <@&{cfg.roles["notify"]}> '
                           'when the queue is almost full',
                     inline=False)
-    try:
-        if is_admin(ctx.author):
-            embed.add_field(name="Staff commands",
-                            value='`=unregister @player` - Permanently remove player profile from the system\n'
-                                  '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
-                            inline=False)
-    except AttributeError:
-        pass  # if ctx is from bot
+    if is_admin(ctx.author):
+        embed.add_field(name="Staff commands",
+                        value='`=rename @player New Name` - Change the player name within the system\n'
+                              '`=unregister @player` - Permanently remove player profile from the system\n'
+                              '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
+                        inline=False)
     return embed
 
 
@@ -44,16 +43,17 @@ def lobby_help(ctx):
     """
     embed = Embed(colour=Color.blurple())
     embed.add_field(name='Lobby commands',
-                    value='`=j` - Join the lobby\n'
-                          '`=l` - Leave the lobby\n'
-                          '`=q` - See the current lobby\n'
-                          '`=i` - Display the global information prompt',
+                    value='`=join` (`=j`) - Join the lobby\n'
+                          '`=leave` (`=l`)  - Leave the lobby\n'
+                          '`=queue` (`=q`)  - See the current lobby\n'
+                          '`=reset` (`=rst`)  - Reset your queue timeout\n'
+                          '`=info` (`=i`)  - Display the global information prompt',
                     inline=False)
     if is_admin(ctx.author):
         embed.add_field(name="Staff commands",
                         value='`=clear` - Clear the lobby\n'
-                              '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages\n'
-                              '`=remove @player` - Remove player from lobby',
+                              '`=remove @player` - Remove player from lobby\n'
+                              '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages\n',
                         inline=False)
     return embed
 
@@ -70,18 +70,18 @@ def admin_help(ctx):
     embed.add_field(name='Lobby commands',
                     value='`=remove @player` - Remove the player from queue\n'
                           '`=clear` - Clear queue\n'
-                          '`=lobby get` - Get all of the user IDs to restore the lobby\n'
+                          '`=lobby get` - Save the lobby state in the db\n'
                           '`=lobby restore id id ...` - Re-add all the users back to the lobby',
                     inline=False)
     embed.add_field(name='Player Management commands',
-                    value='`=timeout @player duration` - Mute the player from POF for a given time\n'
+                    value='`=rename @player New Name` - Rename a player within the system\n'
+                          '`=timeout @player duration` - Mute the player from POF for a given time\n'
                           '`=unregister @player` - Forcibly unregisters and removes a user from the system',
                     inline=False)
     embed.add_field(name='Match commands',
-                    value='`=demote @player` - Force `=resign` the player\n'
-                          '`=sub @player` - Pick someone in queue to replace the player\n'
-                          '`=base name` - Force a base\n'
-                          '`=pog ingame` - Toggle the in-game player check',
+                    value='`=sub @player1 @player2` - Sub player1 by player2\n'
+                          '`=clear` - Clear the match\n'
+                          '`=check account/online` - Disable account or online check',
                     inline=False)
     return embed
 
@@ -100,10 +100,14 @@ def base_help(ctx):
     """ Returns base help embed
     """
     embed = Embed(colour=Color.blurple())
-    embed.add_field(name='Map selection commands',
+    embed.add_field(name='Base selection commands',
                     value=f'`=base nanite realm` - Display all the bases containing *nanite realm* in their name\n'
-                          f'`=base 3` - Chooses the base number 3 from the selection\n'
-                          f'`=base` - Display the current selection or show the help',
+                          f'`=base 3` - Choose the base number 3 from the selection\n'
+                          f'`=base` (`=b`)  - Display the current selection or show the help\n'
+                          f'`=base list` (`=b l`) - Force the display of all available bases\n'
+                          f'`=base accept` (`=b a`) - Accept the base selection\n'
+                          f'`=base decline` (`=b d`) - Decline the base selection\n'
+                          f'`=base cancel` (`=b c`) - Cancel the base selection',
                     inline=False)
     return embed
 
@@ -112,12 +116,15 @@ def captain_help(ctx):
     """ Returns base help embed
     """
     embed = Embed(colour=Color.blurple())
-    embed.add_field(name='Map selection commands',
-                    value=f'`=cap volunteer` - Display all the bases containing *nanite realm* in their name\n'
-                          f'`=cap confirm` - Chooses the base number 3 from the selection\n'
-                          f'`=cap decline` - Display the current selection or show the help',
+    embed.add_field(name='Captain selection commands',
+                    value=f'`=captain volunteer` (`=c v`) - Volunteer as a captain for the match\n'
+                          f'`=captain accept` (`=c a`) - Accept the captain proposal\n'
+                          f'`=captain decline` (`=c d`) - Decline the captain proposal\n'
+                          f'`=captain` (`=c`) - Display the current status\n'
+                          f'`=captain help` (`=c h`) - Display the help prompt',
                     inline=False)
     return embed
+
 
 def usage_help(ctx):
     """ Returns base help embed
@@ -160,22 +167,23 @@ def match_help(ctx):
     """
     embed = Embed(colour=Color.blurple())
     embed.add_field(name='Match commands',
-                    value='`=m` - Display the match status and team composition\n'
+                    value='`=info` (`=i`) - Display the match status and team composition\n'
+                          '`=captain` (`=c`) - Command for captain selection, use `=c help` to know more\n'
                           "`=squittal` - Display player data for integration in Chirtle's script",
                     inline=False)
     embed.add_field(name='Team Captain commands',
                     value='`=p @player` - Pick a player in your team\n'
                           '`=p VS`/`NC`/`TR` - Pick a faction\n'
-                          '`=p base name` - Pick the base *base name*\n'
-                          '`=resign` - Resign from Team Captain position\n'
-                          '`=ready` - To toggle the ready status of your team',
+                          '`=base` (`=b`) - Command for the base selection, use `=b help` to know more\n'
+                          '`=ready` - To toggle the ready status of your team\n'
+                          '`=sub @player` - Pick someone in queue to replace the player mentioned\n'
+                          '`=swap @player1 @player2` - Swap the two players from one team to the other',
                     inline=False)
     if is_admin(ctx.author):
         embed.add_field(name="Staff commands",
                         value='`=clear` - Clear the match\n'
-                              '`=base base name` - Force select a base\n'
-                              '`=demote @player` - Remove Team Captain position from player\n'
-                              '`=sub @player` - Pick someone in queue to replace the player\n'
+                              '`=sub @player1 @player2` - Replace player1 by player2'
+                              '`=check account/online` - Disable account or online check\n'
                               '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                         inline=False)
     return embed

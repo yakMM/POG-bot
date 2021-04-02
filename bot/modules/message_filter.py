@@ -71,7 +71,8 @@ async def on_message(client, message):
         return
 
     # Make the message lower-case:
-    message.content = message.content.lower()
+    if "=rename" not in message.content.lower():
+        message.content = message.content.lower()
 
     # Automatically add a mention if a discord id is in the message:
     args = message.content.split(" ")

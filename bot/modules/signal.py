@@ -6,6 +6,8 @@ import modules.config as cfg
 import modules.lobby as lobby
 import modules.database as db
 
+# This doesn't work
+
 
 def save_state():
     loop = asyncio.get_event_loop()

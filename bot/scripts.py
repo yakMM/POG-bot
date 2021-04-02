@@ -228,7 +228,7 @@ def get_match_from_db(m_id):
 
     #_make_image(m)
 
-def matches_db_update():
+def fill_player_stats():
     all = dict()
     db.get_all_elements(DbMatch.new_from_data, "matches")
     for m in _all_db_matches:
@@ -239,13 +239,9 @@ def matches_db_update():
                 all[p["discord_id"]].add_data(m.id, p)
     la = list()
     for x in all.values():
-        print(f"add {x.discord_id}")
+        print(f"add {x.id}")
         la.append(x.get_data())
     db.force_update("player_stats", la)
-
-
-
-
 
 def remove_old_accounts():
     db.get_all_elements(DbPlayer.new_from_data, "users")
@@ -272,10 +268,11 @@ def matches_time_stat():
 #     print(f"{p}: min:{(k[p][0]-14)%24}, max:{(k[p][1]-14)%24}")
 
 #matches_db_update()
-# d= dict()
-# d["_id"] = 0
-# d["last_match_id"] = 108
-# collections["restart_data"].insert_one(d)
+def init_restart_data():
+    d= dict()
+    d["_id"] = 0
+    d["last_match_id"] = 1973
+    db.set_element("restart_data", 0, d)
 
 
 
@@ -286,4 +283,4 @@ def matches_time_stat():
 #     if dta:
 #         collections["matches"].replace_one({"_id": dta["_id"]}, dta)
 #     ij-=1
-get_match_from_db(1800)
+players_db_update()

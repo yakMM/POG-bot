@@ -209,6 +209,7 @@ def _add_init_handlers(client):
                         modules.lobby.add_to_lobby(player)
                 except ValueError:
                     pass
+            modules.database.set_field("restart_data", 0, {"last_lobby": list()})
         await disp.LB_QUEUE.send(ContextWrapper.channel(cfg.channels["lobby"]),
                                  names_in_lobby=modules.lobby.get_all_names_in_lobby())
         modules.loader.unlock_all(client)
