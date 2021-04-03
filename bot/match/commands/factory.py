@@ -8,9 +8,14 @@ import modules.config as cfg
 import modules.roles as roles
 from classes import Player
 from match.common import check_faction, get_check_captain
+from logging import getLogger
 
 import modules.accounts_handler as accounts
 import modules.census as census
+from modules.asynchttp import ApiNotReachable
+
+
+log = getLogger("pog_bot")
 
 _external_commands = [SubHandler, SwapHandler]
 
@@ -134,12 +139,16 @@ class CommandFactory(metaclass=MetaFactory):
                                                             " ".join(p.mention for p in not_validated_players))
                     return
             if self.match.check_offline:
-                offline_players = await census.get_offline_players(captain.team)
-                if len(offline_players) != 0:
-                    await disp.MATCH_PLAYERS_OFFLINE.send(ctx, captain.team.name,
-                                                          " ".join(p.mention for p in offline_players),
-                                                          p_list=offline_players)
-                    return
+                try:
+                    offline_players = await census.get_offline_players(captain.team)
+                    if len(offline_players) != 0:
+                        await disp.MATCH_PLAYERS_OFFLINE.send(ctx, captain.team.name,
+                                                              " ".join(p.mention for p in offline_players),
+                                                              p_list=offline_players)
+                        return
+                except ApiNotReachable as e:
+                    log.error(f"ApiNotReachable caught when checking online players: {e.url}")
+                    await disp.API_READY_ERROR.send(ctx)
             await match.on_team_ready(captain.team, True)
             await disp.MATCH_TEAM_READY.send(ctx, captain.team.name, match=self.match.proxy)
             return
@@ -184,7 +193,7 @@ class CommandFactory(metaclass=MetaFactory):
         await self.match.base_selector.process_request(ctx, a_player, args)
 
     @Command.command(*captains_ok_states, MatchStatus.IS_CAPTAIN)
-    async def clear(self, ctx):
+    async def clear(self, ctx, args):
         match = self.match.proxy
         await disp.MATCH_CLEAR.send(ctx)
         await match.clear(ctx)

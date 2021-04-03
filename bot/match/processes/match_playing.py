@@ -1,7 +1,8 @@
-from display import AllStrings as disp
+from display import AllStrings as disp, ContextWrapper
 from asyncio import sleep
 from datetime import datetime as dt, timezone as tz
 from lib.tasks import Loop, loop
+from logging import getLogger
 
 from match import MatchStatus
 from .process import Process
@@ -9,11 +10,15 @@ from .process import Process
 import modules.config as cfg
 import modules.reactions as reactions
 
+from modules.asynchttp import ApiNotReachable
+
 from match.classes.base_selector import push_last_bases
 
 import modules.census as census
 import modules.tools as tools
 import modules.image_maker as i_maker
+
+log = getLogger("pog_bot")
 
 
 class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
@@ -76,8 +81,13 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         await self.match.set_status(MatchStatus.IS_RUNNING)
         await self.rh.destroy()
         await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, self.match.round_no)
-        await census.process_score(self.match.proxy)
-        await i_maker.publish_match_image(self.match)
+        try:
+            await census.process_score(self.match.proxy)
+            await i_maker.publish_match_image(self.match)
+        except ApiNotReachable as e:
+            log.error(f"ApiNotReachable caught when processing scores : {e.url}")
+            await disp.API_SCORE_ERROR.send(ContextWrapper.channel(cfg.channels["results"]), self.match.id,
+                                            self.match.round_no)
         await self.match.next_process()
 
     @Process.public

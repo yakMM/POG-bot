@@ -182,7 +182,7 @@ def match_help(ctx):
     if is_admin(ctx.author):
         embed.add_field(name="Staff commands",
                         value='`=clear` - Clear the match\n'
-                              '`=sub @player1 @player2` - Replace player1 by player2'
+                              '`=sub @player1 @player2` - Replace player1 by player2\n'
                               '`=check account/online` - Disable account or online check\n'
                               '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',
                         inline=False)
@@ -278,20 +278,23 @@ def global_info(ctx, lobby, match_list):
     embed.add_field(name=lb_embed.name, value=lb_embed.value, inline=lb_embed.inline)
     for m in match_list:
         desc = ""
-        if m.next_status is not MatchStatus.IS_FREE:
+        if m.status is MatchStatus.IS_FREE:
+            continue
+        else:
             if m.round_no != 0:
                 desc += f"*Match {m.id} - Round {m.round_no}*"
             else:
                 desc += f"*Match {m.id}*"
             desc += "\n"
         desc += f"Status: {m.status_str}"
+        if m.status is MatchStatus.IS_PLAYING:
+            desc += f"\nTime Remaining: **{m.get_formatted_time_to_round_end()}**"
         if m.base:
-            desc += f"\nBase: **{m.base.name}**\n"
+            desc += f"\nBase: **{m.base.name}**"
         for tm in m.teams:
             if tm and tm.faction != 0:
                 desc += f"\n{tm.name}: **{cfg.factions[tm.faction]}**"
-        if m.status is MatchStatus.IS_PLAYING:
-            desc += f"\nTime Remaining: **{m.get_formatted_time_to_round_end()}**"
+
         embed.add_field(name=m.channel.name, value=desc, inline=False)
     return embed
 

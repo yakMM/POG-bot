@@ -63,18 +63,18 @@ class AllStrings(Enum):
     PK_OK = Message("Player picked! {} your turn, pick a player!", embed=embeds.team_update, ping=False)
     PK_OK_2 = Message("Player picked!", ping=False)
     PK_LAST = Message("Assigned {} to {}!", embed=embeds.team_update)
-    PK_OK_FACTION = Message("Teams are ready! {} pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting bellow!",
+    PK_OK_FACTION = Message("Teams are ready! {} pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting below!",
                             ping=False)
     PK_NOT_VALID_FACTION = Message("Incorrect input!")
     PK_FACTION_OK = Message("{} chose {}!", ping=False)
     PK_FACTION_ALREADY = Message("Your team is already {}!")
     PK_FACTION_OTHER = Message("Faction already picked by the other team!")
-    PK_FACTION_OK_NEXT = Message("{} chose {}! {} pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting bellow!",
+    PK_FACTION_OK_NEXT = Message("{} chose {}! {} pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting below!",
                                  ping=False)
     PK_FACTION_CHANGED = Message("{} changed to {}!", ping=False)
     PK_FACTION_NOT_PLAYER = Message("Pick a faction, not a player!")
     PK_FACTION_INFO = Message("Captains can change faction with `=pick` `tr`/`vs`/`nc`!")
-    PK_FACTION_HELP = Message("Waiting for {} to pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting bellow!",
+    PK_FACTION_HELP = Message("Waiting for {} to pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting below!",
                               ping=False)
     PK_OVER_READY = Message("Can't do that if your team is ready!")
     PK_RESIGNED = Message("Successfully resigned! {} is the new captain for {}!", embed=embeds.team_update)
@@ -94,6 +94,8 @@ class AllStrings(Enum):
     CHANNEL_INIT = Message("`Bot init`: Correctly hooked in channel <#{}>")
     INVALID_STR = Message("You entered an invalid argument! `{}`")
     API_ERROR = Message("Could not reach Planetside2 API, try again later!")
+    API_READY_ERROR = Message("Could not reach Planetside2 API, player online check ignored!", ping=False)
+    API_SCORE_ERROR = Message("Match {}, round {}: Could not reach Planetside2 API, no scores for this round!")
     GLOBAL_INFO = Message("Here is what's going on in POG at the moment:", embed=embeds.global_info)
     CHECK_ACCOUNT = Message("Your account password may have been flipped!\n"
                             "Re-register in <#{}> to confirm you still have access to it!", embed=embeds.flip_accounts)
@@ -123,7 +125,7 @@ class AllStrings(Enum):
 
     CAP_WAITING = Message("Waiting for captain(s), use `=captain volunteer` or react below if you want to be one",
                           ping=False, embed=embeds.team_update)
-    CAP_AUTO_ANNOUNCE = Message("Captains will be automatically chosen in 1 minute!")
+    CAP_AUTO_ANNOUNCE = Message("Captains will be automatically suggested in 1 minute!")
     CAP_OK = Message("{} will be captain for {}!", ping=False)
     CAP_AUTO = Message("{} has been designated as captain for {}\n"
                        "Accept or decline with `=captain accept/decline` or by reacting below!")
