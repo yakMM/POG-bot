@@ -57,6 +57,7 @@ class AdminCog(commands.Cog, name='admin'):
         if ctx.channel.id in cfg.channels["matches"]:
             match = Match.get(ctx.channel.id)
             await match.command.clear(ctx)
+            return
         await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
 
     @commands.command()

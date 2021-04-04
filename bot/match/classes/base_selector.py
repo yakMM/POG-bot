@@ -54,7 +54,6 @@ class BaseSelector:
         self.__validator = CaptainValidator(self.__match)
         self.add_callbacks(self.__validator)
         self.__nav = BaseNavigator(self, match.channel)
-        _pog_selected_bases[self.__match.id] = None
         self._get_booked_from_calendar.start()
 
     @loop(count=1)
@@ -65,12 +64,13 @@ class BaseSelector:
     async def clean(self):
         await self.__validator.clean()
         await self.__nav.reaction_handler.destroy()
-        _pog_selected_bases[self.__match.id] = None
+        if self.__match.id in _pog_selected_bases:
+            del _pog_selected_bases[self.__match.id]
 
     def __is_used(self, base):
         for key in _pog_selected_bases.keys():
             if key != self.__match.id:
-                if base is _pog_selected_bases[key]:
+                if base.id == _pog_selected_bases[key]:
                     return True
         return False
 
@@ -108,7 +108,7 @@ class BaseSelector:
         async def do_confirm(ctx, base):
             self.__reset_selection()
             self.__selected = base
-            _pog_selected_bases[self.__match.id] = base
+            _pog_selected_bases[self.__match.id] = base.id
             self.__match.data.base = base
             await self.__nav.reaction_handler.destroy()
             await disp.BASE_ON_SELECT.send(ctx, base.name, base=base, is_booked=self.is_booked)
@@ -184,7 +184,7 @@ class BaseSelector:
         other_captain = self.__match.teams[picker.team.id - 1].captain
         msg = await disp.BASE_OK_CONFIRM.send(ctx, base.name, other_captain.mention)
         await self.__validator.wait_valid(picker, msg, base=base)
-        if self.is_booked:
+        if self.is_base_booked(base):
             await disp.BASE_BOOKED.send(ctx, other_captain.mention, base.name)
 
     def __reset_selection(self):

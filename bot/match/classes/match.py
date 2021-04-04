@@ -196,7 +196,7 @@ class MatchObjects:
         self.base_selector = None
         self.progress_index = 0
         self.result_msg = None
-        self.clean_channel.start()
+        self.clean_channel.start(display=False)
         self.check_offline = True
         self.check_validated = True
         self.players_with_account = list()
@@ -254,12 +254,13 @@ class MatchObjects:
         self.check_offline = True
         self.check_validated = True
         await self.set_status(MatchStatus.IS_FREE)
-        self.clean_channel.start()
+        self.clean_channel.start(display=True)
         self.progress_index = 0
 
     @loop(count=1)
-    async def clean_channel(self):
-        await disp.MATCH_CHANNEL_OVER.send(self.channel)
+    async def clean_channel(self, display):
+        if display:
+            await disp.MATCH_CHANNEL_OVER.send(self.channel)
         await roles.modify_match_channel(self.match.channel, view=False)
 
     @property

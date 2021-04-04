@@ -208,8 +208,10 @@ def _add_init_handlers(client):
                 except ValueError:
                     pass
             modules.database.set_field("restart_data", 0, {"last_lobby": list()})
-        await disp.LB_QUEUE.send(ContextWrapper.channel(cfg.channels["lobby"]),
-                                 names_in_lobby=modules.lobby.get_all_names_in_lobby())
+        names = modules.lobby.get_all_names_in_lobby()
+        if names:
+            await disp.LB_QUEUE.send(ContextWrapper.channel(cfg.channels["lobby"]),
+                                     names_in_lobby=modules.lobby.get_all_names_in_lobby())
         modules.loader.unlock_all(client)
         log.info('Client is ready!')
         await disp.RDY.send(ContextWrapper.channel(cfg.channels["spam"]), cfg.VERSION)
