@@ -1,42 +1,39 @@
 # Planetside Open Games bot
 
-<img src="logos/bot.png" width="200">
+![node](logos/bot.png) 
 
 This repository contains POG bot, a discord bot used by [Planetside Open Games](https://docs.google.com/document/d/13rsrWA4r16gpB-F3gvx5HWf2T974mdHLraPSjh5DO1Q) to provide a community-driven matchmaking system for 6v6 infantry scrims in Planetside2.
 
-@TODO: write pydoc in the code
-@TODO: 3.0: Update this readme
-
 ### Requirements:
-- This project uses a `requirements.txt` to relay its python dependencies that need to be installed.
+- This project relies on several [python dependencies](#python-dependencies).
 - A [discord bot application and channels](#discord-bot-component) have to be created.
-- The app uses a [MongoDB database](#preparing-mongodb-component). 
-- Jaeger accounts are managed from a [Google Sheet](#preparing-google-component). 
-- To retrieve PS2 game information a [Daybreak Census ID](#assigning-census-id) has to be provided.
+- A [MongoDB database](#preparing-mongodb-component) is used for persistent data storage. 
+- Jaeger accounts are pulled from a [Google Sheet](#preparing-google-component). 
+- To retrieve Planetside2 information a [Daybreak Census ID](#assigning-census-id) has to be provided.
 - To use the TeamSpeak 3 Integration, set up an instance of [TS3AudioBot](#teamspeak-integration).
-- Finally, to prepare the environment, [three functions](#populating-the-collections) have to be run.
+- Finally, to initialize the application, [scripts functions](#populating-the-collections) are provided.
 
+### Python dependencies:
+- Python 3.6 or above is required to run the project.
+- We recommend using [pipenv](https://pypi.org/project/pipenv/) to set up the project environment. Pipenv will install automatically install the required dependencies from the `Pipfile` provided with the project.
+- Alternatively, the dependencies are also listed in the `requirements.txt` file (compatible with [venv](https://docs.python.org/3/library/venv.html))
 
 ### Notes for the developer:
-
-- Master branch is a release branch, it will stay clean and is synced with the hosting.
-- So developments should be done on feature branches and will be then merged in.
+- Master branch is a release branch, it will stay clean and is synced with the official POG hosting server.
+- So developments should be done on feature or development branches and will be then merged in.
 - Keep fork repos up to date from upstream as much as possible.
 - `google_api_secret.json` and `config.cfg` are not available for confidentiality reasons, templates are given instead.
-- `cogs` folder contains cogs modules as described in discord.py. Each of them regroups a set of commands and their associated checks. The core functionalities/processes are in `classes` folder.
-    - These modules are not to be imported in any way (they are only launched through the discord.py client)
-    - As such, it's not a problem to import anything from the `cogs`
-- `modules` folder contains interfaces to the outside of the program and tools susceptible to be used by the program.
-    - These modules are to be imported when needed.
-    - Do not import any of the `classes` modules from here, this would most likely lead to circular importation and reveal a bad design choice
-- `classes` folder contains all the main processes, the core of the application its classes.
-    - Only `modules` modules and external modules can be imported from here.
-    - Do not import any of the `classes` modules from here.    
-    
-    
+- The code of the application itself can be found in the `bot` folder. It contains:
+  - The `cogs` folder: it holds cogs modules as described in discord.py. Each of them regroups a set of commands and their associated checks. These modules are not to be imported in any way (they are only launched through the discord.py client)
+  - The `display` folder: it is a python package handling all the display from the application to discord. All discords embed and strings used are stored there.
+  - The `modules` folder: it is a python package containing general interfaces and tools that can be used in the rest of the application.
+  - The `classes` folder: it contains the main classes of the application: `Player`, `Team`, `Weapon`, `Base`, `Account`, etc...
+  - The `lib` folder: it contains third-party modules that were modified for the purpose of the application.
+  - The `match` folder: it contains all the code handling the match processes and commands.
+  
 ### Discord Bot Component
 Create a bot application following the [discord.py documentation](https://discordpy.readthedocs.io/en/latest/discord.html).
-The client-secret retrieved at this manual has to put into the configuration at:
+The client-secret retrieved at this manual has to put into the configuration file:
 ```buildoutcfg
 [General]
 token = RetrievedDiscordApiBotToken
@@ -45,16 +42,19 @@ token = RetrievedDiscordApiBotToken
 #### Create channels and roles
 To retrieve discord channel, message and role-ids you have to enable Discord Developer Mode which can be toggled at appearance.
 `Copy ID` will then appear at the right click menu for channels, messages and roles.
-At that point you can populate the `[channels]` section of the configuration.
+At that point you can populate the `[channels]` and `[roles]`sections of the configuration file.
 
 ### Preparing MongoDB Component
-Pymongo is used for interaction with the mongodb. As of now, the database should contain four collections:
+Pymongo is used for interaction with the mongodb. The database should contain several collections:
 - One for the user data.
 - One for the bases.
 - One for the weapons.
 - One for the matches.
+- One for the player stats
+- One for persistent restart data
+- One for jaeger account usage
 Check `script.py` to populate the databases.
-The baseping of these can be configured at the `[Collections]` part of the config.
+The naming of these collections can be configured at the `[Collections]` part of the configuration file.
 
 There are two common ways to get MongoDB running: [Atlas](#Atlas) and [Manual Deployment](#manual-deployment).
 
@@ -82,11 +82,11 @@ The Gspread module is used for interaction with google API. [Follow these steps 
 An example excel sheet has been provided called `accounts_sheet_template.xlsx`. 
 By creating a new Google Sheet in your Drive and importing the excel file through the menu you can avoid format and naming convention errors.
 
-The `accounts` configuration at `[Database]` has to contain the ID of the Google Sheet.
+The `accounts` field from the `[Database]` section of the configuration file has to contain the ID of the Google Sheet.
 This ID can be easily retrieved from the URI of the document: `https://docs.google.com/spreadsheets/d/GOOGLE_SHEET_ID/edit#gid=0`.
 
 Finally, add the service account email to the shared users with editor permissions to the google sheet. 
-This email is also listed as `client_email` at the `google_api_secret.json`.
+This email is also listed as `client_email` in the `google_api_secret.json` file.
 
 ### Assigning Census ID
 Communication with the Daybreak Census API is required to retrieve game information, therefore you have to supply a Service ID.
@@ -104,6 +104,6 @@ This bot works on the dotnet runtime and can be built and installed following th
 @TODO: Explain how to configure the TS3 bot
 
 ### Populating the collections
-The file `scripts.py` contains two functions called `pushAccounts()` and `getAllMapsFromApi()`.
+The file `scripts.py` contains two functions called `push_accounts()` and `get_all_maps_from_api()`.
 The file `weapons_script.py` contains the function `push_all_weapons()`.
 Running all of these functions will populate the MongoDB users, bases and weapons collections, allowing you to run `main.py`.

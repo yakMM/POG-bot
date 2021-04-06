@@ -229,6 +229,10 @@ def _test(client):
 
 def _define_log(launch_str):
     # Logging config, logging outside the github repo
+    try:
+        os.makedirs('../../POG-data/logging')
+    except FileExistsError:
+        pass
     log_filename = '../../POG-data/logging/bot_log'
     logging.Formatter.converter = gmtime
     formatter = logging.Formatter('%(asctime)s | %(levelname)s %(message)s', "%Y-%m-%d %H:%M:%S UTC")
@@ -274,9 +278,6 @@ def main(launch_str=""):
     _define_log(launch_str)
 
     # Init order MATTERS
-
-    # Seeding random generator
-    seed(dt.now())
 
     log.info("Starting init...")
 

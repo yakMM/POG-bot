@@ -5,6 +5,7 @@ from json import loads
 from requests import get
 from configparser import ConfigParser, ParsingError
 from logging import getLogger
+import os
 
 log = getLogger("pog_bot")
 
@@ -179,6 +180,10 @@ def get_config(launch_str):
     GAPI_JSON = f"google_api_secret{launch_str}.json"
 
     file = f"config{launch_str}.cfg"
+
+    if not os.path.isfile(file):
+        raise ConfigError(f"{file} not found!")
+
     config = ConfigParser()
     try:
         config.read(file)
