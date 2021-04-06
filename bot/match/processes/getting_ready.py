@@ -82,7 +82,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
             return
         if not subbed.active.has_own_account:
             await self.remove_account(subbed.active)
-            subbed.on_player_clean()
+        subbed.on_player_clean()
         if not new_player.active.has_own_account:
             await self.give_account(new_player.active)
 
