@@ -49,7 +49,7 @@ async def role_update(player):
     memb = _guild.get_member(player.id)
     if memb is None:
         return
-    if player.is_notify and memb.status not in (Status.offline, Status.dnd):
+    if player.is_notify and memb.status not in (Status.offline, Status.dnd) and not (player.is_lobbied or player.match):
         if _roles_dict["notify"] not in memb.roles:
             await memb.add_roles(_roles_dict["notify"])
         if _roles_dict["registered"] in memb.roles:
