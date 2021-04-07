@@ -72,6 +72,7 @@ def _team_display(img, draw, team, y_offset):
 
         # Loadout
         loadouts = a_player.get_main_loadouts()
+        print(loadouts)
         a_loadouts = list()
         try:
             for l in loadouts:

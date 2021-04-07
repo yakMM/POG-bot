@@ -322,6 +322,8 @@ def team_update(arg, match):
     embed = Embed(colour=Color.blue(), title=title, description=desc)
     if match.base is not None:
         embed.add_field(name="Map", value=match.base.name, inline=False)
+        if match.base.id in cfg.base_images:
+            embed.set_thumbnail(url=cfg.base_images[match.base.id])
     for tm in match.teams:
         if tm.captain:
             value = ""
@@ -384,7 +386,8 @@ def base_display(ctx, base, is_booked):
 
 def join_ts(ctx):
     embed = Embed(colour=Color.blue(), title="Teamspeak server",
-                  description="Join the Teamspeak server for the duration of the match! The address is `PSB` (no password)")
+                  description="Join the Teamspeak server for the duration of the match! "
+                              "The address is `JaegerEvents` (no password)")
     embed.set_image(url=cfg.ts["config_help"])
     return embed
 

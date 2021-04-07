@@ -127,31 +127,7 @@ class CommandFactory(metaclass=MetaFactory):
         if msg:
             await msg
             return
-        if not captain.is_turn:
-            await match.on_team_ready(captain.team, False)
-            await disp.MATCH_TEAM_UNREADY.send(ctx, captain.team.name, match=self.match.proxy)
-            return
-        if captain.is_turn:
-            if self.match.check_validated:
-                not_validated_players = accounts.get_not_validated_accounts(captain.team)
-                if len(not_validated_players) != 0:
-                    await disp.MATCH_PLAYERS_NOT_READY.send(ctx, captain.team.name,
-                                                            " ".join(p.mention for p in not_validated_players))
-                    return
-            if self.match.check_offline:
-                try:
-                    offline_players = await census.get_offline_players(captain.team)
-                    if len(offline_players) != 0:
-                        await disp.MATCH_PLAYERS_OFFLINE.send(ctx, captain.team.name,
-                                                              " ".join(p.mention for p in offline_players),
-                                                              p_list=offline_players)
-                        return
-                except ApiNotReachable as e:
-                    log.error(f"ApiNotReachable caught when checking online players: {e.url}")
-                    await disp.API_READY_ERROR.send(ctx)
-            await match.on_team_ready(captain.team, True)
-            await disp.MATCH_TEAM_READY.send(ctx, captain.team.name, match=self.match.proxy)
-            return
+        await match.ready(ctx, captain)
 
     @Command.command(MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_WAITING_2)
     async def squittal(self, ctx, args):
@@ -197,3 +173,11 @@ class CommandFactory(metaclass=MetaFactory):
         match = self.match.proxy
         await disp.MATCH_CLEAR.send(ctx)
         await match.clear(ctx)
+
+    @Command.command(*captains_ok_states, MatchStatus.IS_CAPTAIN)
+    async def info(self, ctx, args):
+        match = self.match.proxy
+        try:
+            await match.info()
+        except AttributeError:
+            await disp.PK_SHOW_TEAMS.send(ctx, match=match)

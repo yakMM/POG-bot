@@ -31,13 +31,7 @@ class MatchesCog(commands.Cog, name='common'):
 
         if ctx.channel.id in cfg.channels["matches"]:
             match = Match.get(ctx.channel.id)
-            if match.status is MatchStatus.IS_FREE:
-                await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
-            else:
-                try:
-                    await match.info()
-                except AttributeError:
-                    await disp.PK_SHOW_TEAMS.send(ctx, match=match)
+            await match.command.info(ctx)
             return
         await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
 

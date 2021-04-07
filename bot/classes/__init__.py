@@ -4,3 +4,4 @@ from .players import Player, ActivePlayer, TeamCaptain, CharNotFound, CharAlread
 from .weapons import Weapon
 from .teams import Team
 from .stats import PlayerStat
+from .scores import TeamScore, PlayerScore, Loadout

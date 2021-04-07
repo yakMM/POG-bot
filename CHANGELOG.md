@@ -1,3 +1,8 @@
+# v3.1:
+- Fixed some issues with sub command
+- Added base image as thumbmail in the match info embed
+- Notify players will no longer be pinged if they are already in a match
+
 # v3.0:
 - Code revamp:
   - Added a process system to handle the different match events

@@ -2,7 +2,7 @@ from logging import getLogger
 from lib.tasks import loop
 from display.strings import AllStrings as disp
 
-from classes import Base, Team
+from classes import Base, Team, TeamScore
 import modules.database as db
 import modules.roles as roles
 import modules.config as cfg
@@ -54,6 +54,11 @@ class Match:
 
     def bind(self, channel):
         self.__objects = MatchObjects(self, self.__data, channel)
+
+    # TODO: dev, remove
+    @property
+    def data(self):
+        return self.__data
 
     @property
     def channel(self):
@@ -138,7 +143,7 @@ class MatchData:
         self.match = match
         if data:
             self.id = data["_id"]
-            self.teams = [Team.from_data(self.match, 0, data["teams"][0]), Team.from_data(self.match, 1, data["teams"][1])]
+            self.teams = [TeamScore.from_data(0, data["teams"][0]), TeamScore.from_data(1, data["teams"][1])]
             self.base = Base.get(data["base_id"])
             self.round_length = data["round_length"]
             self.round_stamps = data["round_stamps"]
@@ -183,7 +188,7 @@ class MatchData:
 
 
 _process_list = [CaptainSelection, PlayerPicking, FactionPicking, BasePicking, GettingReady, MatchPlaying,
-                 GettingReady2, MatchPlaying]
+                 GettingReady, MatchPlaying]
 
 
 class MatchObjects:
@@ -272,6 +277,7 @@ class MatchObjects:
         if not self.current_process:
             return MatchStatus.IS_FREE
         else:
+            print(f"")
             return self.current_process.status
 
     def __getattr__(self, name):

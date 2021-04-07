@@ -14,6 +14,7 @@ import modules.database as db
 import modules.tools as tools
 
 from .stats import PlayerStat
+from .scores import PlayerScore
 
 from logging import getLogger
 from datetime import datetime as dt
@@ -457,6 +458,10 @@ class Player:
 
         return updated
 
+    @property
+    def all_players(self):
+        return self._all_players
+
 
 class DataPlayer:
 
@@ -473,34 +478,12 @@ class ActivePlayer:
 
     def __init__(self, player, team, from_data=False):
         self.__player = player
-        self.__illegal_weapons = dict()
-        self.__kills = 0
-        self.__deaths = 0
-        self.__net = 0
-        self.__score = 0
         self.__team = team
         self.__account = None
         self.__unique_usages = None
         self.__is_playing = False
-        self.__loadouts = dict()
-        if from_data:
-            return
         self.__player.on_picked(self)
-
-    @classmethod
-    def new_from_data(cls, data, team):
-        try:
-            ig_name = data["ig_name"]
-        except KeyError:
-            ig_name = "N/A"
-        pl = DataPlayer(data["discord_id"], ig_name, data["ig_id"])
-        obj = cls(pl, team, from_data=True)
-        obj.__score = data["score"]
-        obj.__net = data["net"]
-        obj.__deaths = data["deaths"]
-        obj.__kills = data["kills"]
-        obj.__ill_weapons_fromData(data["ill_weapons"])
-        return obj
+        self.__player_score = None
 
     def clean(self):
         self.__player.on_player_clean()
@@ -508,59 +491,9 @@ class ActivePlayer:
     def change_team(self, team):
         self.__team = team
 
-    def add_loadout_event(self, loadout):
-        if loadout in self.__loadouts:
-            self.__loadouts[loadout] += 1
-        else:
-            self.__loadouts[loadout] = 1
-
-    def get_main_loadouts(self):
-        max2_v = 0
-        max2_k = 0
-        max_v = 0
-        max_k = 0
-        for k in self.__loadouts.keys():
-            if self.__loadouts[k] > max_v:
-                max2_k = max_k
-                max2_v = max_v
-                max_v = self.__loadouts[k]
-                max_k = k
-        return max_k, max2_k
-
-    def get_loadouts(self):
-        loadouts = list()
-        for k in self.__loadouts.keys():
-            try:
-                loadouts.append(cfg.loadout_id[k])
-            except KeyError:
-                pass
-        return loadouts
-
-    def get_data(self):
-        data = {"discord_id": self.__player.id,
-                "ig_id": self.ig_id,
-                "ig_name": self.ig_name,
-                "ill_weapons": self.__get_ill_weaponsDoc(),
-                "loadouts": self.get_loadouts(),
-                "score": self.__score,
-                "net": self.__net,
-                "deaths": self.__deaths,
-                "kills": self.__kills,
-                }
-        return data
-
-    def __get_ill_weaponsDoc(self):
-        data = list()
-        for weap_id in self.__illegal_weapons.keys():
-            doc = {"weap_id": weap_id,
-                   "kills": self.__illegal_weapons[weap_id]
-                   }
-            data.append(doc)
-        return data
-
-    def __ill_weapons_fromData(self, data):
-        for weap_doc in data:
-            self.__illegal_weapons[weap_doc["weap_id"]] = weap_doc["kills"]
+    @property
+    def player_score(self):
+        return self.__player_score
 
     @property
     def is_captain(self):
@@ -640,64 +573,15 @@ class ActivePlayer:
     def match(self):
         return self.__player.match
 
-    @property
-    def kills(self):
-        return self.__kills
-
-    @property
-    def deaths(self):
-        return self.__deaths
-
-    @property
-    def score(self):
-        return self.__score
-
-    @property
-    def net(self):
-        return self.__net
-
     async def update_stats(self):
         self.__player.stats.add_stats(self)
-        await db.async_db_call(db.set_element, "player_stats", self.id, self.__player.stats.get_data())
-
-    @property
-    def illegal_weapons(self):
-        return self.__illegal_weapons
+        # TODO here wrong
+        # await db.async_db_call(db.set_element, "player_stats", self.id, self.__player.stats.get_data())
 
     def on_team_ready(self, ready):
         self.__is_playing = ready
-
-    def add_illegal_weapon(self, weap_id):
-        if weap_id in self.__illegal_weapons:
-            self.__illegal_weapons[weap_id] += 1
-        else:
-            self.__illegal_weapons[weap_id] = 1
-
-    def add_one_kill(self, points):
-        self.__kills += 1
-        self.__team.add_one_kill()
-        self.__add_points(points)
-
-    def add_one_death(self, points):
-        self.__deaths += 1
-        self.__team.add_one_death()
-        points = -points
-        self.__net += points
-        self.__team.add_net(points)
-
-    def add_one_t_k(self):
-        self.__add_points(cfg.scores["teamkill"])
-
-    def add_one_suicide(self):
-        self.__deaths += 1
-        self.__team.add_one_death()
-        self.__add_points(cfg.scores["suicide"])
-
-    def __add_points(self, points):
-        self.__net += points
-        self.__score += points
-        self.__team.add_score(points)
-        self.__team.add_net(points)
+        if ready:
+            self.__player_score = PlayerScore(self.id, self.team.team_score, self.name, self.ig_name, self.ig_id)
 
 
 class TeamCaptain(ActivePlayer):

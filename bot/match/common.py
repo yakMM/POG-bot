@@ -1,10 +1,15 @@
 from display import AllStrings as disp, ContextWrapper
 import modules.config as cfg
+import discord
 
 from modules.lobby import get_sub, get_all_names_in_lobby
 from lib.tasks import Loop
 
 from classes import Player
+
+from logging import getLogger
+
+log = getLogger("pog_bot")
 
 
 async def check_faction(ctx, args):
@@ -45,7 +50,7 @@ def switch_turn(process, team):
     return other
 
 
-async def get_substitute(match, subbed, force_player=None):
+async def get_substitute(match, subbed, player=None):
     """
     Get a substitute player from lobby, return it
 
@@ -55,26 +60,28 @@ async def get_substitute(match, subbed, force_player=None):
     :return: Player found for subbing, return None if no player available
     """
     # Get a new player from the lobby, if None available, display
-    if not force_player:
-        new_player = get_sub()
-        if new_player is None:
-            await disp.SUB_NO_PLAYER.send(match.channel, subbed.mention)
-            return
-    else:
-        new_player = force_player
+    was_lobbied = (not player) or (player and player.is_lobbied)
+    player = get_sub(player)
+    if player is None:
+        await disp.SUB_NO_PLAYER.send(match.channel, subbed.mention)
+        return
 
-    Loop(coro=ping_sub_in_lobby, count=1).start(match, new_player, new_player.is_lobbied)
+    Loop(coro=ping_sub_in_lobby, count=1).start(match, player, was_lobbied)
 
-    await new_player.on_match_selected(match.proxy)
-    return new_player
+    await player.on_match_selected(match.proxy)
+    return player
 
 
-async def ping_sub_in_lobby(match, new_player, is_lobbied):
-    if is_lobbied:
+async def ping_sub_in_lobby(match, new_player, was_lobbied):
+    if was_lobbied:
         await disp.SUB_LOBBY.send(ContextWrapper.channel(cfg.channels["lobby"]), new_player.mention, match.channel.id,
                                   names_in_lobby=get_all_names_in_lobby())
     ctx = ContextWrapper.user(new_player.id)
-    await disp.MATCH_DM_PING.send(ctx)
+    try:
+        await disp.MATCH_DM_PING.send(ctx, match.id, match.channel.name)
+    except discord.errors.Forbidden:
+        log.warning(f"Player id:[{new_player.id}], name:[{new_player.name}] is refusing DMs")
+
 
 
 async def after_pick_sub(match, subbed, force_player, clean_subbed=True):
@@ -88,7 +95,7 @@ async def after_pick_sub(match, subbed, force_player, clean_subbed=True):
     :return: Nothing
     """
     # Get a new player for substitution
-    new_player = await get_substitute(match, subbed, force_player=force_player)
+    new_player = await get_substitute(match, subbed, player=force_player)
     if not new_player:
         return
 
@@ -137,6 +144,8 @@ def get_check_captain(ctx, match, check_turn=True):
     elif check_turn and not player.active.is_turn:
         # Not player's turn
         msg = disp.PK_NOT_TURN.send(ctx)
+    elif player.active.team.is_ready:
+        msg = disp.MATCH_NO_COMMAND_READY.send(ctx.command.name)
     else:
         a_player = player.active
     return a_player, msg

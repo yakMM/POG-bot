@@ -56,7 +56,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             await after_pick_sub(self.match, subbed, force_player)
         else:
             # Get a new player for substitution
-            new_player = await get_substitute(self.match, subbed, force_player)
+            new_player = await get_substitute(self.match, subbed, player=force_player)
             if not new_player:
                 return
             # Remove them fro the player list

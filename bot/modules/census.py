@@ -10,61 +10,71 @@ from logging import getLogger
 log = getLogger("pog_bot")
 
 
-async def process_score(match):
+async def process_score(match, start_time):
     ig_dict = dict()
     current_ill_weapons = dict()
-    start = match.round_stamps[-1]
+    start = start_time
     end = start + (match.round_length * 60)
     for tm in match.teams:
-        for a_player in tm.players:
-            ig_dict[int(a_player.ig_id)] = a_player
-    for a_player in ig_dict.values():
+        for player in tm.players:
+            ig_dict[int(player.ig_id)] = player
+    for player in ig_dict.values():
         url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_event/?character_id=' \
-              f'{a_player.ig_id}&type=KILL&after={start}&before={end}&c:limit=500'
+              f'{player.ig_id}&type=KILL&after={start}&before={end}&c:limit=500'
         j_data = await http_request(url)
         if j_data["returned"] == 0:
-            log.error(f'No kill found for player: id={a_player.ig_name} (url={url})')
+            log.error(f'No kill found for player: id={player.ig_name} (url={url})')
             continue
 
         # Loop through all events
         event_list = j_data["characters_event_list"]
         current_ill_weapons.clear()
         for event in event_list:
-            opo_id = int(event["character_id"])
-            if opo_id not in ig_dict:
+
+            # Get opponent player
+            oppo = ig_dict.get(int(event["character_id"]))
+            if not oppo:
                 # interaction with outside player, to be ignored
                 continue
-            opo = ig_dict[opo_id]
+
+            # Get loadout objects
+            opo_loadout = oppo.get_loadout(int(event["character_loadout_id"]))
+            player_loadout = player.get_loadout(int(int(event["attacker_loadout_id"])))
+
+            # Get weapon
             weap_id = int(event["attacker_weapon_id"])
             weapon = Weapon.get(weap_id)
-            opo.add_loadout_event(int(event["character_loadout_id"]))
-            a_player.add_loadout_event(int(event["attacker_loadout_id"]))
             if not weapon:
                 log.error(f'Weapon not found in database: id={weap_id}')
                 weapon = Weapon.get(0)
-            if opo is a_player:
-                a_player.add_one_suicide()
-            elif opo.team is a_player.team:
-                a_player.add_one_t_k()
-                opo.add_one_death(0)
+
+            if oppo is player:
+                player_loadout.add_one_suicide()
+            elif oppo.team is player.team:
+                player_loadout.add_one_tk()
+                opo_loadout.add_one_death(0)
             else:
                 if not weapon.is_banned:
                     pts = weapon.points
-                    a_player.add_one_kill(pts)
-                    opo.add_one_death(pts)
+                    player_loadout.add_one_kill(pts)
+                    opo_loadout.add_one_death(pts)
                 else:
-                    a_player.add_illegal_weapon(weapon.id)
+                    player_loadout.add_illegal_weapon(weapon.id)
                     if weapon.id in current_ill_weapons:
                         current_ill_weapons[weapon.id] += 1
                     else:
                         current_ill_weapons[weapon.id] = 1
                     # TODO: Should we add penalty?
+
         for weap_id in current_ill_weapons.keys():
             weapon = Weapon.get(weap_id)
-            await display.SC_ILLEGAL_WE.send(match.channel, a_player.mention, weapon.name,
-                                             match.id, current_ill_weapons[weap_id])
-            await display.SC_ILLEGAL_WE.send(ContextWrapper.channel(cfg.channels["staff"]), a_player.mention,
-                                             weapon.name, match.id, current_ill_weapons[weap_id])
+            try:
+                await display.SC_ILLEGAL_WE.send(match.channel, player.mention, weapon.name,
+                                                 match.id, current_ill_weapons[weap_id])
+                await display.SC_ILLEGAL_WE.send(ContextWrapper.channel(cfg.channels["staff"]), player.mention,
+                                                 weapon.name, match.id, current_ill_weapons[weap_id])
+            except AttributeError as e:
+                log.error(f"Attribute error on illegal weapon display: {e}")
 
     await get_captures(match, start, end)
 

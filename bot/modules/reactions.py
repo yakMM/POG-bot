@@ -45,6 +45,11 @@ class ReactionHandler:
         self.__auto_destroy = auto_destroy
         self.lock = False
 
+    # TODO: DEBUG
+    def print(self):
+        print(self.__f_dict)
+
+
     def is_reaction(self, react):
         return str(react.emoji) in self.__f_dict
 

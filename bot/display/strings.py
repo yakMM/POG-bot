@@ -135,7 +135,7 @@ class AllStrings(Enum):
     CAP_DENY_NO = Message("You can't do that, you were not designated as team captain!")
     CAP_DENY_OK = Message("You declined the team captain role!")
 
-    MATCH_DM_PING = Message("Lobby filled! Your POG match is starting!", ping=False)
+    MATCH_DM_PING = Message("POG match {} is starting! Please join `{}` channel in the Jaeger Events discord!", ping=False)
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ping=False)
     MATCH_BASE_AUTO = Message("Match will be on **{}**", ping=False)
@@ -149,6 +149,7 @@ class AllStrings(Enum):
     MATCH_STARTED = Message("{}\n{}\nRound {} is starting now!")
     MATCH_NO_MATCH = Message("Can't use command `={}`, no match is happening here!")
     MATCH_NO_COMMAND = Message("Can't use command `={}` now!")
+    MATCH_NO_COMMAND_READY = Message("Can't use command `={}: your team is ready!")
     MATCH_CLEARED = Message("Successfully cleared!")
     MATCH_PLAYERS_NOT_READY = Message("Can't get {} ready, {} did not accept their Jaeger accounts", ping=False)
     MATCH_PLAYERS_OFFLINE = Message("Can't get {} ready, {} are not online in game!", ping=False,

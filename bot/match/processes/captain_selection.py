@@ -61,7 +61,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             # print(f"{p.name}, matches: {p.stats.nb_matches_played}")
             # ctx = ContextWrapper.user(p.id)
             # try:
-            #     await disp.MATCH_DM_PING.send(ctx)
+            #     await disp.MATCH_DM_PING.send(ctx, match.id, match.channel.name)
             # except discord.errors.Forbidden:
             #     log.warning(f"Player id:[{p.id}], name:[{p.name}] is refusing DMs")
 

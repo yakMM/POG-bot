@@ -57,10 +57,11 @@ def _auto_ping_cancel():
     _auto_ping.already = False
 
 
-def get_sub():
+def get_sub(player):
     if len(_lobby_list) == 0:
-        return
-    player = random_choice(_lobby_list)
+        return player
+    if not player:
+        player = _lobby_list[0]
     try:
         _warned_players.remove(player)
     except ValueError:

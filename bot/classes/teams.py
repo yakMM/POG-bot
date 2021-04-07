@@ -3,7 +3,7 @@
 """ Basic team object, should be explicit
 """
 
-from classes.players import ActivePlayer  # ok
+from .scores import TeamScore
 
 
 class Team:
@@ -11,42 +11,17 @@ class Team:
         self.__id = id
         self.__name = name
         self.__players = list()
-        self.__score = 0
-        self.__net = 0
-        self.__deaths = 0
-        self.__kills = 0
         self.__faction = 0
-        self.__cap = 0
         self.__match = match
-
-    @classmethod
-    def from_data(cls, match, i, data):
-        obj = cls(i, data["name"], match)
-        obj.__faction = data["faction_id"]
-        obj.__score = data["score"]
-        obj.__net = data["net"]
-        obj.__deaths = data["deaths"]
-        obj.__kills = data["kills"]
-        obj.__cap = data["cap_points"]
-        for p_data in data["players"]:
-            obj.__players.append(ActivePlayer.new_from_data(p_data, obj))
-        return obj
-
-    def get_data(self):
-        data = {"name": self.__name,
-                "faction_id": self.__faction,
-                "score": self.__score,
-                "net": self.__net,
-                "deaths": self.deaths,
-                "kills": self.__kills,
-                "cap_points": self.__cap,
-                "players": [p.get_data() for p in self.__players]
-                }
-        return data
+        self.__is_playing = False
+        self.__team_score = None
 
     @property
     def id(self):
         return self.__id
+
+    def get_data(self):
+        return self.__team_score.get_data()
 
     @property
     def ig_string(self):
@@ -70,24 +45,12 @@ class Team:
         self.__faction = faction
 
     @property
-    def score(self):
-        return self.__score
+    def team_score(self):
+        return self.__team_score
 
     @property
-    def net(self):
-        return self.__net
-
-    @property
-    def cap(self):
-        return self.__cap
-    
-    @property
-    def kills(self):
-        return self.__kills
-    
-    @property
-    def deaths(self):
-        return self.__deaths
+    def is_playing(self):
+        return self.__is_playing
 
     @property
     def player_pings(self):
@@ -117,32 +80,20 @@ class Team:
         return self.__match
 
     def on_team_ready(self, ready):
+        self.__is_playing = ready
+        if ready:
+            self.__team_score = TeamScore(self.id, self.name, self.faction)
         for a_player in self.__players:
             a_player.on_team_ready(ready)
-    
+            if ready:
+                self.__team_score.add_player(a_player.player_score)
+
     def clear(self):
         self.__players.clear()
 
     def clean(self):
         for a_player in self.__players:
             a_player.clean()
-
-    def add_cap(self, points):
-        self.__cap += points
-        self.__score += points
-        # self.__net += points
-
-    def add_score(self, points):
-        self.__score += points
-
-    def add_net(self, points):
-        self.__net += points
-
-    def add_one_kill(self):
-        self.__kills += 1
-
-    def add_one_death(self):
-        self.__deaths += 1
 
     def add_player(self, p_class, player):
         active = p_class(player, self)
