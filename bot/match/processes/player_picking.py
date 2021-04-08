@@ -188,6 +188,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         elif len(self.players) == 0:
             # Start next step
             await self.match.next_process()
+            self.match.plugin_manager.on_teams_done()
 
     @loop(count=1)
     async def ping_last_player(self, team, p):

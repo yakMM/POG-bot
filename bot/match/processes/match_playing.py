@@ -41,6 +41,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
             await self.match.base_selector.clean()
             push_last_bases(self.match.base)
             self.match.base_selector = None
+        self.match.plugin_manager.on_match_starting()
         await disp.MATCH_STARTING_1.send(self.match.channel, self.match.round_no, "30")
         await sleep(10)
         await disp.MATCH_STARTING_2.send(self.match.channel, self.match.round_no, "20")
@@ -80,6 +81,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         self.auto_info_loop.cancel()
         await self.match.set_status(MatchStatus.IS_RUNNING)
         await self.rh.destroy()
+        self.match.plugin_manager.on_round_over()
         await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, self.match.round_no)
         try:
             await census.process_score(self.match.data, self.match.last_start_stamp, self.match.channel)

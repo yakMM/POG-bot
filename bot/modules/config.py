@@ -206,7 +206,8 @@ def get_config(launch_str):
             _error_incorrect(key, 'General', file)
 
     # Testing api key
-    skip_api_test = False
+    #TODO CHANGE
+    skip_api_test = True
     if not skip_api_test:
         url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
         j_data = loads(get(url).content)

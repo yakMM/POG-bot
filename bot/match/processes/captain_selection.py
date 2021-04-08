@@ -165,6 +165,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             self.auto_captain.cancel()
             await self.volunteer_rh.destroy()
             await self.match.next_process(self.p_list)
+            self.match.plugin_manager.on_captain_selected()
         else:
             await self.info()
 

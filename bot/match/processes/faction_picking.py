@@ -104,6 +104,8 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
         team.faction = faction
         switch_turn(self, team)
 
+        self.match.plugin_manager.on_faction_pick(team)
+
         # If other team didn't pick yet:
         if other.faction == 0:
             msg = await disp.PK_FACTION_OK_NEXT.send(self.match.channel, team.name, cfg.factions[team.faction],
@@ -115,3 +117,4 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
         await disp.PK_FACTION_OK.send(ctx, team.name, cfg.factions[team.faction])
         await self.reaction_handler.destroy()
         await self.match.next_process()
+        self.match.plugin_manager.on_factions_picked()

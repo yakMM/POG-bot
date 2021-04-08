@@ -84,6 +84,8 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
 
     async def on_team_ready(self, team, ready):
         team.captain.is_turn = not ready
+        if ready:
+            self.match.plugin_manager.on_team_ready(team)
         if self.is_first_round:
             team.on_team_ready(ready)
             if ready:

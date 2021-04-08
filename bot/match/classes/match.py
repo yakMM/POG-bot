@@ -13,6 +13,7 @@ from match.processes import *
 from match.commands import CommandFactory
 from match.match_status import MatchStatus
 from .base_selector import on_match_over
+from match.plugins.manager import PluginManager
 
 log = getLogger("pog_bot")
 
@@ -197,11 +198,12 @@ class MatchObjects:
         self.base_selector = None
         self.progress_index = 0
         self.result_msg = None
-        self.clean_channel.start(display=False)
         self.check_offline = True
         self.check_validated = True
         self.players_with_account = list()
         self.command_factory = CommandFactory(self)
+        self.plugin_manager = PluginManager(self)
+        self.clean_channel.start(display=False)
 
     @property
     def status(self):
@@ -234,6 +236,7 @@ class MatchObjects:
     def on_spin_up(self, p_list):
         self.data.id = Match._last_match_id
         self.current_process = _process_list[self.progress_index](self, p_list)
+        self.plugin_manager.on_match_launching()
 
     async def on_match_over(self):
         await disp.MATCH_OVER.send(self.match.channel)
@@ -252,6 +255,7 @@ class MatchObjects:
             raise AttributeError(f"Current process has no attribute '{name}'")
 
     async def clean(self):
+        self.plugin_manager.on_match_over()
         if self.base_selector:
             await self.base_selector.clean()
             self.base_selector = None
