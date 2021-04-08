@@ -46,6 +46,8 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
                 i = 1
             else:
                 raise reactions.UserLackingPermission
+            if not self.accept_msg[i]:
+                raise reactions.UserLackingPermission
             if msg.id != self.accept_msg[i].id:
                 raise reactions.UserLackingPermission
             if not await self.on_answer(player, is_accept=(str(reaction) == "✅")):

@@ -5,6 +5,7 @@ import os
 import signal
 import sys
 import logging
+import time
 
 
 class ProcessGroup:
@@ -21,17 +22,19 @@ class ProcessGroup:
     def kill_discord(self):
         if self.discord_process:
             logging.info("Sending soft exit signal to discord bot!")
-            os.killpg(os.getpgid(self.discord_process.pid), signal.SIGINT)
+            os.killpg(os.getpgid(self.discord_process.pid), signal.SIGKILL)
             self.discord_process = None
 
     def restart_ts3(self):
         self.kill_ts3()
         logging.info("Starting TS3 bot!")
+        time.sleep(5)
         self.ts3_process = subprocess.Popen(f"{os.getcwd()}/ts3_bot_launcher.sh", shell=True, preexec_fn=os.setsid)
 
     def restart_discord(self):
         self.kill_discord()
         logging.info("Starting discord bot!")
+        time.sleep(5)
         self.discord_process = subprocess.Popen(f"{os.getcwd()}/discord_bot_launcher.sh", shell=True,
                                                 preexec_fn=os.setsid)
 
@@ -62,6 +65,7 @@ if __name__ == "__main__":
         group.kill_ts3()
         logging.info("Launcher exiting!")
         logging.info("======================================")
+        time.sleep(2)
         sys.exit(0)
 
     def restart_1(sig, frame):

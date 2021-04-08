@@ -79,14 +79,18 @@ class ReactionHandler:
         except (KeyError, UserLackingPermission):
             pass
         else:
-            if self.__auto_destroy:
-                rem_handler(msg.id)
-                await msg.clear_reactions()
-                return
-            if self.__rem_bot_react:
-                rem_handler(msg.id)
-                await msg.remove_reaction(reaction.emoji, _client.user)
-        if self.__rem_user_react:
+            if msg.id in _all_handlers:
+                if self.__auto_destroy:
+                    rem_handler(msg.id)
+                    await msg.clear_reactions()
+                    return
+                if self.__rem_bot_react:
+                    rem_handler(msg.id)
+                    await msg.remove_reaction(reaction.emoji, _client.user)
+                    if self.__rem_user_react:
+                        await msg.remove_reaction(reaction.emoji, user)
+                    return
+        if msg.id in _all_handlers and self.__rem_user_react:
             await msg.remove_reaction(reaction.emoji, user)
 
     async def auto_add_reactions(self, msg):

@@ -25,7 +25,7 @@ class AudioBot(Plugin):
         _TaskAudio(self).task_audio.start(audio_string, lobby=True)
 
     def on_captain_selected(self):
-        _TaskAudio(self).task_audio.start("select_teams", lobby=False, wait=10)
+        _TaskAudio(self).task_audio.start("select_teams", lobby=False)
 
     def on_teams_done(self):
         _TaskAudio(self).task_audio.start("select_factions")
@@ -54,7 +54,9 @@ class AudioBot(Plugin):
 
     def on_round_over(self):
         _TaskAudio(self).task_audio.start("round_over")
-        _TaskAudio(self).task_audio.start("switch_sides")
+        if self.match.round_no == 1:
+            _TaskAudio(self).task_audio.start("switch_sides")
+            _TaskAudio(self).task_audio.start("type_ready")
 
 
 class _TaskAudio:

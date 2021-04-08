@@ -10,6 +10,8 @@
 - Overhauled scoring system:
   - Classes will now be properly reported on the score sheet
   - Now tracking per-class stats internally
+- Added match plugins
+  - Added ts3 interaction as a plugin
 
 # v3.0:
 - Code revamp:
