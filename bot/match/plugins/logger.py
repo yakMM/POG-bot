@@ -1,6 +1,8 @@
 from logging import getLogger
 
 from .plugin import Plugin
+from modules.tools import timestamp_now
+import modules.database as db
 
 log = getLogger("pog_bot")
 
@@ -9,36 +11,42 @@ class SimpleLogger(Plugin):
 
     def __init__(self, match):
         super().__init__(match)
+        self.data = {"_id": match.id}
 
-    def event(self, name):
+    def __event(self, name):
         log.info(f"Match {self.match.id}: event received: {name}")
 
     def on_match_launching(self):
-        self.event("on_match_launching")
+        self.__event("on_match_launching")
 
     def on_captain_selected(self):
-        self.event("on_captain_selected")
+        self.__event("on_captain_selected")
 
     def on_teams_done(self):
-        self.event("on_teams_done")
+        self.__event("on_teams_done")
 
     def on_faction_pick(self, team):
-        self.event("on_faction_pick")
+        self.__event("on_faction_pick")
 
     def on_factions_picked(self):
-        self.event("on_factions_picked")
+        self.__event("on_factions_picked")
 
     def on_base_selected(self, base):
-        self.event("on_base_selected")
+        self.__event("on_base_selected")
 
     def on_team_ready(self, team):
-        self.event("on_team_ready")
+        self.__event("on_team_ready")
 
     def on_match_starting(self):
-        self.event("on_match_starting")
+        self.__event("on_match_starting")
 
     def on_round_over(self):
-        self.event("on_round_over")
+        self.__event("on_round_over")
 
     def on_match_over(self):
-        self.event("on_match_over")
+        self.__event("on_match_over")
+        self.data["match_over"] = timestamp_now()
+
+    async def clean(self):
+        self.data["cleaning"] = timestamp_now()
+        await db.async_db_call(db.set_element, "match_logs", self.match.id, self.data)

@@ -156,7 +156,7 @@ _collections = {
     "player_stats": "",
     "restart_data": "",
     "accounts_usage": "",
-    "matches_new": ""
+    "match_logs": ""
 }
 
 # Database

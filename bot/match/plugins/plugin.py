@@ -31,3 +31,6 @@ class Plugin:
 
     def on_match_over(self):
         pass
+
+    async def clean(self):
+        pass

@@ -24,6 +24,10 @@ class PluginManager:
         for p in self.plugins:
             getattr(p, event)(*args, **kwargs)
 
+    async def clean(self):
+        for p in self.plugins:
+            await p.clean()
+
     def __getattr__(self, item):
         return VirtualAttribute(self, item)
 

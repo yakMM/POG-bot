@@ -177,7 +177,7 @@ class MatchData:
         self.round_stamps = list()
 
     async def push_db(self):
-        await db.async_db_call(db.set_element, "matches_new", self.id, self.get_data())
+        await db.async_db_call(db.set_element, "matches", self.id, self.get_data())
         for tm in self.teams:
             for p in tm.players:
                 await p.update_stats()
@@ -239,6 +239,7 @@ class MatchObjects:
         self.plugin_manager.on_match_launching()
 
     async def on_match_over(self):
+        self.plugin_manager.on_match_over()
         await disp.MATCH_OVER.send(self.match.channel)
         await self.data.push_db()
         await self.clean()
@@ -255,7 +256,7 @@ class MatchObjects:
             raise AttributeError(f"Current process has no attribute '{name}'")
 
     async def clean(self):
-        self.plugin_manager.on_match_over()
+        await self.plugin_manager.clean()
         if self.base_selector:
             await self.base_selector.clean()
             self.base_selector = None
