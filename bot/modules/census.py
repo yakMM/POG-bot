@@ -10,7 +10,7 @@ from logging import getLogger
 log = getLogger("pog_bot")
 
 
-async def process_score(match, start_time):
+async def process_score(match, start_time, match_channel=None):
     ig_dict = dict()
     current_ill_weapons = dict()
     start = start_time
@@ -68,13 +68,11 @@ async def process_score(match, start_time):
 
         for weap_id in current_ill_weapons.keys():
             weapon = Weapon.get(weap_id)
-            try:
-                await display.SC_ILLEGAL_WE.send(match.channel, player.mention, weapon.name,
+            if match_channel:
+                await display.SC_ILLEGAL_WE.send(match_channel, player.mention, weapon.name,
                                                  match.id, current_ill_weapons[weap_id])
                 await display.SC_ILLEGAL_WE.send(ContextWrapper.channel(cfg.channels["staff"]), player.mention,
-                                                 weapon.name, match.id, current_ill_weapons[weap_id])
-            except AttributeError as e:
-                log.error(f"Attribute error on illegal weapon display: {e}")
+                                                weapon.name, match.id, current_ill_weapons[weap_id])
 
     await get_captures(match, start, end)
 

@@ -2,6 +2,7 @@ import modules.reactions as reactions
 from modules.tools import UnexpectedError
 
 from display import AllStrings as disp, ContextWrapper
+from match import MatchStatus
 
 
 class CaptainValidator:
@@ -15,6 +16,8 @@ class CaptainValidator:
 
         @self.rh.reaction('✅', "❌")
         async def reaction_confirm(reaction, player, user, msg):
+            if self.match.status is MatchStatus.IS_RUNNING:
+                raise reactions.UserLackingPermission
             if player.active:
                 a_p = player.active
                 ctx = ContextWrapper.wrap(self.channel)
@@ -89,7 +92,12 @@ class CaptainValidator:
                     await self.clean()
                 return True
             elif args[0] == "cancel" or args[0] == "c":
-                if self.is_captain(captain) and (captain is not self.expected):
+                if not self.expected:
+                    await disp.CANCEL_NOTHING.send(ctx)
+                elif self.is_captain(captain) and (captain is not self.expected):
                     await disp.CONFIRM_CANCELED.send(ctx)
                     await self.clean()
+                else:
+                    await disp.CANCEL_NOT_CAPTAIN.send(ctx)
+                return True
         return False

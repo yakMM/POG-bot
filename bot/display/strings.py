@@ -107,6 +107,9 @@ class AllStrings(Enum):
     DECLINE_NOT_CAPTAIN = Message("You can't decline! {} should do it!")
     CONFIRM_DECLINE = Message("You declined the request!")
     CONFIRM_CANCELED = Message("You canceled the request!")
+    CANCEL_NOTHING = Message("Nothing to cancel!")
+    CANCEL_NOT_CAPTAIN = Message("You can't cancel this request!")
+    READY_NO_COMMAND = Message("Can't do that while your team is ready!")
 
     BOT_UNLOCKED = Message("Unlocked!")
     BOT_LOCKED = Message("Locked!")
@@ -175,8 +178,9 @@ class AllStrings(Enum):
     BASE_CALENDAR = Message("{} Pick an available base!", ping=False, embed=embeds.jaeger_calendar)
     BASE_NO_BASE = Message("No base yet selected!")
     BASE_NO_BASE_WAITING = Message("Waiting for captains to pick a base...")
-    BASE_OK_CONFIRM = Message("Picked **{}**! {} confirm if you agree! (use `=b accept/decline` or react below)")
+    BASE_OK_CONFIRM = Message("Picked **{}**! {} accept if you agree! (use `=b accept/decline` or react below)")
     BASE_NO_CHANGE = Message("It's not possible to change the match base anymore!")
+    BASE_NO_READY = Message("Can't change the base if a team is ready!")
 
     ACC_NOT_ENOUGH = Message("Not enough accounts are available for this match!\n**Match has been canceled!**")
     ACC_ERROR = Message("Error when giving out Jaeger accounts!\n**Match has been canceled!**")
@@ -228,6 +232,7 @@ class AllStrings(Enum):
     SC_RESULT_HALF = Message("Match {} - **halftime**")
     SC_RESULT = Message("Match {}")
 
+    SUB_RDY = Message("Can't sub a player whose team is ready!")
     SUB_NO = Message("This player can't be subbed!")
     SUB_NOT_OK = Message("Can't sub a player at this stage!")
     SUB_NO_PLAYER = Message("Subbing {}: no player is available to substitute!")
@@ -241,8 +246,9 @@ class AllStrings(Enum):
     SWAP_MENTION_2 = Message("Invalid request! @ mention two players to swap!")
     SWAP_NO = Message("{} can't be swapped!", ping=False)
     SWAP_CAP = Message("Invalid request! {} is a team captain!", ping=False)
+    SWAP_RDY = Message("Can't swap a player whose team is ready!")
     SWAP_SAME_TEAM = Message("Invalid request! Can't swap two players of the same team!", ping=False)
-    SWAP_OK_CONFIRM = Message("Swapping players! {} confirm if you agree! (use `=sub accept/decline` or react below)")
+    SWAP_OK_CONFIRM = Message("Swapping players! {} accept if you agree! (use `=swap accept/decline` or react below)")
 
     async def send(self, ctx, *args, **kwargs):
         """ Send the message string_name in context ctx,

@@ -55,19 +55,31 @@ class InstantiatedCommand:
     def name(self):
         return self.__name
 
-    async def on_status(self, status):
-        if status in self.__status and not self.__is_running:
-            try:
-                self.__parent.start()
-            except AttributeError:
-                pass
-            self.__is_running = True
+    async def on_team_ready(self, team):
+        pass
+
+    async def on_status_update(self, status):
+        if status is MatchStatus.IS_RUNNING:
+            return
+        if status in self.__status:
+            if not self.__is_running:
+                try:
+                    self.__parent.start()
+                except AttributeError:
+                    pass
+                self.__is_running = True
+            else:
+                try:
+                    self.__parent.update()
+                except AttributeError:
+                    pass
         elif status not in self.__status and self.__is_running:
             try:
                 await self.__parent.stop()
             except AttributeError:
                 pass
             self.__is_running = False
+
 
     def direct_do(self, obj, ctx, *args, **kwargs):
         return self.__func(obj, ctx, *args, **kwargs)

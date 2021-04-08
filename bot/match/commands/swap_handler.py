@@ -33,7 +33,9 @@ class SwapHandler(InstantiatedCommand):
 
     async def stop(self):
         await self.validator.clean()
-        self.validator = None
+
+    async def on_team_ready(self, team):
+        await self.stop()
 
     @Command.command(*picking_states)
     async def swap(self, ctx, args):
@@ -63,11 +65,17 @@ class SwapHandler(InstantiatedCommand):
             if p.active.is_captain:
                 await disp.SWAP_CAP.send(ctx, p.mention)
                 return
+            if p.active.is_playing:
+                await disp.SWAP_RDY.send(ctx)
+                return
             players.append(p.active)
 
         if players[0].team is players[1].team:
             await disp.SWAP_SAME_TEAM.send(ctx)
             return
+
+        # Can't have a sub command running  at the same time
+        await self.factory.sub.stop()
 
         if roles.is_admin(ctx.author):
             await self.validator.force_confirm(ctx, p_1=players[0], p_2=players[1])

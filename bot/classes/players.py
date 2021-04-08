@@ -573,15 +573,11 @@ class ActivePlayer:
     def match(self):
         return self.__player.match
 
-    async def update_stats(self):
-        self.__player.stats.add_stats(self)
-        # TODO here wrong
-        # await db.async_db_call(db.set_element, "player_stats", self.id, self.__player.stats.get_data())
-
     def on_team_ready(self, ready):
         self.__is_playing = ready
         if ready:
             self.__player_score = PlayerScore(self.id, self.team.team_score, self.name, self.ig_name, self.ig_id)
+            self.__player_score.stats = self.__player.stats
 
 
 class TeamCaptain(ActivePlayer):

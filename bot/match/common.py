@@ -144,8 +144,6 @@ def get_check_captain(ctx, match, check_turn=True):
     elif check_turn and not player.active.is_turn:
         # Not player's turn
         msg = disp.PK_NOT_TURN.send(ctx)
-    elif player.active.team.is_ready:
-        msg = disp.MATCH_NO_COMMAND_READY.send(ctx.command.name)
     else:
         a_player = player.active
     return a_player, msg

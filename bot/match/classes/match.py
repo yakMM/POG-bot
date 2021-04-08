@@ -12,6 +12,7 @@ from modules.tools import UnexpectedError
 from match.processes import *
 from match.commands import CommandFactory
 from match.match_status import MatchStatus
+from .base_selector import on_match_over
 
 log = getLogger("pog_bot")
 
@@ -91,11 +92,15 @@ class Match:
 
     @property
     def teams(self):
-        return self.__data.teams
+        if not self.__objects:
+            raise AttributeError("Match instance is not bound, no attribute 'teams'")
+        return self.__objects.teams
 
     @property
     def round_no(self):
-        return self.__data.round_no
+        if not self.__objects:
+            raise AttributeError("Match instance is not bound, no attribute 'round_no'")
+        return self.__objects.round_no
 
     @property
     def base(self):
@@ -143,7 +148,8 @@ class MatchData:
         self.match = match
         if data:
             self.id = data["_id"]
-            self.teams = [TeamScore.from_data(0, data["teams"][0]), TeamScore.from_data(1, data["teams"][1])]
+            self.teams = [TeamScore.from_data(0, match, data["teams"][0]),
+                          TeamScore.from_data(1, match, data["teams"][1])]
             self.base = Base.get(data["base_id"])
             self.round_length = data["round_length"]
             self.round_stamps = data["round_stamps"]
@@ -164,27 +170,16 @@ class MatchData:
         return dta
 
     def clean(self):
-        # Clean players if in teams
-        for tm in self.teams:
-            if tm is not None:
-                tm.clean()
-
         self.id = 0
         self.teams = [None, None]
         self.base = None
         self.round_stamps = list()
 
-    @property
-    def round_no(self):
-        if self.match.next_status is MatchStatus.IS_PLAYING:
-            return len(self.round_stamps)
-        if self.match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_WAITING_2, MatchStatus.IS_STARTING):
-            return len(self.round_stamps) + 1
-        return 0
-
-    @property
-    def last_start_stamp(self):
-        return self.round_stamps[-1]
+    async def push_db(self):
+        await db.async_db_call(db.set_element, "matches_new", self.id, self.get_data())
+        for tm in self.teams:
+            for p in tm.players:
+                await p.update_stats()
 
 
 _process_list = [CaptainSelection, PlayerPicking, FactionPicking, BasePicking, GettingReady, MatchPlaying,
@@ -196,6 +191,7 @@ class MatchObjects:
         self.__status = MatchStatus.IS_FREE
         self.data = data
         self.proxy = match
+        self.teams = [None, None]
         self.channel = channel
         self.current_process = None
         self.base_selector = None
@@ -211,9 +207,21 @@ class MatchObjects:
     def status(self):
         return self.__status
 
+    @property
+    def round_no(self):
+        if self.match.next_status is MatchStatus.IS_PLAYING:
+            return len(self.data.round_stamps)
+        if self.match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_WAITING_2, MatchStatus.IS_STARTING):
+            return len(self.data.round_stamps) + 1
+        return 0
+
+    @property
+    def last_start_stamp(self):
+        return self.data.round_stamps[-1]
+
     async def set_status(self, value):
         self.__status = value
-        await self.match.command.on_status_update(value)
+        await self.command_factory.on_status_update(value)
 
     async def next_process(self, *args):
         await self.set_status(MatchStatus.IS_RUNNING)
@@ -229,10 +237,7 @@ class MatchObjects:
 
     async def on_match_over(self):
         await disp.MATCH_OVER.send(self.match.channel)
-        await db.async_db_call(db.set_element, "matches", self.data.id, self.data.get_data())
-        for tm in self.teams:
-            for p in tm.players:
-                await p.update_stats()
+        await self.data.push_db()
         await self.clean()
         await disp.MATCH_CLEARED.send(self.match.channel)
 
@@ -250,9 +255,14 @@ class MatchObjects:
         if self.base_selector:
             await self.base_selector.clean()
             self.base_selector = None
+        on_match_over(self.data.id)
         for a_player in self.players_with_account:
             await accounts.terminate_account(a_player)
+        for tm in self.teams:
+            if tm is not None:
+                tm.clean()
         self.data.clean()
+        self.teams = [None, None]
         self.current_process = None
         self.players_with_account = list()
         self.result_msg = None

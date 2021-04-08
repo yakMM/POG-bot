@@ -52,7 +52,11 @@ class CommandFactory(metaclass=MetaFactory):
 
     async def on_status_update(self, status):
         for command in self.commands.values():
-            await command.on_status(status)
+            await command.on_status_update(status)
+
+    async def on_team_ready(self, team):
+        for command in self.commands.values():
+            await command.on_team_ready(team)
 
     @Command.has_status("pick_status")
     @Command.command(*picking_states)
@@ -60,6 +64,10 @@ class CommandFactory(metaclass=MetaFactory):
         captain, msg = get_check_captain(ctx, self.match)
         if msg:
             await msg
+            return
+
+        if captain.team.is_playing:
+            await disp.READY_NO_COMMAND.send(ctx)
             return
 
         try:
@@ -129,9 +137,10 @@ class CommandFactory(metaclass=MetaFactory):
             return
         await match.ready(ctx, captain)
 
-    @Command.command(MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_WAITING_2)
+    @Command.command(MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_WAITING_2)
     async def squittal(self, ctx, args):
-        if self.match.status is MatchStatus.IS_WAITING:
+        if self.match.status is MatchStatus.IS_WAITING and \
+                not (self.match.teams[0].is_playing and self.match.teams[0].is_playing):
             await disp.SC_PLAYERS_STRING_DISC.send(ctx, "\n".join(tm.ig_string for tm in self.match.teams))
         else:
             await disp.SC_PLAYERS_STRING.send(ctx, "\n".join(tm.ig_string for tm in self.match.teams))
@@ -165,6 +174,13 @@ class CommandFactory(metaclass=MetaFactory):
                     # Else we display the error message
                     await msg
                 return
+
+        if self.match.teams[0].is_playing or self.match.teams[1].is_playing:
+            if len(args) == 0:
+                await self.match.base_selector.show_base_status(ctx)
+            else:
+                await disp.BASE_NO_READY.send(ctx)
+            return
 
         await self.match.base_selector.process_request(ctx, a_player, args)
 

@@ -1,4 +1,5 @@
 import modules.config as cfg
+import modules.database as db
 
 
 def ill_weapons_from_data(data):
@@ -19,10 +20,11 @@ def get_ill_weapons_doc(ill_weapons):
 
 
 class TeamScore:
-    def __init__(self, id, name, faction):
+    def __init__(self, id, match, name, faction):
         self.__id = id
         self.__name = name
         self.__faction = faction
+        self.__match = match
         self.__kills = 0
         self.__deaths = 0
         self.__net = 0
@@ -51,6 +53,10 @@ class TeamScore:
         return self.__score
 
     @property
+    def match(self):
+        return self.__match
+
+    @property
     def net(self):
         return self.__net
 
@@ -67,8 +73,8 @@ class TeamScore:
         return self.__faction
 
     @classmethod
-    def from_data(cls, i, data):
-        obj = cls(i, data["name"], data["faction_id"])
+    def from_data(cls, match, i, data):
+        obj = cls(i, match, data["name"], data["faction_id"])
         obj.__faction = data["faction_id"]
         obj.__score = data["score"]
         obj.__net = data["net"]
@@ -88,6 +94,7 @@ class TeamScore:
                 "cap_points": self.__cap,
                 "players": [p.get_data() for p in self.__players]
                 }
+        return data
 
     def add_player(self, score_player):
         self.__players.append(score_player)
@@ -112,6 +119,7 @@ class TeamScore:
 
 class PlayerScore:
     def __init__(self, p_id, team, name, ig_name, ig_id):
+        self.stats = None
         self.__id = p_id
         self.__team = team
         self.__name = name
@@ -133,13 +141,42 @@ class PlayerScore:
         obj = cls(data["discord_id"], team, name, ig_name, data["ig_id"])
         if data["loadouts"]:
             for loadout in data["loadouts"]:
-                obj.__loadouts[loadout["loadout_id"]] = Loadout.new_from_data(obj, loadout)
-        obj.__score = data["net"]
-        obj.__net = data["net"]
-        obj.__deaths = data["deaths"]
-        obj.__kills = data["kills"]
-        obj.__illegal_weapons = ill_weapons_from_data(data["ill_weapons"])
+                ld = Loadout.new_from_data(obj, loadout)
+                obj.__loadouts[ld.id] = ld
+                obj.__score += ld.score
+                obj.__net += ld.net
+                obj.__deaths += ld.deaths
+                obj.__kills += ld.kills
+                for weap in ld.ill_weapons.keys():
+                    if weap in obj.__illegal_weapons:
+                        obj.__illegal_weapons[weap] += obj.__illegal_weapons[weap]
+                    else:
+                        obj.__illegal_weapons[weap] = obj.__illegal_weapons[weap]
         return obj
+
+    def get_main_loadouts(self):
+        result = list()
+        all = list(self.__loadouts.values())
+        for i in range(2):
+            max_v = 0
+            max_l = None
+            for ld in all:
+                if ld.weight > max_v:
+                    max_l = ld
+            if max_l:
+                result.append(max_l.name)
+                all.remove(max_l)
+            else:
+                return result
+        return result
+
+    async def update_stats(self):
+        self.stats.add_stats(self)
+        await db.async_db_call(db.set_element, "player_stats", self.__id, self.stats.get_data())
+
+    @property
+    def match(self):
+        return self.__team.match
 
     @property
     def name(self):
@@ -177,11 +214,6 @@ class PlayerScore:
         data = {"discord_id": self.__id,
                 "ig_id": self.__ig_id,
                 "ig_name": self.__ig_name,
-                "score": self.__score,
-                "net": self.__net,
-                "deaths": self.__deaths,
-                "kills": self.__kills,
-                "ill_weapons": get_ill_weapons_doc(self.__illegal_weapons),
                 "loadouts": [loadout.get_data() for loadout in self.__loadouts.values()]
                 }
         return data
@@ -247,6 +279,26 @@ class Loadout:
     @property
     def weight(self):
         return self.__weight
+
+    @property
+    def score(self):
+        return self.__score
+
+    @property
+    def net(self):
+        return self.__net
+
+    @property
+    def kills(self):
+        return self.__kills
+
+    @property
+    def deaths(self):
+        return self.__deaths
+
+    @property
+    def ill_weapons(self):
+        return self.__illegal_weapons
 
     @classmethod
     def new_from_data(cls, p_score, data):

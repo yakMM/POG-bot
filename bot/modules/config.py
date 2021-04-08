@@ -155,7 +155,8 @@ _collections = {
     "matches": "",
     "player_stats": "",
     "restart_data": "",
-    "accounts_usage": ""
+    "accounts_usage": "",
+    "matches_new": ""
 }
 
 # Database
@@ -167,7 +168,7 @@ database = {
     "collections": _collections
 }
 
-# Map Images
+# Base Images
 base_images = dict()
 
 

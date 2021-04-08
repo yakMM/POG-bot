@@ -35,7 +35,18 @@ class SubHandler(InstantiatedCommand):
 
     async def stop(self):
         await self.validator.clean()
-        self.validator = None
+
+    def update(self):
+        try:
+            self.sub_func = self.match.get_process_attr("do_sub")
+        except AttributeError:
+            self.sub_func = None
+
+    async def on_team_ready(self, team):
+        if "subbed" in self.validator.kwargs:
+            player = self.validator.kwargs["subbed"]
+            if player.active and (player.active.team is team):
+                await self.stop()
 
     @Command.command(*picking_states)
     async def sub(self, ctx, args):
@@ -60,6 +71,12 @@ class SubHandler(InstantiatedCommand):
         if not(subbed.match and subbed.match.id == self.match.id):
             await disp.SUB_NO.send(ctx)
             return
+        if subbed.active and subbed.active.is_playing:
+            await disp.SUB_RDY.send(ctx)
+            return
+
+        # Can't have a swap command running at the same time
+        await self.factory.swap.stop()
 
         if roles.is_admin(ctx.author):
             player = None

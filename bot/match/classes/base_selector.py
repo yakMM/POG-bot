@@ -37,6 +37,9 @@ def is_last_used(base):
     return False
 
 
+def on_match_over(m_id):
+    if m_id in _pog_selected_bases:
+        del _pog_selected_bases[m_id]
 
 
 class BaseSelector:
@@ -64,8 +67,6 @@ class BaseSelector:
     async def clean(self):
         await self.__validator.clean()
         await self.__nav.reaction_handler.destroy()
-        if self.__match.id in _pog_selected_bases:
-            del _pog_selected_bases[self.__match.id]
 
     def __is_used(self, base):
         for key in _pog_selected_bases.keys():

@@ -82,7 +82,7 @@ class Team:
     def on_team_ready(self, ready):
         self.__is_playing = ready
         if ready:
-            self.__team_score = TeamScore(self.id, self.name, self.faction)
+            self.__team_score = TeamScore(self.id, self.match, self.name, self.faction)
         for a_player in self.__players:
             a_player.on_team_ready(ready)
             if ready:

@@ -7,6 +7,7 @@ from display.classes import ContextWrapper
 from match import MatchStatus
 import modules.config as cfg
 from datetime import datetime as dt
+import os
 
 big_font = ImageFont.truetype("../fonts/OpenSans2.ttf", 100)
 font = ImageFont.truetype("../fonts/OpenSans2.ttf", 80)
@@ -72,20 +73,11 @@ def _team_display(img, draw, team, y_offset):
 
         # Loadout
         loadouts = a_player.get_main_loadouts()
-        print(loadouts)
-        a_loadouts = list()
-        try:
-            for l in loadouts:
-                load = cfg.loadout_id[l]
-                if load not in a_loadouts:
-                    a_loadouts.append(cfg.loadout_id[l])
-        except KeyError:
-            pass
 
-        for j in range(len(a_loadouts)):
-            loadout_img = Image.open(f"../logos/{a_loadouts[j]}.png")
+        for j in range(len(loadouts)):
+            loadout_img = Image.open(f"../logos/{loadouts[j]}.png")
             loadout_img = loadout_img.resize((80, 80))
-            if len(a_loadouts) == 1:
+            if len(loadouts) == 1:
                 off = 90 // 2
             else:
                 off = 90 * j
@@ -140,12 +132,16 @@ def _make_image(match):
     for tm in match.teams:
         draw.text((X_OFFSET+2200,200+100*(tm.id+2)), f"{tm.name}: {tm.cap} points", font=small_font, white=white)
         _team_display(img, draw, tm, y_off(tm.id))
+    try:
+        os.makedirs('../../POG-data/matches')
+    except FileExistsError:
+        pass
     img.save(f'../../POG-data/matches/match_{match.id}.png')
 
 
 async def publish_match_image(match):
     loop = get_event_loop()
-    await loop.run_in_executor(None, _make_image, match)
+    await loop.run_in_executor(None, _make_image, match.data)
 
     if match.result_msg is not None:
         await match.result_msg.delete()

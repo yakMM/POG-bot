@@ -82,7 +82,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         await self.rh.destroy()
         await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, self.match.round_no)
         try:
-            await census.process_score(self.match.proxy, self.match.last_start_stamp)
+            await census.process_score(self.match.data, self.match.last_start_stamp, self.match.channel)
             await i_maker.publish_match_image(self.match)
         except ApiNotReachable as e:
             log.error(f"ApiNotReachable caught when processing scores : {e.url}")

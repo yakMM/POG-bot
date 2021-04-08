@@ -321,7 +321,7 @@ def team_update(arg, match):
         desc += f"\nTime Remaining: **{match.get_formatted_time_to_round_end()}**"
     embed = Embed(colour=Color.blue(), title=title, description=desc)
     if match.base is not None:
-        embed.add_field(name="Map", value=match.base.name, inline=False)
+        embed.add_field(name="Base", value=match.base.name, inline=False)
         if match.base.id in cfg.base_images:
             embed.set_thumbnail(url=cfg.base_images[match.base.id])
     for tm in match.teams:

@@ -2,6 +2,14 @@
 - Fixed some issues with sub command
 - Added base image as thumbmail in the match info embed
 - Notify players will no longer be pinged if they are already in a match
+- Overhauled team ready section:
+  - Added reactions for the =ready command
+  - =sub can no longer be used on a player whose team is ready
+  - =swap can no longer be used it a team is ready
+  - It's no longer possible to change the base if a team is ready
+- Overhauled scoring system:
+  - Classes will now be properly reported on the score sheet
+  - Now tracking per-class stats internally
 
 # v3.0:
 - Code revamp:

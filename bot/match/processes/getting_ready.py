@@ -41,7 +41,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
             ctx = ContextWrapper.wrap(self.match.channel)
             ctx.author = user
             ctx.cmd_name = "ready"
-            await self.match.command.ready(ctx)
+            await self.ready(ctx, player.active)
 
         super().__init__(match)
 
@@ -82,10 +82,14 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         msg = await disp.PK_SHOW_TEAMS.send(self.match.channel, match=self.match.proxy)
         await self.rh.set_new_msg(msg)
 
-    def on_team_ready(self, team, ready):
+    async def on_team_ready(self, team, ready):
         team.captain.is_turn = not ready
         if self.is_first_round:
             team.on_team_ready(ready)
+            if ready:
+                self.match.data.teams[team.id] = team.team_score
+                await self.match.base_selector.clean()
+                await self.match.command_factory.on_team_ready(team)
 
     async def ready_check(self, team):
         other = self.match.teams[team.id - 1]
@@ -100,7 +104,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
     @Process.public
     async def ready(self, ctx, captain):
         if not captain.is_turn:
-            self.on_team_ready(captain.team, False)
+            await self.on_team_ready(captain.team, False)
             msg = await disp.MATCH_TEAM_UNREADY.send(ctx, captain.team.name, match=self.match.proxy)
             await self.rh.set_new_msg(msg)
             return
@@ -122,7 +126,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
                 except ApiNotReachable as e:
                     log.error(f"ApiNotReachable caught when checking online players: {e.url}")
                     await disp.API_READY_ERROR.send(ctx)
-            self.on_team_ready(captain.team, True)
+            await self.on_team_ready(captain.team, True)
             msg = await disp.MATCH_TEAM_READY.send(ctx, captain.team.name, match=self.match.proxy)
             if not await self.ready_check(captain.team):
                 await self.rh.set_new_msg(msg)

@@ -13,7 +13,6 @@ from display import ContextWrapper
 
 log = getLogger("pog_bot")
 
-
 def get_ids():
     # Enter here a list of discord IDS of accounts you wish to use for the testing
     # For example:
@@ -59,14 +58,14 @@ async def launch(ctx, id_list, tier):
     while match.status is not MatchStatus.IS_CAPTAIN:
         await asyncio.sleep(1)
 
-    cap_1_ctx = ContextWrapper.user(players[0].id)
-    cap_1_ctx.channel = ctx.channel
+    cap_1_ctx = ContextWrapper.wrap(ctx.channel)
     cap_1_ctx.message = ctx.message
+    cap_1_ctx.author = ctx.guild.get_member(players[0].id)
     await match.command.captain(cap_1_ctx, ["v"])
 
-    cap_2_ctx = ContextWrapper.user(players[1].id)
-    cap_2_ctx.channel = ctx.channel
+    cap_2_ctx = ContextWrapper.wrap(ctx.channel)
     cap_2_ctx.message = ctx.message
+    cap_2_ctx.author = ctx.guild.get_member(players[1].id)
     await match.command.captain(cap_2_ctx, ["v"])
 
     if tier == 2:
