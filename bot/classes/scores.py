@@ -179,6 +179,10 @@ class PlayerScore:
         return self.__team.match
 
     @property
+    def mention(self):
+        return f"<@{self.__id}>"
+
+    @property
     def name(self):
         return self.__name
 

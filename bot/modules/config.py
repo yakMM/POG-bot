@@ -107,7 +107,8 @@ general = {
 ts = {
     "url": "",
     "config_help": "",
-    "lobby_id": 0
+    "lobby_id": 0,
+    "matches": list()
 }
 
 # Channels
@@ -220,7 +221,15 @@ def get_config(launch_str):
 
     for key in ts:
         try:
-            if isinstance(ts[key], int):
+            if key == "matches":
+                tmp = config['Teamspeak'][key].split(',')
+                ts[key].clear()
+                for m in tmp:
+                    ts[key].append(list())
+                    c_id = m.split('/')
+                    for val in c_id:
+                        ts[key][-1].append(int(val))
+            elif isinstance(ts[key], int):
                 ts[key] = int(config['Teamspeak'][key])
             else:
                 ts[key] = config['Teamspeak'][key]

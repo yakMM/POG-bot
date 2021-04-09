@@ -49,4 +49,4 @@ class SimpleLogger(Plugin):
 
     async def clean(self):
         self.data["cleaning"] = timestamp_now()
-        await db.async_db_call(db.set_element, "match_logs", self.match.id, self.data)
+        # await db.async_db_call(db.set_element, "match_logs", self.match.id, self.data)

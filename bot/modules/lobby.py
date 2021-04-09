@@ -96,7 +96,7 @@ def get_lobby_len():
 
 
 def get_all_names_in_lobby():
-    names = [p.mention for p in _lobby_list]
+    names = [f"{p.mention} ({p.name})" for p in _lobby_list]
     return names
 
 
@@ -116,7 +116,7 @@ def remove_from_lobby(player):
 
 
 def _on_match_free():
-    _auto_ping.already = True
+    _auto_ping.already = False
     if len(_lobby_list) == cfg.general["lobby_size"]:
         _start_match_from_full_lobby()
 

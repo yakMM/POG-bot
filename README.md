@@ -98,9 +98,9 @@ api_key = Daybreak_Registered_Service_ID
 ```
 
 ### Teamspeak integration
-The bot used for Teamspeak audio integration is Splamy's [TS3AudioBot](https://github.com/Splamy/TS3AudioBot)
+The bot used for Teamspeak audio integration is Splamy's [TS3AudioBot](https://github.com/yakMM/TS3AudioBot).
 This bot works on the dotnet runtime and can be built and installed following the readme available in TS3AudioBot github's repo.
-As of now, the version `0.12.1` of TS3AudioBot is used.
+As of now, a fork of version `0.12.1` is used.
 
 #### TS3-bot folder structure
 The structure of the TS3AudioBot folder is the following:
@@ -136,6 +136,11 @@ bots_path = "bots"
 # Path for audio files
 media = { path = "audio" }
 
+[bot.audio]
+# Activate subscription-based whispers
+send_mode = "!whisper subscription"
+
+
 [bot.connect]
 # TS3 default connect information
 address = Your_TS3_Url
@@ -152,13 +157,18 @@ Additionally, add access to all commands for localhost in the `rights.toml` file
 ```
 
 #### Configuring individual bots
-Each individual bot is also to be configured (in each `bot.toml` file). The main parameter to modify is `send_mode`.
-This parameter is needed for the bot to send whisper broadcast to the match channels.
+Each individual bot can also be configured, in each `bot.toml` files. This allows for example to change the name of each individual bot.
 ```buildoutcfg
-[audio]
-# Example if your match, team1 and team2 channels IDs are 1, 2 and 3
-send_mode = "!xecute (!whisper subscription) (!subscribe channel 1) (!subscribe channel 2) (!subscribe channel 3)"
+[connect]
+# Client nickname when connecting.
+name = "POG_3"
+
 ```
+
+#### Setting up TS3 channels IDs
+THe channel IDs can be set up in the configuration file: 
+
+
 
 
 ### Populating the collections

@@ -46,7 +46,8 @@ class AllStrings(Enum):
     LB_CLEARED = Message("Lobby has been cleared!", embed=embeds.lobby_list)
     LB_EMPTY = Message("Lobby is already empty!")
     LB_NOTIFY = Message("{} queue is almost full, join to start a match!")
-    LB_GET = Message("Lobby status saved, will be restored on next restart!")
+    LB_GET = Message("Restore the lobby with `=lobby restore {}`")
+    LB_SAVE = Message("Lobby status saved, will be restored on next restart!")
     LB_REFRESHED = Message("You have reset your queue timeout!")
 
     PK_OVER = Message("The teams are already made. You can't pick!")
@@ -96,6 +97,7 @@ class AllStrings(Enum):
     API_ERROR = Message("Could not reach Planetside2 API, try again later!")
     API_READY_ERROR = Message("Could not reach Planetside2 API, player online check ignored!", ping=False)
     API_SCORE_ERROR = Message("Match {}, round {}: Could not reach Planetside2 API, no scores for this round!")
+    PUBLISH_ERROR = Message("Match {}, round {}: Could not publish score image, no scores for this round!")
     GLOBAL_INFO = Message("Here is what's going on in POG at the moment:", embed=embeds.global_info)
     CHECK_ACCOUNT = Message("Your account password may have been flipped!\n"
                             "Re-register in <#{}> to confirm you still have access to it!", embed=embeds.flip_accounts)
@@ -142,7 +144,7 @@ class AllStrings(Enum):
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ping=False)
     MATCH_BASE_AUTO = Message("Match will be on **{}**", ping=False)
-    MATCH_CONFIRM = Message("{} {} Type `=ready` when your team is inside their sunderer, ready to start",
+    MATCH_CONFIRM = Message("{} {} Type `=ready` or react below when your team is inside their sunderer, ready to start",
                             embed=embeds.team_update)
     MATCH_TEAM_READY = Message("{} is now ready!", embed=embeds.team_update)
     MATCH_TEAM_UNREADY = Message("{} is no longer ready!", embed=embeds.team_update)

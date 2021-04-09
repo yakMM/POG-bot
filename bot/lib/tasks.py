@@ -30,13 +30,14 @@ class Loop:
         self._current_loop = 0
         self._task = None
         self._injected = None
-        self._valid_exception = (
-            OSError,
-            discord.GatewayNotFound,
-            discord.ConnectionClosed,
-            aiohttp.ClientError,
-            asyncio.TimeoutError,
-        )
+        self._valid_exception = ()
+        # self._valid_exception = (
+        #     OSError,
+        #     discord.GatewayNotFound,
+        #     discord.ConnectionClosed,
+        #     aiohttp.ClientError,
+        #     asyncio.TimeoutError,
+        # )
 
         self._before_loop = None
         self._after_loop = None

@@ -163,9 +163,13 @@ class AdminCog(commands.Cog, name='admin'):
                     pass
             await disp.LB_QUEUE.send(ctx, names_in_lobby=lobby.get_all_names_in_lobby())
             return
-        if len(args) > 0 and args[0] == "get":
+        if len(args) > 0 and args[0] == "save":
             lb = lobby.get_all_ids_in_lobby()
             await db.async_db_call(db.set_field, "restart_data", 0, {"last_lobby": lb})
+            await disp.LB_SAVE.send(ctx)
+            return
+        if len(args) > 0 and args[0] == "get":
+            lb = lobby.get_all_ids_in_lobby()
             await disp.LB_GET.send(ctx, " ".join([str(p_id) for p_id in lb]))
             return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)

@@ -53,7 +53,8 @@ def lobby_help(ctx):
         embed.add_field(name="Staff commands",
                         value='`=clear` - Clear the lobby\n'
                               '`=remove @player` - Remove player from lobby\n'
-                              '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages\n',
+                              '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages\n'
+                              '`=lobby save`/`get`/`restore` - Will save, get or restore the lobby from player IDs',
                         inline=False)
     return embed
 
@@ -70,8 +71,7 @@ def admin_help(ctx):
     embed.add_field(name='Lobby commands',
                     value='`=remove @player` - Remove the player from queue\n'
                           '`=clear` - Clear queue\n'
-                          '`=lobby get` - Save the lobby state in the db\n'
-                          '`=lobby restore id id ...` - Re-add all the users back to the lobby',
+                          '`=lobby save`/`get`/`restore` - Will save, get or restore the lobby from player IDs',
                     inline=False)
     embed.add_field(name='Player Management commands',
                     value='`=rename @player New Name` - Rename a player within the system\n'

@@ -1,6 +1,6 @@
 # v3.1:
 - Fixed some issues with sub command
-- Added base image as thumbmail in the match info embed
+- Added base image as thumbnail in the match info embed
 - Notify players will no longer be pinged if they are already in a match
 - Overhauled team ready section:
   - Added reactions for the =ready command
@@ -12,6 +12,10 @@
   - Now tracking per-class stats internally
 - Added match plugins
   - Added ts3 interaction as a plugin
+  - Fixed some problems in the ts3 bot handling
+  - TS3 channels ids are not in the config file
+- Separated =lobby get from =lobby save
+- Players name are now displayed in lobby lists
 
 # v3.0:
 - Code revamp:
