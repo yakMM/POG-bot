@@ -69,7 +69,7 @@ class _TaskAudio:
         if wait != 0:
             await sleep(wait)
         await self.__lobby(lobby)
-        url = f'http://localhost:58913/api/bot/template/{self.bot.num}(/xecute(/add/{string}.mp3)(/play))'
+        url = f'{cfg.ts["url"]}/api/bot/template/{self.bot.num}(/xecute(/add/{string}.mp3)(/play))'
         await _send_url(url)
 
     async def __lobby(self, bl):
@@ -77,10 +77,10 @@ class _TaskAudio:
             return
         if bl:
             self.bot.lobby = True
-            url = f'http://localhost:58913/api/bot/template/{self.bot.num}(/subscribe/channel/19)'
+            url = f'{cfg.ts["url"]}/api/bot/template/{self.bot.num}(/subscribe/channel/{cfg.ts["lobby_id"]})'
         else:
             self.bot.lobby = False
-            url = f'http://localhost:58913/api/bot/template/{self.bot.num}(/unsubscribe/channel/19)'
+            url = f'{cfg.ts["url"]}/api/bot/template/{self.bot.num}(/unsubscribe/channel/{cfg.ts["lobby_id"]})'
         await _send_url(url)
 
 

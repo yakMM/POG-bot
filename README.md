@@ -79,7 +79,7 @@ cluster = DatabaseName
 The Gspread module is used for interaction with google API. [Follow these steps to create your google_api_secret.json](https://gspread.readthedocs.io/en/latest/oauth2.html#for-bots-using-service-account)
 
 #### Prepare Google Sheet
-An example excel sheet has been provided called `accounts_sheet_template.xlsx`. 
+An example sheet has been provided called `accounts_sheet_template.xlsx`. 
 By creating a new Google Sheet in your Drive and importing the excel file through the menu you can avoid format and naming convention errors.
 
 The `accounts` field from the `[Database]` section of the configuration file has to contain the ID of the Google Sheet.
@@ -100,8 +100,66 @@ api_key = Daybreak_Registered_Service_ID
 ### Teamspeak integration
 The bot used for Teamspeak audio integration is Splamy's [TS3AudioBot](https://github.com/Splamy/TS3AudioBot)
 This bot works on the dotnet runtime and can be built and installed following the readme available in TS3AudioBot github's repo.
+As of now, the version `0.12.1` of TS3AudioBot is used.
 
-@TODO: Explain how to configure the TS3 bot
+#### TS3-bot folder structure
+The structure of the TS3AudioBot folder is the following:
+```
+TS3-bot
++-- TS3AudioBot.dll
++-- rights.toml
++-- ts3audiobot.toml
++-- ...
++-- audio
+|   +-- audio_file_1.mp3
+|   +-- audio_file_1.mp3
+|   +-- ...
++-- bots
+|   +-- 1
+|   | +-- bot.toml
+|   +-- 2
+|   | +-- bot.toml
+|   +-- 3
+|   | +-- bot.toml
+|   +-- ...
+```
+The audio files should be put in the `audio` repository. Each sub-repository of `bots` represent TS3 bot (one bot per match channel is needed).
+
+#### Main configuration file
+The first file to modify is `ts3audiobot.toml`. The relevant parameters for are listed below. You may want to change the parameters depending on your project file structure.
+```buildoutcfg
+[configs]
+# Path for the bots
+bots_path = "bots"
+
+[factories]
+# Path for audio files
+media = { path = "audio" }
+
+[bot.connect]
+# TS3 default connect information
+address = Your_TS3_Url
+channel = Your_TS3_Bot_Channel_Id (example: /10)
+```
+
+Additionally, add access to all commands for localhost in the `rights.toml` file:
+```buildoutcfg
+# Admin rule
+[[rule]]
+        # Treat requests from localhost as admin
+        ip = [ "::ffff:127.0.0.1" ]
+        "+" = "*"
+```
+
+#### Configuring individual bots
+Each individual bot is also to be configured (in each `bot.toml` file). The main parameter to modify is `send_mode`.
+This parameter is needed for the bot to send whisper broadcast to the match channels.
+```buildoutcfg
+[audio]
+# Example if your match, team1 and team2 channels IDs are 1, 2 and 3
+send_mode = "!xecute (!whisper subscription) (!subscribe channel 1) (!subscribe channel 2) (!subscribe channel 3)"
+```
+
 
 ### Populating the collections
 The file `scripts.py` contains two functions called `push_accounts()` and `get_all_maps_from_api()`.
