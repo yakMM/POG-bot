@@ -64,9 +64,9 @@ class BaseSelector:
         lp = get_event_loop()
         await lp.run_in_executor(None, get_booked_bases, Base, self.__booked)
 
-    async def clean(self):
-        await self.__validator.clean()
-        await self.__nav.reaction_handler.destroy()
+    def clean(self):
+        self.__validator.clean()
+        self.__nav.reaction_handler.clear()
 
     def __is_used(self, base):
         for key in _pog_selected_bases.keys():
@@ -111,10 +111,10 @@ class BaseSelector:
             self.__selected = base
             _pog_selected_bases[self.__match.id] = base.id
             self.__match.data.base = base
-            await self.__nav.reaction_handler.destroy()
+            self.__nav.reaction_handler.clear()
             await disp.BASE_ON_SELECT.send(ctx, base.name, base=base, is_booked=self.is_booked)
             if self.__match.status is MatchStatus.IS_BASING:
-                await self.__match.proxy.on_base_found()
+                self.__match.proxy.on_base_found()
 
     async def show_base_status(self, ctx):
         if self.__selected is None:
@@ -168,7 +168,7 @@ class BaseSelector:
             await disp.BASE_TOO_MUCH.send(ctx)
         else:
             self.__selection = current_list
-            await self.__validator.clean()
+            self.__validator.clean()
             await disp.BASE_SHOW_LIST.send(ctx, bases_list=self.string_list)
             await self.__nav.reload()
 
@@ -244,10 +244,10 @@ class BaseNavigator:
         # Like so, the odds are even for all bases
 
     async def select(self, reaction, player, user, msg):
+        self.reaction_handler.clear()
         ctx = ContextWrapper.wrap(self.channel)
         ctx.author = user
         await self.selector.select_by_index(ctx, player.active, self.index)
-        await self.reaction_handler.clear_reactions()
 
     def check_auth(self, reaction, player, user, msg):
         if player.active and player.active.is_captain:

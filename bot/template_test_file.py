@@ -13,6 +13,7 @@ from display import ContextWrapper
 
 log = getLogger("pog_bot")
 
+
 def get_ids():
     # Enter here a list of discord IDS of accounts you wish to use for the testing
     # For example:
@@ -37,7 +38,6 @@ def test_hand(client):
     async def y(ctx):
         await launch(ctx, [20, 21, 22, 23], 2)
         await launch(ctx, ids, 1)
-
 
 
 async def launch(ctx, id_list, tier):

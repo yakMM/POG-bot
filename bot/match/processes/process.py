@@ -73,7 +73,7 @@ class Process(metaclass=MetaProcess, status=None):
         if self.init_func:
             await self.init_func(self, *args)
         if self.status:
-            await self.match.set_status(self.status)
+            self.match.status = self.status
 
     @classmethod
     def public(cls, func):

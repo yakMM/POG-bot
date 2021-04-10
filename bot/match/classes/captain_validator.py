@@ -24,16 +24,16 @@ class CaptainValidator:
                 ctx.author = user
                 if a_p is self.expected:
                     if str(reaction) == "❌":
+                        self.clean()
                         await disp.CONFIRM_DECLINE.send(ctx)
-                        await self.clean()
                         return
                     elif self.confirm_func:
+                        self.clean()
                         await self.confirm_func(ctx, **self.kwargs)
-                        await self.clean()
                         return
                 elif self.is_captain(a_p) and str(reaction) == "❌":
+                    self.clean()
                     await disp.CONFIRM_CANCELED.send(ctx)
-                    await self.clean()
                     return
             raise reactions.UserLackingPermission
 
@@ -43,8 +43,8 @@ class CaptainValidator:
                 return True
         return False
 
-    async def clean(self):
-        await self.rh.destroy()
+    def clean(self):
+        self.rh.clear()
         self.expected = None
         self.kwargs = dict()
 
@@ -55,7 +55,7 @@ class CaptainValidator:
     async def force_confirm(self, ctx, **kwargs):
         if self.confirm_func:
             await self.confirm_func(ctx, **kwargs)
-            await self.clean()
+            self.clean()
 
     async def wait_valid(self, captain, msg, **kwargs):
         if not self.is_captain(captain):
@@ -73,8 +73,8 @@ class CaptainValidator:
                 elif captain is not self.expected:
                     await disp.CONFIRM_NOT_CAPTAIN.send(ctx, self.expected.mention)
                 elif self.confirm_func:
+                    self.clean()
                     await self.confirm_func(ctx, **self.kwargs)
-                    await self.clean()
                 else:
                     raise UnexpectedError("Confirm Function is None!")
                 return True
@@ -83,20 +83,20 @@ class CaptainValidator:
                     await disp.DECLINE_NOTHING.send(ctx)
                 elif captain is not self.expected:
                     if self.is_captain(captain):
+                        self.clean()
                         await disp.CONFIRM_CANCELED.send(ctx)
-                        await self.clean()
                     else:
                         await disp.DECLINE_NOT_CAPTAIN.send(ctx, self.expected.mention)
                 else:
+                    self.clean()
                     await disp.CONFIRM_DECLINE.send(ctx)
-                    await self.clean()
                 return True
             elif args[0] == "cancel" or args[0] == "c":
                 if not self.expected:
                     await disp.CANCEL_NOTHING.send(ctx)
                 elif self.is_captain(captain) and (captain is not self.expected):
+                    self.clean()
                     await disp.CONFIRM_CANCELED.send(ctx)
-                    await self.clean()
                 else:
                     await disp.CANCEL_NOT_CAPTAIN.send(ctx)
                 return True

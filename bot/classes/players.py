@@ -211,7 +211,6 @@ class Player:
             self.role_task.start()
         except RuntimeError:  # if task is already active
             log.warning(f"Player task conflict: {self.name}")
-            pass
 
     @loop(count=1)
     async def role_task(self):

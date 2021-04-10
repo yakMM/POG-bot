@@ -50,13 +50,13 @@ class CommandFactory(metaclass=MetaFactory):
     def __init__(self, match):
         self.match = match
 
-    async def on_status_update(self, status):
+    def on_status_update(self, status):
         for command in self.commands.values():
-            await command.on_status_update(status)
+            command.on_status_update(status)
 
-    async def on_team_ready(self, team):
+    def on_team_ready(self, team):
         for command in self.commands.values():
-            await command.on_team_ready(team)
+            command.on_team_ready(team)
 
     @Command.has_status("pick_status")
     @Command.command(*picking_states)

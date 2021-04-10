@@ -98,9 +98,8 @@ api_key = Daybreak_Registered_Service_ID
 ```
 
 ### Teamspeak integration
-The bot used for Teamspeak audio integration is Splamy's [TS3AudioBot](https://github.com/yakMM/TS3AudioBot).
+The bot used for Teamspeak audio integration is Splamy's [TS3AudioBot](https://github.com/Splamy/TS3AudioBot).
 This bot works on the dotnet runtime and can be built and installed following the readme available in TS3AudioBot github's repo.
-As of now, a fork of version `0.12.1` is used.
 
 #### TS3-bot folder structure
 The structure of the TS3AudioBot folder is the following:

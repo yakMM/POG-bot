@@ -88,9 +88,9 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         self.auto_captain.cancel()
         for p in self.p_list:
             p.on_player_clean()
-        await self.clean_msg(0)
-        await self.clean_msg(1)
-        await self.volunteer_rh.destroy()
+        reactions.auto_clear(self.accept_msg[0])
+        reactions.auto_clear(self.accept_msg[1])
+        self.volunteer_rh.clear()
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)
 
@@ -132,7 +132,6 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             await disp.CAP_DENY_OK.send(ctx)
             self.auto_captain.restart()
             await self.get_new_auto(i)
-
         return True
 
     @loop(minutes=1, delay=1, count=2)
@@ -142,7 +141,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         self.auto_captain.restart()
 
     async def get_new_auto(self, i):
-        await self.clean_msg(i)
+        reactions.auto_clear(self.accept_msg[i])
         captain = self.captains[i]
         if not captain or (captain and not captain.active):
             if not self.players:
@@ -151,9 +150,8 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             player = self.players.pop(self.find_captain())
             self.captains[i] = player
             msg = await disp.CAP_AUTO.send(self.match.channel, player.mention, self.match.teams[i].name)
-            reactions.add_handler(msg.id, self.accept_rh)
             self.accept_msg[i] = msg
-            await self.accept_rh.auto_add_reactions(msg)
+            await self.accept_rh.auto_add(msg)
 
     async def add_captain(self, i, player):
         self.match.teams[i].add_player(TeamCaptain, player)
@@ -161,22 +159,18 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         self.p_list.remove(player)
         if player.id in self.players:
             del self.players[player.id]
-        await self.clean_msg(i)
-        await disp.CAP_OK.send(self.match.channel, player.mention, self.match.teams[i].name)
-        if self.captains[i-1] and self.captains[i-1].active:
+        reactions.auto_clear(self.accept_msg[i])
+        all_captains_selected = self.captains[i - 1] and self.captains[i - 1].active
+        if all_captains_selected:
             self.auto_captain.cancel()
-            await self.volunteer_rh.destroy()
-            await self.match.next_process(self.p_list)
+            self.volunteer_rh.clear()
+            self.match.status = MatchStatus.IS_RUNNING
+        await disp.CAP_OK.send(self.match.channel, player.mention, self.match.teams[i].name)
+        if all_captains_selected:
             self.match.plugin_manager.on_captain_selected()
+            self.match.next_process(self.p_list)
         else:
             await self.info()
-
-    async def clean_msg(self, i):
-        if self.accept_msg[i]:
-            msg = self.accept_msg[i]
-            await msg.clear_reactions()
-            reactions.rem_handler(msg.id)
-            self.accept_msg[i] = None
 
     @Process.public
     def get_left_players_pings(self) -> list:

@@ -74,7 +74,7 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
 
     @Process.public
     async def clear(self, ctx):
-        await self.reaction_handler.destroy()
+        self.reaction_handler.clear()
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)
 
@@ -114,7 +114,7 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
             return msg
 
         # Else, over, all teams have selected a faction
+        self.reaction_handler.clear()
         await disp.PK_FACTION_OK.send(ctx, team.name, cfg.factions[team.faction])
-        await self.reaction_handler.destroy()
-        await self.match.next_process()
+        self.match.next_process()
         self.match.plugin_manager.on_factions_picked()

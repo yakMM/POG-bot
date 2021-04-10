@@ -31,11 +31,11 @@ class SwapHandler(InstantiatedCommand):
             p_2.change_team(team1)
             await disp.SWAP_OK.send(self.match.channel, p_1.mention, p_2.mention, match=self.match.proxy)
 
-    async def stop(self):
-        await self.validator.clean()
+    def stop(self):
+        self.validator.clean()
 
-    async def on_team_ready(self, team):
-        await self.stop()
+    def on_team_ready(self, team):
+        self.stop()
 
     @Command.command(*picking_states)
     async def swap(self, ctx, args):

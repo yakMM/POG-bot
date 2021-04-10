@@ -18,11 +18,11 @@ class BasePicking(Process, status=MatchStatus.IS_BASING):
                                                                 f"{self.match.teams[1].captain.mention}")
         else:
             await self.match.base_selector.show_base_status(self.match.channel)
-            await self.on_base_found()
+            self.on_base_found()
 
     @Process.public
-    async def on_base_found(self):
-        await self.match.next_process()
+    def on_base_found(self):
+        self.match.next_process()
         self.match.plugin_manager.on_base_selected(self.match.base)
 
     @Process.public

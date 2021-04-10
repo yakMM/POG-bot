@@ -55,12 +55,10 @@ class InstantiatedCommand:
     def name(self):
         return self.__name
 
-    async def on_team_ready(self, team):
+    def on_team_ready(self, team):
         pass
 
-    async def on_status_update(self, status):
-        if status is MatchStatus.IS_RUNNING:
-            return
+    def on_status_update(self, status):
         if status in self.__status:
             if not self.__is_running:
                 try:
@@ -75,7 +73,7 @@ class InstantiatedCommand:
                     pass
         elif status not in self.__status and self.__is_running:
             try:
-                await self.__parent.stop()
+                self.__parent.stop()
             except AttributeError:
                 pass
             self.__is_running = False

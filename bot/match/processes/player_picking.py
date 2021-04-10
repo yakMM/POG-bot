@@ -131,7 +131,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
         # Do selection
         team = captain.team
-        await self.do_pick(team, picked)
+        self.do_pick(team, picked)
 
         # If player pick is over
         if len(self.players) == 0:
@@ -141,7 +141,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             other = self.match.teams[team.id - 1]
             await disp.PK_OK.send(ctx, other.captain.mention, match=self.match.proxy)
 
-    async def do_pick(self, team: Team, player):
+    def do_pick(self, team: Team, player):
         """ Pick a player.
             
             Parameters
@@ -159,9 +159,9 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         other = switch_turn(self, team)
 
         # Check if no player left to pick
-        await self.pick_check(other)
+        self.pick_check(other)
 
-    async def pick_check(self, other):
+    def pick_check(self, other):
         """ Check pick progress, auto pick players if needed.
             
             Parameters
@@ -181,13 +181,13 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             # Get last player
             p = [*self.players.values()][0]
             # Pick them
-            await self.do_pick(other, p)
+            self.do_pick(other, p)
             # Ping them
             self.ping_last_player.start(other, p)
         # If no player left, trigger the next step
         elif len(self.players) == 0:
             # Start next step
-            await self.match.next_process()
+            self.match.next_process()
             self.match.plugin_manager.on_teams_done()
 
     @loop(count=1)

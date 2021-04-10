@@ -79,8 +79,8 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
     async def on_match_over(self):
         player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
         self.auto_info_loop.cancel()
-        await self.match.set_status(MatchStatus.IS_RUNNING)
-        await self.rh.destroy()
+        self.match.status = MatchStatus.IS_RUNNING
+        self.rh.clear()
         self.match.plugin_manager.on_round_over()
         await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, self.match.round_no)
         try:
@@ -96,13 +96,13 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
             log.error(f"ApiNotReachable caught when processing scores : {e.url}")
             await disp.API_SCORE_ERROR.send(ContextWrapper.channel(cfg.channels["results"]), self.match.id,
                                             self.match.round_no)
-        await self.match.next_process()
+        self.match.next_process()
 
     @Process.public
     async def clear(self, ctx):
         self.auto_info_loop.cancel()
         self.match_loop.cancel()
-        await self.rh.destroy()
+        self.rh.clear()
         player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
         await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, self.match.round_no)
         await disp.MATCH_OVER.send(self.match.channel)

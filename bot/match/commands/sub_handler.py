@@ -33,8 +33,8 @@ class SubHandler(InstantiatedCommand):
             else:
                 await after_pick_sub(self.match, subbed, force_player)
 
-    async def stop(self):
-        await self.validator.clean()
+    def stop(self):
+        self.validator.clean()
 
     def update(self):
         try:
@@ -42,11 +42,11 @@ class SubHandler(InstantiatedCommand):
         except AttributeError:
             self.sub_func = None
 
-    async def on_team_ready(self, team):
+    def on_team_ready(self, team):
         if "subbed" in self.validator.kwargs:
             player = self.validator.kwargs["subbed"]
             if player.active and (player.active.team is team):
-                await self.stop()
+                self.stop()
 
     @Command.command(*picking_states)
     async def sub(self, ctx, args):

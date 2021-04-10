@@ -1,7 +1,10 @@
 from .logger import SimpleLogger
 from .ts3_interface import AudioBot
+from logging import getLogger
 
 _plugins = [SimpleLogger, AudioBot]
+
+log = getLogger("pog_bot")
 
 
 class VirtualAttribute:
@@ -22,7 +25,10 @@ class PluginManager:
 
     def on_event(self, event, *args, **kwargs):
         for p in self.plugins:
-            getattr(p, event)(*args, **kwargs)
+            try:
+                getattr(p, event)(*args, **kwargs)
+            except Exception as e:
+                log.error(f"Error occurred in plugin {type(p).__name__}\n{e}")
 
     async def clean(self):
         for p in self.plugins:

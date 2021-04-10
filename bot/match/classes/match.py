@@ -221,15 +221,17 @@ class MatchObjects:
     def last_start_stamp(self):
         return self.data.round_stamps[-1]
 
-    async def set_status(self, value):
+    @status.setter
+    def status(self, value):
         self.__status = value
-        await self.command_factory.on_status_update(value)
+        if self.__status is not MatchStatus.IS_RUNNING:
+            self.command_factory.on_status_update(value)
 
-    async def next_process(self, *args):
-        await self.set_status(MatchStatus.IS_RUNNING)
+    def next_process(self, *args):
+        self.status = MatchStatus.IS_RUNNING
         self.progress_index += 1
         if self.progress_index == len(_process_list):
-            await self.on_match_over()
+            self.on_match_over()
             return
         self.current_process = _process_list[self.progress_index](self, *args)
 
@@ -240,6 +242,10 @@ class MatchObjects:
 
     async def on_match_over(self):
         self.plugin_manager.on_match_over()
+        self.match_over_loop.start()
+
+    @loop(count=1)
+    async def match_over_loop(self):
         await disp.MATCH_OVER.send(self.match.channel)
         await self.data.push_db()
         await self.clean()
@@ -273,7 +279,7 @@ class MatchObjects:
         self.result_msg = None
         self.check_offline = True
         self.check_validated = True
-        await self.set_status(MatchStatus.IS_FREE)
+        self.status = MatchStatus.IS_FREE
         self.clean_channel.start(display=True)
         self.progress_index = 0
 

@@ -73,7 +73,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
 
     @Process.public
     async def clear(self, ctx):
-        await self.rh.destroy()
+        self.rh.clear()
         await self.match.clean()
         await disp.MATCH_CLEARED.send(ctx)
 
@@ -82,7 +82,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         msg = await disp.PK_SHOW_TEAMS.send(self.match.channel, match=self.match.proxy)
         await self.rh.set_new_msg(msg)
 
-    async def on_team_ready(self, team, ready):
+    def on_team_ready(self, team, ready):
         team.captain.is_turn = not ready
         if ready:
             self.match.plugin_manager.on_team_ready(team)
@@ -90,23 +90,23 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
             team.on_team_ready(ready)
             if ready:
                 self.match.data.teams[team.id] = team.team_score
-                await self.match.base_selector.clean()
-                await self.match.command_factory.on_team_ready(team)
+                self.match.base_selector.clean()
+                self.match.command_factory.on_team_ready(team)
 
-    async def ready_check(self, team):
+    def ready_check(self, team):
         other = self.match.teams[team.id - 1]
         # If other is_turn, then not ready
         # Else everyone ready
         if not other.captain.is_turn:
-            await self.rh.destroy()
-            await self.match.next_process()
+            self.rh.clear()
+            self.match.next_process()
             return True
         return False
 
     @Process.public
     async def ready(self, ctx, captain):
         if not captain.is_turn:
-            await self.on_team_ready(captain.team, False)
+            self.on_team_ready(captain.team, False)
             msg = await disp.MATCH_TEAM_UNREADY.send(ctx, captain.team.name, match=self.match.proxy)
             await self.rh.set_new_msg(msg)
             return
@@ -128,9 +128,10 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
                 except ApiNotReachable as e:
                     log.error(f"ApiNotReachable caught when checking online players: {e.url}")
                     await disp.API_READY_ERROR.send(ctx)
-            await self.on_team_ready(captain.team, True)
+            self.on_team_ready(captain.team, True)
+            is_over = self.ready_check(captain.team)
             msg = await disp.MATCH_TEAM_READY.send(ctx, captain.team.name, match=self.match.proxy)
-            if not await self.ready_check(captain.team):
+            if not is_over:
                 await self.rh.set_new_msg(msg)
 
     @Process.public
