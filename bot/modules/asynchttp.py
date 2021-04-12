@@ -1,12 +1,12 @@
-# @CHECK 2.0 features OK
-
-"""Handle asynchronous http requests to Census API
+"""
+Handle asynchronous http requests
 
 Usage:
-    * json_result_file = await request(url)
+    Request to PS2 api: json_result_file = await api_request_and_retry(url)
+    Standard HTTP request: result_code = await request_code(url)
 """
 
-# Others
+# External imports
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientOSError, ClientConnectorError
 from json import loads
@@ -19,8 +19,13 @@ from modules.tools import UnexpectedError
 log = getLogger("pog_bot")
 
 
-# PUBLIC:
 class ApiNotReachable(Exception):
+    """
+    Custom API request exception.
+
+    Attributes:
+        url: Url of the failed request.
+    """
     def __init__(self, url):
         self.url = url
         message = f"Cannot resolve Api ({url})!"
@@ -28,34 +33,62 @@ class ApiNotReachable(Exception):
         super().__init__(message)
 
 
-async def request(url):
-    async with ClientSession() as client:
-        result = await _fetch(client, url)
-        return loads(result)
-
-
-async def request_code(url):
+async def request_code(url: str) -> int:
+    """
+    Get the url requested.
+    :param url: URL to get.
+    :return: HTTP code returned.
+    """
     async with ClientSession() as client:
         result = await _fetch_code(client, url)
         return result
 
 
-async def api_request_and_retry(url):
-    for i in range(5):
+async def api_request_and_retry(url: str, retries: int = 3) -> dict:
+    """
+    Try to query Planetside2 API.
+    :param retries: (Optional, default: 3) Number of retries.
+    :param url: URL to get.
+    :return: Json dictionary returned by the API.
+    :raise: ApiNotReachable if the request failed.
+    """
+    for i in range(retries):
         try:
-            j_data = await request(url)
+            j_data = await _request(url)
         except (ClientOSError, ClientConnectorError, JSONDecodeError) as e:
             log.warning(f"API request: {e} on try {i} for {url}")
-            continue  # Try again
+            # Try again
+            continue
         if "returned" in j_data:
+            # If something returned
             return j_data
         else:
+            # If not, try again
             log.warning(f"Nothing returned on try {i} for {url}")
+    # If nothing returned after retries, raise exception
     raise ApiNotReachable(url)
 
 
-# PRIVATE:
-async def _fetch(client, url):
+# PRIVATE FUNCTIONS:
+async def _request(url: str) -> dict:
+    """
+    Simple HTTP request, parse the result as a json dictionary.
+    :param url: URL to get.
+    :return: Json dictionary of the result.
+    """
+    async with ClientSession() as client:
+        result = await _fetch(client, url)
+        return loads(result)
+
+
+async def _fetch(client: ClientSession, url: str) -> str:
+    """
+    HTTP request.
+    :param client: Asynchttp ClientSession object.
+    :param url: URL to get.
+    :return: result of the request as text.
+    :raise: UnexpectedError if OK is not returned by the request.
+    """
     async with client.get(url) as resp:
         if resp.status != 200:
             log.error(f'Status {resp.status} for url {url}')
@@ -64,5 +97,11 @@ async def _fetch(client, url):
 
 
 async def _fetch_code(client, url):
+    """
+    HTTP request.
+    :param client: Asynchttp ClientSession object.
+    :param url: URL to get.
+    :return: Code returned by the HTTP request.
+    """
     async with client.get(url) as resp:
         return resp.status
