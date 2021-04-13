@@ -156,7 +156,8 @@ class CommandFactory(metaclass=MetaFactory):
             if len(args) != 0:
                 await disp.BASE_NO_CHANGE.send(ctx)
                 return
-            await disp.BASE_SELECTED.send(ctx, base=self.match.base, is_booked=False)
+            base = self.match.base
+            await disp.BASE_SELECTED.send(ctx, base.name, base=base, is_booked=False)
             return
 
         if len(args) == 1 and (args[0] == "help" or args[0] == "h"):

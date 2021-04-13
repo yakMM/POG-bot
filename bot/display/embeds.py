@@ -248,8 +248,9 @@ def lobby_list(ctx, names_in_lobby):
 def selected_bases(ctx, bases_list):
     """ Returns a list of bases currently selected
     """
-    embed = Embed(colour=Color.blue())
-    embed.add_field(name=f"{len(bases_list)} bases found",
+    embed = Embed(colour=Color.blue(), title="Base Pool",
+                  url="https://docs.google.com/presentation/d/1xOtNU4THuHe7PTj8RcVpLOLmfQk9zL9QmN9JYR29c5U")
+    embed.add_field(name=f"{len(bases_list)} bases:",
                     value="\n".join(bases_list),
                     inline=False)
     return embed

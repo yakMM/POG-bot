@@ -170,8 +170,8 @@ class AllStrings(Enum):
     BASE_TOO_MUCH = Message("Too many bases found! Try to be more precise")
     BASE_NOT_FOUND = Message("Couldn't find a result for your search!")
     BASE_ON_SELECT = Message("Successfully selected **{}**", embed=embeds.base_display)
-    BASE_SHOW_LIST = Message("Here are the bases found:", ping=False, embed=embeds.selected_bases)
-    BASE_SELECTED = Message("Here is the selected base for this match:", embed=embeds.base_display)
+    BASE_SHOW_LIST = Message("Select a base with `=base Name` or `=base number`:", ping=False, embed=embeds.selected_bases)
+    BASE_SELECTED = Message("This match will be played on **{}**:", embed=embeds.base_display)
     BASE_DISPLAY = Message("Base navigator:", ping=False, embed=embeds.base_display)
     BASE_BOOKED = Message("{} WARNING: **{}** seems unavailable. Please check occupation "
                           "before confirming this base.", ping=False, embed=embeds.jaeger_calendar)

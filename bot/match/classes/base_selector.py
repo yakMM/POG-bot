@@ -56,7 +56,7 @@ class BaseSelector:
         self.__booked = list()
         self.__validator = CaptainValidator(self.__match)
         self.add_callbacks(self.__validator)
-        self.__nav = BaseNavigator(self, match.channel)
+        # self.__nav = BaseNavigator(self, match.channel)
         self._get_booked_from_calendar.start()
 
     @loop(count=1)
@@ -66,7 +66,7 @@ class BaseSelector:
 
     def clean(self):
         self.__validator.clean()
-        self.__nav.reaction_handler.clear()
+        # self.__nav.reaction_handler.clear()
 
     def __is_used(self, base):
         for key in _pog_selected_bases.keys():
@@ -111,7 +111,7 @@ class BaseSelector:
             self.__selected = base
             _pog_selected_bases[self.__match.id] = base.id
             self.__match.data.base = base
-            self.__nav.reaction_handler.clear()
+            # self.__nav.reaction_handler.clear()
             await disp.BASE_ON_SELECT.send(ctx, base.name, base=base, is_booked=self.is_booked)
             if self.__match.status is MatchStatus.IS_BASING:
                 self.__match.proxy.on_base_found()
@@ -123,7 +123,7 @@ class BaseSelector:
             else:
                 await disp.BASE_NO_BASE.send(ctx)
         else:
-            await disp.BASE_SELECTED.send(ctx, base=self.__selected, is_booked=self.is_booked)
+            await disp.BASE_SELECTED.send(ctx, self.__selected.name, base=self.__selected, is_booked=self.is_booked)
 
     async def process_request(self, ctx, a_player, args):
         if a_player:
@@ -155,7 +155,7 @@ class BaseSelector:
         await disp.BASE_CALENDAR.send(ctx, mentions)
         if self.__selection:
             await disp.BASE_SHOW_LIST.send(ctx, bases_list=self.string_list)
-            await self.__nav.reload()
+            # await self.__nav.reload()
 
     async def select_by_name(self, ctx, picker, args):
         arg = " ".join(args)
@@ -170,7 +170,7 @@ class BaseSelector:
             self.__selection = current_list
             self.__validator.clean()
             await disp.BASE_SHOW_LIST.send(ctx, bases_list=self.string_list)
-            await self.__nav.reload()
+            # await self.__nav.reload()
 
     async def select_by_index(self, ctx, captain, index):
         if 0 <= index < len(self.__selection):
@@ -195,66 +195,66 @@ class BaseSelector:
             self.__selection.clear()
 
 
-class BaseNavigator:
-    def __init__(self, sel, match_channel):
-        self.selector = sel
-        self.channel = match_channel
-        self.index = 0
-        self.length = 0
-        self.reaction_handler = reactions.SingleMessageReactionHandler(remove_msg=True)
-        self.reaction_handler.set_reaction("◀️", self.check_auth, self.go_left, self.refresh_message)
-        self.reaction_handler.set_reaction("⏺️", self.check_auth, self.select)
-        self.reaction_handler.set_reaction("▶️", self.check_auth, self.go_right, self.refresh_message)
-        self.reaction_handler.set_reaction("🔀", self.check_auth, self.shuffle, self.refresh_message)
-
-    @property
-    def current_base(self):
-        return self.selector.get_base_from_selection(self.index)
-
-    @property
-    def is_booked(self):
-        return self.selector.is_base_booked(self.current_base)
-
-    async def reload(self):
-        self.length = len(self.selector.current_selection)
-        try:
-            self.index = randint(0, self.length - 1)
-        except ValueError:
-            self.index = 0
-
-        msg = await disp.BASE_DISPLAY.send(self.channel, base=self.current_base, is_booked=self.is_booked)
-        await self.reaction_handler.set_new_msg(msg)
-
-    def go_right(self, *args):
-        self.index += 1
-        self.index %= self.length
-
-    def go_left(self, *args):
-        self.index -= 1
-        self.index %= self.length
-
-    def shuffle(self, *args):
-        # Get a new base at random
-        old_index = self.index
-        # Exclude the last base
-        self.index = randint(0, self.length - 2)
-        # So that if we get the old base, we take the last base instead
-        if self.index == old_index:
-            self.index = self.length - 1
-        # Like so, the odds are even for all bases
-
-    async def select(self, reaction, player, user, msg):
-        self.reaction_handler.clear()
-        ctx = ContextWrapper.wrap(self.channel)
-        ctx.author = user
-        await self.selector.select_by_index(ctx, player.active, self.index)
-
-    def check_auth(self, reaction, player, user, msg):
-        if player.active and player.active.is_captain:
-            return
-        if is_admin(user):
-            return
-        raise reactions.UserLackingPermission
-
-    async def refresh_message(self, *args):
-        await disp.BASE_DISPLAY.edit(self.reaction_handler.msg, base=self.current_base, is_booked=self.is_booked)
+# class BaseNavigator:
+#     def __init__(self, sel, match_channel):
+#         self.selector = sel
+#         self.channel = match_channel
+#         self.index = 0
+#         self.length = 0
+#         self.reaction_handler = reactions.SingleMessageReactionHandler(remove_msg=True)
+#         self.reaction_handler.set_reaction("◀️", self.check_auth, self.go_left, self.refresh_message)
+#         self.reaction_handler.set_reaction("⏺️", self.check_auth, self.select)
+#         self.reaction_handler.set_reaction("▶️", self.check_auth, self.go_right, self.refresh_message)
+#         self.reaction_handler.set_reaction("🔀", self.check_auth, self.shuffle, self.refresh_message)
+#
+#     @property
+#     def current_base(self):
+#         return self.selector.get_base_from_selection(self.index)
+#
+#     @property
+#     def is_booked(self):
+#         return self.selector.is_base_booked(self.current_base)
+#
+#     async def reload(self):
+#         self.length = len(self.selector.current_selection)
+#         try:
+#             self.index = randint(0, self.length - 1)
+#         except ValueError:
+#             self.index = 0
+#
+#         msg = await disp.BASE_DISPLAY.send(self.channel, base=self.current_base, is_booked=self.is_booked)
+#         await self.reaction_handler.set_new_msg(msg)
+#
+#     def go_right(self, *args):
+#         self.index += 1
+#         self.index %= self.length
+#
+#     def go_left(self, *args):
+#         self.index -= 1
+#         self.index %= self.length
+#
+#     def shuffle(self, *args):
+#         # Get a new base at random
+#         old_index = self.index
+#         # Exclude the last base
+#         self.index = randint(0, self.length - 2)
+#         # So that if we get the old base, we take the last base instead
+#         if self.index == old_index:
+#             self.index = self.length - 1
+#         # Like so, the odds are even for all bases
+#
+#     async def select(self, reaction, player, user, msg):
+#         self.reaction_handler.clear()
+#         ctx = ContextWrapper.wrap(self.channel)
+#         ctx.author = user
+#         await self.selector.select_by_index(ctx, player.active, self.index)
+#
+#     def check_auth(self, reaction, player, user, msg):
+#         if player.active and player.active.is_captain:
+#             return
+#         if is_admin(user):
+#             return
+#         raise reactions.UserLackingPermission
+#
+#     async def refresh_message(self, *args):
+#         await disp.BASE_DISPLAY.edit(self.reaction_handler.msg, base=self.current_base, is_booked=self.is_booked)
