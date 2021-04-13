@@ -57,9 +57,6 @@ class AccountNotFound(Exception):
         super().__init__(f"Account not found in database: {id}")
 
 
-
-
-
 class Player:
     """ Basic player class, every registered user matches a Player object contained in the dictionary
     """
@@ -127,6 +124,15 @@ class Player:
             obj.__timeout = data["timeout"]
         return obj
 
+    def get_data(self):  # get data for database push
+        data = {"_id": self.__id, "name": self.__name, "notify": self.__notify, "is_registered": self.__is_registered}
+        if self.__has_own_account:
+            data["ig_names"] = self.__ig_names
+            data["ig_ids"] = self.__ig_ids
+        if self.__timeout != 0:
+            data["timeout"] = self.__timeout
+        return data
+
     async def db_update(self, arg):
         if arg == "notify":
             await db.async_db_call(db.set_field, "users", self.id, {"notify": self.__notify})
@@ -189,57 +195,9 @@ class Player:
     def is_lobbied(self):
         return self.__lobby_stamp != 0
 
-    def reset_lobby_timestamp(self):
-        self.__lobby_stamp = tools.timestamp_now()
-
     @property
     def lobby_stamp(self):
         return self.__lobby_stamp
-
-    @property
-    def accounts_flipped(self):
-        accs = list()
-        if not self.__has_own_account:
-            return accs
-        for i in range(3):
-            if self.__ig_ids[i] == 0:
-                accs.append(self.__ig_names[i])
-        return accs
-
-    def update_role(self):
-        try:
-            self.role_task.start()
-        except RuntimeError:  # if task is already active
-            log.warning(f"Player task conflict: {self.name}")
-
-    @loop(count=1)
-    async def role_task(self):
-        await role_update(self)
-
-    def on_lobby_leave(self):
-        self.__lobby_stamp = 0
-        self.update_role()
-
-    def on_lobby_add(self):
-        self.__lobby_stamp = tools.timestamp_now()
-        self.update_role()
-
-    def on_player_clean(self):
-        self.__match = None
-        self.__active = None
-        self.__stats = None
-        if not self.__has_own_account:
-            self.__ig_names = ["N/A", "N/A", "N/A"]
-            self.__ig_ids = [0, 0, 0]
-        self.update_role()
-
-    def on_picked(self, active):
-        self.__active = active
-
-    async def on_match_selected(self, m):
-        self.__match = m
-        self.__lobby_stamp = 0
-        self.__stats = await PlayerStat.get_from_database(self.__id)
 
     @property
     def stats(self):
@@ -273,18 +231,57 @@ class Player:
     def has_own_account(self):
         return self.__has_own_account
 
+    @property
+    def accounts_flipped(self):
+        accs = list()
+        if not self.__has_own_account:
+            return accs
+        for i in range(3):
+            if self.__ig_ids[i] == 0:
+                accs.append(self.__ig_names[i])
+        return accs
+
+    def update_role(self):
+        try:
+            self.role_task.start()
+        except RuntimeError:  # if task is already active
+            log.warning(f"Player task conflict: {self.name}")
+
+    @loop(count=1)
+    async def role_task(self):
+        await role_update(self)
+
+    def on_lobby_leave(self):
+        self.__lobby_stamp = 0
+        self.update_role()
+
+    def reset_lobby_timestamp(self):
+        self.__lobby_stamp = tools.timestamp_now()
+
+    def on_lobby_add(self):
+        self.__lobby_stamp = tools.timestamp_now()
+        self.update_role()
+
+    def on_player_clean(self):
+        self.__match = None
+        self.__active = None
+        self.__stats = None
+        if not self.__has_own_account:
+            self.__ig_names = ["N/A", "N/A", "N/A"]
+            self.__ig_ids = [0, 0, 0]
+        self.update_role()
+
+    def on_picked(self, active):
+        self.__active = active
+
+    async def on_match_selected(self, m):
+        self.__match = m
+        self.__lobby_stamp = 0
+        self.__stats = await PlayerStat.get_from_database(self.__id)
+
     def copy_ig_info(self, player):
         self.__ig_names = player.ig_names.copy()
         self.__ig_ids = player.ig_ids.copy()
-
-    def get_data(self):  # get data for database push
-        data = {"_id": self.__id, "name": self.__name, "notify": self.__notify, "is_registered": self.__is_registered}
-        if self.__has_own_account:
-            data["ig_names"] = self.__ig_names
-            data["ig_ids"] = self.__ig_ids
-        if self.__timeout != 0:
-            data["timeout"] = self.__timeout
-        return data
 
     async def register(self, char_list: list) -> bool:
         """ Register the player with char_list.
@@ -457,19 +454,6 @@ class Player:
 
         return updated
 
-    @property
-    def all_players(self):
-        return self._all_players
-
-
-class DataPlayer:
-
-    def __init__(self, p_id, ig_name, ig_id):
-        self.id = p_id
-        self.name = "unknsrtwrsadfasdfsdfasdfown"
-        self.ig_names = [ig_name] * 3
-        self.ig_ids = [ig_id] * 3
-
 
 class ActivePlayer:
     """ ActivePlayer class, with more data than Player class, for when match is happening
@@ -481,14 +465,9 @@ class ActivePlayer:
         self.__account = None
         self.__unique_usages = None
         self.__is_playing = False
+        self.__match = player.match
         self.__player.on_picked(self)
         self.__player_score = None
-
-    def clean(self):
-        self.__player.on_player_clean()
-
-    def change_team(self, team):
-        self.__team = team
 
     @property
     def player_score(self):
@@ -521,20 +500,6 @@ class ActivePlayer:
     @unique_usages.setter
     def unique_usages(self, value):
         self.__unique_usages = value
-
-    async def accept_account(self):
-        account_id = self.__account.id
-        if account_id not in self.__unique_usages:
-            self.__unique_usages.append(account_id)
-            try:
-                await db.async_db_call(db.push_element, "accounts_usage", self.id,
-                                                        {"unique_usages": account_id})
-            except db.DatabaseError:
-                pass
-        fake_player = Player.get(account_id)
-        if fake_player is None:
-            raise AccountNotFound(account_id)
-        self.__player.copy_ig_info(fake_player)
 
     @property
     def mention(self):
@@ -570,13 +535,33 @@ class ActivePlayer:
 
     @property
     def match(self):
-        return self.__player.match
+        return self.__match
+
+    def clean(self):
+        self.__player.on_player_clean()
+
+    def change_team(self, team):
+        self.__team = team
 
     def on_team_ready(self, ready):
         self.__is_playing = ready
         if ready:
             self.__player_score = PlayerScore(self.id, self.team.team_score, self.name, self.ig_name, self.ig_id)
             self.__player_score.stats = self.__player.stats
+
+    async def accept_account(self):
+        account_id = self.__account.id
+        if account_id not in self.__unique_usages:
+            self.__unique_usages.append(account_id)
+            try:
+                await db.async_db_call(db.push_element, "accounts_usage", self.id,
+                                                        {"unique_usages": account_id})
+            except db.DatabaseError:
+                pass
+        fake_player = Player.get(account_id)
+        if fake_player is None:
+            raise AccountNotFound(account_id)
+        self.__player.copy_ig_info(fake_player)
 
 
 class TeamCaptain(ActivePlayer):

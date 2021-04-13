@@ -165,8 +165,13 @@ name = "POG_3"
 ```
 
 #### Setting up TS3 channels IDs
-THe channel IDs can be set up in the configuration file: 
-
+The `Teamspeak` section of the configuration file can now be completed 
+```buildoutcfg
+[Teamspeak]
+url = # Teamspeak bot webapi url
+lobby_id = # Lobby channel id
+matches = # Matches channel ids (example: 1/2/3,4/5/6) (matches separated by commas, channels by slashes, no spaces)
+```
 
 
 

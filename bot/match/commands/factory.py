@@ -150,9 +150,9 @@ class CommandFactory(metaclass=MetaFactory):
             await disp.SC_PLAYERS_STRING.send(ctx, "\n".join(tm.ig_string for tm in self.match.teams))
 
     @Command.has_help(disp.BASE_HELP)
-    @Command.command(*captains_ok_states)
+    @Command.command(*captains_ok_states, MatchStatus.IS_STARTING)
     async def base(self, ctx, args):
-        if self.match.status in (MatchStatus.IS_PLAYING, MatchStatus.IS_WAITING_2):
+        if self.match.status in (MatchStatus.IS_PLAYING, MatchStatus.IS_WAITING_2, MatchStatus.IS_STARTING):
             if len(args) != 0:
                 await disp.BASE_NO_CHANGE.send(ctx)
                 return
@@ -194,7 +194,7 @@ class CommandFactory(metaclass=MetaFactory):
         await disp.MATCH_CLEAR.send(ctx)
         await match.clear(ctx)
 
-    @Command.command(*captains_ok_states, MatchStatus.IS_CAPTAIN)
+    @Command.command(*captains_ok_states, MatchStatus.IS_CAPTAIN, MatchStatus.IS_STARTING)
     async def info(self, ctx, args):
         match = self.match.proxy
         try:

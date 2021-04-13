@@ -1,6 +1,11 @@
 # v3.2:
 - Added locking mechanic on reaction handler to avoid errors due to players spamming the reactions
 - Overhauled the use of async functions for critical events
+- Changed "Last played" to "Previously played"
+- Players are now freed as soon as the match round ends
+- =squittal can now be used when the match is starting
+- =base can now be used when the match is starting
+- Now displaying players in-game names in the match info embed
 
 # v3.1:
 - Fixed some issues with sub command

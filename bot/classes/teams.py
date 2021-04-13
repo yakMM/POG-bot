@@ -4,6 +4,7 @@
 """
 
 from .scores import TeamScore
+from match import MatchStatus
 
 
 class Team:
@@ -55,8 +56,11 @@ class Team:
     @property
     def player_pings(self):
         # Excluding captain
-        pings = [f"{p.mention} ({p.name})" for p in self.__players[1:]]
-        return pings
+        if self.match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_WAITING_2,
+                                      MatchStatus.IS_PLAYING):
+            return [f"{p.mention} ({p.name}) [{p.ig_name}]" for p in self.__players[1:]]
+        else:
+            return [f"{p.mention} ({p.name})" for p in self.__players[1:]]
 
     @property
     def all_pings(self):

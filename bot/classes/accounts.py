@@ -17,6 +17,7 @@ QUIT_DELAY = 300
 
 log = getLogger("pog_bot")
 
+
 class Account:
     """ Account object, each of these represent one single account"""
 

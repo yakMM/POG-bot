@@ -41,6 +41,10 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
             self.match.base_selector.clean()
             push_last_bases(self.match.base)
             self.match.base_selector = None
+        self.start_match_loop.start()
+
+    @loop(count=1)
+    async def start_match_loop(self):
         self.match.plugin_manager.on_match_starting()
         await disp.MATCH_STARTING_1.send(self.match.channel, self.match.round_no, "30")
         await sleep(10)
@@ -54,6 +58,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         super().change_status(MatchStatus.IS_PLAYING)
         self.match_loop.start()
         self.auto_info_loop.start()
+        self.match.status = MatchStatus.IS_PLAYING
 
     @Process.public
     async def info(self, ctx=None):
@@ -81,8 +86,9 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         self.auto_info_loop.cancel()
         self.rh.clear()
         self.match.plugin_manager.on_round_over()
+        round_no = self.match.round_no
         self.match.ready_next_process()
-        await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, self.match.round_no)
+        await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, round_no)
         try:
             await census.process_score(self.match.data, self.match.last_start_stamp, self.match.channel)
             try:
@@ -90,16 +96,15 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
             except Exception as e:
                 # Should not happen
                 log.error(f"Error in publish_match_image : {e}")
-                await disp.PUBLISH_ERROR.send(ContextWrapper.channel(cfg.channels["results"]), self.match.id,
-                                              self.match.round_no)
+                await disp.PUBLISH_ERROR.send(ContextWrapper.channel(cfg.channels["results"]), self.match.id, round_no)
         except ApiNotReachable as e:
             log.error(f"ApiNotReachable caught when processing scores : {e.url}")
-            await disp.API_SCORE_ERROR.send(ContextWrapper.channel(cfg.channels["results"]), self.match.id,
-                                            self.match.round_no)
+            await disp.API_SCORE_ERROR.send(ContextWrapper.channel(cfg.channels["results"]), self.match.id, round_no)
         self.match.start_next_process()
 
     @Process.public
     async def clear(self, ctx):
+        self.start_match_loop.cancel()
         self.auto_info_loop.cancel()
         self.match_loop.cancel()
         self.rh.clear()

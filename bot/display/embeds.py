@@ -282,11 +282,11 @@ def global_info(ctx, lobby, match_list):
             continue
         else:
             if m.round_no != 0:
-                desc += f"*Match {m.id} - Round {m.round_no}*"
+                desc += f"Match {m.id} - Round {m.round_no}"
             else:
-                desc += f"*Match {m.id}*"
+                desc += f"Match {m.id}"
             desc += "\n"
-        desc += f"Status: {m.status_str}"
+        desc += f"Status: *{m.status_str}*"
         if m.status is MatchStatus.IS_PLAYING:
             desc += f"\nTime Remaining: **{m.get_formatted_time_to_round_end()}**"
         if m.base:
@@ -328,10 +328,14 @@ def team_update(arg, match):
         if tm.captain:
             value = ""
             name = ""
-            if tm.captain.is_turn and match.next_status in (MatchStatus.IS_FACTION, MatchStatus.IS_PICKING):
-                value = f"Captain **[pick]**: {tm.captain.mention} ({tm.captain.name})\n"
+            cap_mention = f"{tm.captain.mention} ({tm.captain.name})"
+            if match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_WAITING_2,
+                                     MatchStatus.IS_PLAYING):
+                cap_mention += f" [{tm.captain.ig_name}]"
+            if match.next_status in (MatchStatus.IS_FACTION, MatchStatus.IS_PICKING) and tm.captain.is_turn:
+                value = f"Captain **[pick]**: {cap_mention}\n"
             else:
-                value = f"Captain: {tm.captain.mention} ({tm.captain.name})\n"
+                value = f"Captain: {cap_mention}\n"
             if tm.player_pings:
                 value += "Players:\n" + '\n'.join(tm.player_pings)
             if match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_WAITING_2):

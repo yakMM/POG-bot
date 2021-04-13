@@ -26,12 +26,12 @@ last_base = [(None, 0), (None, 0)]
 
 def push_last_bases(base):
     last_base[1] = (last_base[0][0], last_base[0][1])
-    last_base[0] = (base, tools.timestamp_now())
+    last_base[0] = (base.id, tools.timestamp_now())
 
 
 def is_last_used(base):
     for i in range(2):
-        if base is last_base[i][0]:
+        if base.id is last_base[i][0]:
             if last_base[i][1] > (tools.timestamp_now() - 14400):
                 return True
     return False
@@ -93,7 +93,7 @@ class BaseSelector:
                 base_string = f"{base.name}"
             last_used = ""
             if is_last_used(base):
-                last_used = " **(last played)**"
+                last_used = " **(recently played)**"
             result.append(f"**{str(i + 1)}**: {base_string}{last_used}")
         return result
 
