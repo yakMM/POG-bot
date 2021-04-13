@@ -135,7 +135,7 @@ class ReactionHandler:
         if msg.id in _all_handlers and self.__rem_user_react:
             await msg.remove_reaction(reaction.emoji, user)
 
-    async def auto_add_reactions(self, msg):
+    async def _auto_add_reactions(self, msg):
         _lock_msg(msg)
         for react in self.__f_dict.keys():
             await msg.add_reaction(react)
@@ -150,7 +150,7 @@ class ReactionHandler:
     async def auto_add(self, msg):
         _lock_msg(msg)
         add_handler(msg.id, self)
-        await self.auto_add_reactions(msg)
+        await self._auto_add_reactions(msg)
 
     def reaction(self, *args):
         def decorator(func):
@@ -211,7 +211,7 @@ class SingleMessageReactionHandler(ReactionHandler):
         self.clear()
         _lock_msg(new_msg)
         add_handler(new_msg.id, self)
-        await super().auto_add_reactions(new_msg)
+        await super()._auto_add_reactions(new_msg)
         self.__msg = new_msg
         # _unlock_msg will be done in auto_add_reactions
 

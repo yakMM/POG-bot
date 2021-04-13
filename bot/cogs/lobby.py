@@ -75,7 +75,7 @@ class LobbyCog(commands.Cog, name='lobby'):
         if not player or (player and not player.is_lobbied):
             await disp.LB_NOT_IN.send(ctx)
             return
-        player.reset_lobby_timestamp()
+        lobby.reset_timeout(player)
         await disp.LB_REFRESHED.send(ctx)
 
     @commands.command(aliases=['l'])

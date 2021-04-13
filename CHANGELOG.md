@@ -7,6 +7,7 @@
 - =base can now be used when the match is starting
 - Now displaying players in-game names in the match info embed
 - Removed the base navigator as it was rarely used
+- Players can now reset their lobby timeout with a reaction
 
 # v3.1:
 - Fixed some issues with sub command
