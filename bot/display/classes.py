@@ -10,7 +10,6 @@ class Message:
         self.__embed_fct = embed
         self.__ping = ping
 
-
     def get_embed(self, ctx, elements, kwargs):
         if self.__embed_fct:
             embed = self.__embed_fct(ctx, **kwargs)
@@ -20,7 +19,6 @@ class Message:
             icon_url = "https://media.discordapp.net/attachments/739231714554937455/739522071423614996/logo_png.png")
 
             elements["embed"] = embed
-
 
     def get_string(self, ctx, elements, args):
         if self.__str:
@@ -36,11 +34,9 @@ class Message:
 
             elements["content"] = string
 
-
     def get_image(self, ctx, elements, image_path):
         if image_path:
             elements["file"] = File(image_path)
-
 
     def get_elements(self, ctx, **kwargs):
 
@@ -50,7 +46,6 @@ class Message:
         self.get_image(ctx, elements, kwargs.get("image"))
 
         return elements
-
 
 
 class ContextWrapper:

@@ -312,7 +312,6 @@ class MatchObjects:
         if not self.current_process:
             return MatchStatus.IS_FREE
         else:
-            print(f"")
             return self.current_process.status
 
     def __getattr__(self, name):

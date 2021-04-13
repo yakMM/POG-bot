@@ -8,6 +8,7 @@
 - Now displaying players in-game names in the match info embed
 - Removed the base navigator as it was rarely used
 - Players can now reset their lobby timeout with a reaction
+- Bot now use only necessary gateway intents (discord API)
 
 # v3.1:
 - Fixed some issues with sub command

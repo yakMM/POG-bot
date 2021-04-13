@@ -274,6 +274,7 @@ def _define_log(launch_str):
 
     log.addHandler(file_handler)
 
+
 def main(launch_str=""):
 
     _define_log(launch_str)
@@ -285,8 +286,27 @@ def main(launch_str=""):
     # Get data from the config file
     cfg.get_config(launch_str)
 
-    # Set up command prefix
-    client = commands.Bot(command_prefix=cfg.general["command_prefix"], intents=Intents.all())
+    # Set up intents
+    intents = Intents.none()
+    intents.guilds = True
+    intents.members = True
+    intents.bans = False
+    intents.emojis = False
+    intents.integrations = False
+    intents.webhooks = False
+    intents.invites = False
+    intents.voice_states = False
+    intents.presences = True
+    intents.messages = True
+    # intents.guild_messages Activated by the previous one
+    # intents.dm_messages Activated by the previous one
+    intents.reactions = True
+    # intents.guild_reactions Activated by the previous one
+    # intents.dm_reactions Activated by the previous one
+    intents.typing = False
+    intents.guild_typing = False
+    intents.dm_typing = False
+    client = commands.Bot(command_prefix=cfg.general["command_prefix"], intents=intents)
 
     # Remove default help
     client.remove_command('help')
