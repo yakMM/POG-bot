@@ -115,7 +115,7 @@ def remove_from_lobby(player):
     player.on_lobby_leave()
 
 
-def _on_match_free():
+def on_match_free():
     _auto_ping.already = False
     if len(_lobby_list) == cfg.general["lobby_size"]:
         _start_match_from_full_lobby()

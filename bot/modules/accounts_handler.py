@@ -168,8 +168,7 @@ async def send_account(channel: discord.TextChannel, a_player: classes.ActivePla
             pass
     if msg:
         # If DM ok, add the reaction handler for the validation
-        reactions.add_handler(msg.id, _reaction_handler)
-        await _reaction_handler.auto_add_reactions(msg)
+        await _reaction_handler.auto_add(msg)
     else:
         # Else validate the account and send it to staff channel instead
         await disp.ACC_CLOSED.send(channel, a_player.mention)

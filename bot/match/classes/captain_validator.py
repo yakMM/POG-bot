@@ -28,8 +28,9 @@ class CaptainValidator:
                         await disp.CONFIRM_DECLINE.send(ctx)
                         return
                     elif self.confirm_func:
+                        kwargs = self.kwargs
                         self.clean()
-                        await self.confirm_func(ctx, **self.kwargs)
+                        await self.confirm_func(ctx, **kwargs)
                         return
                 elif self.is_captain(a_p) and str(reaction) == "❌":
                     self.clean()
@@ -73,8 +74,9 @@ class CaptainValidator:
                 elif captain is not self.expected:
                     await disp.CONFIRM_NOT_CAPTAIN.send(ctx, self.expected.mention)
                 elif self.confirm_func:
+                    kwargs = self.kwargs
                     self.clean()
-                    await self.confirm_func(ctx, **self.kwargs)
+                    await self.confirm_func(ctx, **kwargs)
                 else:
                     raise UnexpectedError("Confirm Function is None!")
                 return True

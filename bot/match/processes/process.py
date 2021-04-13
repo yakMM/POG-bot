@@ -62,16 +62,18 @@ class Process(metaclass=MetaProcess, status=None):
             obj.status = obj.meta_status
         return obj
 
-    def __init__(self, match, *args):
+    def __init__(self, match):
         self.match = match
-        Loop(coro=self._async_init, count=1).start(*args)
+
+    def initialize(self):
+        Loop(coro=self._async_init, count=1).start()
 
     def change_status(self, status):
         self.status = status
 
-    async def _async_init(self, *args):
+    async def _async_init(self):
         if self.init_func:
-            await self.init_func(self, *args)
+            await self.init_func(self)
         if self.status:
             self.match.status = self.status
 

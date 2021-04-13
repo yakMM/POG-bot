@@ -8,6 +8,7 @@ import modules.roles as roles
 import modules.config as cfg
 import modules.accounts_handler as accounts
 from modules.tools import UnexpectedError
+import modules.lobby as lobby
 
 from match.processes import *
 from match.commands import CommandFactory
@@ -227,28 +228,33 @@ class MatchObjects:
         if self.__status is not MatchStatus.IS_RUNNING:
             self.command_factory.on_status_update(value)
 
-    def next_process(self, *args):
+    def ready_next_process(self, *args):
         self.status = MatchStatus.IS_RUNNING
         self.progress_index += 1
         if self.progress_index == len(_process_list):
-            self.on_match_over()
-            return
-        self.current_process = _process_list[self.progress_index](self, *args)
+            self.current_process = None
+            self.plugin_manager.on_match_over()
+            self.clean_critical()
+        else:
+            self.current_process = _process_list[self.progress_index](self, *args)
+
+    def start_next_process(self):
+        if self.current_process:
+            self.current_process.initialize()
+        else:
+            self.match_over_loop.start()
 
     def on_spin_up(self, p_list):
         self.data.id = Match._last_match_id
         self.current_process = _process_list[self.progress_index](self, p_list)
         self.plugin_manager.on_match_launching()
-
-    async def on_match_over(self):
-        self.plugin_manager.on_match_over()
-        self.match_over_loop.start()
+        self.start_next_process()
 
     @loop(count=1)
     async def match_over_loop(self):
         await disp.MATCH_OVER.send(self.match.channel)
         await self.data.push_db()
-        await self.clean()
+        await self.clean_async()
         await disp.MATCH_CLEARED.send(self.match.channel)
 
     @property
@@ -261,27 +267,36 @@ class MatchObjects:
         else:
             raise AttributeError(f"Current process has no attribute '{name}'")
 
-    async def clean(self):
-        await self.plugin_manager.clean()
+    def clean_critical(self):
+        self.status = MatchStatus.IS_RUNNING
+        self.command_factory.on_clean()
         if self.base_selector:
-            await self.base_selector.clean()
+            self.base_selector.clean()
             self.base_selector = None
-        on_match_over(self.data.id)
-        for a_player in self.players_with_account:
-            await accounts.terminate_account(a_player)
         for tm in self.teams:
             if tm is not None:
                 tm.clean()
-        self.data.clean()
         self.teams = [None, None]
         self.current_process = None
+
+    async def clean_all_auto(self):
+        self.clean_critical()
+        await self.clean_async()
+
+    async def clean_async(self):
+        await self.plugin_manager.clean()
+        on_match_over(self.data.id)
+        for a_player in self.players_with_account:
+            await accounts.terminate_account(a_player)
+        self.data.clean()
         self.players_with_account = list()
         self.result_msg = None
         self.check_offline = True
         self.check_validated = True
-        self.status = MatchStatus.IS_FREE
         self.clean_channel.start(display=True)
         self.progress_index = 0
+        self.status = MatchStatus.IS_FREE
+        lobby.on_match_free()
 
     @loop(count=1)
     async def clean_channel(self, display):

@@ -38,7 +38,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
     @Process.init_loop
     async def init(self):
         if self.match.base_selector:
-            await self.match.base_selector.clean()
+            self.match.base_selector.clean()
             push_last_bases(self.match.base)
             self.match.base_selector = None
         self.match.plugin_manager.on_match_starting()
@@ -79,9 +79,9 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
     async def on_match_over(self):
         player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
         self.auto_info_loop.cancel()
-        self.match.status = MatchStatus.IS_RUNNING
         self.rh.clear()
         self.match.plugin_manager.on_round_over()
+        self.match.ready_next_process()
         await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, self.match.round_no)
         try:
             await census.process_score(self.match.data, self.match.last_start_stamp, self.match.channel)
@@ -96,7 +96,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
             log.error(f"ApiNotReachable caught when processing scores : {e.url}")
             await disp.API_SCORE_ERROR.send(ContextWrapper.channel(cfg.channels["results"]), self.match.id,
                                             self.match.round_no)
-        self.match.next_process()
+        self.match.start_next_process()
 
     @Process.public
     async def clear(self, ctx):
@@ -104,9 +104,11 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         self.match_loop.cancel()
         self.rh.clear()
         player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
+        self.match.clean_critical()
+        self.match.plugin_manager.on_round_over()
         await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, self.match.round_no)
         await disp.MATCH_OVER.send(self.match.channel)
-        await self.match.clean()
+        await self.match.clean_async()
         await disp.MATCH_CLEARED.send(ctx)
 
 

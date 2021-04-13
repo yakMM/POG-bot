@@ -1,3 +1,7 @@
+# v3.2:
+- Added locking mechanic on reaction handler to avoid errors due to players spamming the reactions
+- Overhauled the use of async functions for critical events
+
 # v3.1:
 - Fixed some issues with sub command
 - Added base image as thumbnail in the match info embed

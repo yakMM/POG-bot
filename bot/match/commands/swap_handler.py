@@ -8,6 +8,7 @@ from display import AllStrings as disp, ContextWrapper
 import modules.roles as roles
 from classes import Player
 
+
 class SwapHandler(InstantiatedCommand):
     def __init__(self, obj):
         super().__init__(self, self.swap)
@@ -18,7 +19,7 @@ class SwapHandler(InstantiatedCommand):
     def match(self):
         return self.factory.match
 
-    def start(self):
+    def on_start(self):
         self.validator = CaptainValidator(self.match)
 
         @self.validator.confirm
@@ -31,11 +32,13 @@ class SwapHandler(InstantiatedCommand):
             p_2.change_team(team1)
             await disp.SWAP_OK.send(self.match.channel, p_1.mention, p_2.mention, match=self.match.proxy)
 
-    def stop(self):
-        self.validator.clean()
+    def on_clean(self):
+        if self.validator:
+            self.validator.clean()
+            self.validator = None
 
     def on_team_ready(self, team):
-        self.stop()
+        self.on_clean()
 
     @Command.command(*picking_states)
     async def swap(self, ctx, args):
@@ -75,7 +78,7 @@ class SwapHandler(InstantiatedCommand):
             return
 
         # Can't have a sub command running  at the same time
-        await self.factory.sub.stop()
+        self.factory.sub.on_clean()
 
         if roles.is_admin(ctx.author):
             await self.validator.force_confirm(ctx, p_1=players[0], p_2=players[1])

@@ -4,6 +4,10 @@ from logging import getLogger
 
 from lib.tasks import loop, Loop
 
+from modules.message_filter import is_spam, unlock
+
+import asyncio
+
 _all_handlers = dict()
 
 _client = None
@@ -21,11 +25,14 @@ class UserLackingPermission(Exception):
 
 async def reaction_handler(reaction, user, player):
     msg = reaction.message
+    if await is_spam(user, msg.channel):
+        return
     handler = _all_handlers.get(msg.id)
     log.debug(f"Handler dict size: {len(_all_handlers)}")
     if handler is None:
         return
     await handler.run(reaction, player, user, msg)
+    unlock(user.id)
 
 
 def add_handler(m_id, handler):
@@ -168,10 +175,20 @@ class SingleMessageReactionHandler(ReactionHandler):
     def msg(self):
         return self.__msg
 
-    # def lock(self):
-    #     if self.__msg is not None:
-    #         _lock_msg(self.__msg)
-    #
+    def is_locked(self):
+        if not self.__msg:
+            return True
+        if self.__msg in _locked_msg:
+            return True
+        return False
+
+    def lock(self):
+        if self.__msg:
+            _lock_msg(self.__msg)
+
+    def unlock(self):
+        if self.__msg:
+            _unlock_msg(self.__msg)
 
     def clear(self):
         if not self.__msg:
@@ -179,10 +196,9 @@ class SingleMessageReactionHandler(ReactionHandler):
         _lock_msg(self.__msg)
         if self.remove_msg:
             rem_handler(self.__msg.id)
-        self._destroy.start(self.__msg)
+        Loop(coro=self._destroy, count=1).start(self.__msg)
         self.__msg = None
 
-    @loop(count=1)
     async def _destroy(self, msg):
         if self.remove_msg:
             await msg.delete()
@@ -193,9 +209,9 @@ class SingleMessageReactionHandler(ReactionHandler):
 
     async def set_new_msg(self, new_msg):
         self.clear()
+        _lock_msg(new_msg)
+        add_handler(new_msg.id, self)
+        await super().auto_add_reactions(new_msg)
         self.__msg = new_msg
-        _lock_msg(self.__msg)
-        add_handler(self.__msg.id, self)
-        await super().auto_add_reactions(self.__msg)
         # _unlock_msg will be done in auto_add_reactions
 

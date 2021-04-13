@@ -36,7 +36,6 @@ class LobbyCog(commands.Cog, name='lobby'):
 
     @commands.command(aliases=['j'])
     @commands.guild_only()
-    @commands.max_concurrency(number=1, wait=True)
     async def join(self, ctx):
         """ Join queue
         """

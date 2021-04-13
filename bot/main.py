@@ -195,23 +195,24 @@ def _add_init_handlers(client):
             await modules.roles.role_update(p)
         _add_main_handlers(client)
 
-        try:
-            last_lobby = modules.database.get_field("restart_data", 0, "last_lobby")
-        except KeyError:
-            pass
-        else:
-            for p_id in last_lobby:
-                try:
-                    player = Player.get(int(p_id))
-                    if player and not modules.lobby.is_lobby_stuck() and player.is_registered:
-                        modules.lobby.add_to_lobby(player)
-                except ValueError:
-                    pass
-            modules.database.set_field("restart_data", 0, {"last_lobby": list()})
-        names = modules.lobby.get_all_names_in_lobby()
-        if names:
-            await disp.LB_QUEUE.send(ContextWrapper.channel(cfg.channels["lobby"]),
-                                     names_in_lobby=modules.lobby.get_all_names_in_lobby())
+        if not modules.lobby.get_all_names_in_lobby():
+            try:
+                last_lobby = modules.database.get_field("restart_data", 0, "last_lobby")
+            except KeyError:
+                pass
+            else:
+                for p_id in last_lobby:
+                    try:
+                        player = Player.get(int(p_id))
+                        if player and not modules.lobby.is_lobby_stuck() and player.is_registered:
+                            modules.lobby.add_to_lobby(player)
+                    except ValueError:
+                        pass
+                modules.database.set_field("restart_data", 0, {"last_lobby": list()})
+            names = modules.lobby.get_all_names_in_lobby()
+            if names:
+                await disp.LB_QUEUE.send(ContextWrapper.channel(cfg.channels["lobby"]),
+                                         names_in_lobby=modules.lobby.get_all_names_in_lobby())
         modules.loader.unlock_all(client)
         log.info('Client is ready!')
         await disp.RDY.send(ContextWrapper.channel(cfg.channels["spam"]), cfg.VERSION)

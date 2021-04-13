@@ -28,36 +28,42 @@ class MatchesCog(commands.Cog, name='matches'):
 
     @commands.command(aliases=['c', 'cap'])
     @commands.guild_only()
+    @commands.max_concurrency(number=1, wait=True)
     async def captain(self, ctx, *args):
         match = Match.get(ctx.channel.id)
         await match.command.captain(ctx, args)
 
     @commands.command()
     @commands.guild_only()
+    @commands.max_concurrency(number=1, wait=True)
     async def sub(self, ctx, *args):
         match = Match.get(ctx.channel.id)
         await match.command.sub(ctx, args)
 
     @commands.command()
     @commands.guild_only()
+    @commands.max_concurrency(number=1, wait=True)
     async def swap(self, ctx, *args):
         match = Match.get(ctx.channel.id)
         await match.command.swap(ctx, args)
 
     @commands.command(aliases=['p'])
     @commands.guild_only()
+    @commands.max_concurrency(number=1, wait=True)
     async def pick(self, ctx, *args):
         match = Match.get(ctx.channel.id)
         await match.command.pick(ctx, args)
 
     @commands.command(aliases=['b', 'map'])
     @commands.guild_only()
+    @commands.max_concurrency(number=1, wait=True)
     async def base(self, ctx, *args):
         match = Match.get(ctx.channel.id)
         await match.command.base(ctx, args)
 
     @commands.command(aliases=['rdy'])
     @commands.guild_only()
+    @commands.max_concurrency(number=1, wait=True)
     async def ready(self, ctx):  # when ready
         match = Match.get(ctx.channel.id)
         await match.command.ready(ctx)

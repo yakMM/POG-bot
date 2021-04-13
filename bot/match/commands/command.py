@@ -8,6 +8,7 @@ picking_states = (MatchStatus.IS_PICKING, MatchStatus.IS_FACTION, MatchStatus.IS
 captains_ok_states = (MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_BASING, MatchStatus.IS_PICKING,
                       MatchStatus.IS_FACTION, MatchStatus.IS_WAITING_2)
 
+
 class Command:
     def __init__(self, func, *args):
         self.func = func
@@ -58,26 +59,25 @@ class InstantiatedCommand:
     def on_team_ready(self, team):
         pass
 
+    def on_clean(self):
+        pass
+
+    def on_start(self):
+        pass
+
+    def on_update(self):
+        pass
+
     def on_status_update(self, status):
         if status in self.__status:
             if not self.__is_running:
-                try:
-                    self.__parent.start()
-                except AttributeError:
-                    pass
+                self.on_start()
                 self.__is_running = True
             else:
-                try:
-                    self.__parent.update()
-                except AttributeError:
-                    pass
+                self.on_update()
         elif status not in self.__status and self.__is_running:
-            try:
-                self.__parent.stop()
-            except AttributeError:
-                pass
+            self.on_clean()
             self.__is_running = False
-
 
     def direct_do(self, obj, ctx, *args, **kwargs):
         return self.__func(obj, ctx, *args, **kwargs)

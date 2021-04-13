@@ -13,6 +13,7 @@ from match.common import check_faction, switch_turn
 
 class FactionPicking(Process, status=MatchStatus.IS_FACTION):
     def __init__(self, match):
+        super().__init__(match)
         self.match = match
 
         self.reaction_handler = reactions.SingleMessageReactionHandler()
@@ -20,8 +21,6 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
 
         self.match.teams[1].captain.is_turn = True
         self.match.teams[0].captain.is_turn = False
-
-        super().__init__(match)
 
     @Process.init_loop
     async def init_loop(self):
@@ -75,7 +74,7 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
     @Process.public
     async def clear(self, ctx):
         self.reaction_handler.clear()
-        await self.match.clean()
+        await self.match.clean_all_auto()
         await disp.MATCH_CLEARED.send(ctx)
 
     @Process.public
@@ -108,13 +107,14 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
 
         # If other team didn't pick yet:
         if other.faction == 0:
+            self.reaction_handler.rem_reaction(cfg.emojis[arg.lower()])
             msg = await disp.PK_FACTION_OK_NEXT.send(self.match.channel, team.name, cfg.factions[team.faction],
                                                      other.captain.mention)
-            self.reaction_handler.rem_reaction(cfg.emojis[arg.lower()])
             return msg
 
         # Else, over, all teams have selected a faction
+        self.match.ready_next_process()
         self.reaction_handler.clear()
         await disp.PK_FACTION_OK.send(ctx, team.name, cfg.factions[team.faction])
-        self.match.next_process()
         self.match.plugin_manager.on_factions_picked()
+        self.match.start_next_process()

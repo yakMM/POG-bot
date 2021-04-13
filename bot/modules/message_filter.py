@@ -14,8 +14,8 @@ __spam_list = dict()
 __SPAM_MSG_FREQUENCY = 5
 
 
-async def is_spam(msg):
-    a_id = msg.author.id
+async def is_spam(author, channel):
+    a_id = author.id
     if a_id not in __spam_list:
         __spam_list[a_id] = 1
         return False
@@ -23,8 +23,8 @@ async def is_spam(msg):
     if __spam_list[a_id] == 1:
         return False
     if __spam_list[a_id] % __SPAM_MSG_FREQUENCY == 0:
-        ctx = ContextWrapper.wrap(msg.channel)
-        ctx.author = msg.author
+        ctx = ContextWrapper.wrap(channel)
+        ctx.author = author
         await disp.STOP_SPAM.send(ctx)
     return True
 
@@ -67,7 +67,7 @@ async def on_message(client, message):
     actual_author = message.author
 
     # Check if too many requests from this user:
-    if await is_spam(message):
+    if await is_spam(message.author, message.channel):
         return
 
     # Make the message lower-case:

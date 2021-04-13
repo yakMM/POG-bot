@@ -46,6 +46,7 @@ class AdminCog(commands.Cog, name='admin'):
 
     @commands.command()
     @commands.guild_only()
+    @commands.max_concurrency(number=1, wait=True)
     async def clear(self, ctx):
         if ctx.channel.id == cfg.channels["lobby"]:  # clear lobby
             if lobby.clear_lobby():
@@ -108,6 +109,7 @@ class AdminCog(commands.Cog, name='admin'):
     
     @commands.command()
     @commands.guild_only()
+    @commands.max_concurrency(number=1, wait=True)
     async def remove(self, ctx):
         if ctx.channel.id == cfg.channels["lobby"]:
             player = await get_check_player(ctx)

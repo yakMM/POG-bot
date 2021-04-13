@@ -79,7 +79,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
     async def clear(self, ctx):
         for p in self.players.values():
             p.on_player_clean()
-        await self.match.clean()
+        await self.match.clean_all_auto()
         await disp.MATCH_CLEARED.send(ctx)
 
     @Process.public
@@ -187,8 +187,9 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         # If no player left, trigger the next step
         elif len(self.players) == 0:
             # Start next step
-            self.match.next_process()
+            self.match.ready_next_process()
             self.match.plugin_manager.on_teams_done()
+            self.match.start_next_process()
 
     @loop(count=1)
     async def ping_last_player(self, team, p):

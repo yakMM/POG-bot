@@ -74,7 +74,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
     @Process.public
     async def clear(self, ctx):
         self.rh.clear()
-        await self.match.clean()
+        await self.match.clean_all_auto()
         await disp.MATCH_CLEARED.send(ctx)
 
     @Process.public
@@ -99,12 +99,15 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         # Else everyone ready
         if not other.captain.is_turn:
             self.rh.clear()
-            self.match.next_process()
+            self.match.ready_next_process()
             return True
         return False
 
     @Process.public
     async def ready(self, ctx, captain):
+        if self.rh.is_locked():
+            return
+        self.rh.lock()
         if not captain.is_turn:
             self.on_team_ready(captain.team, False)
             msg = await disp.MATCH_TEAM_UNREADY.send(ctx, captain.team.name, match=self.match.proxy)
@@ -131,7 +134,9 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
             self.on_team_ready(captain.team, True)
             is_over = self.ready_check(captain.team)
             msg = await disp.MATCH_TEAM_READY.send(ctx, captain.team.name, match=self.match.proxy)
-            if not is_over:
+            if is_over:
+                self.match.start_next_process()
+            else:
                 await self.rh.set_new_msg(msg)
 
     @Process.public

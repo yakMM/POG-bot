@@ -91,7 +91,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         reactions.auto_clear(self.accept_msg[0])
         reactions.auto_clear(self.accept_msg[1])
         self.volunteer_rh.clear()
-        await self.match.clean()
+        await self.match.clean_all_auto()
         await disp.MATCH_CLEARED.send(ctx)
 
     @Process.public
@@ -162,13 +162,13 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         reactions.auto_clear(self.accept_msg[i])
         all_captains_selected = self.captains[i - 1] and self.captains[i - 1].active
         if all_captains_selected:
+            self.match.ready_next_process(self.p_list)
             self.auto_captain.cancel()
             self.volunteer_rh.clear()
-            self.match.status = MatchStatus.IS_RUNNING
         await disp.CAP_OK.send(self.match.channel, player.mention, self.match.teams[i].name)
         if all_captains_selected:
             self.match.plugin_manager.on_captain_selected()
-            self.match.next_process(self.p_list)
+            self.match.start_next_process()
         else:
             await self.info()
 

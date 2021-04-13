@@ -8,23 +8,21 @@ from display import AllStrings as disp, ContextWrapper
 import modules.roles as roles
 from classes import Player
 
+
 class SubHandler(InstantiatedCommand):
     def __init__(self, obj):
         super().__init__(self, self.sub)
-        self.validator = None
         self.sub_func = None
         self.factory = obj
+        self.validator = None
 
     @property
     def match(self):
         return self.factory.match
 
-    def start(self):
+    def on_start(self):
         self.validator = CaptainValidator(self.match)
-        try:
-            self.sub_func = self.match.get_process_attr("do_sub")
-        except AttributeError:
-            self.sub_func = None
+        self.on_update()
 
         @self.validator.confirm
         async def do_sub(ctx, subbed, force_player=None):
@@ -33,10 +31,12 @@ class SubHandler(InstantiatedCommand):
             else:
                 await after_pick_sub(self.match, subbed, force_player)
 
-    def stop(self):
-        self.validator.clean()
+    def on_clean(self):
+        if self.validator:
+            self.validator.clean()
+            self.validator = None
 
-    def update(self):
+    def on_update(self):
         try:
             self.sub_func = self.match.get_process_attr("do_sub")
         except AttributeError:
@@ -46,7 +46,7 @@ class SubHandler(InstantiatedCommand):
         if "subbed" in self.validator.kwargs:
             player = self.validator.kwargs["subbed"]
             if player.active and (player.active.team is team):
-                self.stop()
+                self.on_clean()
 
     @Command.command(*picking_states)
     async def sub(self, ctx, args):
@@ -76,7 +76,7 @@ class SubHandler(InstantiatedCommand):
             return
 
         # Can't have a swap command running at the same time
-        await self.factory.swap.stop()
+        self.factory.swap.on_clean()
 
         if roles.is_admin(ctx.author):
             player = None

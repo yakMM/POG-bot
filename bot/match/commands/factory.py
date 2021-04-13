@@ -58,6 +58,10 @@ class CommandFactory(metaclass=MetaFactory):
         for command in self.commands.values():
             command.on_team_ready(team)
 
+    def on_clean(self):
+        for command in self.commands.values():
+            command.on_clean()
+
     @Command.has_status("pick_status")
     @Command.command(*picking_states)
     async def pick(self, ctx, args):
