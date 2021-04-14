@@ -5,7 +5,7 @@ import modules.database as db
 def ill_weapons_from_data(data):
     ill_weapons = dict()
     for weap_doc in data:
-        ill_weapons[weap_doc["weap_id"]] = weap_doc["kills"]
+        ill_weapons[weap_doc["weapon_id"]] = weap_doc["kills"]
     return ill_weapons
 
 
@@ -20,8 +20,8 @@ def get_ill_weapons_doc(ill_weapons):
 
 
 class TeamScore:
-    def __init__(self, id, match, name, faction):
-        self.__id = id
+    def __init__(self, t_id, match, name, faction):
+        self.__id = t_id
         self.__name = name
         self.__faction = faction
         self.__match = match
@@ -39,6 +39,10 @@ class TeamScore:
     @property
     def name(self):
         return self.__name
+
+    @property
+    def nb_players(self):
+        return len(self.__players)
 
     @property
     def players(self):
@@ -73,7 +77,7 @@ class TeamScore:
         return self.__faction
 
     @classmethod
-    def from_data(cls, match, i, data):
+    def from_data(cls, i, match, data):
         obj = cls(i, match, data["name"], data["faction_id"])
         obj.__faction = data["faction_id"]
         obj.__score = data["score"]
@@ -83,6 +87,7 @@ class TeamScore:
         obj.__cap = data["cap_points"]
         for player in data["players"]:
             obj.add_player(PlayerScore.new_from_data(player, obj))
+        return obj
 
     def get_data(self):
         data = {"name": self.__name,
@@ -149,9 +154,9 @@ class PlayerScore:
                 obj.__kills += ld.kills
                 for weap in ld.ill_weapons.keys():
                     if weap in obj.__illegal_weapons:
-                        obj.__illegal_weapons[weap] += obj.__illegal_weapons[weap]
+                        obj.__illegal_weapons[weap] += ld.ill_weapons[weap]
                     else:
-                        obj.__illegal_weapons[weap] = obj.__illegal_weapons[weap]
+                        obj.__illegal_weapons[weap] = ld.ill_weapons[weap]
         return obj
 
     def get_main_loadouts(self):
@@ -250,6 +255,7 @@ class PlayerScore:
             self.__illegal_weapons[weap_id] += 1
         else:
             self.__illegal_weapons[weap_id] = 1
+
 
 class Loadout:
     def __init__(self, l_id, p_score):

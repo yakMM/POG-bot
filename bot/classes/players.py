@@ -459,7 +459,7 @@ class ActivePlayer:
     """ ActivePlayer class, with more data than Player class, for when match is happening
     """
 
-    def __init__(self, player, team, from_data=False):
+    def __init__(self, player, team):
         self.__player = player
         self.__team = team
         self.__account = None
