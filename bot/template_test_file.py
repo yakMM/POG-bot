@@ -39,6 +39,11 @@ def test_hand(client):
         await launch(ctx, [20, 21, 22, 23], 2)
         await launch(ctx, ids, 1)
 
+    @client.command()
+    @commands.guild_only()
+    async def w(ctx, *args):
+        await asyncio.sleep(60)
+
 
 async def launch(ctx, id_list, tier):
     print("TIER 1")

@@ -38,7 +38,8 @@ class SwapHandler(InstantiatedCommand):
             self.validator = None
 
     def on_team_ready(self, team):
-        self.on_clean()
+        if self.validator:
+            self.validator.clean()
 
     @Command.command(*picking_states)
     async def swap(self, ctx, args):

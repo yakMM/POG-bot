@@ -19,6 +19,7 @@ def init(client):
     global _client
     _client = client
 
+
 class UserLackingPermission(Exception):
     pass
 
@@ -33,6 +34,8 @@ async def reaction_handler(reaction, user, player):
         return
     await handler.run(reaction, player, user, msg)
     unlock(user.id)
+    if msg.id in _all_handlers and handler.rem_user_react:
+        await msg.remove_reaction(reaction.emoji, user)
 
 
 def add_handler(m_id, handler):
@@ -42,14 +45,14 @@ def add_handler(m_id, handler):
 _locked_msg = list()
 
 
-def _lock_msg(msg):
-    if msg.id not in _locked_msg:
-        _locked_msg.append(msg.id)
+def _lock_msg(m_id):
+    if m_id not in _locked_msg:
+        _locked_msg.append(m_id)
 
 
-def _unlock_msg(msg):
-    if msg.id in _locked_msg:
-        _locked_msg.remove(msg.id)
+def _unlock_msg(m_id):
+    if m_id in _locked_msg:
+        _locked_msg.remove(m_id)
 
 
 def rem_handler(m_id):
@@ -61,14 +64,14 @@ def rem_handler(m_id):
 
 def auto_clear(msg):
     if msg:
-        _lock_msg(msg)
+        _lock_msg(msg.id)
         Loop(coro=clear_loop, count=1).start(msg)
 
 
 async def clear_loop(msg):
     await msg.clear_reactions()
     rem_handler(msg.id)
-    _unlock_msg(msg)
+    _unlock_msg(msg.id)
 
 
 class ReactionHandler:
@@ -85,6 +88,10 @@ class ReactionHandler:
     @property
     def _string(self):
         return str(self.__f_dict)
+
+    @property
+    def rem_user_react(self):
+        return self.__rem_user_react
 
     def is_reaction(self, react):
         return str(react.emoji) in self.__f_dict
@@ -103,52 +110,47 @@ class ReactionHandler:
             del self.__f_dict[react]
 
     async def run(self, reaction, player, user, msg):
+        if msg.id in _locked_msg:
+            return
+
         try:
-            if msg.id in _locked_msg:
-                raise UserLackingPermission
-            _lock_msg(msg)
             funcs = self.__f_dict[str(reaction.emoji)]
             for func in funcs:
                 if is_coroutine(func):
                     await func(reaction, player, user, msg)
                 else:
                     func(reaction, player, user, msg)
-        except (KeyError, UserLackingPermission):
-            _unlock_msg(msg)
-        else:
             if msg.id in _all_handlers:
                 if self.__auto_destroy:
-                    _lock_msg(msg)
+                    _lock_msg(msg.id)
                     await msg.clear_reactions()
                     rem_handler(msg.id)
-                    _unlock_msg(msg)
-                    return
-                if self.__rem_bot_react:
-                    _lock_msg(msg)
-                    await msg.remove_reaction(reaction.emoji, _client.user)
+                    _unlock_msg(msg.id)
+                elif self.__rem_bot_react:
+                    _lock_msg(msg.id)
                     if self.__rem_user_react:
-                        await msg.remove_reaction(reaction.emoji, user)
+                        await msg.clear_reactions()
+                    else:
+                        await msg.remove_reaction(reaction.emoji, _client.user)
                     rem_handler(msg.id)
-                    _unlock_msg(msg)
-                    return
-            _unlock_msg(msg)
-        if msg.id in _all_handlers and self.__rem_user_react:
-            await msg.remove_reaction(reaction.emoji, user)
+                    _unlock_msg(msg.id)
+        except (KeyError, UserLackingPermission):
+            pass
 
     async def _auto_add_reactions(self, msg):
-        _lock_msg(msg)
+        _lock_msg(msg.id)
         for react in self.__f_dict.keys():
             await msg.add_reaction(react)
-        _unlock_msg(msg)
+        _unlock_msg(msg.id)
 
     async def auto_remove_reactions(self, msg):
-        _lock_msg(msg)
+        _lock_msg(msg.id)
         for react in self.__f_dict.keys():
             await msg.remove_reaction(react, _client.user)
-        _unlock_msg(msg)
+        _unlock_msg(msg.id)
 
     async def auto_add(self, msg):
-        _lock_msg(msg)
+        _lock_msg(msg.id)
         add_handler(msg.id, self)
         await self._auto_add_reactions(msg)
 
@@ -158,7 +160,6 @@ class ReactionHandler:
                 self.add_reaction(react, func)
             return func
         return decorator
-
 
 
 class SingleMessageReactionHandler(ReactionHandler):
@@ -175,25 +176,10 @@ class SingleMessageReactionHandler(ReactionHandler):
     def msg(self):
         return self.__msg
 
-    def is_locked(self):
-        if not self.__msg:
-            return True
-        if self.__msg in _locked_msg:
-            return True
-        return False
-
-    def lock(self):
-        if self.__msg:
-            _lock_msg(self.__msg)
-
-    def unlock(self):
-        if self.__msg:
-            _unlock_msg(self.__msg)
-
     def clear(self):
         if not self.__msg:
             return
-        _lock_msg(self.__msg)
+        _lock_msg(self.__msg.id)
         if self.remove_msg:
             rem_handler(self.__msg.id)
         Loop(coro=self._destroy, count=1).start(self.__msg)
@@ -205,11 +191,11 @@ class SingleMessageReactionHandler(ReactionHandler):
         else:
             await msg.clear_reactions()
             rem_handler(msg.id)
-        _unlock_msg(msg)
+        _unlock_msg(msg.id)
 
     async def set_new_msg(self, new_msg):
         self.clear()
-        _lock_msg(new_msg)
+        _lock_msg(new_msg.id)
         add_handler(new_msg.id, self)
         await super()._auto_add_reactions(new_msg)
         self.__msg = new_msg

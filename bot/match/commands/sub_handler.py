@@ -43,10 +43,10 @@ class SubHandler(InstantiatedCommand):
             self.sub_func = None
 
     def on_team_ready(self, team):
-        if "subbed" in self.validator.kwargs:
+        if self.validator and "subbed" in self.validator.kwargs:
             player = self.validator.kwargs["subbed"]
             if player.active and (player.active.team is team):
-                self.on_clean()
+                self.validator.clean()
 
     @Command.command(*picking_states)
     async def sub(self, ctx, args):

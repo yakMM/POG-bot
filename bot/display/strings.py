@@ -41,7 +41,7 @@ class AllStrings(Enum):
     LB_STUCK_JOIN = Message("You can't join the lobby, it is already full!")
     LB_MATCH_STARTING = Message("Lobby full, match can start! Join <#{}> for team selection!", ping=False,
                                 embed=embeds.join_ts)
-    LB_WARNING = Message("{} you will be timed out of the lobby soon! Use `=reset` to remain in the queue!")
+    LB_WARNING = Message("{} you will be timed out of the lobby soon! Use `=reset` or react below to remain in the queue!")
     LB_TOO_LONG = Message("{} was removed from the lobby by timeout!", embed=embeds.lobby_list)
     LB_CLEARED = Message("Lobby has been cleared!", embed=embeds.lobby_list)
     LB_EMPTY = Message("Lobby is already empty!")
@@ -103,6 +103,8 @@ class AllStrings(Enum):
                             "Re-register in <#{}> to confirm you still have access to it!", embed=embeds.flip_accounts)
     RDY = Message("Bot just started and is now ready. Version `{}`")
     STOP = Message("Bot shutting down! Saving state...")
+    SPAM_CLEARED = Message("Cleared the spam list!")
+    SPAM_DEBUG = Message("Here are the players in the spam filter:{}")
     CONFIRM_NOT_CAPTAIN = Message("You can't accept! {} should do it!")
     CONFIRM_NOTHING = Message("Nothing to accept!")
     DECLINE_NOTHING = Message("Nothing to decline!")

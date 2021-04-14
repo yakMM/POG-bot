@@ -66,7 +66,8 @@ def admin_help(ctx):
     embed.add_field(name='Debug commands',
                     value='`=channel (un)freeze` - Prevent users from typing in a channel\n'
                           '`=pog version` - Display current version and lock status\n'
-                          '`=pog (un)lock` - Prevent users from interacting with the bot (but admins still can)\n',
+                          '`=pog (un)lock` - Prevent users from interacting with the bot (but admins still can)\n'
+                          '`=spam clear` - Clear the spam filter\n',
                     inline=False)
     embed.add_field(name='Lobby commands',
                     value='`=remove @player` - Remove the player from queue\n'

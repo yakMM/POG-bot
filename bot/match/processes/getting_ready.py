@@ -105,9 +105,6 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
 
     @Process.public
     async def ready(self, ctx, captain):
-        if self.rh.is_locked():
-            return
-        self.rh.lock()
         if not captain.is_turn:
             self.on_team_ready(captain.team, False)
             msg = await disp.MATCH_TEAM_UNREADY.send(ctx, captain.team.name, match=self.match.proxy)

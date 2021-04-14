@@ -16,6 +16,7 @@ import modules.census as census
 import modules.lobby as lobby
 import modules.tools as tools
 import modules.accounts_handler as accounts_sheet
+import modules.message_filter as msg_filter
 import asyncio
 
 from match.classes.match import Match
@@ -148,6 +149,32 @@ class AdminCog(commands.Cog, name='admin'):
                 await disp.MATCH_CHECK_CHANGED.send(ctx, arg, "enabled" if result else "disabled")
             except KeyError:
                 await disp.INVALID_STR.send(ctx, arg)
+
+    @commands.command()
+    @commands.guild_only()
+    async def spam(self, ctx, *args):
+        if len(args) == 1:
+            arg = args[0]
+        else:
+            await disp.WRONG_USAGE.send(ctx, ctx.command.name)
+            return
+        if arg == "clear":
+            msg_filter.clear_spam_list()
+            await disp.SPAM_CLEARED.send(ctx)
+            return
+        if arg == "debug":
+            all_spammers = msg_filter.debug()
+            giga_string = ""
+            for k in all_spammers.keys():
+                p = Player.get(k)
+                if p:
+                    giga_string += f"\nSpammer: {p.mention}, id[{p.id}], name: [{p.name}], " \
+                                   f"spam value: [{all_spammers[k]}]"
+                else:
+                    giga_string += f"\nSpammer: id[{k}], spam value: [{all_spammers[k]}]"
+            await disp.SPAM_DEBUG.send(ctx, giga_string)
+            return
+        await disp.WRONG_USAGE.send(ctx, ctx.command.name)
 
     @commands.command()
     @commands.guild_only()
