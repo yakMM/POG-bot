@@ -26,7 +26,6 @@ class AllStrings(Enum):
     REG_WITH_CHARS = Message("You successfully registered with the following Jaeger characters: `{}`, `{}`, `{}`")
     REG_FROZEN = Message("You can't register while you're playing a match!")
     REG_RULES = Message("{} You have accepted the rules, you may now register", embed=embeds.register_help)
-    REG_NO_RULE = Message("You have to accept the rules before registering! Check <#{}>")
 
     LB_ALREADY_IN = Message("You are already in queue!")
     LB_IN_MATCH = Message("You are already in a match!")
@@ -112,6 +111,8 @@ class AllStrings(Enum):
     CANCEL_NOTHING = Message("Nothing to cancel!")
     CANCEL_NOT_CAPTAIN = Message("You can't cancel this request!")
     READY_NO_COMMAND = Message("Can't do that while your team is ready!")
+    NO_RULE = Message("You have to accept the rules before using `{}`! Check <#{}>")
+    DISPLAY_STATS = Message("Here are your POG stats:", embed=embeds.player_stats)
 
     BOT_UNLOCKED = Message("Unlocked!")
     BOT_LOCKED = Message("Locked!")

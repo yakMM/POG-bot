@@ -211,6 +211,17 @@ def register_status(ctx, player):
     return embed
 
 
+def player_stats(ctx, stats):
+    embed = Embed(colour=Color.blue(), title="Player stats",
+                  description=f"POG stats for <@{stats.id}>\nNote: Tracking stats only after POG match 569")
+    embed.add_field(name="Number of matches played", value=stats.nb_matches_played, inline=False)
+    embed.add_field(name="Raw POG net", value=stats.net, inline=False)
+    embed.add_field(name="Raw POG score", value=stats.score, inline=False)
+    embed.add_field(name="Number of POG kills", value=stats.kills, inline=False)
+    embed.add_field(name="Number of POG deaths", value=stats.deaths, inline=False)
+    return embed
+
+
 def account(ctx, account):
     """ Returns account message embed
     """

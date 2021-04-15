@@ -9,6 +9,7 @@ from modules.roles import is_admin
 from asyncio import sleep
 import modules.tools as tools
 from logging import getLogger
+from modules.dm_handler import on_stats
 
 __spam_list = dict()
 __SPAM_MSG_FREQUENCY = 5
@@ -69,6 +70,9 @@ async def on_message(client, message):
 
     # if dm, send in staff
     if isinstance(message.channel, DMChannel):
+        if message.content.lower() in ("stat", "stats", "statistics", "s"):
+            await on_stats(message.author)
+            return
         await disp.BOT_DM.send(ContextWrapper.channel(cfg.channels["staff"]), msg=message)
         await disp.BOT_DM_RECEIVED.send(message.author)
         return

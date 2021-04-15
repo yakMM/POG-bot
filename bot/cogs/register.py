@@ -42,7 +42,7 @@ class RegisterCog(commands.Cog, name='register'):
             return
         player = classes.Player.get(ctx.author.id)
         if not player:
-            await display.REG_NO_RULE.send(ctx, cfg.channels["rules"])
+            await display.NO_RULE.send(ctx, f"={ctx.command.name}", cfg.channels["rules"])
             return
 
         msg = await _register(player, ctx, args)
@@ -52,7 +52,7 @@ class RegisterCog(commands.Cog, name='register'):
     async def notify(self, ctx):
         player = classes.Player.get(ctx.author.id)
         if not player:
-            await display.REG_NO_RULE.send(ctx, cfg.channels["rules"])
+            await display.NO_RULE.send(ctx, f"={ctx.command.name}", cfg.channels["rules"])
             return
         if player.is_notify:
             player.is_notify = False
