@@ -9,10 +9,8 @@ class AllStrings(Enum):
     """
 
     REG_NOT_REGISTERED = Message("You are not registered!", embed=embeds.register_help)
-    REG_IS_OWN = Message("You are registered with the following Jaeger characters: `{}`, `{}`, `{}`")
+    REG_STATUS = Message(None, embed=embeds.register_status)
     REG_ALREADY_OWN = Message("You are already registered with the following Jaeger characters: `{}`, `{}`, `{}`")
-    REG_IS_NOA = Message("You are registered without a Jaeger account! If you have your own "
-                         "account, please re-register with your Jaeger characters.")
     REG_ALREADY_NOA = Message("You are already registered without a Jaeger account! If you have your own "
                               "account, please re-register with your Jaeger characters.")
     REG_HELP = Message("Registration help:", embed=embeds.register_help)

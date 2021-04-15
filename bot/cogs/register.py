@@ -89,10 +89,7 @@ async def _register(player, ctx, args):
         if not player.is_registered:
             await display.REG_NOT_REGISTERED.send(ctx)
             return
-        if player.has_own_account:
-            await display.REG_IS_OWN.send(ctx, *player.ig_names)
-            return
-        await display.REG_IS_NOA.send(ctx)
+        await display.REG_STATUS.send(ctx, player=player)
         return
     # store previous status
     was_player_registered = player.is_registered

@@ -190,6 +190,27 @@ def match_help(ctx):
     return embed
 
 
+def register_status(ctx, player):
+    embed = Embed(colour=Color.blue(), title="Player status",
+                  description=f"Handle: {player.mention}\nName: {player.name}\nID: `{player.id}`\n")
+    if player.is_notify:
+        value = "You are subscribed to the notify feature!"
+    else:
+        value = "You are **not** subscribed to the notify feature!"
+    embed.add_field(name="Notify", value=value, inline=False)
+    if player.has_own_account:
+        value = "You are registered with the following Jaeger characters:\n`{}`, `{}`, `{}`".format(*player.ig_names)
+    else:
+        value = "You are registered without a Jaeger account!\nIf you have your own "\
+                         "account, please re-register with your Jaeger characters."
+    embed.add_field(name="Account", value=value, inline=False)
+    embed.add_field(name="Help",
+                    value="Use `=notify` to join or leave the notify feature\n"
+                          "Use `=register` (`=r`) to update your account information",
+                    inline=False)
+    return embed
+
+
 def account(ctx, account):
     """ Returns account message embed
     """

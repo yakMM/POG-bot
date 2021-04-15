@@ -30,12 +30,14 @@ async def reaction_handler(reaction, user, player):
         return
     handler = _all_handlers.get(msg.id)
     log.debug(f"Handler dict size: {len(_all_handlers)}")
-    if handler is None:
-        return
-    await handler.run(reaction, player, user, msg)
+    if handler:
+        await handler.run(reaction, player, user, msg)
+        if msg.id in _all_handlers and handler.rem_user_react:
+            try:
+                await msg.remove_reaction(reaction.emoji, user)
+            except Exception as e:
+                log.warning(f"Error when removing reaction!\n{e}")
     unlock(user.id)
-    if msg.id in _all_handlers and handler.rem_user_react:
-        await msg.remove_reaction(reaction.emoji, user)
 
 
 def add_handler(m_id, handler):

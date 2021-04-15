@@ -9,6 +9,8 @@
 - Removed the base navigator as it was rarely used
 - Players can now reset their lobby timeout with a reaction
 - Bot now use only necessary gateway intents (discord API)
+- Added proper logger Plugin
+- Added embed showing player status when using =r command
 
 # v3.1:
 - Fixed some issues with sub command
