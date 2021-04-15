@@ -160,6 +160,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         if player.id in self.players:
             del self.players[player.id]
         reactions.auto_clear(self.accept_msg[i])
+        self.match.plugin_manager.on_captain_selected(i, player)
         all_captains_selected = self.captains[i - 1] and self.captains[i - 1].active
         if all_captains_selected:
             self.match.ready_next_process(self.p_list)
@@ -167,7 +168,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             self.volunteer_rh.clear()
         await disp.CAP_OK.send(self.match.channel, player.mention, self.match.teams[i].name)
         if all_captains_selected:
-            self.match.plugin_manager.on_captain_selected()
+            self.match.plugin_manager.on_captains_selected()
             self.match.start_next_process()
         else:
             await self.info()

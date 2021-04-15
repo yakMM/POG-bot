@@ -25,7 +25,7 @@ class AudioBot(Plugin):
         audio_string = f"drop_match_{self.num}_picks"
         _TaskAudio(self).task_audio.start(audio_string, lobby=True, wait=0)
 
-    def on_captain_selected(self):
+    def on_captains_selected(self):
         _TaskAudio(self).task_audio.start("select_teams", lobby=False)
 
     def on_teams_done(self):

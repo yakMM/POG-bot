@@ -5,7 +5,10 @@ class Plugin:
     def on_match_launching(self):
         pass
 
-    def on_captain_selected(self):
+    def on_captain_selected(self, i, player):
+        pass
+
+    def on_captains_selected(self):
         pass
 
     def on_teams_done(self):

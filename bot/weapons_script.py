@@ -16,182 +16,182 @@ cfg.get_config(LAUNCHSTR)
 db_init(cfg.database)
 get_all_elements(classes.Weapon, "static_weapons")
 
-item_type_id = 26 #weapon
+item_type_id = 26  # weapon
 
 we_cats = {
-    2:  'Knife',                    # DET
-    3:  'Pistol',                   # DET
-    8:  'Carbine',                  # ALL
-    7:  'Assault Rifle',            # ALL
-    139:'Infantry Abilities',       # REMOVE
-    4:  'Shotgun',                  # BAN
-    6:  'LMG',                      # ALL
-    13: 'Rocket Launcher',          # NP
-    11: 'Sniper Rifle',             # DET
-    18: 'Explosive',                # BAN
-    17: 'Grenade',                  # NP
-    5:  'SMG',                      # DET
-    19: 'Battle Rifle',             # BAN
-    24: 'Crossbow',                 # ALL
-    12: 'Scout Rifle',              # DET
-    10: 'AI MAX (Left)',            # BAN
-    14: 'Heavy Weapon',             # BAN
-    21: 'AV MAX (Right)',           # BAN
-    20: 'AA MAX (Right)',           # BAN
-    22: 'AI MAX (Right)',           # BAN
-    9:  'AV MAX (Left)',            # BAN
-    23: 'AA MAX (Left)',            # BAN
-    147:'Aerial Combat Weapon',     # BAN
-    104:'Vehicle Weapons',          # REMOVE
-    211:'Colossus Primary Weapon',  # REMOVE
-    144:'ANT Top Turret',           # REMOVE
-    157:'Hybrid Rifle',             # REMOVE
-    126:'Reaver Wing Mount',        # REMOVE
-    208:'Bastion Point Defense',    # REMOVE
-    209:'Bastion Bombard',          # REMOVE
-    210:'Bastion Weapon System'     # REMOVE
+    2: 'Knife',  # DET
+    3: 'Pistol',  # DET
+    8: 'Carbine',  # ALL
+    7: 'Assault Rifle',  # ALL
+    139: 'Infantry Abilities',  # REMOVE
+    4: 'Shotgun',  # BAN
+    6: 'LMG',  # ALL
+    13: 'Rocket Launcher',  # NP
+    11: 'Sniper Rifle',  # DET
+    18: 'Explosive',  # BAN
+    17: 'Grenade',  # NP
+    5: 'SMG',  # DET
+    19: 'Battle Rifle',  # BAN
+    24: 'Crossbow',  # ALL
+    12: 'Scout Rifle',  # DET
+    10: 'AI MAX (Left)',  # BAN
+    14: 'Heavy Weapon',  # BAN
+    21: 'AV MAX (Right)',  # BAN
+    20: 'AA MAX (Right)',  # BAN
+    22: 'AI MAX (Right)',  # BAN
+    9: 'AV MAX (Left)',  # BAN
+    23: 'AA MAX (Left)',  # BAN
+    147: 'Aerial Combat Weapon',  # BAN
+    104: 'Vehicle Weapons',  # REMOVE
+    211: 'Colossus Primary Weapon',  # REMOVE
+    144: 'ANT Top Turret',  # REMOVE
+    157: 'Hybrid Rifle',  # REMOVE
+    126: 'Reaver Wing Mount',  # REMOVE
+    208: 'Bastion Point Defense',  # REMOVE
+    209: 'Bastion Bombard',  # REMOVE
+    210: 'Bastion Weapon System'  # REMOVE
 }
 
-
-ignored_categories = [] # [104,211,144,157,126,208,209,210,139] Switched this to banned
-banned_categories  = [21,20,22,9,23,10,18,147,14,4,104,211,144,157,126,208,209,210,139]
-allowed_categories = [24,12]
-detailled = [2,3,5,6,7,8,11,17,19]
-no_point = [13,17]
+ignored_categories = []  # [104,211,144,157,126,208,209,210,139] Switched this to banned
+banned_categories = [21, 20, 22, 9, 23, 10, 18, 147, 14, 4, 104, 211, 144, 157, 126, 208, 209, 210, 139]
+allowed_categories = [24, 12]
+detailled = [2, 3, 5, 6, 7, 8, 11, 17, 19]
+no_point = [13, 17]
 
 
 def get_banned_per_categorie(cat, id):
     # Knife
     if cat == 2:
         d = {
-        271:        "Carver",
-        285:        "Ripper",
-        286:        "Lumine Edge",
-        1082:       "MAX Punch",
-        1083:       "MAX Punch",
-        1084:       "MAX Punch",
-        804795:     "NSX Amaterasu",
-        6005451:    "Lumine Edge AE",
-        6005452:    "Ripper AE",
-        6005453:    "Carver AE",
-        6008687:    "Defector Claws",
-        600946:     "NS Icebreaker",
-        6009515:    "NS Icebreaker",
-        6009516:    "NS Icebreaker",
-        6009517:    "NS Icebreaker",
-        6009518:    "NS Icebreaker",
-        6009600:    "NS Firebug"
+            271: "Carver",
+            285: "Ripper",
+            286: "Lumine Edge",
+            1082: "MAX Punch",
+            1083: "MAX Punch",
+            1084: "MAX Punch",
+            804795: "NSX Amaterasu",
+            6005451: "Lumine Edge AE",
+            6005452: "Ripper AE",
+            6005453: "Carver AE",
+            6008687: "Defector Claws",
+            600946: "NS Icebreaker",
+            6009515: "NS Icebreaker",
+            6009516: "NS Icebreaker",
+            6009517: "NS Icebreaker",
+            6009518: "NS Icebreaker",
+            6009600: "NS Firebug"
         }
     # Pistol
     elif cat == 3:
-        d={
-        1889:       "The Executive",
-        1954:       "The President",
-        1959:       "The Immortal",
-        7390:       "NC08 Mag-Scatter",
-        802733:     "NS-44L Blackhand",
-        802781:     "NS-44LB Blackhand",
-        802782:     "NS-44LG Blackhand",
-        804960:     "NS-44LP Blackhand",
-        6002661:    'NS-44L "Ravenous" Blackhand',
-        6003793:    "NS-44L Showdown",
-        6003943:    "NS-357 IA",
-        6004714:    "Soldier Soaker",
-        6004995:    "Ectoblaster",
-        6005969:    "NSX-A Yawara",
-        6009652:    'NS-357 "Endeavor" Underboss'
+        d = {
+            1889: "The Executive",
+            1954: "The President",
+            1959: "The Immortal",
+            7390: "NC08 Mag-Scatter",
+            802733: "NS-44L Blackhand",
+            802781: "NS-44LB Blackhand",
+            802782: "NS-44LG Blackhand",
+            804960: "NS-44LP Blackhand",
+            6002661: 'NS-44L "Ravenous" Blackhand',
+            6003793: "NS-44L Showdown",
+            6003943: "NS-357 IA",
+            6004714: "Soldier Soaker",
+            6004995: "Ectoblaster",
+            6005969: "NSX-A Yawara",
+            6009652: 'NS-357 "Endeavor" Underboss'
         }
     # SMG
     elif cat == 5:
-        d={
-        1899:       "Tempest",
-        1944:       "Shuriken",
-        1949:       "Skorpios",
-        27000:      "AF-4 Cyclone",
-        27005:      "AF-4G Cyclone",
-        28000:      "SMG-46 Armistice",
-        28005:      "SMG-46G Armistice",
-        29000:      "Eridani SX5",
-        29005:      "Eridani SX5G",
-        6002772:    "Eridani SX5-AE",
-        6002800:    "SMG-46AE Armistice",
-        6002824:    "AF-4AE Cyclone",
-        6003850:    "MGR-S1 Gladius",
-        6003879:    "MG-S1 Jackal",
-        6003925:    "VE-S Canis",
-        6005968:    "NSX-A Kappa",
-        6009203:    "NS-66 Punisher"
+        d = {
+            1899: "Tempest",
+            1944: "Shuriken",
+            1949: "Skorpios",
+            27000: "AF-4 Cyclone",
+            27005: "AF-4G Cyclone",
+            28000: "SMG-46 Armistice",
+            28005: "SMG-46G Armistice",
+            29000: "Eridani SX5",
+            29005: "Eridani SX5G",
+            6002772: "Eridani SX5-AE",
+            6002800: "SMG-46AE Armistice",
+            6002824: "AF-4AE Cyclone",
+            6003850: "MGR-S1 Gladius",
+            6003879: "MG-S1 Jackal",
+            6003925: "VE-S Canis",
+            6005968: "NSX-A Kappa",
+            6009203: "NS-66 Punisher"
         }
     # LMG
     elif cat == 6:
-        d={
-        1879:   "NC6A GODSAW",
-        1894:   "Betelgeuse 54-A",
-        1924:   'T9A "Butcher"'
+        d = {
+            1879: "NC6A GODSAW",
+            1894: "Betelgeuse 54-A",
+            1924: 'T9A "Butcher"'
         }
     # Assault Rifle
     elif cat == 7:
-        d={
-        1904:   "T1A Unity",
-        1909:   "Darkstar",
-        77822:  "Gauss Prime"
+        d = {
+            1904: "T1A Unity",
+            1909: "Darkstar",
+            77822: "Gauss Prime"
         }
     # Carbine
     elif cat == 8:
-        d={
-        1869:   "19A Fortuna",
-        1914:   "TRAC-Shot",
-        1919:   "Eclipse VE3A"
+        d = {
+            1869: "19A Fortuna",
+            1914: "TRAC-Shot",
+            1919: "Eclipse VE3A"
         }
     # Sniper Rifle
     elif cat == 11:
-        d={
-        1969:       "The Moonshot",
-        1974:       "Bighorn .50M",
-        1979:       "Parsec VX3-A",
-        802771:     "NS-AM7 Archer",
-        802910:     "NS-AM7B Archer",
-        802921:     "NS-AM7G Archer",
-        804255:     "NSX Daimyo",
-        6002918:    "NS-AM7 VS/AE Archer",
-        6002930:    "NS-AM7 AE/TR Archer",
-        6002943:    "NS-AM7 AE/NC Archer",
-        6004294:    "AM7-XOXO",
-        6004992:    "NS-AM8 Shortbow",
-        6006850:    "SR-200",
-        6008496:    "PSA-01 Hammerhead AMR",
-        6008652:    'NSX "Ivory" Daimyo',
-        6008670:    'NSX "Networked" Daimyo'
+        d = {
+            1969: "The Moonshot",
+            1974: "Bighorn .50M",
+            1979: "Parsec VX3-A",
+            802771: "NS-AM7 Archer",
+            802910: "NS-AM7B Archer",
+            802921: "NS-AM7G Archer",
+            # 804255: "NSX Daimyo",
+            6002918: "NS-AM7 VS/AE Archer",
+            6002930: "NS-AM7 AE/TR Archer",
+            6002943: "NS-AM7 AE/NC Archer",
+            6004294: "AM7-XOXO",
+            6004992: "NS-AM8 Shortbow",
+            6006850: "SR-200",
+            6008496: "PSA-01 Hammerhead AMR"
+            # 6008652: 'NSX "Ivory" Daimyo',
+            # 6008670: 'NSX "Networked" Daimyo'
         }
     # Grenades
     elif cat == 17:
-        d={
-        6050:       "Decoy Grenade",
-        6003418:    "NSX Fujin",
-        6004742:    "Water Balloon",
-        6004743:    "Water Balloon",
-        6004744:    "Water Balloon",
-        6004750:    "Flamewake Grenade",
-        6005304:    "Smoke Grenade",
-        6005472:    "NSX Raijin",
-        6007252:    "Water Balloon",
-        6009459:    "Lightning Grenade",
-        6009524:    "Condensate Grenade",
-        6009583:    "Infernal Grenade"
+        d = {
+            6050: "Decoy Grenade",
+            6003418: "NSX Fujin",
+            6004742: "Water Balloon",
+            6004743: "Water Balloon",
+            6004744: "Water Balloon",
+            6004750: "Flamewake Grenade",
+            6005304: "Smoke Grenade",
+            6005472: "NSX Raijin",
+            6007252: "Water Balloon",
+            6009459: "Lightning Grenade",
+            6009524: "Condensate Grenade",
+            6009583: "Infernal Grenade"
         }
     # Battle Rifle
     elif cat == 19:
-        d={
-        1984:       "GD Guardian",
-        1989:       "DMR-99",
-        1994:       "Revenant",
-        6004209:    "MGR-M1 Bishop",
-        6004214:    "VE-LR Obelisk",
-        6004216:    "MG-HBR1 Dragoon",
-        6005970:    "NSX-A Sesshin",
-        6009101:    "NS-30 Tranquility"
+        d = {
+            1984: "GD Guardian",
+            1989: "DMR-99",
+            1994: "Revenant",
+            6004209: "MGR-M1 Bishop",
+            6004214: "VE-LR Obelisk",
+            6004216: "MG-HBR1 Dragoon",
+            6005970: "NSX-A Sesshin",
+            6009101: "NS-30 Tranquility"
         }
     return id in d.keys()
+
 
 def get_weapons_categories():
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/item/?item_type_id=26&is_vehicle_weapon=0&c:limit=5000&c:show=item_id,item_category_id,name.en'
@@ -217,8 +217,9 @@ def get_weapons_categories():
 
     return cats
 
+
 def get_unknown_weapon():
-    n_data=dict()
+    n_data = dict()
     n_data["_id"] = 0
     n_data["name"] = "Unknown"
     n_data["points"] = 1
@@ -228,8 +229,8 @@ def get_unknown_weapon():
     return n_data
 
 
-def push_all_weapons(find_new = False):
-    giga_list=list()
+def push_all_weapons(find_new=False):
+    giga_list = list()
     for cat in we_cats.keys():
         if cat in ignored_categories:
             continue
@@ -273,12 +274,13 @@ def push_all_weapons(find_new = False):
             try:
                 n_data["faction"] = int(we["faction_id"])
             except KeyError:
-                n_data["faction"]  = 0
+                n_data["faction"] = 0
             giga_list.append(n_data)
             # To find new weapons:
             if find_new:
                 if not classes.Weapon.get(n_data["_id"]):
-                    print(f'Weapon not found in database: cat : {n_data["cat_id"]}, name: {n_data["name"]}, id: {n_data["_id"]}')
+                    print(
+                        f'Weapon not found in database: cat : {n_data["cat_id"]}, name: {n_data["name"]}, id: {n_data["_id"]}')
     giga_list.append(get_unknown_weapon())
     if not find_new:
         print("DB updated!")
@@ -297,6 +299,7 @@ def displayWeaponsFromCategorie(cat):
     for we in jdata["item_list"]:
         print(f"{we['item_id']};{we['name']['en']}")
 
+
 def get_all_categories():
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/item_category/?c:limit=500'
     response = requests.get(url)
@@ -310,5 +313,6 @@ def get_all_categories():
     for cat in jdata["item_category_list"]:
         di[int(cat["item_category_id"])] = cat["name"]["en"]
     return di
+
 
 push_all_weapons()

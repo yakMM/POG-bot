@@ -32,7 +32,10 @@ class PluginManager:
 
     async def clean(self):
         for p in self.plugins:
-            await p.clean()
+            try:
+                await p.clean()
+            except Exception as e:
+                log.error(f"Error occurred when clearing plugin {type(p).__name__}\n{e}")
 
     def __getattr__(self, item):
         return VirtualAttribute(self, item)
