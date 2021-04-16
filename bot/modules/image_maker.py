@@ -141,7 +141,7 @@ def _team_display(img: Image, draw: ImageDraw, team: 'classes.TeamScore', y_offs
         # Draw loadouts icons
         for j in range(len(loadouts)):
             # Get loadout icon
-            loadout_img = Image.open(f"../logos/{loadouts[j]}.png")
+            loadout_img = Image.open(f"../media/{loadouts[j]}.png")
             loadout_img = loadout_img.resize((80, 80))
             if len(loadouts) == 1:
                 # If only one loadout used, we put the icon in the middle
