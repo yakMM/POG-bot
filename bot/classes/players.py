@@ -545,9 +545,10 @@ class ActivePlayer:
 
     def on_team_ready(self, ready):
         self.__is_playing = ready
-        if ready:
-            self.__player_score = PlayerScore(self.id, self.team.team_score, self.name, self.ig_name, self.ig_id)
-            self.__player_score.stats = self.__player.stats
+
+    def on_match_starting(self):
+        self.__player_score = PlayerScore(self.id, self.team.team_score, self.name, self.ig_name, self.ig_id)
+        self.__player_score.stats = self.__player.stats
 
     async def accept_account(self):
         account_id = self.__account.id

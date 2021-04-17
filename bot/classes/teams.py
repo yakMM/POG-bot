@@ -58,9 +58,9 @@ class Team:
         # Excluding captain
         if self.match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_WAITING_2,
                                       MatchStatus.IS_PLAYING):
-            return [f"{p.mention} ({p.name}) [{p.ig_name}]" for p in self.__players[1:]]
+            return [f"- {p.mention} ({p.name}) [{p.ig_name}]" for p in self.__players[1:]]
         else:
-            return [f"{p.mention} ({p.name})" for p in self.__players[1:]]
+            return [f"- {p.mention} ({p.name})" for p in self.__players[1:]]
 
     @property
     def all_pings(self):
@@ -85,12 +85,14 @@ class Team:
 
     def on_team_ready(self, ready):
         self.__is_playing = ready
-        if ready:
-            self.__team_score = TeamScore(self.id, self.match, self.name, self.faction)
         for a_player in self.__players:
             a_player.on_team_ready(ready)
-            if ready:
-                self.__team_score.add_player(a_player.player_score)
+
+    def on_match_starting(self):
+        self.__team_score = TeamScore(self.id, self.match, self.name, self.faction)
+        for a_player in self.__players:
+            a_player.on_match_starting()
+            self.__team_score.add_player(a_player.player_score)
 
     def clear(self):
         self.__players.clear()

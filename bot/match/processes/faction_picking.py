@@ -30,7 +30,7 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
 
     def add_callbacks(self, rh):
 
-        @rh.reaction(cfg.emojis["vs"], cfg.emojis["nc"], cfg.emojis["tr"])
+        @rh.reaction(cfg.emojis["VS"], cfg.emojis["NC"], cfg.emojis["TR"])
         def check(reaction, player, user, msg):
             if not player.active:
                 raise reactions.UserLackingPermission
@@ -42,9 +42,9 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
             if not a_p.is_turn:
                 raise reactions.UserLackingPermission
 
-        @rh.reaction(cfg.emojis["vs"], cfg.emojis["nc"], cfg.emojis["tr"])
+        @rh.reaction(cfg.emojis["VS"], cfg.emojis["NC"], cfg.emojis["TR"])
         async def pick_faction(reaction, player, user, msg):
-            for faction in ["vs", "nc", "tr"]:
+            for faction in ["VS", "NC", "TR"]:
                 if str(reaction) == cfg.emojis[faction]:
                     ctx = ContextWrapper.wrap(self.match.channel)
                     ctx.author = user
@@ -107,7 +107,7 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
 
         # If other team didn't pick yet:
         if other.faction == 0:
-            self.reaction_handler.rem_reaction(cfg.emojis[arg.lower()])
+            self.reaction_handler.rem_reaction(cfg.emojis[arg.upper()])
             msg = await disp.PK_FACTION_OK_NEXT.send(self.match.channel, team.name, cfg.factions[team.faction],
                                                      other.captain.mention)
             return msg

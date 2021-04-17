@@ -89,7 +89,6 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         if self.is_first_round:
             team.on_team_ready(ready)
             if ready:
-                self.match.data.teams[team.id] = team.team_score
                 self.match.base_selector.clean()
                 self.match.command_factory.on_team_ready(team)
 
@@ -100,6 +99,10 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         if not other.captain.is_turn:
             self.rh.clear()
             self.match.ready_next_process()
+            if self.is_first_round:
+                for tm in self.match.teams:
+                    tm.on_match_starting()
+                    self.match.data.teams[tm.id] = tm.team_score
             return True
         return False
 

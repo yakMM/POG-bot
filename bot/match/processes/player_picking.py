@@ -72,7 +72,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
     def get_left_players_pings(self) -> list:
         """ The list of mentions of all players left to pick.
         """
-        pings = [f"{p.mention} ({p.name})" for p in self.players.values()]
+        pings = [f"- {p.mention} ({p.name})" for p in self.players.values()]
         return pings
 
     @Process.public

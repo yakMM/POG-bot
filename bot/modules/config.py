@@ -135,9 +135,9 @@ roles = {
 
 # Emojis
 emojis = {
-    "vs": "",
-    "tr": "",
-    "nc": ""
+    "VS": "",
+    "TR": "",
+    "NC": ""
 }
 
 # Scores

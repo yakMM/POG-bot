@@ -177,7 +177,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
     def get_left_players_pings(self) -> list:
         """ The list of mentions of all players left to pick.
         """
-        pings = [f"{p.mention} ({p.name})" for p in self.p_list]
+        pings = [f"- {p.mention} ({p.name})" for p in self.p_list]
         return pings
 
     def find_captain(self):

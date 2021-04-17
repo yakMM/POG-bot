@@ -65,7 +65,8 @@ class CommandFactory(metaclass=MetaFactory):
     @Command.has_status("pick_status")
     @Command.command(*picking_states)
     async def pick(self, ctx, args):
-        captain, msg = get_check_captain(ctx, self.match)
+        check_turn = self.match.status not in (MatchStatus.IS_BASING, MatchStatus.IS_WAITING)
+        captain, msg = get_check_captain(ctx, self.match, check_turn=check_turn)
         if msg:
             await msg
             return

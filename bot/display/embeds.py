@@ -324,10 +324,10 @@ def global_info(ctx, lobby, match_list):
         if m.status is MatchStatus.IS_PLAYING:
             desc += f"\nTime Remaining: **{m.get_formatted_time_to_round_end()}**"
         if m.base:
-            desc += f"\nBase: **{m.base.name}**"
+            desc += f"\nBase: [{m.base.name}]({cfg.base_images[m.base.id]})"
         for tm in m.teams:
             if tm and tm.faction != 0:
-                desc += f"\n{tm.name}: **{cfg.factions[tm.faction]}**"
+                desc += f"\n{tm.name}: {cfg.emojis[cfg.factions[tm.faction]]} {cfg.factions[tm.faction]}"
 
         embed.add_field(name=m.channel.name, value=desc, inline=False)
     return embed
@@ -372,13 +372,16 @@ def team_update(arg, match):
                 value = f"Captain: {cap_mention}\n"
             if tm.player_pings:
                 value += "Players:\n" + '\n'.join(tm.player_pings)
+            faction = ""
+            if tm.faction != 0:
+                faction = f"{cfg.emojis[cfg.factions[tm.faction]]} {cfg.factions[tm.faction]}"
             if match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_WAITING_2):
                 if tm.captain.is_turn:
-                    name = f"{tm.name} [{cfg.factions[tm.faction]}] - not ready"
+                    name = f"{tm.name} - {faction} - not ready"
                 else:
-                    name = f"{tm.name} [{cfg.factions[tm.faction]}] - ready"
-            elif tm.faction != 0:
-                name = f"{tm.name} [{cfg.factions[tm.faction]}]"
+                    name = f"{tm.name} - {faction} - ready"
+            elif faction:
+                name = f"{tm.name} - {faction}"
             else:
                 name = f"{tm.name}"
             embed.add_field(name=name,
@@ -408,11 +411,13 @@ def jaeger_calendar(arg):
 
 
 def base_display(ctx, base, is_booked):
+    description = f"[Full Base Pool]" \
+                  f"(https://docs.google.com/presentation/d/1xOtNU4THuHe7PTj8RcVpLOLmfQk9zL9QmN9JYR29c5U)"
     if is_booked:
         embed = Embed(colour=Color.red(), title=base.name,
-                      description="WARNING! This base seems to be unavailable!")
+                      description=f"{description}\nWARNING! This base seems to be unavailable!")
     else:
-        embed = Embed(colour=Color.blue(), title=base.name)
+        embed = Embed(colour=Color.blue(), title=base.name, description=description)
     if base.id in cfg.base_images:
         embed.set_image(url=cfg.base_images[base.id])
     else:
