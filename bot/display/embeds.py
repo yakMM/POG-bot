@@ -201,8 +201,8 @@ def register_status(ctx, player):
     if player.has_own_account:
         value = "You are registered with the following Jaeger characters:\n`{}`, `{}`, `{}`".format(*player.ig_names)
     else:
-        value = "You are registered without a Jaeger account!\nIf you have your own "\
-                         "account, please re-register with your Jaeger characters."
+        value = "You are registered without a Jaeger account!\nIf you have your own " \
+                "account, please re-register with your Jaeger characters."
     embed.add_field(name="Account", value=value, inline=False)
     embed.add_field(name="Help",
                     value="Use `=notify` to join or leave the notify feature\n"
@@ -231,8 +231,8 @@ def account(ctx, account):
         desc = "This account token is no longer valid"
         color = Color.dark_grey()
     elif account.is_validated:
-        desc = f'Id: `{account.str_id}`\n' + f'Username: `{account.username}`\n' + f'Password: `{account.password}`\n'\
-                'Note: This account is given to you only for the time of **ONE** match'
+        desc = f'Id: `{account.str_id}`\n' + f'Username: `{account.username}`\n' + f'Password: `{account.password}`\n' \
+                                                                                   'Note: This account is given to you only for the time of **ONE** match'
         color = Color.green()
     else:
         desc = "Accept the rules by reacting with a checkmark to get your account details."
@@ -469,28 +469,28 @@ def usage(ctx, data):
             name = f'User: <@{use["id"]}>'
         else:
             name = f'POG account {use["id"]}'
-        lead = tools.timestamp_now() - use["time_stop"]
-        if lead < 60:
-            lead_str = f"{lead} second(s) ago"
-        elif lead < 3600:
-            lead //= 60
-            lead_str = f"{lead} minute(s) ago"
-        elif lead < 86400:
-            lead //= 3600
-            lead_str = f"{lead} hour(s) ago"
-        elif lead < 604800:
-            lead //= 86400
-            lead_str = f"{lead} day(s) ago"
-        elif lead < 2419200:
-            lead //= 604800
-            lead_str = f"{lead} week(s) ago"
-        else:
-            lead //= 2419200
-            lead_str = f"{lead} month(s) ago"
-
+        lead_str = tools.time_diff(use["time_stop"]) + " ago"
         embed.add_field(name=lead_str,
-                        value=name+f'\nMatch {use["match_id"]}\n'
-                        f'Starting time: {dt.utcfromtimestamp(use["time_start"]).strftime("%Y-%m-%d %H:%M UTC")}\n'
-                        f'Stopping time: {dt.utcfromtimestamp(use["time_stop"]).strftime("%Y-%m-%d %H:%M UTC")}\n',
+                        value=name + f'\nMatch {use["match_id"]}\n'
+                                     f'Starting time: {dt.utcfromtimestamp(use["time_start"]).strftime("%Y-%m-%d %H:%M UTC")}\n'
+                                     f'Stopping time: {dt.utcfromtimestamp(use["time_stop"]).strftime("%Y-%m-%d %H:%M UTC")}\n',
                         inline=False)
+    return embed
+
+
+def psb_usage(ctx, player, usages):
+    string_list = list()
+    embed = Embed(
+        colour=Color.blue(),
+        title='POG participation',
+        description=f"Handle: {player.mention}\nName: {player.name}\nID: `{player.id}`\n"
+    )
+    for use in usages[::-1]:
+        bef = "✅" if use.num else "❌"
+        pref = "**" if use.num else ""
+        match_str = "matches" if use.num > 1 else "match"
+        embed.add_field(name=f"{bef} Week {use.week_num}",
+                        value=f"From {use.start_str} to {use.end_str}\n{pref}{use.num} {match_str}{pref}",
+                        inline=False)
+
     return embed

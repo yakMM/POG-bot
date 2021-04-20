@@ -35,6 +35,7 @@ import modules.database
 import modules.message_filter
 import modules.accounts_handler
 import modules.signal
+import modules.stat_processor
 
 # Classes
 from match.classes.match import Match
@@ -334,6 +335,9 @@ def main(launch_str=""):
 
     # Init signal handler
     modules.signal.init()
+
+    # Init stat processor
+    modules.stat_processor.init()
 
     # Add init handlers
     _add_init_handlers(client)

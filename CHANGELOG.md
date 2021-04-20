@@ -1,3 +1,7 @@
+# v3.3:
+- Added stat processor module
+- Added =psb command for usage tracking
+
 # v3.2:
 - Added locking mechanic on reaction handler to avoid errors due to players spamming the reactions
 - Overhauled the use of async functions for critical events

@@ -277,7 +277,7 @@ class Player:
     async def on_match_selected(self, m):
         self.__match = m
         self.__lobby_stamp = 0
-        self.__stats = await PlayerStat.get_from_database(self.__id)
+        self.__stats = await PlayerStat.get_from_database(self.__id, self.__name)
 
     def copy_ig_info(self, player):
         self.__ig_names = player.ig_names.copy()

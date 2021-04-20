@@ -12,5 +12,5 @@ async def on_stats(user):
         await disp.NO_RULE.send(user, "stats", cfg.channels["rules"])
         return
     log.info(f"Stats request from player id: [{player.id}], name: [{player.name}]")
-    stat_player = await PlayerStat.get_from_database(player.id)
+    stat_player = await PlayerStat.get_from_database(player.id, player.name)
     await disp.DISPLAY_STATS.send(user, stats=stat_player)

@@ -2,8 +2,9 @@ import modules.database as db
 
 
 class PlayerStat:
-    def __init__(self, p_id, data=None):
+    def __init__(self, p_id, name, data=None):
         self.id = p_id
+        self.name = name
         if data:
             self.matches = data["matches"]
             self.kills = data["kills"]
@@ -21,10 +22,14 @@ class PlayerStat:
     def nb_matches_played(self):
         return len(self.matches)
 
+    @property
+    def mention(self):
+        return f"<@{self.id}>"
+
     @classmethod
-    async def get_from_database(cls, p_id):
+    async def get_from_database(cls, p_id, name):
         dta = await db.async_db_call(db.get_element, "player_stats", p_id)
-        return cls(p_id, dta)
+        return cls(p_id, name=name, data=dta)
 
     def add_data(self, match_id, dta):
         self.matches.append(match_id)

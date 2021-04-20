@@ -10,6 +10,7 @@ import modules.lobby as lobby
 from match import MatchStatus
 
 from display import ContextWrapper
+import modules.tools as tools
 
 log = getLogger("pog_bot")
 
@@ -42,7 +43,10 @@ def test_hand(client):
     @client.command()
     @commands.guild_only()
     async def w(ctx, *args):
-        await asyncio.sleep(60)
+        time = tools.time_calculator("".join(args))
+        ts = tools.timestamp_now() - time
+        t_str = tools.time_diff(ts)
+        print(t_str)
 
 
 async def launch(ctx, id_list, tier):
