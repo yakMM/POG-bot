@@ -1,6 +1,8 @@
 # v3.3:
 - Added stat processor module
 - Added =psb command for usage tracking
+- Changed the way DM messages are handled
+- updated = timeout command
 
 # v3.2:
 - Added locking mechanic on reaction handler to avoid errors due to players spamming the reactions

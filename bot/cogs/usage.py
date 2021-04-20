@@ -29,19 +29,15 @@ class RegisterCog(commands.Cog, name='muted'):
     async def cog_check(self, ctx):  # Check if right channel
         return ctx.channel.id == cfg.channels['usage']
 
-    @commands.command(aliases=['a'])
+    @commands.command(aliases=['u'])
     @commands.guild_only()
-    async def account(self, ctx, *args):
-        if len(args) != 1:
-            await disp.RM_MENTION_ONE.send(ctx)
-            return
-        arg = args[0]
+    async def usage(self, ctx, *args):
         if len(ctx.message.mentions) == 1:
             r_id = ctx.message.mentions[0].id
         else:
             try:
-                r_id = int(arg)
-            except ValueError:
+                r_id = int(args[0])
+            except (ValueError, IndexError):
                 await disp.RM_MENTION_ONE.send(ctx)
                 return
         data = await db.async_db_call(db.get_element, "accounts_usage", r_id)
@@ -50,13 +46,9 @@ class RegisterCog(commands.Cog, name='muted'):
         else:
             await disp.ACCOUNT_USAGE.send(ctx, data=data)
 
-    @commands.command(aliases=['u'])
+    @commands.command()
     @commands.guild_only()
-    async def usage(self, ctx, *args):
-        if len(args) < 1:
-            await disp.RM_MENTION_ONE.send(ctx)
-            return
-
+    async def stats(self, ctx, *args):
         if len(ctx.message.mentions) == 1:
             p_id = ctx.message.mentions[0].id
         else:
@@ -69,26 +61,31 @@ class RegisterCog(commands.Cog, name='muted'):
             return
 
         time = 0
-        if len(args) > 1:
-            time = tools.time_calculator("".join(args[1:]))
+        if len(args) > 0:
+            time = tools.time_calculator(" ".join(args))
             if time == 0:
                 await disp.WRONG_USAGE.send(ctx, ctx.command.name)
                 return
-            time = tools.timestamp_now() - tools.time_calculator("".join(args[1:]))
+            time = tools.timestamp_now() - tools.time_calculator(" ".join(args))
         else:
             time = stat_processor.oldest
 
-        num = stat_processor.get_num_matches(stat_player, time)
+        num = len(stat_processor.get_matches_in_time(stat_player, time))
         t_str = tools.time_diff(time)
-        await disp.DISPLAY_USAGE.send(ctx, p_id, num, t_str, dt.utcfromtimestamp(time).strftime("%Y-%m-%d %H:%M UTC"))
+        num_str = ""
+        suffix = ""
+        if num == 0:
+            num_str = "no"
+        else:
+            num_str = str(num)
+        if num > 1:
+            suffix = "es"
+
+        await disp.DISPLAY_USAGE.send(ctx, p_id, num_str, suffix, t_str, dt.utcfromtimestamp(time).strftime("%Y-%m-%d %H:%M UTC"))
 
     @commands.command()
     @commands.guild_only()
     async def psb(self, ctx, *args):
-        if len(args) < 1:
-            await disp.RM_MENTION_ONE.send(ctx)
-            return
-
         if len(ctx.message.mentions) == 1:
             p_id = ctx.message.mentions[0].id
         else:
@@ -105,7 +102,7 @@ class RegisterCog(commands.Cog, name='muted'):
             await disp.NO_DATA.send(ctx)
             return
 
-        req_date, usages = stat_processor.format_for_psb(stat_player, args[1:])
+        req_date, usages = stat_processor.format_for_psb(stat_player, args)
 
         await disp.PSB_USAGE.send(ctx, stat_player.mention, req_date, player=stat_player, usages=usages)
 

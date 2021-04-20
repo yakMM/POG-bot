@@ -181,7 +181,7 @@ class MatchData:
         await db.async_db_call(db.set_element, "matches", self.id, self.get_data())
         for tm in self.teams:
             for p in tm.players:
-                await p.update_stats()
+                await p.db_update_stats()
 
 
 _process_list = [CaptainSelection, PlayerPicking, FactionPicking, BasePicking, GettingReady, MatchPlaying,

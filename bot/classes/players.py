@@ -146,8 +146,7 @@ class Player:
             else:
                 await db.async_db_call(db.unset_field, "users", self.id, doc)
         elif arg == "timeout":
-            if self.__timeout != 0:
-                await db.async_db_call(db.set_field, "users", self.id, {"timeout": self.__timeout})
+            await db.async_db_call(db.set_field, "users", self.id, {"timeout": self.__timeout})
         elif arg == "name":
             await db.async_db_call(db.set_field, "users", self.id, {"name": self.__name})
         else:

@@ -76,6 +76,7 @@ async def perms_muted(value, p_id):
         if memb in channel.overwrites:
             await channel.set_permissions(memb, overwrite=None)
 
+
 async def modify_match_channel(channel, view):
     ov_notify = channel.overwrites_for(_roles_dict["notify"])
     ov_registered = channel.overwrites_for(_roles_dict["registered"])
@@ -86,6 +87,7 @@ async def modify_match_channel(channel, view):
     await channel.set_permissions(_roles_dict["notify"], overwrite=ov_notify)
     await channel.set_permissions(_roles_dict["registered"], overwrite=ov_registered)
     # await channel.edit(name=f"pog-match-{match.id}")
+
 
 async def channel_freeze(value, id):
     channel = _guild.get_channel(id)

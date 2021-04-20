@@ -131,10 +131,11 @@ def usage_help(ctx):
     """ Returns base help embed
     """
     embed = Embed(colour=Color.blurple())
-    embed.add_field(name='Get the last POG account usages by id or by mention',
-                    value=f'`=usage 2` - Get last usages of POG account 2\n'
-                          f'`=usage user_id` - Get last usages of the user matching the provided discord ID\n'
-                          f'`=usage @user` - Get last usages of the mentioned user',
+    embed.add_field(name='POG usage commands',
+                    value=f'`=usage x` - Get last usages of POG account x\n'
+                          f'`=usage @user` - Get last usages of the mentioned user\n'
+                          f'`=psb @user (date)` - Get user activity formatted for PSB purposes\n'
+                          f'`=stats @user (duration)` - Get player stats for the duration provided',
                     inline=False)
     return embed
 
@@ -149,6 +150,18 @@ def timeout_help(ctx):
                           '`=timeout @player 10 minutes` - Mute @player from POG for 10 minutes\n'
                           '`=timeout @player remove` - Unmute @player from POG\n'
                           '`=timeout @player` - Get info on current timeout for @player',
+                    inline=False)
+    return embed
+
+
+def dm_help(ctx):
+    """ Returns timeout help embed
+    """
+    embed = Embed(colour=Color.blurple())
+    embed.add_field(name='Direct Message commands',
+                    value='`help` - Display this prompt\n'
+                          '`stats` - Display your POG stats\n'
+                          '`modmail` (`dm`) - Send a message to POG staff\n',
                     inline=False)
     return embed
 
@@ -211,17 +224,6 @@ def register_status(ctx, player):
     return embed
 
 
-def player_stats(ctx, stats):
-    embed = Embed(colour=Color.blue(), title="Player stats",
-                  description=f"POG stats for <@{stats.id}>\nNote: Tracking stats only after POG match 569")
-    embed.add_field(name="Number of matches played", value=stats.nb_matches_played, inline=False)
-    embed.add_field(name="Raw POG net", value=stats.net, inline=False)
-    embed.add_field(name="Raw POG score", value=stats.score, inline=False)
-    embed.add_field(name="Number of POG kills", value=stats.kills, inline=False)
-    embed.add_field(name="Number of POG deaths", value=stats.deaths, inline=False)
-    return embed
-
-
 def account(ctx, account):
     """ Returns account message embed
     """
@@ -259,11 +261,16 @@ def auto_help(ctx):
     if ctx.channel_id in cfg.channels['matches']:
         return match_help(ctx)
     if ctx.channel_id == cfg.channels['muted']:
-        return muted_help(ctx)
+        if ctx.author and is_admin(ctx.author):
+            return timeout_help(ctx)
+        else:
+            return muted_help(ctx)
     if ctx.channel_id == cfg.channels['staff']:
         return admin_help(ctx)
     if ctx.channel_id == cfg.channels['usage']:
         return usage_help(ctx)
+    if ctx.author and ctx.author.id == ctx.channel_id:
+        return dm_help(ctx)
     return default_help(ctx)
 
 
@@ -435,9 +442,14 @@ def join_ts(ctx):
     return embed
 
 
-def direct_message(ctx, msg):
+def direct_message(ctx, player, msg):
+    description = f"Received a DM"
+    if player:
+        description += f"\nHandle: {player.mention}\nName: {player.name}\nID: `{player.id}`\n"
+    else:
+        description += f" from unregistered user {msg.author.mention} (id: {msg.author.id})\n"
     embed = Embed(colour=Color.dark_grey(), title="Direct Message",
-                  description=f"Received a DM from {msg.author.mention}")
+                  description=description)
     embed.add_field(name=f"Message:",
                     value=msg.content,
                     inline=False)
@@ -485,12 +497,36 @@ def psb_usage(ctx, player, usages):
         title='POG participation',
         description=f"Handle: {player.mention}\nName: {player.name}\nID: `{player.id}`\n"
     )
+    # for use in usages[::-1]:
+    #     bef = "✅" if use.num else "❌"
+    #     pref = "**" if use.num else ""
+    #     match_str = "matches" if use.num > 1 else "match"
+    #     embed.add_field(name=f"{bef} Week {use.week_num}",
+    #                     value=f"From {use.start_str} to {use.end_str}\n{pref}{use.num} {match_str}{pref}",
+    #                     inline=False)
     for use in usages[::-1]:
         bef = "✅" if use.num else "❌"
         pref = "**" if use.num else ""
         match_str = "matches" if use.num > 1 else "match"
-        embed.add_field(name=f"{bef} Week {use.week_num}",
-                        value=f"From {use.start_str} to {use.end_str}\n{pref}{use.num} {match_str}{pref}",
-                        inline=False)
+        string_list.append(f"{bef} {pref}Week {use.week_num} "
+                           f"[{use.start_str} - {use.end_str}] {use.num} {match_str}{pref}")
+    embed.add_field(name="Participation", value="\n".join(string_list), inline=False)
 
+    return embed
+
+
+def player_stats(ctx, stats, recent_stats):
+    embed = Embed(title=f"{stats.name}'s Stats:", colour=Color.blue())
+    embed.add_field(name="Recent (last 2 weeks)",
+                    value=f"Matches played: {recent_stats.nb_matches_played}\n"
+                          f"Score: {recent_stats.score}\n"
+                          f"Kills per match: {recent_stats.kpm}",
+                    inline=False)
+    embed.add_field(name="All time",
+                    value=f"Matches played: {stats.nb_matches_played}\n"
+                          f"Total score: {stats.score}\n"
+                          f"Kills per match: {stats.kpm}",
+                    inline=False)
+
+    embed.set_footer(text="Note: Tracking stats only after POG match 569.")
     return embed

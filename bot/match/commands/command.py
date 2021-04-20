@@ -94,7 +94,7 @@ class InstantiatedCommand:
             await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
             return
         if self.__has_status:
-            if len(args) == 0 or (len(args) == 1 and (args[0] == "help" or args[0] == "h")):
+            if (len(args) == 0 and not ctx.message.mentions) or (len(args) == 1 and (args[0] == "help" or args[0] == "h")):
                 try:
                     await self.__parent.match.get_process_attr(self.__has_status)(ctx)
                     return

@@ -16,7 +16,7 @@ import modules.census as census
 import modules.lobby as lobby
 import modules.tools as tools
 import modules.accounts_handler as accounts_sheet
-import modules.message_filter as msg_filter
+import modules.spam_checker as spam_checker
 import asyncio
 
 from match.classes.match import Match
@@ -97,14 +97,10 @@ class AdminCog(commands.Cog, name='admin'):
         player = await get_check_player(ctx)
         if not player:
             return
-        fields = list()
-        for arg in args:
-            if "@" not in arg:
-                fields.append(arg)
-        if len(fields) == 0:
+        if len(args) == 0:
             await disp.WRONG_USAGE.send(ctx, ctx.command.name)
             return
-        new_name = " ".join(fields)
+        new_name = " ".join(args)
         await player.change_name(new_name)
         await disp.RM_NAME_CHANGED.send(ctx, player.mention, new_name)
     
@@ -159,11 +155,11 @@ class AdminCog(commands.Cog, name='admin'):
             await disp.WRONG_USAGE.send(ctx, ctx.command.name)
             return
         if arg == "clear":
-            msg_filter.clear_spam_list()
+            spam_checker.clear_spam_list()
             await disp.SPAM_CLEARED.send(ctx)
             return
         if arg == "debug":
-            all_spammers = msg_filter.debug()
+            all_spammers = spam_checker.debug()
             giga_string = ""
             for k in all_spammers.keys():
                 p = Player.get(k)
@@ -183,8 +179,9 @@ class AdminCog(commands.Cog, name='admin'):
             await disp.WRONG_CHANNEL.send(ctx, ctx.command.name, f'<#{cfg.channels["lobby"]}>')
             return
         if len(args) > 0 and args[0] == "restore":
-            for p_id in args[1:]:
+            for mention in ctx.message.mentions:
                 try:
+                    p_id = mention.id
                     player = Player.get(int(p_id))
                     if player and not lobby.is_lobby_stuck() and player.is_registered:
                         lobby.add_to_lobby(player)
@@ -206,9 +203,6 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def timeout(self, ctx, *args):
-        if len(args) == 0:
-            await disp.RM_TIMEOUT_HELP.send(ctx)
-            return
         if len(args) == 1 and args[0] == "help":
             await disp.RM_TIMEOUT_HELP.send(ctx)
             return
@@ -227,7 +221,8 @@ class AdminCog(commands.Cog, name='admin'):
         if player.match:
             await disp.RM_IN_MATCH.send(ctx)
             return
-        if len(args) == 1:
+
+        if len(args) == 0:
             if player.is_timeout:
                 await disp.RM_TIMEOUT_INFO.send(ctx, dt.utcfromtimestamp(player.timeout).strftime("%Y-%m-%d %H:%M UTC"))
                 return
@@ -236,10 +231,7 @@ class AdminCog(commands.Cog, name='admin'):
             await disp.RM_TIMEOUT_NO.send(ctx)
             return
         # =timeout @player remove
-        if len(args) == 2 and args[1] == 'remove':
-            if not player.is_timeout:
-                await disp.RM_TIMEOUT_ALREADY.send(ctx)
-                return
+        if len(args) == 1 and args[0] == 'remove':
             player.timeout = 0
             await player.db_update("timeout")
             await disp.RM_TIMEOUT_FREE.send(ctx, player.mention)
@@ -247,26 +239,13 @@ class AdminCog(commands.Cog, name='admin'):
             await roles.perms_muted(False, player.id)
             return
         # Check if command is correct (=timeout @player 12 d)
-        if len(args) != 3:
+
+        time = tools.time_calculator(" ".join(args))
+        if time == 0:
             await disp.RM_TIMEOUT_INVALID.send(ctx)
             return
-        if args[2] in ['d', 'day', 'days']:
-            time = 86400
-        elif args[2] in ['h', 'hour', 'hours']:
-            time = 3600
-        elif args[2] in ['m', 'min', 'mins', 'minute', 'minutes']:
-            time = 60
-        else:
-            await disp.RM_TIMEOUT_INVALID.send(ctx)
-            return
-        try:
-            time *= int(args[1])
-            if time == 0:
-                raise ValueError
-        except ValueError:
-            await disp.RM_TIMEOUT_INVALID.send(ctx)
-            return
-        end_time = tools.timestamp_now()+time
+
+        end_time = tools.timestamp_now() + time
         player.timeout = end_time
         await roles.role_update(player)
         await player.db_update("timeout")

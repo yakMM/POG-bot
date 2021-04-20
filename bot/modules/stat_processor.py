@@ -1,8 +1,13 @@
 
 
+from match.classes import Match
 import modules.database as db
 from datetime import datetime as dt, timezone as tz, date as dt_date, time as dt_time, timedelta as dt_delta
 import modules.tools as tools
+from classes import PlayerStat
+from logging import getLogger
+
+log = getLogger("pog_bot")
 
 _match_stamps = dict()
 
@@ -18,17 +23,17 @@ def init():
     db.get_all_elements(add_match, "matches")
 
 
-def get_num_matches(player, time):
-    num = 0
+def get_matches_in_time(player, time):
+    matches_to_query = list()
     for m_id in player.matches[::-1]:
         try:
             if _match_stamps[m_id] >= time:
-                num += 1
+                matches_to_query.append(m_id)
             else:
                 break
         except KeyError:
             pass
-    return num
+    return matches_to_query
 
 
 def get_previous_week(date):
@@ -36,6 +41,27 @@ def get_previous_week(date):
     end = dt.combine(dt_date.fromisocalendar(iso_date[0], iso_date[1], 1), dt_time(tzinfo=tz.utc))
     start = end - dt_delta(weeks=1)
     return start, end
+
+
+async def get_new_stats(player, time=tools.timestamp_now()-1209600):
+    m_list = get_matches_in_time(player, time)
+    new_p_stats = PlayerStat(player.id, player.name)
+    for m_id in m_list:
+        match = await Match.get_from_database(m_id)
+        if not match:
+            log.error(f"get_new_stats: Couldn't find match {m_id} in database!")
+            continue
+        found = False
+        for tm in match.data.teams:
+            for p_score in tm.players:
+                if int(p_score.id) == player.id:
+                    p_score.stats = new_p_stats
+                    p_score.update_stats()
+                    found = True
+                    break
+            if found:
+                break
+    return new_p_stats
 
 
 class PsbWeekUsage:
@@ -63,11 +89,11 @@ class PsbWeekUsage:
 
     @property
     def start_str(self):
-        return self.start.strftime("%B %d")
+        return self.start.strftime("%b %d")
 
     @property
     def end_str(self):
-        return self.end.strftime("%B %d")
+        return self.end.strftime("%b %d")
 
 
 def format_for_psb(player, args):

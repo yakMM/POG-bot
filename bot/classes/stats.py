@@ -23,6 +23,12 @@ class PlayerStat:
         return len(self.matches)
 
     @property
+    def kpm(self):
+        if self.nb_matches_played == 0:
+            return "{:.1f}".format(0)
+        return "{:.1f}".format(self.kills / self.nb_matches_played)
+
+    @property
     def mention(self):
         return f"<@{self.id}>"
 

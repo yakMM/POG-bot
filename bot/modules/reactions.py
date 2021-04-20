@@ -4,7 +4,7 @@ from logging import getLogger
 
 from lib.tasks import loop, Loop
 
-from modules.message_filter import is_spam, unlock
+from modules.spam_checker import is_spam, unlock
 
 import asyncio
 

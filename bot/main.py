@@ -129,6 +129,7 @@ def _add_main_handlers(client):
             return
         # reaction to the rule message?
         if payload.message_id == cfg.general["rules_msg_id"]:
+            print(str(payload.emoji))
             if str(payload.emoji) == "✅":
                 p = Player.get(payload.member.id)
                 if not p:  # if new player

@@ -199,10 +199,8 @@ class AllStrings(Enum):
     ACC_GIVING = Message("Sent a Jaeger account for {}!", ping=False)
 
     NO_DATA = Message("No data for this id!")
-    ACCOUNT_NO = Message("No account usage found for this id!")
     ACCOUNT_USAGE = Message("Here is the POG account usage for this user:", embed=embeds.usage)
-    USAGE_NO = Message("No POG usage found for this id!")
-    DISPLAY_USAGE = Message("<@{}> played {} POG matches in the last {}. \n(since {})", ping=False)
+    DISPLAY_USAGE = Message("<@{}> played {} POG match{} in the last {}. \n(since {})", ping=False)
     PSB_USAGE = Message("Here is the participation for {}, with start date {}:", ping=False, embed=embeds.psb_usage)
 
     NOTIFY_REMOVED = Message("You left Notify!")

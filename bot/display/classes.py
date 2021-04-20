@@ -79,10 +79,10 @@ class ContextWrapper:
     @classmethod
     def user(cls, user_id):
         user = cls.client.get_user(user_id)
-        return cls(user, "x", user_id, None, user.send)
+        return cls(user, "?", user_id, None, user.send)
 
     @classmethod
-    def channel(cls, channel_id, cmd_name="x"):
+    def channel(cls, channel_id, cmd_name="?"):
         channel = cls.client.get_channel(channel_id)
         return cls(None, cmd_name, channel_id, None, channel.send)
 

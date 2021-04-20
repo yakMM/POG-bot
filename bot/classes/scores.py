@@ -175,8 +175,11 @@ class PlayerScore:
                 return result
         return result
 
-    async def update_stats(self):
+    def update_stats(self):
         self.stats.add_stats(self)
+
+    async def db_update_stats(self):
+        self.update_stats()
         await db.async_db_call(db.set_element, "player_stats", self.__id, self.stats.get_data())
 
     @property
@@ -190,6 +193,10 @@ class PlayerScore:
     @property
     def name(self):
         return self.__name
+
+    @property
+    def id(self):
+        return self.__id
 
     @property
     def ig_id(self):
@@ -313,7 +320,7 @@ class Loadout:
     @classmethod
     def new_from_data(cls, p_score, data):
         obj = cls(data["loadout_id"], p_score)
-        obj.__score = data["net"]
+        obj.__score = data["score"]
         obj.__net = data["net"]
         obj.__deaths = data["deaths"]
         obj.__kills = data["kills"]
