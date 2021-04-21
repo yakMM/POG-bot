@@ -19,7 +19,7 @@ def init():
     def add_match(match):
         global oldest
         _match_stamps[match["_id"]] = match["round_stamps"][0]
-        oldest = match["round_stamps"][0] if oldest ==0 else min(match["round_stamps"][0], oldest)
+        oldest = match["round_stamps"][0] if oldest == 0 else min(match["round_stamps"][0], oldest)
     db.get_all_elements(add_match, "matches")
 
 
