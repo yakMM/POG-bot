@@ -229,13 +229,13 @@ class MatchObjects:
 
     def ready_next_process(self, *args):
         self.status = MatchStatus.IS_RUNNING
-        self.progress_index += 1
         if self.progress_index == len(_process_list):
             self.current_process = None
             self.plugin_manager.on_match_over()
             self.clean_critical()
         else:
             self.current_process = _process_list[self.progress_index](self, *args)
+        self.progress_index += 1
 
     def start_next_process(self):
         if self.current_process:
@@ -245,7 +245,8 @@ class MatchObjects:
 
     def on_spin_up(self, p_list):
         self.data.id = Match._last_match_id
-        self.current_process = _process_list[self.progress_index](self, p_list)
+        self.ready_next_process(p_list)
+        self.clean_channel.cancel()
         self.plugin_manager.on_match_launching()
         self.start_next_process()
 
@@ -292,12 +293,13 @@ class MatchObjects:
         self.result_msg = None
         self.check_offline = True
         self.check_validated = True
+        self.clean_channel.change_interval(minutes=2)
         self.clean_channel.start(display=True)
         self.progress_index = 0
         self.status = MatchStatus.IS_FREE
         lobby.on_match_free()
 
-    @loop(count=1)
+    @loop(count=2, delay=1)
     async def clean_channel(self, display):
         if display:
             await disp.MATCH_CHANNEL_OVER.send(self.channel)
