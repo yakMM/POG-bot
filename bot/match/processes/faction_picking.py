@@ -1,6 +1,7 @@
 from display.strings import AllStrings as disp
 from display.classes import ContextWrapper
 from asyncio import sleep
+import discord
 
 import modules.config as cfg
 
@@ -25,8 +26,13 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
     @Process.init_loop
     async def init_loop(self):
         await sleep(0)
-        msg = await disp.PK_OK_FACTION.send(self.match.channel, self.picking_captain.mention, match=self.match.proxy)
-        await self.reaction_handler.set_new_msg(msg)
+        for i in range(3):
+            try:
+                msg = await disp.PK_OK_FACTION.send(self.match.channel, self.picking_captain.mention, match=self.match.proxy)
+                await self.reaction_handler.set_new_msg(msg)
+                break
+            except discord.NotFound:
+                pass
 
     def add_callbacks(self, rh):
 

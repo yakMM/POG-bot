@@ -1,3 +1,5 @@
+import discord
+
 from match import MatchStatus
 
 from display import AllStrings as disp, ContextWrapper
@@ -67,9 +69,14 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
 
             await disp.ACC_SENT.send(self.match.channel)
 
-        msg = await disp.MATCH_CONFIRM.send(self.match.channel, self.match.teams[0].captain.mention,
-                                            self.match.teams[1].captain.mention, match=self.match.proxy)
-        await self.rh.set_new_msg(msg)
+        for i in range(3):
+            try:
+                msg = await disp.MATCH_CONFIRM.send(self.match.channel, self.match.teams[0].captain.mention,
+                                                    self.match.teams[1].captain.mention, match=self.match.proxy)
+                await self.rh.set_new_msg(msg)
+                break
+            except discord.NotFound:
+                pass
 
     @Process.public
     async def clear(self, ctx):
