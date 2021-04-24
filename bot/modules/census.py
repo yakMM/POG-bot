@@ -40,7 +40,7 @@ async def process_score(match: 'match.classes.MatchData', start_time: int, match
         # URL for current player
         url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_event/?character_id=' \
               f'{player.ig_id}&type=KILL&after={start}&before={end}&c:limit=500'
-        j_data = await http_request(url)
+        j_data = await http_request(url, retries=6)
 
         # If no data, skip this player
         if j_data["returned"] == 0:
@@ -125,7 +125,7 @@ async def get_captures(match: 'match.classes.MatchData', start: int, end: int):
     # URL to get events
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/world_event/' + \
           f'?world_id=19&after={start}&before={end}&c:limit=500'
-    j_data = await http_request(url)
+    j_data = await http_request(url, retries=6)
     if j_data["returned"] == 0:
         # No event
         log.warning(f'No event found for base! (url={url})')

@@ -2,6 +2,7 @@ from display.strings import AllStrings as disp
 from display.classes import ContextWrapper
 from asyncio import sleep
 import discord
+from logging import getLogger
 
 import modules.config as cfg
 
@@ -10,6 +11,8 @@ from .process import Process
 import modules.reactions as reactions
 
 from match.common import check_faction, switch_turn
+
+log = getLogger("pog_bot")
 
 
 class FactionPicking(Process, status=MatchStatus.IS_FACTION):
@@ -31,8 +34,8 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
                 msg = await disp.PK_OK_FACTION.send(self.match.channel, self.picking_captain.mention, match=self.match.proxy)
                 await self.reaction_handler.set_new_msg(msg)
                 break
-            except discord.NotFound:
-                pass
+            except discord.NotFound as e:
+                log.warning(f"Error in `faction_picking` init loop:{e}")
 
     def add_callbacks(self, rh):
 

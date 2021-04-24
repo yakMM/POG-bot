@@ -82,8 +82,8 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             try:
                 await self.info()
                 break
-            except discord.NotFound:
-                pass
+            except discord.NotFound as e:
+                log.warning(f"Error in `captain_selection` init loop:{e}")
 
         self.auto_captain.start()
         await disp.CAP_AUTO_ANNOUNCE.send(self.match.channel)

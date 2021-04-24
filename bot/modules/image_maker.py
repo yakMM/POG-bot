@@ -3,6 +3,7 @@ This module handle the creation of score images
 """
 
 # External imports
+import discord
 from PIL import Image, ImageDraw, ImageFont
 from asyncio import get_event_loop
 from datetime import datetime as dt
@@ -241,9 +242,15 @@ async def publish_match_image(match: 'match.classes.Match'):
     loop = get_event_loop()
     await loop.run_in_executor(None, _make_image, match.data)
 
-    # If already posted once, it is the end-of-match image
-    if match.result_msg is not None:
-        await match.result_msg.delete()
+    # If already posted once
+    if match.result_msg:
+        try:
+            await match.result_msg.delete()
+        except discord.NotFound:
+            pass
+
+    # If end of match image
+    if len(match.round_stamps) == 2:
         match.result_msg = await display.SC_RESULT.image_send(ContextWrapper.channel(cfg.channels["results"]),
                                                               f'../../POG-data/matches/match_{match.id}.png', match.id)
     else:  # Else it is the half-match image

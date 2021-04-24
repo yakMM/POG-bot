@@ -75,8 +75,8 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
                                                     self.match.teams[1].captain.mention, match=self.match.proxy)
                 await self.rh.set_new_msg(msg)
                 break
-            except discord.NotFound:
-                pass
+            except discord.NotFound as e:
+                log.warning(f"Error in `faction_picking` init loop:{e}")
 
     @Process.public
     async def clear(self, ctx):
