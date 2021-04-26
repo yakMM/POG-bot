@@ -3,6 +3,7 @@
 - Added =psb command for usage tracking
 - Changed the way DM messages are handled
 - updated = timeout command
+- It is now possible to use =swap and =sub between two rounds
 
 # v3.2:
 - Added locking mechanic on reaction handler to avoid errors due to players spamming the reactions

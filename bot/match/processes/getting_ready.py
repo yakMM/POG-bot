@@ -24,13 +24,14 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         self.match = match
 
         if self.match.round_no > 0:
-            super().change_status(MatchStatus.IS_WAITING_2)
             self.is_first_round = False
         else:
             self.is_first_round = True
 
         self.match.teams[1].captain.is_turn = True
+        self.match.teams[1].on_team_ready(False)
         self.match.teams[0].captain.is_turn = True
+        self.match.teams[0].on_team_ready(False)
 
         self.rh = reactions.SingleMessageReactionHandler()
 
@@ -92,12 +93,11 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
     def on_team_ready(self, team, ready):
         team.captain.is_turn = not ready
         if ready:
-            self.match.plugin_manager.on_team_ready(team)
-        if self.is_first_round:
-            team.on_team_ready(ready)
-            if ready:
+            if self.is_first_round:
                 self.match.base_selector.clean()
-                self.match.command_factory.on_team_ready(team)
+            self.match.command_factory.on_team_ready(team)
+            self.match.plugin_manager.on_team_ready(team)
+        team.on_team_ready(ready)
 
     def ready_check(self, team):
         other = self.match.teams[team.id - 1]
@@ -106,10 +106,8 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         if not other.captain.is_turn:
             self.rh.clear()
             self.match.ready_next_process()
-            if self.is_first_round:
-                for tm in self.match.teams:
-                    tm.on_match_starting()
-                    self.match.data.teams[tm.id] = tm.team_score
+            for tm in self.match.teams:
+                tm.on_match_starting()
             return True
         return False
 

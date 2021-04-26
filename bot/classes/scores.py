@@ -159,6 +159,11 @@ class PlayerScore:
                         obj.__illegal_weapons[weap] = ld.ill_weapons[weap]
         return obj
 
+    def update(self, name, ig_name, ig_id):
+        self.__name = name
+        self.__ig_name = ig_name
+        self.__ig_id = ig_id
+
     def get_main_loadouts(self):
         result = list()
         all = list(self.__loadouts.values())

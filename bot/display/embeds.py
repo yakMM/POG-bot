@@ -370,8 +370,7 @@ def team_update(arg, match):
             value = ""
             name = ""
             cap_mention = f"{tm.captain.mention} ({tm.captain.name})"
-            if match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_WAITING_2,
-                                     MatchStatus.IS_PLAYING):
+            if match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING):
                 cap_mention += f" [{tm.captain.ig_name}]"
             if match.next_status in (MatchStatus.IS_FACTION, MatchStatus.IS_PICKING) and tm.captain.is_turn:
                 value = f"Captain **[pick]**: {cap_mention}\n"
@@ -382,7 +381,7 @@ def team_update(arg, match):
             faction = ""
             if tm.faction != 0:
                 faction = f"{cfg.emojis[cfg.factions[tm.faction]]} {cfg.factions[tm.faction]}"
-            if match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_WAITING_2):
+            if match.next_status is MatchStatus.IS_WAITING:
                 if tm.captain.is_turn:
                     name = f"{tm.name} - {faction} - not ready"
                 else:

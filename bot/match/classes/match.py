@@ -212,7 +212,7 @@ class MatchObjects:
 
     @property
     def round_no(self):
-        if self.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_WAITING_2, MatchStatus.IS_STARTING):
+        if self.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING):
             return len(self.data.round_stamps) + 1
         else:
             return len(self.data.round_stamps)

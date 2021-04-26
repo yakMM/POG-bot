@@ -6,7 +6,7 @@ log = getLogger("pog_bot")
 
 picking_states = (MatchStatus.IS_PICKING, MatchStatus.IS_FACTION, MatchStatus.IS_BASING, MatchStatus.IS_WAITING)
 captains_ok_states = (MatchStatus.IS_WAITING, MatchStatus.IS_PLAYING, MatchStatus.IS_BASING, MatchStatus.IS_PICKING,
-                      MatchStatus.IS_FACTION, MatchStatus.IS_WAITING_2)
+                      MatchStatus.IS_FACTION)
 
 
 class Command:

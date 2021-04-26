@@ -11,4 +11,3 @@ class MatchStatus(Enum):
     IS_WAITING = "Waiting for teams to be ready"
     IS_STARTING = "Match starting..."
     IS_PLAYING = "Match is being played"
-    IS_WAITING_2 = "Waiting for teams to start next round"

@@ -133,7 +133,7 @@ class CommandFactory(metaclass=MetaFactory):
                 return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)
 
-    @Command.command(MatchStatus.IS_WAITING, MatchStatus.IS_WAITING_2)
+    @Command.command(MatchStatus.IS_WAITING)
     async def ready(self, ctx, args):
         match = self.match.proxy
         captain, msg = get_check_captain(ctx, match, check_turn=False)
@@ -142,7 +142,7 @@ class CommandFactory(metaclass=MetaFactory):
             return
         await match.ready(ctx, captain)
 
-    @Command.command(MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING, MatchStatus.IS_WAITING_2)
+    @Command.command(MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING)
     async def squittal(self, ctx, args):
         if self.match.status is MatchStatus.IS_WAITING and \
                 not (self.match.teams[0].is_playing and self.match.teams[0].is_playing):
@@ -153,7 +153,9 @@ class CommandFactory(metaclass=MetaFactory):
     @Command.has_help(disp.BASE_HELP)
     @Command.command(*captains_ok_states, MatchStatus.IS_STARTING)
     async def base(self, ctx, args):
-        if self.match.status in (MatchStatus.IS_PLAYING, MatchStatus.IS_WAITING_2, MatchStatus.IS_STARTING):
+        bl = self.match.status in (MatchStatus.IS_PLAYING, MatchStatus.IS_STARTING)
+        bl = bl or (self.match.status is MatchStatus.IS_WAITING and self.match.round_no > 0)
+        if bl:
             if len(args) != 0:
                 await disp.BASE_NO_CHANGE.send(ctx)
                 return
