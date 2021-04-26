@@ -127,6 +127,7 @@ if [ $# -eq 1 ]; then
   if [ "$1" == "update" ]; then
     my_stop
     my_update
+    my_start
     exit
   fi
 fi
