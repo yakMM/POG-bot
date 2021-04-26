@@ -556,11 +556,10 @@ class ActivePlayer:
             self.__player_score.disable()
             self.__player_score = None
         if not self.__player_score:
-            self.__player_score = PlayerScore(self.id, self.team.team_score, self.name, self.ig_name, self.ig_id)
+            self.__player_score = PlayerScore(self.id, self.team.team_score)
             self.__player_score.stats = self.__player.stats
             team_score.add_player(self.__player_score)
-        else:
-            self.__player_score.update(self.name, self.ig_name, self.ig_id)
+        self.__player_score.update(self.name, self.ig_name, self.ig_id)
 
     async def accept_account(self):
         account_id = self.__account.id

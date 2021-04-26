@@ -77,6 +77,10 @@ class BenchHandler(InstantiatedCommand):
                 return
             players.append(p.active)
 
+        if players[0].team is players[1].team:
+            await disp.BENCH_SAME_TEAM.send(ctx)
+            return
+
         # Can't have another command running  at the same time
         self.factory.sub.on_clean()
         self.factory.swap.on_clean()

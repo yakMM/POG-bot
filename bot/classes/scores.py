@@ -123,18 +123,19 @@ class TeamScore:
 
 
 class PlayerScore:
-    def __init__(self, p_id, team, name, ig_name, ig_id):
+    def __init__(self, p_id, team):
         self.stats = None
         self.__id = p_id
         self.__team = team
-        self.__name = name
-        self.__ig_name = ig_name
-        self.__ig_id = ig_id
+        self.__name = "Unknown"
+        self.__ig_name = "N/A"
+        self.__ig_id = 0
         self.__kills = 0
         self.__deaths = 0
         self.__net = 0
         self.__score = 0
         self.__is_disabled = False
+        self.__rounds = [False, False]
         self.__illegal_weapons = dict()
         self.__loadouts = dict()
 
@@ -144,7 +145,11 @@ class PlayerScore:
             ig_name = data["ig_name"]
         except KeyError:
             ig_name = "N/A"
-        obj = cls(data["discord_id"], team, name, ig_name, data["ig_id"])
+        obj = cls(data["discord_id"], team)
+        obj.__name = name
+        obj.__ig_name = ig_name
+        obj.__ig_id = data["ig_id"]
+        obj.__rounds = data["rounds"]
         if data["loadouts"]:
             for loadout in data["loadouts"]:
                 ld = Loadout.new_from_data(obj, loadout)
@@ -164,6 +169,7 @@ class PlayerScore:
         self.__is_disabled = True
 
     def update(self, name, ig_name, ig_id):
+        self.__rounds[self.__team.match.round_no - 1] = True
         self.__name = name
         self.__ig_name = ig_name
         self.__ig_id = ig_id
@@ -243,6 +249,7 @@ class PlayerScore:
         data = {"discord_id": self.__id,
                 "ig_id": self.__ig_id,
                 "ig_name": self.__ig_name,
+                "rounds": self.__rounds,
                 "loadouts": [loadout.get_data() for loadout in self.__loadouts.values()]
                 }
         return data

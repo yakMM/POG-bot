@@ -259,6 +259,7 @@ class AllStrings(Enum):
     BENCH_RDY = Message("Can't remove a player whose team is ready!")
     BENCH_OK_CONFIRM = Message("Removing players! {} accept if you agree! (use `=remove accept/decline` or react below)")
     BENCH_OK = Message("Successfully removed {} and {} from the match!", ping=False, embed=embeds.team_update)
+    BENCH_SAME_TEAM = Message("Invalid request! Can't remove two players of the same team!", ping=False)
 
     async def send(self, ctx, *args, **kwargs):
         """ Send the message string_name in context ctx,
