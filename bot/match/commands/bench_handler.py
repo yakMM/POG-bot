@@ -9,9 +9,9 @@ import modules.roles as roles
 from classes import Player
 
 
-class SwapHandler(InstantiatedCommand):
+class BenchHandler(InstantiatedCommand):
     def __init__(self, obj):
-        super().__init__(self, self.swap)
+        super().__init__(self, self.bench)
         self.validator = None
         self.factory = obj
 
@@ -23,14 +23,16 @@ class SwapHandler(InstantiatedCommand):
         self.validator = CaptainValidator(self.match)
 
         @self.validator.confirm
-        async def do_swap(ctx, p_1, p_2):
-            team1 = p_1.team
-            team2 = p_2.team
-            team1.swap_player(p_1, p_2)
-            team2.swap_player(p_2, p_1)
-            p_1.change_team(team2)
-            p_2.change_team(team1)
-            await disp.SWAP_OK.send(self.match.channel, p_1.mention, p_2.mention, match=self.match.proxy)
+        async def do_bench(ctx, p1, p2):
+            p1.team.remove(p1)
+            p2.team.remove(p2)
+            for p in (p1, p2):
+                if not p.has_own_account:
+                    try:
+                        await self.match.remove_account(p)
+                    except AttributeError:
+                        pass
+            await disp.BENCH_OK.send(self.match.channel, p1.mention, p2.mention, match=self.match.proxy)
 
     def on_clean(self, hard=False):
         if self.validator:
@@ -43,7 +45,7 @@ class SwapHandler(InstantiatedCommand):
             self.validator.clean()
 
     @Command.command(*picking_states)
-    async def swap(self, ctx, args):
+    async def bench(self, ctx, args):
         captain = None
         if not roles.is_admin(ctx.author):
             captain, msg = get_check_captain(ctx, self.match, check_turn=False)
@@ -55,7 +57,7 @@ class SwapHandler(InstantiatedCommand):
                 return
 
         if len(ctx.message.mentions) != 2:
-            await disp.SWAP_MENTION_2.send(ctx)
+            await disp.BENCH_MENTION_2.send(ctx)
             return
 
         players = list()
@@ -64,29 +66,25 @@ class SwapHandler(InstantiatedCommand):
             if not p:
                 await disp.RM_NOT_IN_DB.send(ctx)
                 return
-            if not(p.match and p.active and p.match.id == self.match.id):
-                await disp.SWAP_NO.send(ctx, p.mention)
+            if not (p.match and p.active and p.match.id == self.match.id):
+                await disp.BENCH_NO.send(ctx, p.mention)
                 return
             if p.active.is_captain:
                 await disp.RM_CAP.send(ctx, p.mention)
                 return
             if p.active.is_playing:
-                await disp.SWAP_RDY.send(ctx)
+                await disp.BENCH_RDY.send(ctx)
                 return
             players.append(p.active)
 
-        if players[0].team is players[1].team:
-            await disp.SWAP_SAME_TEAM.send(ctx)
-            return
-
-        # Can't have a sub command running  at the same time
+        # Can't have another command running  at the same time
         self.factory.sub.on_clean()
-        self.factory.bench.on_clean()
+        self.factory.swap.on_clean()
 
         if roles.is_admin(ctx.author):
-            await self.validator.force_confirm(ctx, p_1=players[0], p_2=players[1])
+            await self.validator.force_confirm(ctx, p1=players[0], p2=players[1])
             return
         else:
             other_captain = self.match.teams[captain.team.id - 1].captain
-            msg = await disp.SWAP_OK_CONFIRM.send(self.match.channel, other_captain.mention)
-            await self.validator.wait_valid(captain, msg, p_1=players[0], p_2=players[1])
+            msg = await disp.BENCH_OK_CONFIRM.send(self.match.channel, other_captain.mention)
+            await self.validator.wait_valid(captain, msg, p1=players[0], p2=players[1])

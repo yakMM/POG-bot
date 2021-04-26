@@ -103,29 +103,6 @@ class AdminCog(commands.Cog, name='admin'):
         new_name = " ".join(args)
         await player.change_name(new_name)
         await disp.RM_NAME_CHANGED.send(ctx, player.mention, new_name)
-    
-    @commands.command()
-    @commands.guild_only()
-    @commands.max_concurrency(number=1, wait=True)
-    async def remove(self, ctx):
-        if ctx.channel.id == cfg.channels["lobby"]:
-            player = await get_check_player(ctx)
-            if not player:
-                return
-            if player.is_lobbied:
-                lobby.remove_from_lobby(player)
-                await disp.RM_LOBBY.send(ContextWrapper.channel(cfg.channels["lobby"]), player.mention,
-                                         names_in_lobby=lobby.get_all_names_in_lobby())
-                return
-            await disp.RM_NOT_LOBBIED.send(ctx)
-            return
-        # if ctx.channel.id == cfg.channels["register"]:
-        #     player = await get_check_player(ctx)
-        #     if not player:
-        #         return
-        #     #TODO: remove ig names
-        else:
-            await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
 
     @commands.command()
     @commands.guild_only()

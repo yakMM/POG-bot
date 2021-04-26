@@ -134,6 +134,7 @@ class PlayerScore:
         self.__deaths = 0
         self.__net = 0
         self.__score = 0
+        self.__is_disabled = False
         self.__illegal_weapons = dict()
         self.__loadouts = dict()
 
@@ -158,6 +159,9 @@ class PlayerScore:
                     else:
                         obj.__illegal_weapons[weap] = ld.ill_weapons[weap]
         return obj
+
+    def disable(self):
+        self.__is_disabled = True
 
     def update(self, name, ig_name, ig_id):
         self.__name = name
@@ -190,6 +194,10 @@ class PlayerScore:
     @property
     def match(self):
         return self.__team.match
+
+    @property
+    def is_disabled(self):
+        return self.__is_disabled
 
     @property
     def mention(self):

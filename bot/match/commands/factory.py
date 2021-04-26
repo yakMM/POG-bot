@@ -1,6 +1,7 @@
 from .command import Command, InstantiatedCommand, picking_states, captains_ok_states
 from .sub_handler import SubHandler
 from .swap_handler import SwapHandler
+from .bench_handler import BenchHandler
 
 from display import AllStrings as disp, ContextWrapper
 from match import MatchStatus
@@ -17,7 +18,7 @@ from modules.asynchttp import ApiNotReachable
 
 log = getLogger("pog_bot")
 
-_external_commands = [SubHandler, SwapHandler]
+_external_commands = [SubHandler, SwapHandler, BenchHandler]
 
 
 class MetaFactory(type):
@@ -60,11 +61,16 @@ class CommandFactory(metaclass=MetaFactory):
 
     def on_clean(self):
         for command in self.commands.values():
-            command.on_clean()
+            command.on_clean(hard=True)
 
     @Command.has_status("pick_status")
     @Command.command(*picking_states)
     async def pick(self, ctx, args):
+        # If already second round
+        if self.match.status is MatchStatus.IS_WAITING and self.match.round_no > 0:
+            await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
+            return
+
         check_turn = self.match.status not in (MatchStatus.IS_BASING, MatchStatus.IS_WAITING)
         captain, msg = get_check_captain(ctx, self.match, check_turn=check_turn)
         if msg:

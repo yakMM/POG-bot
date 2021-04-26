@@ -539,6 +539,11 @@ class ActivePlayer:
     def clean(self):
         self.__player.on_player_clean()
 
+    def remove(self):
+        if self.__player_score:
+            self.__player_score.disable()
+        self.clean()
+
     def change_team(self, team):
         self.__team = team
 
@@ -548,6 +553,7 @@ class ActivePlayer:
     def on_match_starting(self):
         team_score = self.team.team_score
         if self.__player_score and (self.__player_score.team is not team_score):
+            self.__player_score.disable()
             self.__player_score = None
         if not self.__player_score:
             self.__player_score = PlayerScore(self.id, self.team.team_score, self.name, self.ig_name, self.ig_id)

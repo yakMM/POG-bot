@@ -119,3 +119,7 @@ class Team:
         while self.__players[i] is not p_out:
             i += 1
         self.__players[i] = p_in
+
+    def remove(self, p):
+        self.players.remove(p)
+        p.remove()

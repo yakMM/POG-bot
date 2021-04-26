@@ -59,7 +59,7 @@ class InstantiatedCommand:
     def on_team_ready(self, team):
         pass
 
-    def on_clean(self):
+    def on_clean(self, hard=False):
         pass
 
     def on_start(self):

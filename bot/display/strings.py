@@ -225,6 +225,7 @@ class AllStrings(Enum):
     RM_DEMOTE_OK = Message("Successfully demoted! {} is the new captain for {}!", ping=False, embed=embeds.team_update)
     RM_DEMOTE_NO_TURN = Message("Can't demote a captain if it's not their turn to pick!")
     RM_NAME_CHANGED = Message("Changed {}'s name to `{}`!", ping=False)
+    RM_CAP = Message("Invalid request! {} is a team captain!", ping=False)
 
     MUTE_SHOW = Message("You are muted from POG until {}!")
     MUTE_FREED = Message("You are no longer muted from POG!")
@@ -249,10 +250,15 @@ class AllStrings(Enum):
     SWAP_OK = Message("Successfully swapped {} and {}", ping=False, embed=embeds.team_update)
     SWAP_MENTION_2 = Message("Invalid request! @ mention two players to swap!")
     SWAP_NO = Message("{} can't be swapped!", ping=False)
-    SWAP_CAP = Message("Invalid request! {} is a team captain!", ping=False)
     SWAP_RDY = Message("Can't swap a player whose team is ready!")
     SWAP_SAME_TEAM = Message("Invalid request! Can't swap two players of the same team!", ping=False)
     SWAP_OK_CONFIRM = Message("Swapping players! {} accept if you agree! (use `=swap accept/decline` or react below)")
+
+    BENCH_MENTION_2 = Message("Invalid request! @ mention two players to remove!")
+    BENCH_NO = Message("{} can't be removed!", ping=False)
+    BENCH_RDY = Message("Can't remove a player whose team is ready!")
+    BENCH_OK_CONFIRM = Message("Removing players! {} accept if you agree! (use `=remove accept/decline` or react below)")
+    BENCH_OK = Message("Successfully removed {} and {} from the match!", ping=False, embed=embeds.team_update)
 
     async def send(self, ctx, *args, **kwargs):
         """ Send the message string_name in context ctx,

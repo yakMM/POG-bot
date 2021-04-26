@@ -33,7 +33,8 @@ async def process_score(match: 'match.classes.MatchData', start_time: int, match
     # Fill player dictionary (in-game id -> player object)
     for tm in match.teams:
         for player in tm.players:
-            ig_dict[int(player.ig_id)] = player
+            if not player.is_disabled:
+                ig_dict[int(player.ig_id)] = player
 
     # Iterate through all players:
     for player in ig_dict.values():

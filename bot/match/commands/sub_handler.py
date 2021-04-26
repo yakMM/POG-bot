@@ -31,10 +31,11 @@ class SubHandler(InstantiatedCommand):
             else:
                 await after_pick_sub(self.match, subbed, force_player)
 
-    def on_clean(self):
+    def on_clean(self, hard=False):
         if self.validator:
             self.validator.clean()
-            self.validator = None
+            if hard:
+                self.validator = None
 
     def on_update(self):
         try:
@@ -77,6 +78,7 @@ class SubHandler(InstantiatedCommand):
 
         # Can't have a swap command running at the same time
         self.factory.swap.on_clean()
+        self.factory.bench.on_clean()
 
         if roles.is_admin(ctx.author):
             player = None

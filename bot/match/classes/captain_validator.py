@@ -55,8 +55,8 @@ class CaptainValidator:
 
     async def force_confirm(self, ctx, **kwargs):
         if self.confirm_func:
-            await self.confirm_func(ctx, **kwargs)
             self.clean()
+            await self.confirm_func(ctx, **kwargs)
 
     async def wait_valid(self, captain, msg, **kwargs):
         if not self.is_captain(captain):
