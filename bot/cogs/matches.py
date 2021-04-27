@@ -47,6 +47,20 @@ class MatchesCog(commands.Cog, name='matches'):
         match = Match.get(ctx.channel.id)
         await match.command.swap(ctx, args)
 
+    @commands.command()
+    @commands.guild_only()
+    @commands.max_concurrency(number=1, wait=True)
+    async def bench(self, ctx, *args):
+        match = Match.get(ctx.channel.id)
+        await match.command.bench(ctx, args, bench=True)
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.max_concurrency(number=1, wait=True)
+    async def unbench(self, ctx, *args):
+        match = Match.get(ctx.channel.id)
+        await match.command.bench(ctx, args, bench=False)
+
     @commands.command(aliases=['p'])
     @commands.guild_only()
     @commands.max_concurrency(number=1, wait=True)

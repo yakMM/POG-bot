@@ -254,12 +254,16 @@ class AllStrings(Enum):
     SWAP_SAME_TEAM = Message("Invalid request! Can't swap two players of the same team!", ping=False)
     SWAP_OK_CONFIRM = Message("Swapping players! {} accept if you agree! (use `=swap accept/decline` or react below)")
 
-    BENCH_MENTION_2 = Message("Invalid request! @ mention two players to remove!")
-    BENCH_NO = Message("{} can't be removed!", ping=False)
-    BENCH_RDY = Message("Can't remove a player whose team is ready!")
-    BENCH_OK_CONFIRM = Message("Removing players! {} accept if you agree! (use `=remove accept/decline` or react below)")
-    BENCH_OK = Message("Successfully removed {} and {} from the match!", ping=False, embed=embeds.team_update)
-    BENCH_SAME_TEAM = Message("Invalid request! Can't remove two players of the same team!", ping=False)
+    BENCH_MENTION = Message("Invalid request! @ mention one player to bench!")
+    BENCH_NO = Message("{} can't be benched!", ping=False)
+    BENCH_RDY = Message("Can't bench a player whose team is ready!")
+    BENCH_OK_CONFIRM = Message("Benching player! {} accept if you agree! (use `=bench accept/decline` or react below)")
+    UNBENCH_OK_CONFIRM = Message("Un-benching player! {} accept if you agree! "
+                                 "(use `=unbench accept/decline` or react below)")
+    BENCH_OK = Message("Successfully benched {}!", ping=False, embed=embeds.team_update)
+    UNBENCH_OK = Message("Successfully un-benched {}!", ping=False, embed=embeds.team_update)
+    BENCH_ALREADY = Message("Player is already benched!", ping=False)
+    BENCH_NOT = Message("Player is not benched!", ping=False)
 
     async def send(self, ctx, *args, **kwargs):
         """ Send the message string_name in context ctx,

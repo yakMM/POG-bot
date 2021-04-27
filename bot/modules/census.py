@@ -169,7 +169,8 @@ async def get_offline_players(team: 'classes.Team') -> list:
     # Assemble a string of all players in-game IDs
     ig_dict = dict()
     for p in team.players:
-        ig_dict[p.ig_id] = p
+        if not p.is_benched:
+            ig_dict[p.ig_id] = p
     id_string = ",".join(str(ig_id) for ig_id in ig_dict.keys())
 
     # DO the request

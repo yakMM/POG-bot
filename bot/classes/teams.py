@@ -57,9 +57,9 @@ class Team:
     def player_pings(self):
         # Excluding captain
         if self.match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING):
-            return [f"- {p.mention} ({p.name}) [{p.ig_name}]" for p in self.__players[1:]]
+            return [f"- {'~~' if p.is_benched else ''}{p.mention} ({p.name}) [{p.ig_name}]{'~~' if p.is_benched else ''}" for p in self.__players[1:]]
         else:
-            return [f"- {p.mention} ({p.name})" for p in self.__players[1:]]
+            return [f"- {'~~' if p.is_benched else ''}{p.mention} ({p.name}){'~~' if p.is_benched else ''}" for p in self.__players[1:]]
 
     @property
     def all_pings(self):
@@ -119,7 +119,3 @@ class Team:
         while self.__players[i] is not p_out:
             i += 1
         self.__players[i] = p_in
-
-    def remove(self, p):
-        self.players.remove(p)
-        p.remove()

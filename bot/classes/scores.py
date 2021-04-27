@@ -168,6 +168,9 @@ class PlayerScore:
     def disable(self):
         self.__is_disabled = True
 
+    def enable(self):
+        self.__is_disabled = False
+
     def update(self, name, ig_name, ig_id):
         self.__rounds[self.__team.match.round_no - 1] = True
         self.__name = name

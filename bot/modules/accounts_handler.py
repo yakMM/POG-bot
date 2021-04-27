@@ -239,6 +239,8 @@ def get_not_validated_accounts(team: classes.Team) -> list:
     for p in team.players:
         if p.has_own_account:
             continue
+        if p.is_benched:
+            continue
         if p.account is None:
             log.error(f"Debug: {p.name} has no account")  # Should not happen
         if not p.account.is_validated:

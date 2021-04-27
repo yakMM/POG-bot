@@ -82,7 +82,7 @@ class InstantiatedCommand:
     def direct_do(self, obj, ctx, *args, **kwargs):
         return self.__func(obj, ctx, *args, **kwargs)
 
-    async def __call__(self, ctx, args=()):
+    async def __call__(self, ctx, args=(), **kwargs):
         if self.__has_help:
             if len(args) == 1 and (args[0] == "help" or args[0] == "h"):
                 await self.__has_help.send(ctx)
@@ -102,5 +102,5 @@ class InstantiatedCommand:
                     # This should not happen
                     log.error(f"Attribute error trying to reach '{self.__has_status}' "
                               f"(match status: {self.__parent.match.status})")
-        await self.__func(self.__parent, ctx, args)
+        await self.__func(self.__parent, ctx, args, **kwargs)
 

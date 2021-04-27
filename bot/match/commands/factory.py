@@ -160,7 +160,7 @@ class CommandFactory(metaclass=MetaFactory):
     @Command.command(*captains_ok_states, MatchStatus.IS_STARTING)
     async def base(self, ctx, args):
         bl = self.match.status in (MatchStatus.IS_PLAYING, MatchStatus.IS_STARTING)
-        bl = bl or (self.match.status is MatchStatus.IS_WAITING and self.match.round_no > 0)
+        bl = bl or (self.match.status is MatchStatus.IS_WAITING and self.match.round_no > 1)
         if bl:
             if len(args) != 0:
                 await disp.BASE_NO_CHANGE.send(ctx)

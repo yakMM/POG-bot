@@ -467,10 +467,15 @@ class ActivePlayer:
         self.__match = player.match
         self.__player.on_picked(self)
         self.__player_score = None
+        self.__is_benched = False
 
     @property
     def player_score(self):
         return self.__player_score
+
+    @property
+    def is_benched(self):
+        return self.__is_benched
 
     @property
     def is_captain(self):
@@ -536,13 +541,16 @@ class ActivePlayer:
     def match(self):
         return self.__match
 
+    def bench(self, bench):
+        self.__is_benched = bench
+        if self.__player_score:
+            if bench:
+                self.__player_score.disable()
+            else:
+                self.__player_score.enable()
+
     def clean(self):
         self.__player.on_player_clean()
-
-    def remove(self):
-        if self.__player_score:
-            self.__player_score.disable()
-        self.clean()
 
     def change_team(self, team):
         self.__team = team
@@ -555,11 +563,12 @@ class ActivePlayer:
         if self.__player_score and (self.__player_score.team is not team_score):
             self.__player_score.disable()
             self.__player_score = None
-        if not self.__player_score:
+        if not self.__player_score and not self.__is_benched:
             self.__player_score = PlayerScore(self.id, self.team.team_score)
             self.__player_score.stats = self.__player.stats
             team_score.add_player(self.__player_score)
-        self.__player_score.update(self.name, self.ig_name, self.ig_id)
+        if self.__player_score:
+            self.__player_score.update(self.name, self.ig_name, self.ig_id)
 
     async def accept_account(self):
         account_id = self.__account.id

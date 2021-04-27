@@ -192,7 +192,7 @@ def match_help(ctx):
                           '`=ready` - To toggle the ready status of your team\n'
                           '`=sub @player` - Pick someone in queue to replace the player mentioned\n'
                           '`=swap @player1 @player2` - Swap the two players from one team to the other\n'
-                          '`=remove @player1 @player2` - Remove two players from the match',
+                          '`=bench`/`=unbench @player` - Bench or un-bench player from the match',
                     inline=False)
     if is_admin(ctx.author):
         embed.add_field(name="Staff commands",

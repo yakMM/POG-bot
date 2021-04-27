@@ -288,7 +288,34 @@ class AdminCog(commands.Cog, name='admin'):
                 await loop.run_in_executor(None, db.get_all_elements, classes.Weapon, "static_weapons")
                 await disp.BOT_RELOAD.send(ctx, "Weapons")
                 return
+            if arg == "bases":
+                classes.Base.clear_all()
+                await loop.run_in_executor(None, db.get_all_elements, classes.Base, "static_bases")
+                await disp.BOT_RELOAD.send(ctx, "Bases")
+                return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)
+
+    @commands.command(aliases=['rm'])
+    @commands.guild_only()
+    async def remove(self, ctx):
+        if ctx.channel.id == cfg.channels["lobby"]:
+            player = await get_check_player(ctx)
+            if not player:
+                return
+            if player.is_lobbied:
+                lobby.remove_from_lobby(player)
+                await disp.RM_LOBBY.send(ContextWrapper.channel(cfg.channels["lobby"]), player.mention,
+                                         names_in_lobby=lobby.get_all_names_in_lobby())
+                return
+            await disp.RM_NOT_LOBBIED.send(ctx)
+            return
+        # if ctx.channel.id == cfg.channels["register"]:
+        #     player = await get_check_player(ctx)
+        #     if not player:
+        #         return
+        #     #TODO: remove ig names
+        else:
+            await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
 
 
 def setup(client):
