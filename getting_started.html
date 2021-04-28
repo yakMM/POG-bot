@@ -1,0 +1,474 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Setting up the project &mdash; POG-bot 3.3 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Project content" href="content.html" />
+    <link rel="prev" title="Welcome to POG-bot’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> POG-bot
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Setting up the project</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#python-dependencies">Python dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#notes-for-the-developer">Notes for the developer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#discord-bot-component">Discord Bot Component</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-channels-and-roles">Create channels and roles</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#preparing-mongodb-component">Preparing MongoDB Component</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#atlas">Atlas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manual-deployment">Manual Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#preparing-google-component">Preparing Google Component</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prepare-google-sheet">Prepare Google Sheet</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#assigning-census-id">Assigning Census ID</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#teamspeak-integration">Teamspeak integration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ts3-bot-folder-structure">TS3-bot folder structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#main-configuration-file">Main configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-individual-bots">Configuring individual bots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setting-up-ts3-channels-ids">Setting up TS3 channels IDs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#populating-the-collections">Populating the collections</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="content.html">Project content</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">POG-bot</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Setting up the project</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="setting-up-the-project">
+<h1>Setting up the project<a class="headerlink" href="#setting-up-the-project" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>This project relies on several <a class="reference external" href="#python-dependencies">python
+dependencies</a>.</p></li>
+<li><p>A <a class="reference external" href="#discord-bot-component">discord bot application and channels</a>
+have to be created.</p></li>
+<li><p>A <a class="reference external" href="#preparing-mongodb-component">MongoDB database</a> is used for
+persistent data storage.</p></li>
+<li><p>Jaeger accounts are pulled from a <a class="reference external" href="#preparing-google-component">Google
+Sheet</a>.</p></li>
+<li><p>To retrieve Planetside2 information a <a class="reference external" href="#assigning-census-id">Daybreak Census
+ID</a> has to be provided.</p></li>
+<li><p>To use the TeamSpeak 3 Integration, set up an instance of
+<a class="reference external" href="#teamspeak-integration">TS3AudioBot</a>.</p></li>
+<li><p>Finally, to initialize the application, <a class="reference external" href="#populating-the-collections">scripts
+functions</a> are provided.</p></li>
+</ul>
+<div class="section" id="python-dependencies">
+<h2>Python dependencies<a class="headerlink" href="#python-dependencies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Python 3.6 or above is required to run the project.</p></li>
+<li><p>We recommend using <a class="reference external" href="https://pypi.org/project/pipenv/">pipenv</a> to
+set up the project environment. Pipenv will install automatically
+install the required dependencies from the <code class="docutils literal notranslate"><span class="pre">Pipfile</span></code> provided with
+the project.</p></li>
+<li><p>Alternatively, the dependencies are also listed in the
+<code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file (compatible with
+<a class="reference external" href="https://docs.python.org/3/library/venv.html">venv</a>)</p></li>
+</ul>
+</div>
+<div class="section" id="notes-for-the-developer">
+<h2>Notes for the developer<a class="headerlink" href="#notes-for-the-developer" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Master branch is a release branch, it will stay clean and is synced
+with the official POG hosting server.</p></li>
+<li><p>So developments should be done on feature or development branches and
+will be then merged in.</p></li>
+<li><p>Keep fork repos up to date from upstream as much as possible.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">google_api_secret.json</span></code> and <code class="docutils literal notranslate"><span class="pre">config.cfg</span></code> are not available for
+confidentiality reasons, templates are given instead.</p></li>
+<li><p>The code of the application itself can be found in the <code class="docutils literal notranslate"><span class="pre">bot</span></code>
+folder. It contains:</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">cogs</span></code> folder: it holds cogs modules as described in
+discord.py. Each of them regroups a set of commands and their
+associated checks. These modules are not to be imported in any way
+(they are only launched through the discord.py client)</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">display</span></code> folder: it is a python package handling all the
+display from the application to discord. All discords embed and
+strings used are stored there.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">modules</span></code> folder: it is a python package containing general
+interfaces and tools that can be used in the rest of the application.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">classes</span></code> folder: it contains the main classes of the
+application: <code class="docutils literal notranslate"><span class="pre">Player</span></code>, <code class="docutils literal notranslate"><span class="pre">Team</span></code>, <code class="docutils literal notranslate"><span class="pre">Weapon</span></code>, <code class="docutils literal notranslate"><span class="pre">Base</span></code>, <code class="docutils literal notranslate"><span class="pre">Account</span></code>,
+etc…</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">lib</span></code> folder: it contains third-party modules that were
+modified for the purpose of the application.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">match</span></code> folder: it contains all the code handling the match
+processes and commands.</p></li>
+</ul>
+</div>
+<div class="section" id="discord-bot-component">
+<h2>Discord Bot Component<a class="headerlink" href="#discord-bot-component" title="Permalink to this headline">¶</a></h2>
+<p>Create a bot application following the <a class="reference external" href="https://discordpy.readthedocs.io/en/latest/discord.html">discord.py
+documentation</a>.
+The client-secret retrieved at this manual has to put into the
+configuration file:</p>
+<div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="k">[General]</span>
+<span class="na">token</span> <span class="o">=</span> <span class="s">RetrievedDiscordApiBotToken</span>
+</pre></div>
+</div>
+<div class="section" id="create-channels-and-roles">
+<h3>Create channels and roles<a class="headerlink" href="#create-channels-and-roles" title="Permalink to this headline">¶</a></h3>
+<p>To retrieve discord channel, message and role-ids you have to enable
+Discord Developer Mode which can be toggled at appearance. <code class="docutils literal notranslate"><span class="pre">Copy</span> <span class="pre">ID</span></code>
+will then appear at the right click menu for channels, messages and
+roles. At that point you can populate the <code class="docutils literal notranslate"><span class="pre">[channels]</span></code> and
+<code class="docutils literal notranslate"><span class="pre">[roles]</span></code>sections of the configuration file.</p>
+</div>
+</div>
+<div class="section" id="preparing-mongodb-component">
+<h2>Preparing MongoDB Component<a class="headerlink" href="#preparing-mongodb-component" title="Permalink to this headline">¶</a></h2>
+<p>Pymongo is used for interaction with the mongodb. The database should
+contain several collections: - One for the user data. - One for the
+bases. - One for the weapons. - One for the matches. - One for the
+player stats - One for persistent restart data - One for jaeger account
+usage Check <code class="docutils literal notranslate"><span class="pre">script.py</span></code> to populate the databases. The naming of these
+collections can be configured at the <code class="docutils literal notranslate"><span class="pre">[Collections]</span></code> part of the
+configuration file.</p>
+<p>There are two common ways to get MongoDB running: <a class="reference external" href="#Atlas">Atlas</a> and
+<a class="reference external" href="#manual-deployment">Manual Deployment</a>.</p>
+<div class="section" id="atlas">
+<h3>Atlas<a class="headerlink" href="#atlas" title="Permalink to this headline">¶</a></h3>
+<p>Atlas can be run using a free instance at <a class="reference external" href="https://www.mongodb.com/cloud/atlas">MongoDB Cloud
+Atlas</a> When using MongoDB Atlas
+the following URI format is expected:</p>
+<div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="k">[Database]</span>
+<span class="na">url</span> <span class="o">=</span> <span class="s">mongodb+srv://username:password@clusteruri/databasename</span>
+<span class="na">cluster</span> <span class="o">=</span> <span class="s">ClusterName</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="manual-deployment">
+<h3>Manual Deployment<a class="headerlink" href="#manual-deployment" title="Permalink to this headline">¶</a></h3>
+<p>When using a single manually deployed MongoDB instance, omit <code class="docutils literal notranslate"><span class="pre">+srv</span></code>
+and remove the database name from the <code class="docutils literal notranslate"><span class="pre">url</span></code> and put it at <code class="docutils literal notranslate"><span class="pre">cluster</span></code>
+instead:</p>
+<div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="k">[Database]</span>
+<span class="na">url</span> <span class="o">=</span> <span class="s">mongodb://username:password@host:port/</span>
+<span class="na">cluster</span> <span class="o">=</span> <span class="s">DatabaseName</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="preparing-google-component">
+<h2>Preparing Google Component<a class="headerlink" href="#preparing-google-component" title="Permalink to this headline">¶</a></h2>
+<p>The Gspread module is used for interaction with google API. <a class="reference external" href="https://gspread.readthedocs.io/en/latest/oauth2.html#for-bots-using-service-account">Follow
+these steps to create your
+google_api_secret.json</a></p>
+<div class="section" id="prepare-google-sheet">
+<h3>Prepare Google Sheet<a class="headerlink" href="#prepare-google-sheet" title="Permalink to this headline">¶</a></h3>
+<p>An example sheet has been provided called
+<code class="docutils literal notranslate"><span class="pre">accounts_sheet_template.xlsx</span></code>. By creating a new Google Sheet in your
+Drive and importing the excel file through the menu you can avoid format
+and naming convention errors.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">accounts</span></code> field from the <code class="docutils literal notranslate"><span class="pre">[Database]</span></code> section of the
+configuration file has to contain the ID of the Google Sheet. This ID
+can be easily retrieved from the URI of the document:
+<code class="docutils literal notranslate"><span class="pre">https://docs.google.com/spreadsheets/d/GOOGLE_SHEET_ID/edit#gid=0</span></code>.</p>
+<p>Finally, add the service account email to the shared users with editor
+permissions to the google sheet. This email is also listed as
+<code class="docutils literal notranslate"><span class="pre">client_email</span></code> in the <code class="docutils literal notranslate"><span class="pre">google_api_secret.json</span></code> file.</p>
+</div>
+</div>
+<div class="section" id="assigning-census-id">
+<h2>Assigning Census ID<a class="headerlink" href="#assigning-census-id" title="Permalink to this headline">¶</a></h2>
+<p>Communication with the Daybreak Census API is required to retrieve game
+information, therefore you have to supply a Service ID. You can apply
+for one at the <a class="reference external" href="http://census.daybreakgames.com/#service-id">Daybreak
+Census</a> website. Once
+you obtained an ID, add it the configuration as <code class="docutils literal notranslate"><span class="pre">api_key</span></code>:</p>
+<div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="k">[General]</span>
+<span class="na">api_key</span> <span class="o">=</span> <span class="s">Daybreak_Registered_Service_ID</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="teamspeak-integration">
+<h2>Teamspeak integration<a class="headerlink" href="#teamspeak-integration" title="Permalink to this headline">¶</a></h2>
+<p>The bot used for Teamspeak audio integration is Splamy’s
+<a class="reference external" href="https://github.com/Splamy/TS3AudioBot">TS3AudioBot</a>. This bot works
+on the dotnet runtime and can be built and installed following the
+readme available in TS3AudioBot github’s repo.</p>
+<div class="section" id="ts3-bot-folder-structure">
+<h3>TS3-bot folder structure<a class="headerlink" href="#ts3-bot-folder-structure" title="Permalink to this headline">¶</a></h3>
+<p>The structure of the TS3AudioBot folder is the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TS3</span><span class="o">-</span><span class="n">bot</span>
+<span class="o">+--</span> <span class="n">TS3AudioBot</span><span class="o">.</span><span class="n">dll</span>
+<span class="o">+--</span> <span class="n">rights</span><span class="o">.</span><span class="n">toml</span>
+<span class="o">+--</span> <span class="n">ts3audiobot</span><span class="o">.</span><span class="n">toml</span>
+<span class="o">+--</span> <span class="o">...</span>
+<span class="o">+--</span> <span class="n">audio</span>
+<span class="o">|</span>   <span class="o">+--</span> <span class="n">audio_file_1</span><span class="o">.</span><span class="n">mp3</span>
+<span class="o">|</span>   <span class="o">+--</span> <span class="n">audio_file_1</span><span class="o">.</span><span class="n">mp3</span>
+<span class="o">|</span>   <span class="o">+--</span> <span class="o">...</span>
+<span class="o">+--</span> <span class="n">bots</span>
+<span class="o">|</span>   <span class="o">+--</span> <span class="mi">1</span>
+<span class="o">|</span>   <span class="o">|</span> <span class="o">+--</span> <span class="n">bot</span><span class="o">.</span><span class="n">toml</span>
+<span class="o">|</span>   <span class="o">+--</span> <span class="mi">2</span>
+<span class="o">|</span>   <span class="o">|</span> <span class="o">+--</span> <span class="n">bot</span><span class="o">.</span><span class="n">toml</span>
+<span class="o">|</span>   <span class="o">+--</span> <span class="mi">3</span>
+<span class="o">|</span>   <span class="o">|</span> <span class="o">+--</span> <span class="n">bot</span><span class="o">.</span><span class="n">toml</span>
+<span class="o">|</span>   <span class="o">+--</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>The audio files should be put in the <code class="docutils literal notranslate"><span class="pre">audio</span></code> repository. Each
+sub-repository of <code class="docutils literal notranslate"><span class="pre">bots</span></code> represent TS3 bot (one bot per match channel
+is needed).</p>
+</div>
+<div class="section" id="main-configuration-file">
+<h3>Main configuration file<a class="headerlink" href="#main-configuration-file" title="Permalink to this headline">¶</a></h3>
+<p>The first file to modify is <code class="docutils literal notranslate"><span class="pre">ts3audiobot.toml</span></code>. The relevant
+parameters for are listed below. You may want to change the parameters
+depending on your project file structure.</p>
+<div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="k">[configs]</span>
+<span class="c1"># Path for the bots</span>
+<span class="na">bots_path</span> <span class="o">=</span> <span class="s">&quot;bots&quot;</span>
+
+<span class="k">[factories]</span>
+<span class="c1"># Path for audio files</span>
+<span class="na">media</span> <span class="o">=</span> <span class="s">{ path = &quot;audio&quot; }</span>
+
+<span class="k">[bot.audio]</span>
+<span class="c1"># Activate subscription-based whispers</span>
+<span class="na">send_mode</span> <span class="o">=</span> <span class="s">&quot;!whisper subscription&quot;</span>
+
+
+<span class="k">[bot.connect]</span>
+<span class="c1"># TS3 default connect information</span>
+<span class="na">address</span> <span class="o">=</span> <span class="s">Your_TS3_Url</span>
+<span class="na">channel</span> <span class="o">=</span> <span class="s">Your_TS3_Bot_Channel_Id (example: /10)</span>
+</pre></div>
+</div>
+<p>Additionally, add access to all commands for localhost in the
+<code class="docutils literal notranslate"><span class="pre">rights.toml</span></code> file:</p>
+<div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="c1"># Admin rule</span>
+<span class="k">[[rule]]</span>
+        <span class="c1"># Treat requests from localhost as admin</span>
+        <span class="na">ip</span> <span class="o">=</span> <span class="s">[ &quot;::ffff:127.0.0.1&quot; ]</span>
+        <span class="na">&quot;+&quot;</span> <span class="o">=</span> <span class="s">&quot;*&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuring-individual-bots">
+<h3>Configuring individual bots<a class="headerlink" href="#configuring-individual-bots" title="Permalink to this headline">¶</a></h3>
+<p>Each individual bot can also be configured, in each <code class="docutils literal notranslate"><span class="pre">bot.toml</span></code> files.
+This allows for example to change the name of each individual bot.</p>
+<div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="k">[connect]</span>
+<span class="c1"># Client nickname when connecting.</span>
+<span class="na">name</span> <span class="o">=</span> <span class="s">&quot;POG_3&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-up-ts3-channels-ids">
+<h3>Setting up TS3 channels IDs<a class="headerlink" href="#setting-up-ts3-channels-ids" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Teamspeak</span></code> section of the configuration file can now be completed</p>
+<div class="highlight-cfg notranslate"><div class="highlight"><pre><span></span><span class="k">[Teamspeak]</span>
+<span class="na">url</span> <span class="o">=</span> <span class="s"># Teamspeak bot webapi url</span>
+<span class="na">lobby_id</span> <span class="o">=</span> <span class="s"># Lobby channel id</span>
+<span class="na">matches</span> <span class="o">=</span> <span class="s"># Matches channel ids (example: 1/2/3,4/5/6) (matches separated by commas, channels by slashes, no spaces)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="populating-the-collections">
+<h2>Populating the collections<a class="headerlink" href="#populating-the-collections" title="Permalink to this headline">¶</a></h2>
+<p>The file <code class="docutils literal notranslate"><span class="pre">scripts.py</span></code> contains two functions called
+<code class="docutils literal notranslate"><span class="pre">push_accounts()</span></code> and <code class="docutils literal notranslate"><span class="pre">get_all_maps_from_api()</span></code>. The file
+<code class="docutils literal notranslate"><span class="pre">weapons_script.py</span></code> contains the function <code class="docutils literal notranslate"><span class="pre">push_all_weapons()</span></code>.
+Running all of these functions will populate the MongoDB users, bases
+and weapons collections, allowing you to run <code class="docutils literal notranslate"><span class="pre">main.py</span></code>.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="content.html" class="btn btn-neutral float-right" title="Project content" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to POG-bot’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Planetside Open Games.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
