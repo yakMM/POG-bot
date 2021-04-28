@@ -1,0 +1,358 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Reactions &mdash; POG-bot 3.3 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Roles" href="modules.roles.html" />
+    <link rel="prev" title="Message filter" href="modules.message_filter.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> POG-bot
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Setting up the project</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../content.html">Project content</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="modules.accounts_handler.html">Accounts handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.asynchttp.html">AsyncHttp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.census.html">Census</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.config.html">Config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.database.html">Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.dm_handler.html">Dm handler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.image_maker.html">Image maker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.jaeger_calendar.html">Jaeger calendar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.loader.html">Modules Loader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.lobby.html">Lobby</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.message_filter.html">Message filter</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Reactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.roles.html">Roles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.signal.html">Signal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.spam_checker.html">Spam checker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.stat_processor.html">Stat processor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.tools.html">Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../classes/classes.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../display/display.html">Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cogs/cogs.html">Cogs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../match/match.html">Match</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lib/lib.html">Lib</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">POG-bot</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../content.html">Project content</a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules</a> &raquo;</li>
+        
+      <li>Reactions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/modules/modules.reactions.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-modules.reactions">
+<span id="reactions"></span><h1>Reactions<a class="headerlink" href="#module-modules.reactions" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="modules.reactions.ReactionHandler">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">ReactionHandler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rem_user_react</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rem_bot_react</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_destroy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.add_reaction">
+<code class="sig-name descname"><span class="pre">add_reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">react</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fct</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.add_reaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.auto_add">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">auto_add</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.auto_add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.auto_remove_reactions">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">auto_remove_reactions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.auto_remove_reactions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.is_reaction">
+<code class="sig-name descname"><span class="pre">is_reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">react</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.is_reaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.print">
+<code class="sig-name descname"><span class="pre">print</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.print" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.reaction">
+<code class="sig-name descname"><span class="pre">reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.reaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.rem_reaction">
+<code class="sig-name descname"><span class="pre">rem_reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">react</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.rem_reaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.rem_user_react">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">rem_user_react</span></code><a class="headerlink" href="#modules.reactions.ReactionHandler.rem_user_react" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.run">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.set_reaction">
+<code class="sig-name descname"><span class="pre">set_reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">react</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">fcts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.set_reaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="modules.reactions.SingleMessageReactionHandler">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">SingleMessageReactionHandler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remove_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.SingleMessageReactionHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modules.reactions.ReactionHandler" title="modules.reactions.ReactionHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">modules.reactions.ReactionHandler</span></code></a></p>
+<dl class="py method">
+<dt id="modules.reactions.SingleMessageReactionHandler.clear">
+<code class="sig-name descname"><span class="pre">clear</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.SingleMessageReactionHandler.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.SingleMessageReactionHandler.is_msg">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_msg</span></code><a class="headerlink" href="#modules.reactions.SingleMessageReactionHandler.is_msg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.SingleMessageReactionHandler.msg">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">msg</span></code><a class="headerlink" href="#modules.reactions.SingleMessageReactionHandler.msg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.SingleMessageReactionHandler.set_new_msg">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">set_new_msg</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.SingleMessageReactionHandler.set_new_msg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="modules.reactions.UserLackingPermission">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">UserLackingPermission</span></code><a class="headerlink" href="#modules.reactions.UserLackingPermission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.reactions.add_handler">
+<code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">add_handler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.add_handler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="modules.reactions.auto_clear">
+<code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">auto_clear</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.auto_clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="modules.reactions.clear_loop">
+<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">clear_loop</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.clear_loop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="modules.reactions.init">
+<code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">init</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="modules.reactions.reaction_handler">
+<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">reaction_handler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.reaction_handler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="modules.reactions.rem_handler">
+<code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">rem_handler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.rem_handler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="modules.roles.html" class="btn btn-neutral float-right" title="Roles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="modules.message_filter.html" class="btn btn-neutral float-left" title="Message filter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Planetside Open Games.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -10,7 +10,7 @@ import modules.accounts_handler as accounts
 from modules.tools import UnexpectedError
 import modules.lobby as lobby
 
-from match.processes import *
+from match.processes import CaptainSelection, PlayerPicking, FactionPicking, BasePicking, GettingReady, MatchPlaying
 from match.commands import CommandFactory
 from match.match_status import MatchStatus
 from .base_selector import on_match_over

@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Player picking &mdash; POG-bot 3.3 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Process" href="processes.process.html" />
+    <link rel="prev" title="Match playing" href="processes.match_playing.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> POG-bot
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Setting up the project</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../content.html">Project content</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules/modules.html">Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../classes/classes.html">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../display/display.html">Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../cogs/cogs.html">Cogs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../match.html">Match</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../classes/classes.html">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../commands/commands.html">Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/plugins.html">Plugins</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="processes.html">Processes</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="processes.base_picking.html">Base picking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="processes.captain_selection.html">Captain selection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="processes.faction_picking.html">Faction picking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="processes.getting_ready.html">Getting ready</a></li>
+<li class="toctree-l4"><a class="reference internal" href="processes.match_playing.html">Match playing</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Player picking</a></li>
+<li class="toctree-l4"><a class="reference internal" href="processes.process.html">Process</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../match.common.html">Common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../match.match_status.html">Match status</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../lib/lib.html">Lib</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">POG-bot</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../content.html">Project content</a> &raquo;</li>
+        
+          <li><a href="../match.html">Match</a> &raquo;</li>
+        
+          <li><a href="processes.html">Processes</a> &raquo;</li>
+        
+      <li>Player picking</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/match/processes/processes.player_picking.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-match.processes.player_picking">
+<span id="player-picking"></span><h1>Player picking<a class="headerlink" href="#module-match.processes.player_picking" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="match.processes.player_picking.PlayerPicking">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">match.processes.player_picking.</span></code><code class="sig-name descname"><span class="pre">PlayerPicking</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.player_picking.PlayerPicking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="processes.process.html#match.processes.process.Process" title="match.processes.process.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">match.processes.process.Process</span></code></a></p>
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.clear">
+<code class="sig-name descname"><span class="pre">clear</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.processes.player_picking.PlayerPicking.do_pick">
+<code class="sig-name descname"><span class="pre">do_pick</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../../classes/classes.teams.html#classes.teams.Team" title="classes.teams.Team"><span class="pre">classes.teams.Team</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.do_pick" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pick a player.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>team</strong> – The team picking the player.</p></li>
+<li><p><strong>player</strong> – Player picked.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.do_sub">
+<code class="sig-name descname"><span class="pre">do_sub</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.do_sub" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.get_left_players_pings">
+<code class="sig-name descname"><span class="pre">get_left_players_pings</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.get_left_players_pings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.init">
+<code class="sig-name descname"><span class="pre">init</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.InitFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.meta_attributes">
+<code class="sig-name descname"><span class="pre">meta_attributes</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;]</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.meta_attributes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.meta_init_func">
+<code class="sig-name descname"><span class="pre">meta_init_func</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.InitFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.meta_init_func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.meta_status">
+<code class="sig-name descname"><span class="pre">meta_status</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Waiting</span> <span class="pre">for</span> <span class="pre">captains</span> <span class="pre">to</span> <span class="pre">pick</span> <span class="pre">players'</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.meta_status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.pick">
+<code class="sig-name descname"><span class="pre">pick</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.pick" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.processes.player_picking.PlayerPicking.pick_check">
+<code class="sig-name descname"><span class="pre">pick_check</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.pick_check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.pick_status">
+<code class="sig-name descname"><span class="pre">pick_status</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.pick_status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.processes.player_picking.PlayerPicking.picking_captain">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">picking_captain</span></code><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.picking_captain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.ping_last_player">
+<code class="sig-name descname"><span class="pre">ping_last_player</span></code><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.ping_last_player" title="Permalink to this definition">¶</a></dt>
+<dd><p>A background task helper that abstracts the loop and reconnection logic for you.</p>
+<p>The main interface to create this is through <code class="xref py py-func docutils literal notranslate"><span class="pre">loop()</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="processes.process.html" class="btn btn-neutral float-right" title="Process" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="processes.match_playing.html" class="btn btn-neutral float-left" title="Match playing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Planetside Open Games.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

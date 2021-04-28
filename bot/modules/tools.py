@@ -29,16 +29,11 @@ class UnexpectedError(Exception):
 
 
 def is_al_num(string):
-    """ Little utility to check if a string contains only letters and numbers (a-z,A-Z,0-9)
-        Parameters
-        ----------
-        string : str
-            The string to be processed
+    """
+    Little utility to check if a string contains only letters and numbers (a-z,A-Z,0-9)
 
-        Returns
-        -------
-        is_alpha_num : boolean
-            Result
+    :param string: The string to be processed
+    :return: Result
     """
     for i in string.lower():
         cond = ord('a') <= ord(i) <= ord('z')

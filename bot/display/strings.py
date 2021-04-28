@@ -266,10 +266,13 @@ class AllStrings(Enum):
     BENCH_NOT = Message("Player is not benched!", ping=False)
 
     async def send(self, ctx, *args, **kwargs):
-        """ Send the message string_name in context ctx,
-            with additional strings *args.
-            Pass **kwargs to the embed function, if any.
-            Returns the message sent.
+        """
+        Send the message
+
+        :param ctx: context.
+        :param args: Additional strings to format the main string with.
+        :param kwargs: Keywords arguments to pass to the embed function.
+        :return: The message sent.
         """
         if not isinstance(ctx, ContextWrapper):
             ctx = ContextWrapper.wrap(ctx)
@@ -277,8 +280,13 @@ class AllStrings(Enum):
         return await ctx.send(**kwargs)
 
     async def edit(self, msg, *args, **kwargs):
-        """ Replaces the message ctx by the message string_name, with additional strings *args. Pass **kwargs to the embed function, if any
-            Returns the message sent
+        """
+        Edit the message
+
+        :param msg:  context.
+        :param args: Additional strings to format the main string with.
+        :param kwargs: Keywords arguments to pass to the embed function.
+        :return: The message edited.
         """
         kwargs = self.value.get_elements(msg, string=args, embed=kwargs)
         return await msg.edit(**kwargs)

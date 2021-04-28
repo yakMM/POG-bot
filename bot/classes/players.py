@@ -283,22 +283,16 @@ class Player:
         self.__ig_ids = player.ig_ids.copy()
 
     async def register(self, char_list: list) -> bool:
-        """ Register the player with char_list.
+        """
+        Register the player with char_list.
 
-            Parameters
-            ----------
-            char_list : list
-                List of character names to be added.
-
-            Raises
-            ------
-            Check _add_characters.
-
-            Returns
-            -------
-            updated : bool
-                Wether there was an update in the player profile.
-
+        :param char_list: List of character names to be added.
+        :return: Whether there was an update in the player profile.
+        :raise: UnexpectedError, when something unexpected happens.
+        :raise: CharNotFound, when a character name is not found in the API.
+        :raise: CharInvalidWorld, when a character doesn't belongs to Jaeger.
+        :raise: CharAlreadyExists, when a character is already registered by another player
+        :raise: CharMissingFaction, when no character was provided for one of the faction.
         """
         # If "no account"
         if char_list is None:

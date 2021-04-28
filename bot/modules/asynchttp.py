@@ -37,6 +37,7 @@ class ApiNotReachable(Exception):
 async def request_code(url: str) -> int:
     """
     Get the url requested.
+
     :param url: URL to get.
     :return: HTTP code returned.
     """
@@ -48,6 +49,7 @@ async def request_code(url: str) -> int:
 async def api_request_and_retry(url: str, retries: int = 3) -> dict:
     """
     Try to query Planetside2 API.
+
     :param retries: (Optional, default: 3) Number of retries.
     :param url: URL to get.
     :return: Json dictionary returned by the API.
@@ -82,6 +84,7 @@ async def api_request_and_retry(url: str, retries: int = 3) -> dict:
 async def _request(url: str) -> dict:
     """
     Simple HTTP request, parse the result as a json dictionary.
+
     :param url: URL to get.
     :return: Json dictionary of the result.
     """
@@ -93,6 +96,7 @@ async def _request(url: str) -> dict:
 async def _fetch(client: ClientSession, url: str) -> str:
     """
     HTTP request.
+
     :param client: Asynchttp ClientSession object.
     :param url: URL to get.
     :return: result of the request as text.
@@ -108,6 +112,7 @@ async def _fetch(client: ClientSession, url: str) -> str:
 async def _fetch_code(client, url):
     """
     HTTP request.
+
     :param client: Asynchttp ClientSession object.
     :param url: URL to get.
     :return: Code returned by the HTTP request.

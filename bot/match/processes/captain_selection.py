@@ -186,12 +186,10 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         return pings
 
     def find_captain(self):
-        """ Pick at random a captain.
+        """
+        Pick at random a captain.
 
-            Returns
-            -------
-            captain : Player
-                The player designated as captain.
+        :return: The player designated as captain.
         """
         potential = list()
         threshold = 20

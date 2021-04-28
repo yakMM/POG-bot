@@ -142,14 +142,11 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             await disp.PK_OK.send(ctx, other.captain.mention, match=self.match.proxy)
 
     def do_pick(self, team: Team, player):
-        """ Pick a player.
-            
-            Parameters
-            ----------
-            team : Team
-                The team picking the player.
-            player : Player
-                Player picked.
+        """
+        Pick a player.
+
+        :param team: The team picking the player.
+        :param player: Player picked.
         """
         # Remove player from the list and add them to the team
         team.add_player(ActivePlayer, player)
@@ -162,20 +159,6 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         self.pick_check(other)
 
     def pick_check(self, other):
-        """ Check pick progress, auto pick players if needed.
-            
-            Parameters
-            ----------
-            team : Team
-                The team picking the player.
-            player : Player
-                Player picked.
-
-            Returns
-            -------
-            other.captain : TeamCaptain
-                The captain of the next team who can pick.
-        """
         # If only one player left, auto-pick them
         if len(self.players) == 1:
             # Get last player

@@ -1,6 +1,6 @@
 """
-Script for populating the weapon database
-Tools for interacting with weapons listed in the census API
+| Script for populating the weapon database.
+| Tools for interacting with weapons listed in the census API
 """
 
 # External imports
@@ -12,9 +12,10 @@ import os
 import modules.config as cfg
 from modules.database import force_update, init as db_init, get_all_elements
 import classes
+import pathlib
 
 # Find if we are in test mode or in production
-if os.path.isfile("test"):
+if os.path.isfile(f"{pathlib.Path(__file__).parent.absolute()}/test"):
     LAUNCHSTR = "_test"
 else:
     LAUNCHSTR = ""
@@ -301,9 +302,6 @@ def push_all_weapons(push_db=False):
         print("DB updated!")
     else:
         print("DB not updated! Use arg 'push_db=True' to update")
-
-
-push_all_weapons(True)
 
 
 def display_weapons_from_category(cat):

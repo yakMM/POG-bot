@@ -4,4 +4,3 @@ from .faction_picking import FactionPicking
 from .getting_ready import GettingReady
 from .match_playing import MatchPlaying
 from .player_picking import PlayerPicking
-__all__ = ["BasePicking", "CaptainSelection", "FactionPicking", "GettingReady", "MatchPlaying", "PlayerPicking"]
