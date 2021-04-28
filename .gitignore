@@ -14,3 +14,4 @@ matches/
 commands/running
 .vscode/
 .idea/
+doc/build/
