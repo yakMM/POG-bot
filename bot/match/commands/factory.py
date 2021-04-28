@@ -67,7 +67,7 @@ class CommandFactory(metaclass=MetaFactory):
     @Command.command(*picking_states)
     async def pick(self, ctx, args):
         # If already second round
-        if self.match.status is MatchStatus.IS_WAITING and self.match.round_no > 0:
+        if self.match.status is MatchStatus.IS_WAITING and self.match.round_no > 1:
             await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
             return
 
