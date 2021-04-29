@@ -51,12 +51,6 @@ class CharMissingFaction(Exception):
         super().__init__(f"Can't find a character for faction: {faction}")
 
 
-class AccountNotFound(Exception):
-    def __init__(self, id):
-        self.id = id
-        super().__init__(f"Account not found in database: {id}")
-
-
 class Player:
     """ Basic player class, every registered user matches a Player object contained in the dictionary
     """
@@ -526,6 +520,11 @@ class ActivePlayer:
     @account.setter
     def account(self, acc):
         self.__account = acc
+        fake_player = Player.get(acc.id)
+        if fake_player is None:
+            log.fatal(f"Player object not found for account {acc.id}")
+        else:
+            self.__player.copy_ig_info(fake_player)
 
     @property
     def team(self):
@@ -573,10 +572,6 @@ class ActivePlayer:
                                                         {"unique_usages": account_id})
             except db.DatabaseError:
                 pass
-        fake_player = Player.get(account_id)
-        if fake_player is None:
-            raise AccountNotFound(account_id)
-        self.__player.copy_ig_info(fake_player)
 
 
 class TeamCaptain(ActivePlayer):

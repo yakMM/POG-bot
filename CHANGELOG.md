@@ -5,6 +5,8 @@
 - updated = timeout command
 - It is now possible to use =swap and =sub between two rounds
 - Added =bench / =unbench command
+- Added doc folder
+- Accounts are now added to player objects before validation
 
 # v3.2:
 - Added locking mechanic on reaction handler to avoid errors due to players spamming the reactions
