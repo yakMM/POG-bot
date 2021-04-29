@@ -7,6 +7,7 @@
 - Added =bench / =unbench command
 - Added doc folder
 - Accounts are now added to player objects before validation
+- Bases can now be picked with pick command
 
 # v3.2:
 - Added locking mechanic on reaction handler to avoid errors due to players spamming the reactions

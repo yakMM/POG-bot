@@ -1,6 +1,7 @@
 from discord.ext import commands
 import modules.config as cfg
 from match.classes import Match
+from classes import Base
 
 
 class MatchesCog(commands.Cog, name='matches'):
@@ -66,6 +67,17 @@ class MatchesCog(commands.Cog, name='matches'):
     @commands.max_concurrency(number=1, wait=True)
     async def pick(self, ctx, *args):
         match = Match.get(ctx.channel.id)
+        arg = " ".join(args)
+
+        # To allow changing base with =p:
+        if arg not in ("vs", "tr", "nc", "help", "h"):  # Those args are reserved for =p
+            # bl is True if arg is detected to relate to base picking
+            bl = arg in ("a", "d", "c", "accept", "decline", "cancel", "list", "l")
+            bl = bl or Base.get_bases_from_name(arg, base_pool=True)
+            bl = bl or arg.isnumeric()
+            if bl:
+                await match.command.base(ctx, args)
+                return
         await match.command.pick(ctx, args)
 
     @commands.command(aliases=['b', 'map'])

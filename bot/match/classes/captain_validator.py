@@ -84,11 +84,7 @@ class CaptainValidator:
                 if not self.expected:
                     await disp.DECLINE_NOTHING.send(ctx)
                 elif captain is not self.expected:
-                    if self.is_captain(captain):
-                        self.clean()
-                        await disp.CONFIRM_CANCELED.send(ctx)
-                    else:
-                        await disp.DECLINE_NOT_CAPTAIN.send(ctx, self.expected.mention)
+                    await disp.DECLINE_NOT_CAPTAIN.send(ctx, self.expected.mention)
                 else:
                     self.clean()
                     await disp.CONFIRM_DECLINE.send(ctx)

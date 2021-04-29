@@ -32,6 +32,8 @@ class Base:
     def get_bases_from_name(cls, name, base_pool=False):
         results = list()
         name = name.lower()
+        if not name or name.isspace():
+            return results
         for base in (cls._base_pool if base_pool else cls._all_bases_list.values()):
             b_name = base.name.lower()
             if name in b_name or name in b_name.replace("'", ""):
