@@ -106,7 +106,11 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
     @Process.public
     async def on_volunteer(self, player):
-        if not self.captains[0]:
+        if player is self.captains[0]:
+            i = 0
+        elif player is self.captains[1]:
+            i = 1
+        elif not self.captains[0]:
             i = 0
         elif not self.captains[1]:
             i = 1
