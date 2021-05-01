@@ -67,6 +67,7 @@ def admin_help(ctx):
                     value='`=channel (un)freeze` - Prevent users from typing in a channel\n'
                           '`=pog version` - Display current version and lock status\n'
                           '`=pog (un)lock` - Prevent users from interacting with the bot (but admins still can)\n'
+                          '`=reload accounts`/`bases`/`weapons`/`config` - Reload specified element from the database\n'
                           '`=spam clear` - Clear the spam filter\n',
                     inline=False)
     embed.add_field(name='Lobby commands',

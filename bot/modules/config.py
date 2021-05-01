@@ -208,14 +208,13 @@ def get_config(launch_str):
             _error_incorrect(key, 'General', file)
 
     # Testing api key
-    #TODO CHANGE
-    skip_api_test = True
-    if not skip_api_test:
-        url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
-        j_data = loads(get(url).content)
-        if 'error' in j_data:
-            raise ConfigError(
-                f"Incorrect api key: {general['api_key']} in '{file}'")
+    # skip_api_test = True
+    # if not skip_api_test:
+    #     url = f"http://census.daybreakgames.com/s:{general['api_key']}/get/ps2:v2/faction"
+    #     j_data = loads(get(url).content)
+    #     if 'error' in j_data:
+    #         raise ConfigError(
+    #             f"Incorrect api key: {general['api_key']} in '{file}'")
 
     # Teamspeak section
     _check_section(config, "Teamspeak", file)
@@ -242,6 +241,7 @@ def get_config(launch_str):
 
     # Channels section
     _check_section(config, "Channels", file)
+    channels_list.clear()
 
     for key in channels:
         try:
@@ -314,11 +314,12 @@ def get_config(launch_str):
     VERSION = txt_str[3:-2]
 
     # Map_Images section
-    _check_section(config, "Map_Images", file)
+    _check_section(config, "Base_Images", file)
+    base_images.clear()
 
-    for key in config['Map_Images'].keys():
+    for key in config['Base_Images'].keys():
         try:
-            base_images[base_to_id[key]] = config['Map_Images'][key]
+            base_images[base_to_id[key]] = config['Base_Images'][key]
         except KeyError:
             raise ConfigError(f"Missing base '{key}' in 'base_to_id' dictionary in 'config.py'")
 

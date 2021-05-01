@@ -76,6 +76,11 @@ async def clear_loop(msg):
     _unlock_msg(msg.id)
 
 
+async def add_reactions(msg, reactions):
+    for r in reactions:
+        await msg.add_reaction(r)
+
+
 class ReactionHandler:
     def __init__(self, rem_user_react=True, rem_bot_react=False, auto_destroy=False):
         self.__f_dict = dict()

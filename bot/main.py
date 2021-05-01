@@ -41,9 +41,6 @@ import modules.stat_processor
 from match.classes.match import Match
 from classes import Player, Base, Weapon
 
-
-rules_msg = None  # Will contain message object representing the rules message, global variable
-
 log = logging.getLogger("pog_bot")
 
 def _add_main_handlers(client):
@@ -140,7 +137,7 @@ def _add_main_handlers(client):
                     await disp.REG_RULES.send(ContextWrapper.channel(cfg.channels["register"]), payload.member.mention)
                 else:
                     await modules.roles.role_update(p)
-            await rules_msg.remove_reaction(payload.emoji, payload.member)
+            await modules.roles.rules_msg.remove_reaction(payload.emoji, payload.member)
 
     # Reaction update handler (for accounts)
     @client.event
@@ -186,11 +183,7 @@ def _add_init_handlers(client):
         modules.roles.init(client)
 
         # fetch rule message, remove all reaction but the bot's
-        global rules_msg
-        rules_msg = await client.get_channel(cfg.channels["rules"]).fetch_message(cfg.general["rules_msg_id"])
-        await rules_msg.clear_reactions()
-        await sleep(0.2)
-        await rules_msg.add_reaction('✅')
+        await modules.roles.update_rule_msg()
 
         # Update all players roles
         for p in Player.get_all_players_list():
