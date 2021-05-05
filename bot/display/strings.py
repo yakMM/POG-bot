@@ -42,7 +42,7 @@ class AllStrings(Enum):
     LB_TOO_LONG = Message("{} was removed from the lobby by timeout!", embed=embeds.lobby_list)
     LB_CLEARED = Message("Lobby has been cleared!", embed=embeds.lobby_list)
     LB_EMPTY = Message("Lobby is already empty!")
-    LB_NOTIFY = Message("{} queue is almost full, join to start a match!")
+    LB_NOTIFY = Message("{} queue is almost full ({}/{}), join to start a match!")
     LB_GET = Message("Restore the lobby with `=lobby restore {}`")
     LB_SAVE = Message("Lobby status saved, will be restored on next restart!")
     LB_REFRESHED = Message("You have reset your queue timeout!")

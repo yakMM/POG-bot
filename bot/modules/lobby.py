@@ -2,11 +2,9 @@ import modules.config as cfg
 from display.strings import AllStrings as disp
 from display.classes import ContextWrapper
 
-from random import choice as random_choice
 from lib.tasks import Loop, loop
 from logging import getLogger
 
-from datetime import datetime as dt
 import modules.tools as tools
 import modules.reactions as reactions
 
@@ -128,7 +126,8 @@ def add_to_lobby(player):
 async def _auto_ping():
     if _MatchClass.find_empty() is None:
         return
-    await disp.LB_NOTIFY.send(ContextWrapper.channel(cfg.channels["lobby"]), f'<@&{cfg.roles["notify"]}>')
+    await disp.LB_NOTIFY.send(ContextWrapper.channel(cfg.channels["lobby"]), f'<@&{cfg.roles["notify"]}>',
+                              get_lobby_len(), cfg.general["lobby_size"])
 
 
 _auto_ping.already = False
