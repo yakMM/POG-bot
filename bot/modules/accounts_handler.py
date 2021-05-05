@@ -1,5 +1,8 @@
 """
-This module handle the POG Jaeger accounts
+| This module handle the POG Jaeger accounts.
+| Initialize or reload the module with :meth:`init`.
+| Then call :meth:`give_account` and :meth:`send_account` to hand an account to an in-match player.
+| Use :meth:`terminate_account` to remove the account from the player.
 """
 
 # External imports

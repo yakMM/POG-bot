@@ -3,5 +3,5 @@ Accounts handler
 
 .. automodule:: modules.accounts_handler
    :members:
-   :undoc-members:
+   :exclude-members: on_account_reaction
    :show-inheritance:

@@ -1,4 +1,6 @@
-""" Retrieves configuration from the config file
+"""
+| Contains all the configuration parameters for the application.
+| Call :meth:`get_config` to initialize the configuration from the config file.
 """
 
 from json import loads
@@ -12,7 +14,12 @@ log = getLogger("pog_bot")
 
 
 class ConfigError(Exception):
-    def __init__(self, msg):
+    """
+    Raised when an error occur while reading the config file.
+
+    :param msg: Error message.
+    """
+    def __init__(self, msg: str):
         self.message = "Error in config file: " + msg
         super().__init__(self.message)
 
@@ -20,16 +27,18 @@ class ConfigError(Exception):
 
 AFK_TIME = 15  # minutes
 
+#: Dictionary to retrieve faction name by id.
 factions = {
     1: "VS",
     2: "NC",
     3: "TR"
 }
 
-# Lazy way to get factions from user input:
+#: Dictionary to retrieve faction id by name.
 i_factions = {v: k for k, v in factions.items()}
 
 # http://census.daybreakgames.com/get/ps2:v2/zone?c:limit=100
+#: Dictionary to retrieve zone name by id.
 zones = {
     2: "Indar",
     4: "Hossin",
@@ -38,6 +47,7 @@ zones = {
 }
 
 # http://census.daybreakgames.com/get/ps2:v2/facility_type?c:limit=100
+#: Dictionary to retrieve facility suffix by id.
 facility_suffix = {
     2: "Amp Station",
     3: "Bio Lab",
@@ -45,6 +55,7 @@ facility_suffix = {
 }
 
 # http://census.daybreakgames.com/get/ps2:v2/loadout/?c:limit=500
+#: Dictionary to retrieve loadout name by id.
 loadout_id = {
     1: "infiltrator",
     3: "light_assault",
@@ -67,6 +78,7 @@ loadout_id = {
 }
 
 # http://census.daybreakgames.com/get/ps2/base_region/?c:limit=400&c:show=facility_id,facility_name,zone_id,facility_type_id
+#: Dictionary to retrieve base id from name.
 base_to_id = {
     "acan": 302030,
     "ghanan": 305010,
@@ -83,6 +95,7 @@ base_to_id = {
     "rime": 244610
 }
 
+#: Dictionary to retrieve base name from id.
 id_to_base = {v: k for k, v in base_to_id.items()}
 
 ## DYNAMIC PARAMETERS:
@@ -94,7 +107,7 @@ LAUNCH_STR = ""
 
 GAPI_JSON = ""
 
-# General
+#: Contains general parameters.
 general = {
     "token": "",
     "api_key": "",
@@ -104,7 +117,7 @@ general = {
     "rules_msg_id": 0
 }
 
-# Teamspeak
+#: Contains TS3 parameters.
 ts = {
     "url": "",
     "config_help": "",
@@ -112,7 +125,7 @@ ts = {
     "matches": list()
 }
 
-# Channels
+#: Contains discord channel IDs.
 channels = {
     "lobby": 0,
     "register": 0,
@@ -125,23 +138,24 @@ channels = {
     "usage": 0
 }
 
+#: Contains all channels the bot should read/interact in.
 channels_list = list()
 
-# Roles
+#: Contains discord roles IDs.
 roles = {
     "admin": 0,
     "registered": 0,
     "notify": 0
 }
 
-# Emojis
+#: Contains discord emojis IDs.
 emojis = {
     "VS": "",
     "TR": "",
     "NC": ""
 }
 
-# Scores
+#: Contains scoring parameters.
 scores = {
     "teamkill": 0,
     "suicide": 0,
@@ -149,7 +163,7 @@ scores = {
     "recapture": 0
 }
 
-# Collections
+# Contains database collections names.
 _collections = {
     "users": "",
     "static_bases": "",
@@ -161,7 +175,7 @@ _collections = {
     "match_logs": ""
 }
 
-# Database
+#: Contains database parameters.
 database = {
     "url": "",
     "cluster": "",
@@ -170,13 +184,18 @@ database = {
     "collections": _collections
 }
 
-# Base Images
+#: Contains url for base images.
 base_images = dict()
 
 
 ## Methods
 
-def get_config(launch_str):
+def get_config(launch_str: str):
+    """
+    Populate the config data from the config file.
+
+    :param launch_str: Config file suffix. Useful to have different configurations files.
+    """
     global LAUNCH_STR
     global GAPI_JSON
     LAUNCH_STR = launch_str

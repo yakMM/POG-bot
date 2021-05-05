@@ -3,6 +3,8 @@ Project content
 
 This section is a work in progress!
 
+| Only :doc:`modules/modules` is currently documented
+
 .. toctree::
    :maxdepth: 4
 

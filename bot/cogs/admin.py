@@ -296,6 +296,7 @@ class AdminCog(commands.Cog, name='admin'):
             if arg == "config":
                 await loop.run_in_executor(None, cfg.get_config, cfg.LAUNCH_STR)
                 await roles.update_rule_msg()
+                await loop.run_in_executor(None, db.init, cfg.database)
                 await disp.BOT_RELOAD.send(ctx, "Config")
                 return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)

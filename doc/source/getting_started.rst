@@ -228,9 +228,9 @@ Additionally, add access to all commands for localhost in the
 
     # Admin rule
     [[rule]]
-            # Treat requests from localhost as admin
-            ip = [ "::ffff:127.0.0.1" ]
-            "+" = "*"
+    # Treat requests from localhost as admin
+    ip = [ "::ffff:127.0.0.1" ]
+    "+" = "*"
 
 Configuring individual bots
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

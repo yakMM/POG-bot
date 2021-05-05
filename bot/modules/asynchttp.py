@@ -1,9 +1,7 @@
 """
-Handle asynchronous http requests
-
-Usage:
-    Request to PS2 api: json_result_file = await api_request_and_retry(url)
-    Standard HTTP request: result_code = await request_code(url)
+| Handle asynchronous http requests.
+| Request to PS2 api: use :meth:`api_request_and_retry`.
+| Standard HTTP request: use :meth:`request_code`.
 """
 
 # External imports
@@ -24,10 +22,9 @@ class ApiNotReachable(Exception):
     """
     Custom API request exception.
 
-    Attributes:
-        url: Url of the failed request.
+    :param url: Url which led to the error.
     """
-    def __init__(self, url):
+    def __init__(self, url: str):
         self.url = url
         message = f"Cannot resolve Api ({url})!"
         log.error(message)
@@ -53,7 +50,7 @@ async def api_request_and_retry(url: str, retries: int = 3) -> dict:
     :param retries: (Optional, default: 3) Number of retries.
     :param url: URL to get.
     :return: Json dictionary returned by the API.
-    :raise: ApiNotReachable if the request failed.
+    :raise ApiNotReachable: if the request failed.
     """
     for i in range(retries):
         try:
