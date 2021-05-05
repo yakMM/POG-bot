@@ -185,17 +185,37 @@ If the accounts in memory and on account sheet are ever different, account track
 Therefore the account sheet should be read only for humans on google drive.</p>
 <dl class="py class">
 <dt id="classes.accounts.Account">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">classes.accounts.</span></code><code class="sig-name descname"><span class="pre">Account</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_usages</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.accounts.Account" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Account</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_usages</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.accounts.Account" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Account object, each of these represent one single account</p>
 <dl class="py method">
-<dt id="classes.accounts.Account.add_usage">
-<code class="sig-name descname"><span class="pre">add_usage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.accounts.Account.add_usage" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.accounts.Account.update">
+<code class="sig-name descname"><span class="pre">update</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.accounts.Account.update" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="classes.accounts.Account.clean">
-<code class="sig-name descname"><span class="pre">clean</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.accounts.Account.clean" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.accounts.Account.is_destroyed">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_destroyed</span></code><a class="headerlink" href="#classes.accounts.Account.is_destroyed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.accounts.Account.nb_unique_usages">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">nb_unique_usages</span></code><a class="headerlink" href="#classes.accounts.Account.nb_unique_usages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.accounts.Account.unique_usages">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">unique_usages</span></code><a class="headerlink" href="#classes.accounts.Account.unique_usages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.accounts.Account.username">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">username</span></code><a class="headerlink" href="#classes.accounts.Account.username" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.accounts.Account.password">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">password</span></code><a class="headerlink" href="#classes.accounts.Account.password" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -204,8 +224,8 @@ Therefore the account sheet should be read only for humans on google drive.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="classes.accounts.Account.is_destroyed">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_destroyed</span></code><a class="headerlink" href="#classes.accounts.Account.is_destroyed" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.accounts.Account.str_id">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">str_id</span></code><a class="headerlink" href="#classes.accounts.Account.str_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -219,43 +239,23 @@ Therefore the account sheet should be read only for humans on google drive.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="classes.accounts.Account.nb_unique_usages">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">nb_unique_usages</span></code><a class="headerlink" href="#classes.accounts.Account.nb_unique_usages" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.accounts.Account.clean">
+<code class="sig-name descname"><span class="pre">clean</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.accounts.Account.clean" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="classes.accounts.Account.password">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">password</span></code><a class="headerlink" href="#classes.accounts.Account.password" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.accounts.Account.str_id">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">str_id</span></code><a class="headerlink" href="#classes.accounts.Account.str_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.accounts.Account.terminate">
-<code class="sig-name descname"><span class="pre">terminate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.accounts.Account.terminate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.accounts.Account.unique_usages">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">unique_usages</span></code><a class="headerlink" href="#classes.accounts.Account.unique_usages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.accounts.Account.update">
-<code class="sig-name descname"><span class="pre">update</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.accounts.Account.update" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.accounts.Account.username">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">username</span></code><a class="headerlink" href="#classes.accounts.Account.username" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.accounts.Account.add_usage">
+<code class="sig-name descname"><span class="pre">add_usage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.accounts.Account.add_usage" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="classes.accounts.Account.validate">
 <em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">validate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.accounts.Account.validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.accounts.Account.terminate">
+<code class="sig-name descname"><span class="pre">terminate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.accounts.Account.terminate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

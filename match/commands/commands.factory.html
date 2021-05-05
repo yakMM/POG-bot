@@ -186,17 +186,53 @@
   <div class="section" id="module-match.commands.factory">
 <span id="factory"></span><h1>Factory<a class="headerlink" href="#module-match.commands.factory" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
+<dt id="match.commands.factory.MetaFactory">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">MetaFactory</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.commands.factory.MetaFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></p>
+</dd></dl>
+
+<dl class="py class">
 <dt id="match.commands.factory.CommandFactory">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">match.commands.factory.</span></code><code class="sig-name descname"><span class="pre">CommandFactory</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.commands.factory.CommandFactory" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">CommandFactory</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.commands.factory.CommandFactory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="match.commands.factory.CommandFactory.on_status_update">
+<code class="sig-name descname"><span class="pre">on_status_update</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.commands.factory.CommandFactory.on_status_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.commands.factory.CommandFactory.on_team_ready">
+<code class="sig-name descname"><span class="pre">on_team_ready</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.commands.factory.CommandFactory.on_team_ready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.commands.factory.CommandFactory.on_clean">
+<code class="sig-name descname"><span class="pre">on_clean</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.commands.factory.CommandFactory.on_clean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
-<dt id="match.commands.factory.CommandFactory.base">
-<code class="sig-name descname"><span class="pre">base</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.commands.factory.CommandFactory.base" title="Permalink to this definition">¶</a></dt>
+<dt id="match.commands.factory.CommandFactory.pick">
+<code class="sig-name descname"><span class="pre">pick</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.commands.factory.CommandFactory.pick" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="match.commands.factory.CommandFactory.captain">
 <code class="sig-name descname"><span class="pre">captain</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.commands.factory.CommandFactory.captain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.commands.factory.CommandFactory.ready">
+<code class="sig-name descname"><span class="pre">ready</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.commands.factory.CommandFactory.ready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.commands.factory.CommandFactory.squittal">
+<code class="sig-name descname"><span class="pre">squittal</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.commands.factory.CommandFactory.squittal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.commands.factory.CommandFactory.base">
+<code class="sig-name descname"><span class="pre">base</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.commands.factory.CommandFactory.base" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -214,42 +250,6 @@
 <code class="sig-name descname"><span class="pre">meta_commands</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[&lt;match.commands.command.Command</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;]</span></em><a class="headerlink" href="#match.commands.factory.CommandFactory.meta_commands" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="match.commands.factory.CommandFactory.on_clean">
-<code class="sig-name descname"><span class="pre">on_clean</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.commands.factory.CommandFactory.on_clean" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="match.commands.factory.CommandFactory.on_status_update">
-<code class="sig-name descname"><span class="pre">on_status_update</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.commands.factory.CommandFactory.on_status_update" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="match.commands.factory.CommandFactory.on_team_ready">
-<code class="sig-name descname"><span class="pre">on_team_ready</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.commands.factory.CommandFactory.on_team_ready" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.commands.factory.CommandFactory.pick">
-<code class="sig-name descname"><span class="pre">pick</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.commands.factory.CommandFactory.pick" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.commands.factory.CommandFactory.ready">
-<code class="sig-name descname"><span class="pre">ready</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.commands.factory.CommandFactory.ready" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.commands.factory.CommandFactory.squittal">
-<code class="sig-name descname"><span class="pre">squittal</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.commands.command.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.commands.factory.CommandFactory.squittal" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="match.commands.factory.MetaFactory">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">match.commands.factory.</span></code><code class="sig-name descname"><span class="pre">MetaFactory</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.commands.factory.MetaFactory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></p>
 </dd></dl>
 
 </div>

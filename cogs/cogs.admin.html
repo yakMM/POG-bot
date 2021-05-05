@@ -179,24 +179,9 @@
 <span id="admin"></span><h1>Admin<a class="headerlink" href="#module-cogs.admin" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="cogs.admin.AdminCog">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cogs.admin.</span></code><code class="sig-name descname"><span class="pre">AdminCog</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cogs.admin.AdminCog" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">AdminCog</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cogs.admin.AdminCog" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">discord.ext.commands.cog.Cog</span></code></p>
 <p>Register cog, handle the admin commands</p>
-<dl class="py attribute">
-<dt id="cogs.admin.AdminCog.channel">
-<code class="sig-name descname"><span class="pre">channel</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.channel" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="cogs.admin.AdminCog.check">
-<code class="sig-name descname"><span class="pre">check</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.check" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="cogs.admin.AdminCog.clear">
-<code class="sig-name descname"><span class="pre">clear</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.clear" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt id="cogs.admin.AdminCog.cog_check">
 <em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">cog_check</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cogs.admin.AdminCog.cog_check" title="Permalink to this definition">¶</a></dt>
@@ -207,13 +192,48 @@ for every command and subcommand in this cog.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="cogs.admin.AdminCog.clear">
+<code class="sig-name descname"><span class="pre">clear</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cogs.admin.AdminCog.unregister">
+<code class="sig-name descname"><span class="pre">unregister</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.unregister" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cogs.admin.AdminCog.rename">
+<code class="sig-name descname"><span class="pre">rename</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.rename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cogs.admin.AdminCog.check">
+<code class="sig-name descname"><span class="pre">check</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cogs.admin.AdminCog.spam">
+<code class="sig-name descname"><span class="pre">spam</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.spam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt id="cogs.admin.AdminCog.lobby">
 <code class="sig-name descname"><span class="pre">lobby</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.lobby" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt id="cogs.admin.AdminCog.timeout">
+<code class="sig-name descname"><span class="pre">timeout</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt id="cogs.admin.AdminCog.pog">
 <code class="sig-name descname"><span class="pre">pog</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.pog" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cogs.admin.AdminCog.channel">
+<code class="sig-name descname"><span class="pre">channel</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.channel" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -226,36 +246,16 @@ for every command and subcommand in this cog.</p>
 <code class="sig-name descname"><span class="pre">remove</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.remove" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt id="cogs.admin.AdminCog.rename">
-<code class="sig-name descname"><span class="pre">rename</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.rename" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="cogs.admin.AdminCog.spam">
-<code class="sig-name descname"><span class="pre">spam</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.spam" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="cogs.admin.AdminCog.timeout">
-<code class="sig-name descname"><span class="pre">timeout</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.timeout" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="cogs.admin.AdminCog.unregister">
-<code class="sig-name descname"><span class="pre">unregister</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;discord.ext.commands.core.Command</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#cogs.admin.AdminCog.unregister" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="py function">
-<dt id="cogs.admin.get_check_player">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">cogs.admin.</span></code><code class="sig-name descname"><span class="pre">get_check_player</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cogs.admin.get_check_player" title="Permalink to this definition">¶</a></dt>
+<dt id="cogs.admin.setup">
+<code class="sig-name descname"><span class="pre">setup</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cogs.admin.setup" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="cogs.admin.setup">
-<code class="sig-prename descclassname"><span class="pre">cogs.admin.</span></code><code class="sig-name descname"><span class="pre">setup</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cogs.admin.setup" title="Permalink to this definition">¶</a></dt>
+<dt id="cogs.admin.get_check_player">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">get_check_player</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cogs.admin.get_check_player" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

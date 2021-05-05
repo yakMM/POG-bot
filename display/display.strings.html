@@ -175,62 +175,367 @@
 <span id="strings"></span><h1>Strings<a class="headerlink" href="#module-display.strings" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="display.strings.AllStrings">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">display.strings.</span></code><code class="sig-name descname"><span class="pre">AllStrings</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#display.strings.AllStrings" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">AllStrings</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#display.strings.AllStrings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
 <p>List of different message strings available</p>
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.ACCOUNT_USAGE">
-<code class="sig-name descname"><span class="pre">ACCOUNT_USAGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACCOUNT_USAGE" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.REG_NOT_REGISTERED">
+<code class="sig-name descname"><span class="pre">REG_NOT_REGISTERED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_NOT_REGISTERED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.ACC_CLOSED">
-<code class="sig-name descname"><span class="pre">ACC_CLOSED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_CLOSED" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.REG_STATUS">
+<code class="sig-name descname"><span class="pre">REG_STATUS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_STATUS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.ACC_ERROR">
-<code class="sig-name descname"><span class="pre">ACC_ERROR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_ERROR" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.REG_ALREADY_OWN">
+<code class="sig-name descname"><span class="pre">REG_ALREADY_OWN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_ALREADY_OWN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.ACC_GIVING">
-<code class="sig-name descname"><span class="pre">ACC_GIVING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_GIVING" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.REG_ALREADY_NOA">
+<code class="sig-name descname"><span class="pre">REG_ALREADY_NOA</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_ALREADY_NOA" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.ACC_LOG">
-<code class="sig-name descname"><span class="pre">ACC_LOG</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_LOG" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.REG_HELP">
+<code class="sig-name descname"><span class="pre">REG_HELP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_HELP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.ACC_NOT_ENOUGH">
-<code class="sig-name descname"><span class="pre">ACC_NOT_ENOUGH</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_NOT_ENOUGH" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.REG_NO_ACCOUNT">
+<code class="sig-name descname"><span class="pre">REG_NO_ACCOUNT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_NO_ACCOUNT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.ACC_OVER">
-<code class="sig-name descname"><span class="pre">ACC_OVER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_OVER" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.REG_INVALID">
+<code class="sig-name descname"><span class="pre">REG_INVALID</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_INVALID" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.ACC_SENDING">
-<code class="sig-name descname"><span class="pre">ACC_SENDING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_SENDING" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.REG_CHAR_NOT_FOUND">
+<code class="sig-name descname"><span class="pre">REG_CHAR_NOT_FOUND</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_CHAR_NOT_FOUND" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.ACC_SENT">
-<code class="sig-name descname"><span class="pre">ACC_SENT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_SENT" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.REG_NOT_JAEGER">
+<code class="sig-name descname"><span class="pre">REG_NOT_JAEGER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_NOT_JAEGER" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.ACC_STAFF">
-<code class="sig-name descname"><span class="pre">ACC_STAFF</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_STAFF" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.REG_ALREADY_EXIST">
+<code class="sig-name descname"><span class="pre">REG_ALREADY_EXIST</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_ALREADY_EXIST" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.ACC_UPDATE">
-<code class="sig-name descname"><span class="pre">ACC_UPDATE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_UPDATE" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.REG_MISSING_FACTION">
+<code class="sig-name descname"><span class="pre">REG_MISSING_FACTION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_MISSING_FACTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.REG_UPDATE_OWN">
+<code class="sig-name descname"><span class="pre">REG_UPDATE_OWN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_UPDATE_OWN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.REG_UPDATE_NOA">
+<code class="sig-name descname"><span class="pre">REG_UPDATE_NOA</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_UPDATE_NOA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.REG_WITH_CHARS">
+<code class="sig-name descname"><span class="pre">REG_WITH_CHARS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_WITH_CHARS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.REG_FROZEN">
+<code class="sig-name descname"><span class="pre">REG_FROZEN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_FROZEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.REG_RULES">
+<code class="sig-name descname"><span class="pre">REG_RULES</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_RULES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_ALREADY_IN">
+<code class="sig-name descname"><span class="pre">LB_ALREADY_IN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_ALREADY_IN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_IN_MATCH">
+<code class="sig-name descname"><span class="pre">LB_IN_MATCH</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_IN_MATCH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_ADDED">
+<code class="sig-name descname"><span class="pre">LB_ADDED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_ADDED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_REMOVED">
+<code class="sig-name descname"><span class="pre">LB_REMOVED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_REMOVED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_NOT_IN">
+<code class="sig-name descname"><span class="pre">LB_NOT_IN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_NOT_IN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_QUEUE">
+<code class="sig-name descname"><span class="pre">LB_QUEUE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_QUEUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_FULL">
+<code class="sig-name descname"><span class="pre">LB_FULL</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_FULL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_STUCK">
+<code class="sig-name descname"><span class="pre">LB_STUCK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_STUCK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_STUCK_JOIN">
+<code class="sig-name descname"><span class="pre">LB_STUCK_JOIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_STUCK_JOIN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_MATCH_STARTING">
+<code class="sig-name descname"><span class="pre">LB_MATCH_STARTING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_MATCH_STARTING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_WARNING">
+<code class="sig-name descname"><span class="pre">LB_WARNING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_WARNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_TOO_LONG">
+<code class="sig-name descname"><span class="pre">LB_TOO_LONG</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_TOO_LONG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_CLEARED">
+<code class="sig-name descname"><span class="pre">LB_CLEARED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_CLEARED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_EMPTY">
+<code class="sig-name descname"><span class="pre">LB_EMPTY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_EMPTY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_NOTIFY">
+<code class="sig-name descname"><span class="pre">LB_NOTIFY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_NOTIFY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_GET">
+<code class="sig-name descname"><span class="pre">LB_GET</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_GET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_SAVE">
+<code class="sig-name descname"><span class="pre">LB_SAVE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_SAVE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.LB_REFRESHED">
+<code class="sig-name descname"><span class="pre">LB_REFRESHED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_REFRESHED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_OVER">
+<code class="sig-name descname"><span class="pre">PK_OVER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_OVER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_NO_LOBBIED">
+<code class="sig-name descname"><span class="pre">PK_NO_LOBBIED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_NO_LOBBIED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_WAIT_FOR_PICK">
+<code class="sig-name descname"><span class="pre">PK_WAIT_FOR_PICK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_WAIT_FOR_PICK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_WRONG_CHANNEL">
+<code class="sig-name descname"><span class="pre">PK_WRONG_CHANNEL</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_WRONG_CHANNEL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_NOT_TURN">
+<code class="sig-name descname"><span class="pre">PK_NOT_TURN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_NOT_TURN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_NOT_CAPTAIN">
+<code class="sig-name descname"><span class="pre">PK_NOT_CAPTAIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_NOT_CAPTAIN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_SHOW_TEAMS">
+<code class="sig-name descname"><span class="pre">PK_SHOW_TEAMS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_SHOW_TEAMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_PLAYERS_HELP">
+<code class="sig-name descname"><span class="pre">PK_PLAYERS_HELP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_PLAYERS_HELP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_NO_ARG">
+<code class="sig-name descname"><span class="pre">PK_NO_ARG</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_NO_ARG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_TOO_MUCH">
+<code class="sig-name descname"><span class="pre">PK_TOO_MUCH</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_TOO_MUCH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_INVALID">
+<code class="sig-name descname"><span class="pre">PK_INVALID</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_INVALID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_OK">
+<code class="sig-name descname"><span class="pre">PK_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_OK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_OK_2">
+<code class="sig-name descname"><span class="pre">PK_OK_2</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_OK_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_LAST">
+<code class="sig-name descname"><span class="pre">PK_LAST</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_LAST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_OK_FACTION">
+<code class="sig-name descname"><span class="pre">PK_OK_FACTION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_OK_FACTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_NOT_VALID_FACTION">
+<code class="sig-name descname"><span class="pre">PK_NOT_VALID_FACTION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_NOT_VALID_FACTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_FACTION_OK">
+<code class="sig-name descname"><span class="pre">PK_FACTION_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_OK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_FACTION_ALREADY">
+<code class="sig-name descname"><span class="pre">PK_FACTION_ALREADY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_ALREADY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_FACTION_OTHER">
+<code class="sig-name descname"><span class="pre">PK_FACTION_OTHER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_OTHER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_FACTION_OK_NEXT">
+<code class="sig-name descname"><span class="pre">PK_FACTION_OK_NEXT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_OK_NEXT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_FACTION_CHANGED">
+<code class="sig-name descname"><span class="pre">PK_FACTION_CHANGED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_CHANGED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_FACTION_NOT_PLAYER">
+<code class="sig-name descname"><span class="pre">PK_FACTION_NOT_PLAYER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_NOT_PLAYER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_FACTION_INFO">
+<code class="sig-name descname"><span class="pre">PK_FACTION_INFO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_INFO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_FACTION_HELP">
+<code class="sig-name descname"><span class="pre">PK_FACTION_HELP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_HELP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_OVER_READY">
+<code class="sig-name descname"><span class="pre">PK_OVER_READY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_OVER_READY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_RESIGNED">
+<code class="sig-name descname"><span class="pre">PK_RESIGNED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_RESIGNED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.PK_BASING_INFO">
+<code class="sig-name descname"><span class="pre">PK_BASING_INFO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_BASING_INFO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.EXT_NOT_REGISTERED">
+<code class="sig-name descname"><span class="pre">EXT_NOT_REGISTERED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.EXT_NOT_REGISTERED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.UNKNOWN_ERROR">
+<code class="sig-name descname"><span class="pre">UNKNOWN_ERROR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.UNKNOWN_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.STOP_SPAM">
+<code class="sig-name descname"><span class="pre">STOP_SPAM</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.STOP_SPAM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.HELP">
+<code class="sig-name descname"><span class="pre">HELP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.HELP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.INVALID_COMMAND">
+<code class="sig-name descname"><span class="pre">INVALID_COMMAND</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.INVALID_COMMAND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.WRONG_USAGE">
+<code class="sig-name descname"><span class="pre">WRONG_USAGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.WRONG_USAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.WRONG_CHANNEL">
+<code class="sig-name descname"><span class="pre">WRONG_CHANNEL</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.WRONG_CHANNEL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.WRONG_CHANNEL_2">
+<code class="sig-name descname"><span class="pre">WRONG_CHANNEL_2</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.WRONG_CHANNEL_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.NO_PERMISSION">
+<code class="sig-name descname"><span class="pre">NO_PERMISSION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.NO_PERMISSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.CHANNEL_INIT">
+<code class="sig-name descname"><span class="pre">CHANNEL_INIT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CHANNEL_INIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.INVALID_STR">
+<code class="sig-name descname"><span class="pre">INVALID_STR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.INVALID_STR" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -249,113 +554,128 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_BOOKED">
-<code class="sig-name descname"><span class="pre">BASE_BOOKED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_BOOKED" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.PUBLISH_ERROR">
+<code class="sig-name descname"><span class="pre">PUBLISH_ERROR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PUBLISH_ERROR" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_CALENDAR">
-<code class="sig-name descname"><span class="pre">BASE_CALENDAR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_CALENDAR" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.GLOBAL_INFO">
+<code class="sig-name descname"><span class="pre">GLOBAL_INFO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.GLOBAL_INFO" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_DISPLAY">
-<code class="sig-name descname"><span class="pre">BASE_DISPLAY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_DISPLAY" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.CHECK_ACCOUNT">
+<code class="sig-name descname"><span class="pre">CHECK_ACCOUNT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CHECK_ACCOUNT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_HELP">
-<code class="sig-name descname"><span class="pre">BASE_HELP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_HELP" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.RDY">
+<code class="sig-name descname"><span class="pre">RDY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RDY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_NOT_FOUND">
-<code class="sig-name descname"><span class="pre">BASE_NOT_FOUND</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_NOT_FOUND" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.STOP">
+<code class="sig-name descname"><span class="pre">STOP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.STOP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_NO_BASE">
-<code class="sig-name descname"><span class="pre">BASE_NO_BASE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_NO_BASE" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.SPAM_CLEARED">
+<code class="sig-name descname"><span class="pre">SPAM_CLEARED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SPAM_CLEARED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_NO_BASE_WAITING">
-<code class="sig-name descname"><span class="pre">BASE_NO_BASE_WAITING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_NO_BASE_WAITING" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.SPAM_DEBUG">
+<code class="sig-name descname"><span class="pre">SPAM_DEBUG</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SPAM_DEBUG" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_NO_CHANGE">
-<code class="sig-name descname"><span class="pre">BASE_NO_CHANGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_NO_CHANGE" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.CONFIRM_NOT_CAPTAIN">
+<code class="sig-name descname"><span class="pre">CONFIRM_NOT_CAPTAIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CONFIRM_NOT_CAPTAIN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_NO_READY">
-<code class="sig-name descname"><span class="pre">BASE_NO_READY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_NO_READY" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.CONFIRM_NOTHING">
+<code class="sig-name descname"><span class="pre">CONFIRM_NOTHING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CONFIRM_NOTHING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_OK_CONFIRM">
-<code class="sig-name descname"><span class="pre">BASE_OK_CONFIRM</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_OK_CONFIRM" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.DECLINE_NOTHING">
+<code class="sig-name descname"><span class="pre">DECLINE_NOTHING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.DECLINE_NOTHING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_ON_SELECT">
-<code class="sig-name descname"><span class="pre">BASE_ON_SELECT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_ON_SELECT" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.DECLINE_NOT_CAPTAIN">
+<code class="sig-name descname"><span class="pre">DECLINE_NOT_CAPTAIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.DECLINE_NOT_CAPTAIN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_SELECTED">
-<code class="sig-name descname"><span class="pre">BASE_SELECTED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_SELECTED" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.CONFIRM_DECLINE">
+<code class="sig-name descname"><span class="pre">CONFIRM_DECLINE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CONFIRM_DECLINE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_SHOW_LIST">
-<code class="sig-name descname"><span class="pre">BASE_SHOW_LIST</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_SHOW_LIST" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.CONFIRM_CANCELED">
+<code class="sig-name descname"><span class="pre">CONFIRM_CANCELED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CONFIRM_CANCELED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BASE_TOO_MUCH">
-<code class="sig-name descname"><span class="pre">BASE_TOO_MUCH</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_TOO_MUCH" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.CANCEL_NOTHING">
+<code class="sig-name descname"><span class="pre">CANCEL_NOTHING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CANCEL_NOTHING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BENCH_ALREADY">
-<code class="sig-name descname"><span class="pre">BENCH_ALREADY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_ALREADY" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.CANCEL_NOT_CAPTAIN">
+<code class="sig-name descname"><span class="pre">CANCEL_NOT_CAPTAIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CANCEL_NOT_CAPTAIN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BENCH_MENTION">
-<code class="sig-name descname"><span class="pre">BENCH_MENTION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_MENTION" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.READY_NO_COMMAND">
+<code class="sig-name descname"><span class="pre">READY_NO_COMMAND</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.READY_NO_COMMAND" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BENCH_NO">
-<code class="sig-name descname"><span class="pre">BENCH_NO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_NO" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.NO_RULE">
+<code class="sig-name descname"><span class="pre">NO_RULE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.NO_RULE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BENCH_NOT">
-<code class="sig-name descname"><span class="pre">BENCH_NOT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_NOT" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.DISPLAY_STATS">
+<code class="sig-name descname"><span class="pre">DISPLAY_STATS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.DISPLAY_STATS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BENCH_OK">
-<code class="sig-name descname"><span class="pre">BENCH_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_OK" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.BOT_UNLOCKED">
+<code class="sig-name descname"><span class="pre">BOT_UNLOCKED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_UNLOCKED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BENCH_OK_CONFIRM">
-<code class="sig-name descname"><span class="pre">BENCH_OK_CONFIRM</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_OK_CONFIRM" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.BOT_LOCKED">
+<code class="sig-name descname"><span class="pre">BOT_LOCKED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_LOCKED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BENCH_RDY">
-<code class="sig-name descname"><span class="pre">BENCH_RDY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_RDY" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.BOT_IS_LOCKED">
+<code class="sig-name descname"><span class="pre">BOT_IS_LOCKED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_IS_LOCKED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="display.strings.AllStrings.BOT_ALREADY">
 <code class="sig-name descname"><span class="pre">BOT_ALREADY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_ALREADY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BOT_VERSION">
+<code class="sig-name descname"><span class="pre">BOT_VERSION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BOT_FROZEN">
+<code class="sig-name descname"><span class="pre">BOT_FROZEN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_FROZEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BOT_UNFROZEN">
+<code class="sig-name descname"><span class="pre">BOT_UNFROZEN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_UNFROZEN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -379,33 +699,8 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BOT_FROZEN">
-<code class="sig-name descname"><span class="pre">BOT_FROZEN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_FROZEN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.BOT_IS_LOCKED">
-<code class="sig-name descname"><span class="pre">BOT_IS_LOCKED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_IS_LOCKED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.BOT_LOCKED">
-<code class="sig-name descname"><span class="pre">BOT_LOCKED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_LOCKED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="display.strings.AllStrings.BOT_RELOAD">
 <code class="sig-name descname"><span class="pre">BOT_RELOAD</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_RELOAD" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.BOT_UNFROZEN">
-<code class="sig-name descname"><span class="pre">BOT_UNFROZEN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_UNFROZEN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.BOT_UNLOCKED">
-<code class="sig-name descname"><span class="pre">BOT_UNLOCKED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_UNLOCKED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -414,28 +709,18 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.BOT_VERSION">
-<code class="sig-name descname"><span class="pre">BOT_VERSION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BOT_VERSION" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.CAP_WAITING">
+<code class="sig-name descname"><span class="pre">CAP_WAITING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CAP_WAITING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.CANCEL_NOTHING">
-<code class="sig-name descname"><span class="pre">CANCEL_NOTHING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CANCEL_NOTHING" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.CAP_AUTO_ANNOUNCE">
+<code class="sig-name descname"><span class="pre">CAP_AUTO_ANNOUNCE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CAP_AUTO_ANNOUNCE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.CANCEL_NOT_CAPTAIN">
-<code class="sig-name descname"><span class="pre">CANCEL_NOT_CAPTAIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CANCEL_NOT_CAPTAIN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.CAP_ACCEPT_NO">
-<code class="sig-name descname"><span class="pre">CAP_ACCEPT_NO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CAP_ACCEPT_NO" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.CAP_ALREADY">
-<code class="sig-name descname"><span class="pre">CAP_ALREADY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CAP_ALREADY" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.CAP_OK">
+<code class="sig-name descname"><span class="pre">CAP_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CAP_OK" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -444,8 +729,18 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.CAP_AUTO_ANNOUNCE">
-<code class="sig-name descname"><span class="pre">CAP_AUTO_ANNOUNCE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CAP_AUTO_ANNOUNCE" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.CAP_HELP">
+<code class="sig-name descname"><span class="pre">CAP_HELP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CAP_HELP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.CAP_ALREADY">
+<code class="sig-name descname"><span class="pre">CAP_ALREADY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CAP_ALREADY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.CAP_ACCEPT_NO">
+<code class="sig-name descname"><span class="pre">CAP_ACCEPT_NO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CAP_ACCEPT_NO" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -459,216 +754,6 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.CAP_HELP">
-<code class="sig-name descname"><span class="pre">CAP_HELP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CAP_HELP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.CAP_OK">
-<code class="sig-name descname"><span class="pre">CAP_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CAP_OK" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.CAP_WAITING">
-<code class="sig-name descname"><span class="pre">CAP_WAITING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CAP_WAITING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.CHANNEL_INIT">
-<code class="sig-name descname"><span class="pre">CHANNEL_INIT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CHANNEL_INIT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.CHECK_ACCOUNT">
-<code class="sig-name descname"><span class="pre">CHECK_ACCOUNT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CHECK_ACCOUNT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.CONFIRM_CANCELED">
-<code class="sig-name descname"><span class="pre">CONFIRM_CANCELED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CONFIRM_CANCELED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.CONFIRM_DECLINE">
-<code class="sig-name descname"><span class="pre">CONFIRM_DECLINE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CONFIRM_DECLINE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.CONFIRM_NOTHING">
-<code class="sig-name descname"><span class="pre">CONFIRM_NOTHING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CONFIRM_NOTHING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.CONFIRM_NOT_CAPTAIN">
-<code class="sig-name descname"><span class="pre">CONFIRM_NOT_CAPTAIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.CONFIRM_NOT_CAPTAIN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.DECLINE_NOTHING">
-<code class="sig-name descname"><span class="pre">DECLINE_NOTHING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.DECLINE_NOTHING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.DECLINE_NOT_CAPTAIN">
-<code class="sig-name descname"><span class="pre">DECLINE_NOT_CAPTAIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.DECLINE_NOT_CAPTAIN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.DISPLAY_STATS">
-<code class="sig-name descname"><span class="pre">DISPLAY_STATS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.DISPLAY_STATS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.DISPLAY_USAGE">
-<code class="sig-name descname"><span class="pre">DISPLAY_USAGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.DISPLAY_USAGE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.EXT_NOT_REGISTERED">
-<code class="sig-name descname"><span class="pre">EXT_NOT_REGISTERED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.EXT_NOT_REGISTERED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.GLOBAL_INFO">
-<code class="sig-name descname"><span class="pre">GLOBAL_INFO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.GLOBAL_INFO" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.HELP">
-<code class="sig-name descname"><span class="pre">HELP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.HELP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.INVALID_COMMAND">
-<code class="sig-name descname"><span class="pre">INVALID_COMMAND</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.INVALID_COMMAND" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.INVALID_STR">
-<code class="sig-name descname"><span class="pre">INVALID_STR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.INVALID_STR" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_ADDED">
-<code class="sig-name descname"><span class="pre">LB_ADDED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_ADDED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_ALREADY_IN">
-<code class="sig-name descname"><span class="pre">LB_ALREADY_IN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_ALREADY_IN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_CLEARED">
-<code class="sig-name descname"><span class="pre">LB_CLEARED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_CLEARED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_EMPTY">
-<code class="sig-name descname"><span class="pre">LB_EMPTY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_EMPTY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_FULL">
-<code class="sig-name descname"><span class="pre">LB_FULL</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_FULL" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_GET">
-<code class="sig-name descname"><span class="pre">LB_GET</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_GET" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_IN_MATCH">
-<code class="sig-name descname"><span class="pre">LB_IN_MATCH</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_IN_MATCH" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_MATCH_STARTING">
-<code class="sig-name descname"><span class="pre">LB_MATCH_STARTING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_MATCH_STARTING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_NOTIFY">
-<code class="sig-name descname"><span class="pre">LB_NOTIFY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_NOTIFY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_NOT_IN">
-<code class="sig-name descname"><span class="pre">LB_NOT_IN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_NOT_IN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_QUEUE">
-<code class="sig-name descname"><span class="pre">LB_QUEUE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_QUEUE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_REFRESHED">
-<code class="sig-name descname"><span class="pre">LB_REFRESHED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_REFRESHED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_REMOVED">
-<code class="sig-name descname"><span class="pre">LB_REMOVED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_REMOVED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_SAVE">
-<code class="sig-name descname"><span class="pre">LB_SAVE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_SAVE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_STUCK">
-<code class="sig-name descname"><span class="pre">LB_STUCK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_STUCK" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_STUCK_JOIN">
-<code class="sig-name descname"><span class="pre">LB_STUCK_JOIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_STUCK_JOIN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_TOO_LONG">
-<code class="sig-name descname"><span class="pre">LB_TOO_LONG</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_TOO_LONG" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.LB_WARNING">
-<code class="sig-name descname"><span class="pre">LB_WARNING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.LB_WARNING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_BASE_AUTO">
-<code class="sig-name descname"><span class="pre">MATCH_BASE_AUTO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_BASE_AUTO" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_CHANNEL_OVER">
-<code class="sig-name descname"><span class="pre">MATCH_CHANNEL_OVER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_CHANNEL_OVER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_CHECK_CHANGED">
-<code class="sig-name descname"><span class="pre">MATCH_CHECK_CHANGED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_CHECK_CHANGED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_CLEAR">
-<code class="sig-name descname"><span class="pre">MATCH_CLEAR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_CLEAR" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_CLEARED">
-<code class="sig-name descname"><span class="pre">MATCH_CLEARED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_CLEARED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_CONFIRM">
-<code class="sig-name descname"><span class="pre">MATCH_CONFIRM</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_CONFIRM" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="display.strings.AllStrings.MATCH_DM_PING">
 <code class="sig-name descname"><span class="pre">MATCH_DM_PING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_DM_PING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -679,63 +764,18 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_NO_COMMAND">
-<code class="sig-name descname"><span class="pre">MATCH_NO_COMMAND</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_NO_COMMAND" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_NO_COMMAND_READY">
-<code class="sig-name descname"><span class="pre">MATCH_NO_COMMAND_READY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_NO_COMMAND_READY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_NO_MATCH">
-<code class="sig-name descname"><span class="pre">MATCH_NO_MATCH</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_NO_MATCH" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_OVER">
-<code class="sig-name descname"><span class="pre">MATCH_OVER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_OVER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_PLAYERS_NOT_READY">
-<code class="sig-name descname"><span class="pre">MATCH_PLAYERS_NOT_READY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_PLAYERS_NOT_READY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_PLAYERS_OFFLINE">
-<code class="sig-name descname"><span class="pre">MATCH_PLAYERS_OFFLINE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_PLAYERS_OFFLINE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_ROUND_OVER">
-<code class="sig-name descname"><span class="pre">MATCH_ROUND_OVER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_ROUND_OVER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="display.strings.AllStrings.MATCH_SHOW_PICKS">
 <code class="sig-name descname"><span class="pre">MATCH_SHOW_PICKS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_SHOW_PICKS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_STARTED">
-<code class="sig-name descname"><span class="pre">MATCH_STARTED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_STARTED" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.MATCH_BASE_AUTO">
+<code class="sig-name descname"><span class="pre">MATCH_BASE_AUTO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_BASE_AUTO" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_STARTING_1">
-<code class="sig-name descname"><span class="pre">MATCH_STARTING_1</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_STARTING_1" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_STARTING_2">
-<code class="sig-name descname"><span class="pre">MATCH_STARTING_2</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_STARTING_2" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.MATCH_SWAP">
-<code class="sig-name descname"><span class="pre">MATCH_SWAP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_SWAP" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.MATCH_CONFIRM">
+<code class="sig-name descname"><span class="pre">MATCH_CONFIRM</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_CONFIRM" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -749,28 +789,198 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.MUTE_FREED">
-<code class="sig-name descname"><span class="pre">MUTE_FREED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MUTE_FREED" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.MATCH_STARTING_1">
+<code class="sig-name descname"><span class="pre">MATCH_STARTING_1</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_STARTING_1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.MUTE_SHOW">
-<code class="sig-name descname"><span class="pre">MUTE_SHOW</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MUTE_SHOW" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.MATCH_STARTING_2">
+<code class="sig-name descname"><span class="pre">MATCH_STARTING_2</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_STARTING_2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.NOTIFY_ADDED">
-<code class="sig-name descname"><span class="pre">NOTIFY_ADDED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.NOTIFY_ADDED" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.MATCH_STARTED">
+<code class="sig-name descname"><span class="pre">MATCH_STARTED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_STARTED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.NOTIFY_REMOVED">
-<code class="sig-name descname"><span class="pre">NOTIFY_REMOVED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.NOTIFY_REMOVED" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.MATCH_NO_MATCH">
+<code class="sig-name descname"><span class="pre">MATCH_NO_MATCH</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_NO_MATCH" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.NOT_CODED">
-<code class="sig-name descname"><span class="pre">NOT_CODED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.NOT_CODED" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.MATCH_NO_COMMAND">
+<code class="sig-name descname"><span class="pre">MATCH_NO_COMMAND</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_NO_COMMAND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.MATCH_NO_COMMAND_READY">
+<code class="sig-name descname"><span class="pre">MATCH_NO_COMMAND_READY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_NO_COMMAND_READY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.MATCH_CLEARED">
+<code class="sig-name descname"><span class="pre">MATCH_CLEARED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_CLEARED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.MATCH_PLAYERS_NOT_READY">
+<code class="sig-name descname"><span class="pre">MATCH_PLAYERS_NOT_READY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_PLAYERS_NOT_READY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.MATCH_PLAYERS_OFFLINE">
+<code class="sig-name descname"><span class="pre">MATCH_PLAYERS_OFFLINE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_PLAYERS_OFFLINE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.MATCH_CLEAR">
+<code class="sig-name descname"><span class="pre">MATCH_CLEAR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_CLEAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.MATCH_ROUND_OVER">
+<code class="sig-name descname"><span class="pre">MATCH_ROUND_OVER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_ROUND_OVER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.MATCH_OVER">
+<code class="sig-name descname"><span class="pre">MATCH_OVER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_OVER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.MATCH_SWAP">
+<code class="sig-name descname"><span class="pre">MATCH_SWAP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_SWAP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.MATCH_CHANNEL_OVER">
+<code class="sig-name descname"><span class="pre">MATCH_CHANNEL_OVER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_CHANNEL_OVER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.MATCH_CHECK_CHANGED">
+<code class="sig-name descname"><span class="pre">MATCH_CHECK_CHANGED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MATCH_CHECK_CHANGED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_HELP">
+<code class="sig-name descname"><span class="pre">BASE_HELP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_HELP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_TOO_MUCH">
+<code class="sig-name descname"><span class="pre">BASE_TOO_MUCH</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_TOO_MUCH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_NOT_FOUND">
+<code class="sig-name descname"><span class="pre">BASE_NOT_FOUND</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_NOT_FOUND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_ON_SELECT">
+<code class="sig-name descname"><span class="pre">BASE_ON_SELECT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_ON_SELECT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_SHOW_LIST">
+<code class="sig-name descname"><span class="pre">BASE_SHOW_LIST</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_SHOW_LIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_SELECTED">
+<code class="sig-name descname"><span class="pre">BASE_SELECTED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_SELECTED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_DISPLAY">
+<code class="sig-name descname"><span class="pre">BASE_DISPLAY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_DISPLAY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_BOOKED">
+<code class="sig-name descname"><span class="pre">BASE_BOOKED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_BOOKED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_CALENDAR">
+<code class="sig-name descname"><span class="pre">BASE_CALENDAR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_CALENDAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_NO_BASE">
+<code class="sig-name descname"><span class="pre">BASE_NO_BASE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_NO_BASE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_NO_BASE_WAITING">
+<code class="sig-name descname"><span class="pre">BASE_NO_BASE_WAITING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_NO_BASE_WAITING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_OK_CONFIRM">
+<code class="sig-name descname"><span class="pre">BASE_OK_CONFIRM</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_OK_CONFIRM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_NO_CHANGE">
+<code class="sig-name descname"><span class="pre">BASE_NO_CHANGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_NO_CHANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BASE_NO_READY">
+<code class="sig-name descname"><span class="pre">BASE_NO_READY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BASE_NO_READY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.ACC_NOT_ENOUGH">
+<code class="sig-name descname"><span class="pre">ACC_NOT_ENOUGH</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_NOT_ENOUGH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.ACC_ERROR">
+<code class="sig-name descname"><span class="pre">ACC_ERROR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.ACC_UPDATE">
+<code class="sig-name descname"><span class="pre">ACC_UPDATE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_UPDATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.ACC_STAFF">
+<code class="sig-name descname"><span class="pre">ACC_STAFF</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_STAFF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.ACC_SENT">
+<code class="sig-name descname"><span class="pre">ACC_SENT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_SENT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.ACC_SENDING">
+<code class="sig-name descname"><span class="pre">ACC_SENDING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_SENDING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.ACC_OVER">
+<code class="sig-name descname"><span class="pre">ACC_OVER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_OVER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.ACC_CLOSED">
+<code class="sig-name descname"><span class="pre">ACC_CLOSED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_CLOSED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.ACC_LOG">
+<code class="sig-name descname"><span class="pre">ACC_LOG</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_LOG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.ACC_GIVING">
+<code class="sig-name descname"><span class="pre">ACC_GIVING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACC_GIVING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -779,148 +989,13 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.NO_PERMISSION">
-<code class="sig-name descname"><span class="pre">NO_PERMISSION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.NO_PERMISSION" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.ACCOUNT_USAGE">
+<code class="sig-name descname"><span class="pre">ACCOUNT_USAGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.ACCOUNT_USAGE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.NO_RULE">
-<code class="sig-name descname"><span class="pre">NO_RULE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.NO_RULE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_BASING_INFO">
-<code class="sig-name descname"><span class="pre">PK_BASING_INFO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_BASING_INFO" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_FACTION_ALREADY">
-<code class="sig-name descname"><span class="pre">PK_FACTION_ALREADY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_ALREADY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_FACTION_CHANGED">
-<code class="sig-name descname"><span class="pre">PK_FACTION_CHANGED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_CHANGED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_FACTION_HELP">
-<code class="sig-name descname"><span class="pre">PK_FACTION_HELP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_HELP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_FACTION_INFO">
-<code class="sig-name descname"><span class="pre">PK_FACTION_INFO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_INFO" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_FACTION_NOT_PLAYER">
-<code class="sig-name descname"><span class="pre">PK_FACTION_NOT_PLAYER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_NOT_PLAYER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_FACTION_OK">
-<code class="sig-name descname"><span class="pre">PK_FACTION_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_OK" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_FACTION_OK_NEXT">
-<code class="sig-name descname"><span class="pre">PK_FACTION_OK_NEXT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_OK_NEXT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_FACTION_OTHER">
-<code class="sig-name descname"><span class="pre">PK_FACTION_OTHER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_FACTION_OTHER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_INVALID">
-<code class="sig-name descname"><span class="pre">PK_INVALID</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_INVALID" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_LAST">
-<code class="sig-name descname"><span class="pre">PK_LAST</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_LAST" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_NOT_CAPTAIN">
-<code class="sig-name descname"><span class="pre">PK_NOT_CAPTAIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_NOT_CAPTAIN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_NOT_TURN">
-<code class="sig-name descname"><span class="pre">PK_NOT_TURN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_NOT_TURN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_NOT_VALID_FACTION">
-<code class="sig-name descname"><span class="pre">PK_NOT_VALID_FACTION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_NOT_VALID_FACTION" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_NO_ARG">
-<code class="sig-name descname"><span class="pre">PK_NO_ARG</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_NO_ARG" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_NO_LOBBIED">
-<code class="sig-name descname"><span class="pre">PK_NO_LOBBIED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_NO_LOBBIED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_OK">
-<code class="sig-name descname"><span class="pre">PK_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_OK" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_OK_2">
-<code class="sig-name descname"><span class="pre">PK_OK_2</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_OK_2" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_OK_FACTION">
-<code class="sig-name descname"><span class="pre">PK_OK_FACTION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_OK_FACTION" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_OVER">
-<code class="sig-name descname"><span class="pre">PK_OVER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_OVER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_OVER_READY">
-<code class="sig-name descname"><span class="pre">PK_OVER_READY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_OVER_READY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_PLAYERS_HELP">
-<code class="sig-name descname"><span class="pre">PK_PLAYERS_HELP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_PLAYERS_HELP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_RESIGNED">
-<code class="sig-name descname"><span class="pre">PK_RESIGNED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_RESIGNED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_SHOW_TEAMS">
-<code class="sig-name descname"><span class="pre">PK_SHOW_TEAMS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_SHOW_TEAMS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_TOO_MUCH">
-<code class="sig-name descname"><span class="pre">PK_TOO_MUCH</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_TOO_MUCH" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_WAIT_FOR_PICK">
-<code class="sig-name descname"><span class="pre">PK_WAIT_FOR_PICK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_WAIT_FOR_PICK" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.PK_WRONG_CHANNEL">
-<code class="sig-name descname"><span class="pre">PK_WRONG_CHANNEL</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PK_WRONG_CHANNEL" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.DISPLAY_USAGE">
+<code class="sig-name descname"><span class="pre">DISPLAY_USAGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.DISPLAY_USAGE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -929,118 +1004,33 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.PUBLISH_ERROR">
-<code class="sig-name descname"><span class="pre">PUBLISH_ERROR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.PUBLISH_ERROR" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.NOTIFY_REMOVED">
+<code class="sig-name descname"><span class="pre">NOTIFY_REMOVED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.NOTIFY_REMOVED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.RDY">
-<code class="sig-name descname"><span class="pre">RDY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RDY" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.NOTIFY_ADDED">
+<code class="sig-name descname"><span class="pre">NOTIFY_ADDED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.NOTIFY_ADDED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.READY_NO_COMMAND">
-<code class="sig-name descname"><span class="pre">READY_NO_COMMAND</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.READY_NO_COMMAND" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.NOT_CODED">
+<code class="sig-name descname"><span class="pre">NOT_CODED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.NOT_CODED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_ALREADY_EXIST">
-<code class="sig-name descname"><span class="pre">REG_ALREADY_EXIST</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_ALREADY_EXIST" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.RM_MENTION_ONE">
+<code class="sig-name descname"><span class="pre">RM_MENTION_ONE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_MENTION_ONE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_ALREADY_NOA">
-<code class="sig-name descname"><span class="pre">REG_ALREADY_NOA</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_ALREADY_NOA" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.RM_NOT_IN_DB">
+<code class="sig-name descname"><span class="pre">RM_NOT_IN_DB</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_NOT_IN_DB" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_ALREADY_OWN">
-<code class="sig-name descname"><span class="pre">REG_ALREADY_OWN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_ALREADY_OWN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_CHAR_NOT_FOUND">
-<code class="sig-name descname"><span class="pre">REG_CHAR_NOT_FOUND</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_CHAR_NOT_FOUND" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_FROZEN">
-<code class="sig-name descname"><span class="pre">REG_FROZEN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_FROZEN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_HELP">
-<code class="sig-name descname"><span class="pre">REG_HELP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_HELP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_INVALID">
-<code class="sig-name descname"><span class="pre">REG_INVALID</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_INVALID" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_MISSING_FACTION">
-<code class="sig-name descname"><span class="pre">REG_MISSING_FACTION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_MISSING_FACTION" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_NOT_JAEGER">
-<code class="sig-name descname"><span class="pre">REG_NOT_JAEGER</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_NOT_JAEGER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_NOT_REGISTERED">
-<code class="sig-name descname"><span class="pre">REG_NOT_REGISTERED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_NOT_REGISTERED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_NO_ACCOUNT">
-<code class="sig-name descname"><span class="pre">REG_NO_ACCOUNT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_NO_ACCOUNT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_RULES">
-<code class="sig-name descname"><span class="pre">REG_RULES</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_RULES" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_STATUS">
-<code class="sig-name descname"><span class="pre">REG_STATUS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_STATUS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_UPDATE_NOA">
-<code class="sig-name descname"><span class="pre">REG_UPDATE_NOA</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_UPDATE_NOA" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_UPDATE_OWN">
-<code class="sig-name descname"><span class="pre">REG_UPDATE_OWN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_UPDATE_OWN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.REG_WITH_CHARS">
-<code class="sig-name descname"><span class="pre">REG_WITH_CHARS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.REG_WITH_CHARS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.RM_CAP">
-<code class="sig-name descname"><span class="pre">RM_CAP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_CAP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.RM_DEMOTE_NO">
-<code class="sig-name descname"><span class="pre">RM_DEMOTE_NO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_DEMOTE_NO" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.RM_DEMOTE_NO_TURN">
-<code class="sig-name descname"><span class="pre">RM_DEMOTE_NO_TURN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_DEMOTE_NO_TURN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.RM_DEMOTE_OK">
-<code class="sig-name descname"><span class="pre">RM_DEMOTE_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_DEMOTE_OK" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.RM_OK">
+<code class="sig-name descname"><span class="pre">RM_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_OK" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1054,28 +1044,8 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.RM_MENTION_ONE">
-<code class="sig-name descname"><span class="pre">RM_MENTION_ONE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_MENTION_ONE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.RM_NAME_CHANGED">
-<code class="sig-name descname"><span class="pre">RM_NAME_CHANGED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_NAME_CHANGED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.RM_NOT_IN_DB">
-<code class="sig-name descname"><span class="pre">RM_NOT_IN_DB</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_NOT_IN_DB" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="display.strings.AllStrings.RM_NOT_LOBBIED">
 <code class="sig-name descname"><span class="pre">RM_NOT_LOBBIED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_NOT_LOBBIED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.RM_OK">
-<code class="sig-name descname"><span class="pre">RM_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_OK" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1084,13 +1054,13 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.RM_TIMEOUT_ALREADY">
-<code class="sig-name descname"><span class="pre">RM_TIMEOUT_ALREADY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_TIMEOUT_ALREADY" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.RM_TIMEOUT_FREE">
+<code class="sig-name descname"><span class="pre">RM_TIMEOUT_FREE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_TIMEOUT_FREE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.RM_TIMEOUT_FREE">
-<code class="sig-name descname"><span class="pre">RM_TIMEOUT_FREE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_TIMEOUT_FREE" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.RM_TIMEOUT_ALREADY">
+<code class="sig-name descname"><span class="pre">RM_TIMEOUT_ALREADY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_TIMEOUT_ALREADY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1099,18 +1069,53 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.RM_TIMEOUT_INFO">
-<code class="sig-name descname"><span class="pre">RM_TIMEOUT_INFO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_TIMEOUT_INFO" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="display.strings.AllStrings.RM_TIMEOUT_INVALID">
 <code class="sig-name descname"><span class="pre">RM_TIMEOUT_INVALID</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_TIMEOUT_INVALID" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt id="display.strings.AllStrings.RM_TIMEOUT_INFO">
+<code class="sig-name descname"><span class="pre">RM_TIMEOUT_INFO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_TIMEOUT_INFO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt id="display.strings.AllStrings.RM_TIMEOUT_NO">
 <code class="sig-name descname"><span class="pre">RM_TIMEOUT_NO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_TIMEOUT_NO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.RM_DEMOTE_NO">
+<code class="sig-name descname"><span class="pre">RM_DEMOTE_NO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_DEMOTE_NO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.RM_DEMOTE_OK">
+<code class="sig-name descname"><span class="pre">RM_DEMOTE_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_DEMOTE_OK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.RM_DEMOTE_NO_TURN">
+<code class="sig-name descname"><span class="pre">RM_DEMOTE_NO_TURN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_DEMOTE_NO_TURN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.RM_NAME_CHANGED">
+<code class="sig-name descname"><span class="pre">RM_NAME_CHANGED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_NAME_CHANGED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.RM_CAP">
+<code class="sig-name descname"><span class="pre">RM_CAP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.RM_CAP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.MUTE_SHOW">
+<code class="sig-name descname"><span class="pre">MUTE_SHOW</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MUTE_SHOW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.MUTE_FREED">
+<code class="sig-name descname"><span class="pre">MUTE_FREED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.MUTE_FREED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1129,38 +1134,18 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.SC_RESULT">
-<code class="sig-name descname"><span class="pre">SC_RESULT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SC_RESULT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="display.strings.AllStrings.SC_RESULT_HALF">
 <code class="sig-name descname"><span class="pre">SC_RESULT_HALF</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SC_RESULT_HALF" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.SPAM_CLEARED">
-<code class="sig-name descname"><span class="pre">SPAM_CLEARED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SPAM_CLEARED" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.SC_RESULT">
+<code class="sig-name descname"><span class="pre">SC_RESULT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SC_RESULT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.SPAM_DEBUG">
-<code class="sig-name descname"><span class="pre">SPAM_DEBUG</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SPAM_DEBUG" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.STOP">
-<code class="sig-name descname"><span class="pre">STOP</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.STOP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.STOP_SPAM">
-<code class="sig-name descname"><span class="pre">STOP_SPAM</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.STOP_SPAM" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.SUB_LOBBY">
-<code class="sig-name descname"><span class="pre">SUB_LOBBY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SUB_LOBBY" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.SUB_RDY">
+<code class="sig-name descname"><span class="pre">SUB_RDY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SUB_RDY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1179,8 +1164,8 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.SUB_OKAY">
-<code class="sig-name descname"><span class="pre">SUB_OKAY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SUB_OKAY" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.SUB_OKAY_TEAM">
+<code class="sig-name descname"><span class="pre">SUB_OKAY_TEAM</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SUB_OKAY_TEAM" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1189,8 +1174,13 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.SUB_OKAY_TEAM">
-<code class="sig-name descname"><span class="pre">SUB_OKAY_TEAM</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SUB_OKAY_TEAM" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.SUB_OKAY">
+<code class="sig-name descname"><span class="pre">SUB_OKAY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SUB_OKAY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.SUB_LOBBY">
+<code class="sig-name descname"><span class="pre">SUB_LOBBY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SUB_LOBBY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1199,8 +1189,8 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.SUB_RDY">
-<code class="sig-name descname"><span class="pre">SUB_RDY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SUB_RDY" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.SWAP_OK">
+<code class="sig-name descname"><span class="pre">SWAP_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SWAP_OK" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1214,16 +1204,6 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.SWAP_OK">
-<code class="sig-name descname"><span class="pre">SWAP_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SWAP_OK" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="display.strings.AllStrings.SWAP_OK_CONFIRM">
-<code class="sig-name descname"><span class="pre">SWAP_OK_CONFIRM</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SWAP_OK_CONFIRM" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="display.strings.AllStrings.SWAP_RDY">
 <code class="sig-name descname"><span class="pre">SWAP_RDY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SWAP_RDY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1234,8 +1214,28 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.UNBENCH_OK">
-<code class="sig-name descname"><span class="pre">UNBENCH_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.UNBENCH_OK" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.SWAP_OK_CONFIRM">
+<code class="sig-name descname"><span class="pre">SWAP_OK_CONFIRM</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.SWAP_OK_CONFIRM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BENCH_MENTION">
+<code class="sig-name descname"><span class="pre">BENCH_MENTION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_MENTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BENCH_NO">
+<code class="sig-name descname"><span class="pre">BENCH_NO</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_NO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BENCH_RDY">
+<code class="sig-name descname"><span class="pre">BENCH_RDY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_RDY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="display.strings.AllStrings.BENCH_OK_CONFIRM">
+<code class="sig-name descname"><span class="pre">BENCH_OK_CONFIRM</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_OK_CONFIRM" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1244,24 +1244,42 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.UNKNOWN_ERROR">
-<code class="sig-name descname"><span class="pre">UNKNOWN_ERROR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.UNKNOWN_ERROR" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.BENCH_OK">
+<code class="sig-name descname"><span class="pre">BENCH_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_OK" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.WRONG_CHANNEL">
-<code class="sig-name descname"><span class="pre">WRONG_CHANNEL</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.WRONG_CHANNEL" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.UNBENCH_OK">
+<code class="sig-name descname"><span class="pre">UNBENCH_OK</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.UNBENCH_OK" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.WRONG_CHANNEL_2">
-<code class="sig-name descname"><span class="pre">WRONG_CHANNEL_2</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.WRONG_CHANNEL_2" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.BENCH_ALREADY">
+<code class="sig-name descname"><span class="pre">BENCH_ALREADY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_ALREADY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="display.strings.AllStrings.WRONG_USAGE">
-<code class="sig-name descname"><span class="pre">WRONG_USAGE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.WRONG_USAGE" title="Permalink to this definition">¶</a></dt>
+<dt id="display.strings.AllStrings.BENCH_NOT">
+<code class="sig-name descname"><span class="pre">BENCH_NOT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;display.classes.Message</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#display.strings.AllStrings.BENCH_NOT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt id="display.strings.AllStrings.send">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">send</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#display.strings.AllStrings.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the message</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ctx</strong> – context.</p></li>
+<li><p><strong>args</strong> – Additional strings to format the main string with.</p></li>
+<li><p><strong>kwargs</strong> – Keywords arguments to pass to the embed function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The message sent.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="display.strings.AllStrings.edit">
@@ -1285,24 +1303,6 @@
 <dt id="display.strings.AllStrings.image_send">
 <em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">image_send</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#display.strings.AllStrings.image_send" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt id="display.strings.AllStrings.send">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">send</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#display.strings.AllStrings.send" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send the message</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ctx</strong> – context.</p></li>
-<li><p><strong>args</strong> – Additional strings to format the main string with.</p></li>
-<li><p><strong>kwargs</strong> – Keywords arguments to pass to the embed function.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The message sent.</p>
-</dd>
-</dl>
-</dd></dl>
 
 </dd></dl>
 

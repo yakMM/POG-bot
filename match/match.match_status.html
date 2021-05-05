@@ -178,37 +178,12 @@
 <span id="match-status"></span><h1>Match status<a class="headerlink" href="#module-match.match_status" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="match.match_status.MatchStatus">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">match.match_status.</span></code><code class="sig-name descname"><span class="pre">MatchStatus</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.match_status.MatchStatus" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">MatchStatus</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.match_status.MatchStatus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
 <p>An enumeration.</p>
 <dl class="py attribute">
-<dt id="match.match_status.MatchStatus.IS_BASING">
-<code class="sig-name descname"><span class="pre">IS_BASING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Waiting</span> <span class="pre">for</span> <span class="pre">base</span> <span class="pre">pick'</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_BASING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.match_status.MatchStatus.IS_CAPTAIN">
-<code class="sig-name descname"><span class="pre">IS_CAPTAIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&quot;Determining</span> <span class="pre">team's</span> <span class="pre">captains&quot;</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_CAPTAIN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.match_status.MatchStatus.IS_FACTION">
-<code class="sig-name descname"><span class="pre">IS_FACTION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Waiting</span> <span class="pre">for</span> <span class="pre">captains</span> <span class="pre">to</span> <span class="pre">pick</span> <span class="pre">factions'</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_FACTION" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="match.match_status.MatchStatus.IS_FREE">
 <code class="sig-name descname"><span class="pre">IS_FREE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'No</span> <span class="pre">match'</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_FREE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.match_status.MatchStatus.IS_PICKING">
-<code class="sig-name descname"><span class="pre">IS_PICKING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Waiting</span> <span class="pre">for</span> <span class="pre">captains</span> <span class="pre">to</span> <span class="pre">pick</span> <span class="pre">players'</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_PICKING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.match_status.MatchStatus.IS_PLAYING">
-<code class="sig-name descname"><span class="pre">IS_PLAYING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Match</span> <span class="pre">is</span> <span class="pre">being</span> <span class="pre">played'</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_PLAYING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -217,13 +192,38 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="match.match_status.MatchStatus.IS_STARTING">
-<code class="sig-name descname"><span class="pre">IS_STARTING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Match</span> <span class="pre">starting...'</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_STARTING" title="Permalink to this definition">¶</a></dt>
+<dt id="match.match_status.MatchStatus.IS_CAPTAIN">
+<code class="sig-name descname"><span class="pre">IS_CAPTAIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&quot;Determining</span> <span class="pre">team's</span> <span class="pre">captains&quot;</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_CAPTAIN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.match_status.MatchStatus.IS_PICKING">
+<code class="sig-name descname"><span class="pre">IS_PICKING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Waiting</span> <span class="pre">for</span> <span class="pre">captains</span> <span class="pre">to</span> <span class="pre">pick</span> <span class="pre">players'</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_PICKING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.match_status.MatchStatus.IS_FACTION">
+<code class="sig-name descname"><span class="pre">IS_FACTION</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Waiting</span> <span class="pre">for</span> <span class="pre">captains</span> <span class="pre">to</span> <span class="pre">pick</span> <span class="pre">factions'</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_FACTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.match_status.MatchStatus.IS_BASING">
+<code class="sig-name descname"><span class="pre">IS_BASING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Waiting</span> <span class="pre">for</span> <span class="pre">base</span> <span class="pre">pick'</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_BASING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="match.match_status.MatchStatus.IS_WAITING">
 <code class="sig-name descname"><span class="pre">IS_WAITING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Waiting</span> <span class="pre">for</span> <span class="pre">teams</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">ready'</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_WAITING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.match_status.MatchStatus.IS_STARTING">
+<code class="sig-name descname"><span class="pre">IS_STARTING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Match</span> <span class="pre">starting...'</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_STARTING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.match_status.MatchStatus.IS_PLAYING">
+<code class="sig-name descname"><span class="pre">IS_PLAYING</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Match</span> <span class="pre">is</span> <span class="pre">being</span> <span class="pre">played'</span></em><a class="headerlink" href="#match.match_status.MatchStatus.IS_PLAYING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

@@ -189,19 +189,31 @@
 <span id="match-playing"></span><h1>Match playing<a class="headerlink" href="#module-match.processes.match_playing" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="match.processes.match_playing.MatchPlaying">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">match.processes.match_playing.</span></code><code class="sig-name descname"><span class="pre">MatchPlaying</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.match_playing.MatchPlaying" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">MatchPlaying</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.match_playing.MatchPlaying" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="processes.process.html#match.processes.process.Process" title="match.processes.process.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">match.processes.process.Process</span></code></a></p>
+<dl class="py attribute">
+<dt id="match.processes.match_playing.MatchPlaying.init">
+<code class="sig-name descname"><span class="pre">init</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.InitFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.match_playing.MatchPlaying.start_match_loop">
+<code class="sig-name descname"><span class="pre">start_match_loop</span></code><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.start_match_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>A background task helper that abstracts the loop and reconnection logic for you.</p>
+<p>The main interface to create this is through <code class="xref py py-func docutils literal notranslate"><span class="pre">loop()</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.match_playing.MatchPlaying.info">
+<code class="sig-name descname"><span class="pre">info</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt id="match.processes.match_playing.MatchPlaying.auto_info_loop">
 <code class="sig-name descname"><span class="pre">auto_info_loop</span></code><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.auto_info_loop" title="Permalink to this definition">¶</a></dt>
 <dd><p>A background task helper that abstracts the loop and reconnection logic for you.</p>
 <p>The main interface to create this is through <code class="xref py py-func docutils literal notranslate"><span class="pre">loop()</span></code>.</p>
 </dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.match_playing.MatchPlaying.clear">
-<code class="sig-name descname"><span class="pre">clear</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.clear" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="match.processes.match_playing.MatchPlaying.get_formatted_time_to_round_end">
@@ -213,14 +225,14 @@
 <code class="sig-name descname"><span class="pre">get_seconds_to_round_end</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.get_seconds_to_round_end" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt id="match.processes.match_playing.MatchPlaying.info">
-<code class="sig-name descname"><span class="pre">info</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.info" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt id="match.processes.match_playing.MatchPlaying.on_match_over">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">on_match_over</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.on_match_over" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="match.processes.match_playing.MatchPlaying.init">
-<code class="sig-name descname"><span class="pre">init</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.InitFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.init" title="Permalink to this definition">¶</a></dt>
+<dt id="match.processes.match_playing.MatchPlaying.clear">
+<code class="sig-name descname"><span class="pre">clear</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.clear" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -237,18 +249,6 @@
 <dt id="match.processes.match_playing.MatchPlaying.meta_status">
 <code class="sig-name descname"><span class="pre">meta_status</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Match</span> <span class="pre">starting...'</span></em><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.meta_status" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt id="match.processes.match_playing.MatchPlaying.on_match_over">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">on_match_over</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.on_match_over" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.match_playing.MatchPlaying.start_match_loop">
-<code class="sig-name descname"><span class="pre">start_match_loop</span></code><a class="headerlink" href="#match.processes.match_playing.MatchPlaying.start_match_loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>A background task helper that abstracts the loop and reconnection logic for you.</p>
-<p>The main interface to create this is through <code class="xref py py-func docutils literal notranslate"><span class="pre">loop()</span></code>.</p>
-</dd></dl>
 
 </dd></dl>
 

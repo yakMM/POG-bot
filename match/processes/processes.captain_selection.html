@@ -189,11 +189,31 @@
 <span id="captain-selection"></span><h1>Captain selection<a class="headerlink" href="#module-match.processes.captain_selection" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="match.processes.captain_selection.CaptainSelection">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">match.processes.captain_selection.</span></code><code class="sig-name descname"><span class="pre">CaptainSelection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">CaptainSelection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="processes.process.html#match.processes.process.Process" title="match.processes.process.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">match.processes.process.Process</span></code></a></p>
-<dl class="py method">
-<dt id="match.processes.captain_selection.CaptainSelection.add_captain">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">add_captain</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.add_captain" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt id="match.processes.captain_selection.CaptainSelection.init">
+<code class="sig-name descname"><span class="pre">init</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.InitFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.captain_selection.CaptainSelection.clear">
+<code class="sig-name descname"><span class="pre">clear</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.captain_selection.CaptainSelection.info">
+<code class="sig-name descname"><span class="pre">info</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.captain_selection.CaptainSelection.on_volunteer">
+<code class="sig-name descname"><span class="pre">on_volunteer</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.on_volunteer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.captain_selection.CaptainSelection.on_answer">
+<code class="sig-name descname"><span class="pre">on_answer</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.on_answer" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -203,9 +223,19 @@
 <p>The main interface to create this is through <code class="xref py py-func docutils literal notranslate"><span class="pre">loop()</span></code>.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt id="match.processes.captain_selection.CaptainSelection.get_new_auto">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">get_new_auto</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.get_new_auto" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.processes.captain_selection.CaptainSelection.add_captain">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">add_captain</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.add_captain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
-<dt id="match.processes.captain_selection.CaptainSelection.clear">
-<code class="sig-name descname"><span class="pre">clear</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.clear" title="Permalink to this definition">¶</a></dt>
+<dt id="match.processes.captain_selection.CaptainSelection.get_left_players_pings">
+<code class="sig-name descname"><span class="pre">get_left_players_pings</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.get_left_players_pings" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -220,26 +250,6 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="match.processes.captain_selection.CaptainSelection.get_left_players_pings">
-<code class="sig-name descname"><span class="pre">get_left_players_pings</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.get_left_players_pings" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="match.processes.captain_selection.CaptainSelection.get_new_auto">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">get_new_auto</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.get_new_auto" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.captain_selection.CaptainSelection.info">
-<code class="sig-name descname"><span class="pre">info</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.info" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.captain_selection.CaptainSelection.init">
-<code class="sig-name descname"><span class="pre">init</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.InitFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.init" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt id="match.processes.captain_selection.CaptainSelection.meta_attributes">
 <code class="sig-name descname"><span class="pre">meta_attributes</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;,</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;]</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.meta_attributes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -252,16 +262,6 @@
 <dl class="py attribute">
 <dt id="match.processes.captain_selection.CaptainSelection.meta_status">
 <code class="sig-name descname"><span class="pre">meta_status</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&quot;Determining</span> <span class="pre">team's</span> <span class="pre">captains&quot;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.meta_status" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.captain_selection.CaptainSelection.on_answer">
-<code class="sig-name descname"><span class="pre">on_answer</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.on_answer" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.captain_selection.CaptainSelection.on_volunteer">
-<code class="sig-name descname"><span class="pre">on_volunteer</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.captain_selection.CaptainSelection.on_volunteer" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

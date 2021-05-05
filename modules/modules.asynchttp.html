@@ -187,26 +187,40 @@
             
   <div class="section" id="module-modules.asynchttp">
 <span id="asynchttp"></span><h1>AsyncHttp<a class="headerlink" href="#module-modules.asynchttp" title="Permalink to this headline">¶</a></h1>
-<p>Handle asynchronous http requests</p>
-<dl class="simple">
-<dt>Usage:</dt><dd><p>Request to PS2 api: json_result_file = await api_request_and_retry(url)
-Standard HTTP request: result_code = await request_code(url)</p>
-</dd>
-</dl>
+<div class="line-block">
+<div class="line">Handle asynchronous http requests.</div>
+<div class="line">Request to PS2 api: use <a class="reference internal" href="#modules.asynchttp.api_request_and_retry" title="modules.asynchttp.api_request_and_retry"><code class="xref py py-meth docutils literal notranslate"><span class="pre">api_request_and_retry()</span></code></a>.</div>
+<div class="line">Standard HTTP request: use <a class="reference internal" href="#modules.asynchttp.request_code" title="modules.asynchttp.request_code"><code class="xref py py-meth docutils literal notranslate"><span class="pre">request_code()</span></code></a>.</div>
+</div>
 <dl class="py exception">
 <dt id="modules.asynchttp.ApiNotReachable">
-<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">modules.asynchttp.</span></code><code class="sig-name descname"><span class="pre">ApiNotReachable</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.asynchttp.ApiNotReachable" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">ApiNotReachable</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.asynchttp.ApiNotReachable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Custom API request exception.</p>
-<dl class="simple">
-<dt>Attributes:</dt><dd><p>url: Url of the failed request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>url</strong> – Url which led to the error.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.asynchttp.request_code">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">request_code</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">int</span><a class="headerlink" href="#modules.asynchttp.request_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the url requested.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>url</strong> – URL to get.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HTTP code returned.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="modules.asynchttp.api_request_and_retry">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">modules.asynchttp.</span></code><code class="sig-name descname"><span class="pre">api_request_and_retry</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retries</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">dict</span><a class="headerlink" href="#modules.asynchttp.api_request_and_retry" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">api_request_and_retry</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retries</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">dict</span><a class="headerlink" href="#modules.asynchttp.api_request_and_retry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Try to query Planetside2 API.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -218,22 +232,8 @@ Standard HTTP request: result_code = await request_code(url)</p>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Json dictionary returned by the API.</p>
 </dd>
-<dt class="field-odd">Raise</dt>
-<dd class="field-odd"><p>ApiNotReachable if the request failed.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="modules.asynchttp.request_code">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">modules.asynchttp.</span></code><code class="sig-name descname"><span class="pre">request_code</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">int</span><a class="headerlink" href="#modules.asynchttp.request_code" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the url requested.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>url</strong> – URL to get.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>HTTP code returned.</p>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#modules.asynchttp.ApiNotReachable" title="modules.asynchttp.ApiNotReachable"><strong>ApiNotReachable</strong></a> – if the request failed.</p>
 </dd>
 </dl>
 </dd></dl>

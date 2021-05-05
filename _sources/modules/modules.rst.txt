@@ -1,6 +1,8 @@
 Modules
 =======
 
+This package contains general utilities used by the rest of the application.
+
 .. toctree::
    :maxdepth: 4
 

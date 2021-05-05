@@ -179,26 +179,11 @@
 <span id="stats"></span><h1>Stats<a class="headerlink" href="#module-classes.stats" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="classes.stats.PlayerStat">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">classes.stats.</span></code><code class="sig-name descname"><span class="pre">PlayerStat</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.stats.PlayerStat" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">PlayerStat</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.stats.PlayerStat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt id="classes.stats.PlayerStat.add_data">
-<code class="sig-name descname"><span class="pre">add_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">match_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.stats.PlayerStat.add_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.stats.PlayerStat.add_stats">
-<code class="sig-name descname"><span class="pre">add_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.stats.PlayerStat.add_stats" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.stats.PlayerStat.get_data">
-<code class="sig-name descname"><span class="pre">get_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.stats.PlayerStat.get_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.stats.PlayerStat.get_from_database">
-<em class="property"><span class="pre">async</span> <span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">get_from_database</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.stats.PlayerStat.get_from_database" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.stats.PlayerStat.nb_matches_played">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">nb_matches_played</span></code><a class="headerlink" href="#classes.stats.PlayerStat.nb_matches_played" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -212,8 +197,23 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="classes.stats.PlayerStat.nb_matches_played">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">nb_matches_played</span></code><a class="headerlink" href="#classes.stats.PlayerStat.nb_matches_played" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.stats.PlayerStat.get_from_database">
+<em class="property"><span class="pre">async</span> <span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">get_from_database</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.stats.PlayerStat.get_from_database" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.stats.PlayerStat.add_data">
+<code class="sig-name descname"><span class="pre">add_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">match_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.stats.PlayerStat.add_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.stats.PlayerStat.add_stats">
+<code class="sig-name descname"><span class="pre">add_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.stats.PlayerStat.add_stats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.stats.PlayerStat.get_data">
+<code class="sig-name descname"><span class="pre">get_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.stats.PlayerStat.get_data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

@@ -183,38 +183,28 @@
             
   <div class="section" id="module-match.classes.base_selector">
 <span id="base-selector"></span><h1>Base selector<a class="headerlink" href="#module-match.classes.base_selector" title="Permalink to this headline">¶</a></h1>
-<dl class="py class">
-<dt id="match.classes.base_selector.BaseSelector">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">match.classes.base_selector.</span></code><code class="sig-name descname"><span class="pre">BaseSelector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">match</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_pool</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt id="match.classes.base_selector.BaseSelector.add_callbacks">
-<code class="sig-name descname"><span class="pre">add_callbacks</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">validator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.add_callbacks" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt id="match.classes.base_selector.push_last_bases">
+<code class="sig-name descname"><span class="pre">push_last_bases</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.push_last_bases" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py function">
+<dt id="match.classes.base_selector.is_last_used">
+<code class="sig-name descname"><span class="pre">is_last_used</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.is_last_used" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="match.classes.base_selector.on_match_over">
+<code class="sig-name descname"><span class="pre">on_match_over</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.on_match_over" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="match.classes.base_selector.BaseSelector">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">BaseSelector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">match</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_pool</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt id="match.classes.base_selector.BaseSelector.clean">
 <code class="sig-name descname"><span class="pre">clean</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.clean" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="match.classes.base_selector.BaseSelector.current_selection">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">current_selection</span></code><a class="headerlink" href="#match.classes.base_selector.BaseSelector.current_selection" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="match.classes.base_selector.BaseSelector.display_all">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">display_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.display_all" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="match.classes.base_selector.BaseSelector.get_base_from_selection">
-<code class="sig-name descname"><span class="pre">get_base_from_selection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.get_base_from_selection" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="match.classes.base_selector.BaseSelector.is_base_booked">
-<code class="sig-name descname"><span class="pre">is_base_booked</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.is_base_booked" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -223,18 +213,28 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="match.classes.base_selector.BaseSelector.process_request">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">process_request</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.process_request" title="Permalink to this definition">¶</a></dt>
+<dt id="match.classes.base_selector.BaseSelector.is_base_booked">
+<code class="sig-name descname"><span class="pre">is_base_booked</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.is_base_booked" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="match.classes.base_selector.BaseSelector.select_by_index">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">select_by_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">captain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.select_by_index" title="Permalink to this definition">¶</a></dt>
+<dt id="match.classes.base_selector.BaseSelector.string_list">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">string_list</span></code><a class="headerlink" href="#match.classes.base_selector.BaseSelector.string_list" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="match.classes.base_selector.BaseSelector.select_by_name">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">select_by_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">picker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.select_by_name" title="Permalink to this definition">¶</a></dt>
+<dt id="match.classes.base_selector.BaseSelector.current_selection">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">current_selection</span></code><a class="headerlink" href="#match.classes.base_selector.BaseSelector.current_selection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.classes.base_selector.BaseSelector.get_base_from_selection">
+<code class="sig-name descname"><span class="pre">get_base_from_selection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.get_base_from_selection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.classes.base_selector.BaseSelector.add_callbacks">
+<code class="sig-name descname"><span class="pre">add_callbacks</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">validator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.add_callbacks" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -243,26 +243,26 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="match.classes.base_selector.BaseSelector.string_list">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">string_list</span></code><a class="headerlink" href="#match.classes.base_selector.BaseSelector.string_list" title="Permalink to this definition">¶</a></dt>
+<dt id="match.classes.base_selector.BaseSelector.process_request">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">process_request</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.process_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.classes.base_selector.BaseSelector.display_all">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">display_all</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mentions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.display_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.classes.base_selector.BaseSelector.select_by_name">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">select_by_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">picker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.select_by_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.classes.base_selector.BaseSelector.select_by_index">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">select_by_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">captain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.BaseSelector.select_by_index" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
-
-<dl class="py function">
-<dt id="match.classes.base_selector.is_last_used">
-<code class="sig-prename descclassname"><span class="pre">match.classes.base_selector.</span></code><code class="sig-name descname"><span class="pre">is_last_used</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.is_last_used" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="match.classes.base_selector.on_match_over">
-<code class="sig-prename descclassname"><span class="pre">match.classes.base_selector.</span></code><code class="sig-name descname"><span class="pre">on_match_over</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.on_match_over" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="match.classes.base_selector.push_last_bases">
-<code class="sig-prename descclassname"><span class="pre">match.classes.base_selector.</span></code><code class="sig-name descname"><span class="pre">push_last_bases</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.classes.base_selector.push_last_bases" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 

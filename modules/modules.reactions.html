@@ -187,43 +187,54 @@
             
   <div class="section" id="module-modules.reactions">
 <span id="reactions"></span><h1>Reactions<a class="headerlink" href="#module-modules.reactions" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="modules.reactions.init">
+<code class="sig-name descname"><span class="pre">init</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt id="modules.reactions.UserLackingPermission">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">UserLackingPermission</span></code><a class="headerlink" href="#modules.reactions.UserLackingPermission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.reactions.reaction_handler">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">reaction_handler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.reaction_handler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="modules.reactions.add_handler">
+<code class="sig-name descname"><span class="pre">add_handler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.add_handler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="modules.reactions.rem_handler">
+<code class="sig-name descname"><span class="pre">rem_handler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.rem_handler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="modules.reactions.auto_clear">
+<code class="sig-name descname"><span class="pre">auto_clear</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.auto_clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="modules.reactions.clear_loop">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">clear_loop</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.clear_loop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="modules.reactions.add_reactions">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">add_reactions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reactions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.add_reactions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py class">
 <dt id="modules.reactions.ReactionHandler">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">ReactionHandler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rem_user_react</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rem_bot_react</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_destroy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">ReactionHandler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rem_user_react</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rem_bot_react</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_destroy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt id="modules.reactions.ReactionHandler.add_reaction">
-<code class="sig-name descname"><span class="pre">add_reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">react</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fct</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.add_reaction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="modules.reactions.ReactionHandler.auto_add">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">auto_add</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.auto_add" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="modules.reactions.ReactionHandler.auto_remove_reactions">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">auto_remove_reactions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.auto_remove_reactions" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="modules.reactions.ReactionHandler.is_reaction">
-<code class="sig-name descname"><span class="pre">is_reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">react</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.is_reaction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt id="modules.reactions.ReactionHandler.print">
 <code class="sig-name descname"><span class="pre">print</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.print" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="modules.reactions.ReactionHandler.reaction">
-<code class="sig-name descname"><span class="pre">reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.reaction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="modules.reactions.ReactionHandler.rem_reaction">
-<code class="sig-name descname"><span class="pre">rem_reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">react</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.rem_reaction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -232,8 +243,8 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="modules.reactions.ReactionHandler.run">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.run" title="Permalink to this definition">¶</a></dt>
+<dt id="modules.reactions.ReactionHandler.is_reaction">
+<code class="sig-name descname"><span class="pre">is_reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">react</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.is_reaction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -241,17 +252,42 @@
 <code class="sig-name descname"><span class="pre">set_reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">react</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">fcts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.set_reaction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.add_reaction">
+<code class="sig-name descname"><span class="pre">add_reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">react</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fct</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.add_reaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.rem_reaction">
+<code class="sig-name descname"><span class="pre">rem_reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">react</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.rem_reaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.run">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.auto_remove_reactions">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">auto_remove_reactions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.auto_remove_reactions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.auto_add">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">auto_add</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.auto_add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="modules.reactions.ReactionHandler.reaction">
+<code class="sig-name descname"><span class="pre">reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.ReactionHandler.reaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt id="modules.reactions.SingleMessageReactionHandler">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">SingleMessageReactionHandler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remove_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.SingleMessageReactionHandler" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">SingleMessageReactionHandler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remove_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.SingleMessageReactionHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#modules.reactions.ReactionHandler" title="modules.reactions.ReactionHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">modules.reactions.ReactionHandler</span></code></a></p>
-<dl class="py method">
-<dt id="modules.reactions.SingleMessageReactionHandler.clear">
-<code class="sig-name descname"><span class="pre">clear</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.SingleMessageReactionHandler.clear" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt id="modules.reactions.SingleMessageReactionHandler.is_msg">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_msg</span></code><a class="headerlink" href="#modules.reactions.SingleMessageReactionHandler.is_msg" title="Permalink to this definition">¶</a></dt>
@@ -263,47 +299,16 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="modules.reactions.SingleMessageReactionHandler.clear">
+<code class="sig-name descname"><span class="pre">clear</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.SingleMessageReactionHandler.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="modules.reactions.SingleMessageReactionHandler.set_new_msg">
 <em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">set_new_msg</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.SingleMessageReactionHandler.set_new_msg" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
-
-<dl class="py exception">
-<dt id="modules.reactions.UserLackingPermission">
-<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">UserLackingPermission</span></code><a class="headerlink" href="#modules.reactions.UserLackingPermission" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="modules.reactions.add_handler">
-<code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">add_handler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.add_handler" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.reactions.auto_clear">
-<code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">auto_clear</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.auto_clear" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.reactions.clear_loop">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">clear_loop</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.clear_loop" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.reactions.init">
-<code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">init</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.init" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.reactions.reaction_handler">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">reaction_handler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.reaction_handler" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.reactions.rem_handler">
-<code class="sig-prename descclassname"><span class="pre">modules.reactions.</span></code><code class="sig-name descname"><span class="pre">rem_handler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.reactions.rem_handler" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 

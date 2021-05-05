@@ -187,17 +187,128 @@
             
   <div class="section" id="module-modules.config">
 <span id="config"></span><h1>Config<a class="headerlink" href="#module-modules.config" title="Permalink to this headline">¶</a></h1>
-<p>Retrieves configuration from the config file</p>
+<div class="line-block">
+<div class="line">Contains all the configuration parameters for the application.</div>
+<div class="line">Call <a class="reference internal" href="#modules.config.get_config" title="modules.config.get_config"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_config()</span></code></a> to initialize the configuration from the config file.</div>
+</div>
 <dl class="py exception">
 <dt id="modules.config.ConfigError">
-<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">modules.config.</span></code><code class="sig-name descname"><span class="pre">ConfigError</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.config.ConfigError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">ConfigError</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.config.ConfigError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Raised when an error occur while reading the config file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msg</strong> – Error message.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.factions">
+<code class="sig-name descname"><span class="pre">factions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{1:</span> <span class="pre">'VS',</span> <span class="pre">2:</span> <span class="pre">'NC',</span> <span class="pre">3:</span> <span class="pre">'TR'}</span></em><a class="headerlink" href="#modules.config.factions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary to retrieve faction name by id.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.i_factions">
+<code class="sig-name descname"><span class="pre">i_factions</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'NC':</span> <span class="pre">2,</span> <span class="pre">'TR':</span> <span class="pre">3,</span> <span class="pre">'VS':</span> <span class="pre">1}</span></em><a class="headerlink" href="#modules.config.i_factions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary to retrieve faction id by name.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.zones">
+<code class="sig-name descname"><span class="pre">zones</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{2:</span> <span class="pre">'Indar',</span> <span class="pre">4:</span> <span class="pre">'Hossin',</span> <span class="pre">6:</span> <span class="pre">'Amerish',</span> <span class="pre">8:</span> <span class="pre">'Esamir'}</span></em><a class="headerlink" href="#modules.config.zones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary to retrieve zone name by id.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.facility_suffix">
+<code class="sig-name descname"><span class="pre">facility_suffix</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{2:</span> <span class="pre">'Amp</span> <span class="pre">Station',</span> <span class="pre">3:</span> <span class="pre">'Bio</span> <span class="pre">Lab',</span> <span class="pre">4:</span> <span class="pre">'Tech</span> <span class="pre">Plant'}</span></em><a class="headerlink" href="#modules.config.facility_suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary to retrieve facility suffix by id.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.loadout_id">
+<code class="sig-name descname"><span class="pre">loadout_id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{1:</span> <span class="pre">'infiltrator',</span> <span class="pre">3:</span> <span class="pre">'light_assault',</span> <span class="pre">4:</span> <span class="pre">'medic',</span> <span class="pre">5:</span> <span class="pre">'engineer',</span> <span class="pre">6:</span> <span class="pre">'heavy_assault',</span> <span class="pre">7:</span> <span class="pre">'max',</span> <span class="pre">8:</span> <span class="pre">'infiltrator',</span> <span class="pre">10:</span> <span class="pre">'light_assault',</span> <span class="pre">11:</span> <span class="pre">'medic',</span> <span class="pre">12:</span> <span class="pre">'engineer',</span> <span class="pre">13:</span> <span class="pre">'heavy_assault',</span> <span class="pre">14:</span> <span class="pre">'max',</span> <span class="pre">15:</span> <span class="pre">'infiltrator',</span> <span class="pre">17:</span> <span class="pre">'light_assault',</span> <span class="pre">18:</span> <span class="pre">'medic',</span> <span class="pre">19:</span> <span class="pre">'engineer',</span> <span class="pre">20:</span> <span class="pre">'heavy_assault',</span> <span class="pre">21:</span> <span class="pre">'max'}</span></em><a class="headerlink" href="#modules.config.loadout_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary to retrieve loadout name by id.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.base_to_id">
+<code class="sig-name descname"><span class="pre">base_to_id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'acan':</span> <span class="pre">302030,</span> <span class="pre">'bridgewater':</span> <span class="pre">272000,</span> <span class="pre">'ceres':</span> <span class="pre">219,</span> <span class="pre">'chac':</span> <span class="pre">307010,</span> <span class="pre">'ghanan':</span> <span class="pre">305010,</span> <span class="pre">'kessel':</span> <span class="pre">266000,</span> <span class="pre">'nettlemire':</span> <span class="pre">283000,</span> <span class="pre">'ns_material':</span> <span class="pre">224,</span> <span class="pre">'pale':</span> <span class="pre">239000,</span> <span class="pre">'peris':</span> <span class="pre">3430,</span> <span class="pre">'rashnu':</span> <span class="pre">3620,</span> <span class="pre">'rime':</span> <span class="pre">244610,</span> <span class="pre">'xeno':</span> <span class="pre">230}</span></em><a class="headerlink" href="#modules.config.base_to_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary to retrieve base id from name.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.id_to_base">
+<code class="sig-name descname"><span class="pre">id_to_base</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{219:</span> <span class="pre">'ceres',</span> <span class="pre">224:</span> <span class="pre">'ns_material',</span> <span class="pre">230:</span> <span class="pre">'xeno',</span> <span class="pre">3430:</span> <span class="pre">'peris',</span> <span class="pre">3620:</span> <span class="pre">'rashnu',</span> <span class="pre">239000:</span> <span class="pre">'pale',</span> <span class="pre">244610:</span> <span class="pre">'rime',</span> <span class="pre">266000:</span> <span class="pre">'kessel',</span> <span class="pre">272000:</span> <span class="pre">'bridgewater',</span> <span class="pre">283000:</span> <span class="pre">'nettlemire',</span> <span class="pre">302030:</span> <span class="pre">'acan',</span> <span class="pre">305010:</span> <span class="pre">'ghanan',</span> <span class="pre">307010:</span> <span class="pre">'chac'}</span></em><a class="headerlink" href="#modules.config.id_to_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary to retrieve base name from id.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.general">
+<code class="sig-name descname"><span class="pre">general</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'api_key':</span> <span class="pre">'',</span> <span class="pre">'command_prefix':</span> <span class="pre">'',</span> <span class="pre">'lobby_size':</span> <span class="pre">0,</span> <span class="pre">'round_length':</span> <span class="pre">0,</span> <span class="pre">'rules_msg_id':</span> <span class="pre">0,</span> <span class="pre">'token':</span> <span class="pre">''}</span></em><a class="headerlink" href="#modules.config.general" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains general parameters.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.ts">
+<code class="sig-name descname"><span class="pre">ts</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'config_help':</span> <span class="pre">'',</span> <span class="pre">'lobby_id':</span> <span class="pre">0,</span> <span class="pre">'matches':</span> <span class="pre">[],</span> <span class="pre">'url':</span> <span class="pre">''}</span></em><a class="headerlink" href="#modules.config.ts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains TS3 parameters.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.channels">
+<code class="sig-name descname"><span class="pre">channels</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'lobby':</span> <span class="pre">0,</span> <span class="pre">'matches':</span> <span class="pre">[],</span> <span class="pre">'muted':</span> <span class="pre">0,</span> <span class="pre">'register':</span> <span class="pre">0,</span> <span class="pre">'results':</span> <span class="pre">0,</span> <span class="pre">'rules':</span> <span class="pre">0,</span> <span class="pre">'spam':</span> <span class="pre">0,</span> <span class="pre">'staff':</span> <span class="pre">0,</span> <span class="pre">'usage':</span> <span class="pre">0}</span></em><a class="headerlink" href="#modules.config.channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains discord channel IDs.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.channels_list">
+<code class="sig-name descname"><span class="pre">channels_list</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#modules.config.channels_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains all channels the bot should read/interact in.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.roles">
+<code class="sig-name descname"><span class="pre">roles</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'admin':</span> <span class="pre">0,</span> <span class="pre">'notify':</span> <span class="pre">0,</span> <span class="pre">'registered':</span> <span class="pre">0}</span></em><a class="headerlink" href="#modules.config.roles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains discord roles IDs.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.emojis">
+<code class="sig-name descname"><span class="pre">emojis</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'NC':</span> <span class="pre">'',</span> <span class="pre">'TR':</span> <span class="pre">'',</span> <span class="pre">'VS':</span> <span class="pre">''}</span></em><a class="headerlink" href="#modules.config.emojis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains discord emojis IDs.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.scores">
+<code class="sig-name descname"><span class="pre">scores</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'capture':</span> <span class="pre">0,</span> <span class="pre">'recapture':</span> <span class="pre">0,</span> <span class="pre">'suicide':</span> <span class="pre">0,</span> <span class="pre">'teamkill':</span> <span class="pre">0}</span></em><a class="headerlink" href="#modules.config.scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains scoring parameters.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.database">
+<code class="sig-name descname"><span class="pre">database</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'accounts':</span> <span class="pre">'',</span> <span class="pre">'cluster':</span> <span class="pre">'',</span> <span class="pre">'collections':</span> <span class="pre">{'accounts_usage':</span> <span class="pre">'',</span> <span class="pre">'match_logs':</span> <span class="pre">'',</span> <span class="pre">'matches':</span> <span class="pre">'',</span> <span class="pre">'player_stats':</span> <span class="pre">'',</span> <span class="pre">'restart_data':</span> <span class="pre">'',</span> <span class="pre">'static_bases':</span> <span class="pre">'',</span> <span class="pre">'static_weapons':</span> <span class="pre">'',</span> <span class="pre">'users':</span> <span class="pre">''},</span> <span class="pre">'jaeger_cal':</span> <span class="pre">'',</span> <span class="pre">'url':</span> <span class="pre">''}</span></em><a class="headerlink" href="#modules.config.database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains database parameters.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="modules.config.base_images">
+<code class="sig-name descname"><span class="pre">base_images</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{}</span></em><a class="headerlink" href="#modules.config.base_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains url for base images.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="modules.config.get_config">
-<code class="sig-prename descclassname"><span class="pre">modules.config.</span></code><code class="sig-name descname"><span class="pre">get_config</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">launch_str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.config.get_config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname"><span class="pre">get_config</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">launch_str</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.config.get_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populate the config data from the config file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>launch_str</strong> – Config file suffix. Useful to have different configurations files.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 

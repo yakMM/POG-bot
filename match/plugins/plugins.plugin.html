@@ -186,16 +186,11 @@
 <span id="plugin"></span><h1>Plugin<a class="headerlink" href="#module-match.plugins.plugin" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="match.plugins.plugin.Plugin">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">match.plugins.plugin.</span></code><code class="sig-name descname"><span class="pre">Plugin</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">match</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Plugin</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">match</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt id="match.plugins.plugin.Plugin.clean">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">clean</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.clean" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="match.plugins.plugin.Plugin.on_base_selected">
-<code class="sig-name descname"><span class="pre">on_base_selected</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.on_base_selected" title="Permalink to this definition">¶</a></dt>
+<dt id="match.plugins.plugin.Plugin.on_match_launching">
+<code class="sig-name descname"><span class="pre">on_match_launching</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.on_match_launching" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -209,6 +204,11 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="match.plugins.plugin.Plugin.on_teams_done">
+<code class="sig-name descname"><span class="pre">on_teams_done</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.on_teams_done" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="match.plugins.plugin.Plugin.on_faction_pick">
 <code class="sig-name descname"><span class="pre">on_faction_pick</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.on_faction_pick" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -219,13 +219,13 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="match.plugins.plugin.Plugin.on_match_launching">
-<code class="sig-name descname"><span class="pre">on_match_launching</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.on_match_launching" title="Permalink to this definition">¶</a></dt>
+<dt id="match.plugins.plugin.Plugin.on_base_selected">
+<code class="sig-name descname"><span class="pre">on_base_selected</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.on_base_selected" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="match.plugins.plugin.Plugin.on_match_over">
-<code class="sig-name descname"><span class="pre">on_match_over</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.on_match_over" title="Permalink to this definition">¶</a></dt>
+<dt id="match.plugins.plugin.Plugin.on_team_ready">
+<code class="sig-name descname"><span class="pre">on_team_ready</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.on_team_ready" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -239,13 +239,13 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="match.plugins.plugin.Plugin.on_team_ready">
-<code class="sig-name descname"><span class="pre">on_team_ready</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.on_team_ready" title="Permalink to this definition">¶</a></dt>
+<dt id="match.plugins.plugin.Plugin.on_match_over">
+<code class="sig-name descname"><span class="pre">on_match_over</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.on_match_over" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="match.plugins.plugin.Plugin.on_teams_done">
-<code class="sig-name descname"><span class="pre">on_teams_done</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.on_teams_done" title="Permalink to this definition">¶</a></dt>
+<dt id="match.plugins.plugin.Plugin.clean">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">clean</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#match.plugins.plugin.Plugin.clean" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

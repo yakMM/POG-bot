@@ -189,11 +189,41 @@
 <span id="player-picking"></span><h1>Player picking<a class="headerlink" href="#module-match.processes.player_picking" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="match.processes.player_picking.PlayerPicking">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">match.processes.player_picking.</span></code><code class="sig-name descname"><span class="pre">PlayerPicking</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.player_picking.PlayerPicking" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">PlayerPicking</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.player_picking.PlayerPicking" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="processes.process.html#match.processes.process.Process" title="match.processes.process.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">match.processes.process.Process</span></code></a></p>
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.init">
+<code class="sig-name descname"><span class="pre">init</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.InitFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.processes.player_picking.PlayerPicking.picking_captain">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">picking_captain</span></code><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.picking_captain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.do_sub">
+<code class="sig-name descname"><span class="pre">do_sub</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.do_sub" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.get_left_players_pings">
+<code class="sig-name descname"><span class="pre">get_left_players_pings</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.get_left_players_pings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt id="match.processes.player_picking.PlayerPicking.clear">
 <code class="sig-name descname"><span class="pre">clear</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.pick_status">
+<code class="sig-name descname"><span class="pre">pick_status</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.pick_status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.player_picking.PlayerPicking.pick">
+<code class="sig-name descname"><span class="pre">pick</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.pick" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -210,20 +240,17 @@
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt id="match.processes.player_picking.PlayerPicking.do_sub">
-<code class="sig-name descname"><span class="pre">do_sub</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.do_sub" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt id="match.processes.player_picking.PlayerPicking.pick_check">
+<code class="sig-name descname"><span class="pre">pick_check</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.pick_check" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="match.processes.player_picking.PlayerPicking.get_left_players_pings">
-<code class="sig-name descname"><span class="pre">get_left_players_pings</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.get_left_players_pings" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.player_picking.PlayerPicking.init">
-<code class="sig-name descname"><span class="pre">init</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.InitFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.init" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="match.processes.player_picking.PlayerPicking.ping_last_player">
+<code class="sig-name descname"><span class="pre">ping_last_player</span></code><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.ping_last_player" title="Permalink to this definition">¶</a></dt>
+<dd><p>A background task helper that abstracts the loop and reconnection logic for you.</p>
+<p>The main interface to create this is through <code class="xref py py-func docutils literal notranslate"><span class="pre">loop()</span></code>.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt id="match.processes.player_picking.PlayerPicking.meta_attributes">
@@ -239,33 +266,6 @@
 <dt id="match.processes.player_picking.PlayerPicking.meta_status">
 <code class="sig-name descname"><span class="pre">meta_status</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Waiting</span> <span class="pre">for</span> <span class="pre">captains</span> <span class="pre">to</span> <span class="pre">pick</span> <span class="pre">players'</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.meta_status" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.player_picking.PlayerPicking.pick">
-<code class="sig-name descname"><span class="pre">pick</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.pick" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="match.processes.player_picking.PlayerPicking.pick_check">
-<code class="sig-name descname"><span class="pre">pick_check</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.pick_check" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.player_picking.PlayerPicking.pick_status">
-<code class="sig-name descname"><span class="pre">pick_status</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.pick_status" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="match.processes.player_picking.PlayerPicking.picking_captain">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">picking_captain</span></code><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.picking_captain" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.player_picking.PlayerPicking.ping_last_player">
-<code class="sig-name descname"><span class="pre">ping_last_player</span></code><a class="headerlink" href="#match.processes.player_picking.PlayerPicking.ping_last_player" title="Permalink to this definition">¶</a></dt>
-<dd><p>A background task helper that abstracts the loop and reconnection logic for you.</p>
-<p>The main interface to create this is through <code class="xref py py-func docutils literal notranslate"><span class="pre">loop()</span></code>.</p>
-</dd></dl>
 
 </dd></dl>
 

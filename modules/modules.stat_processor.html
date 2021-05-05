@@ -187,15 +187,30 @@
             
   <div class="section" id="module-modules.stat_processor">
 <span id="stat-processor"></span><h1>Stat processor<a class="headerlink" href="#module-modules.stat_processor" title="Permalink to this headline">¶</a></h1>
-<dl class="py class">
-<dt id="modules.stat_processor.PsbWeekUsage">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">modules.stat_processor.</span></code><code class="sig-name descname"><span class="pre">PsbWeekUsage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">week_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.PsbWeekUsage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt id="modules.stat_processor.PsbWeekUsage.end_str">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">end_str</span></code><a class="headerlink" href="#modules.stat_processor.PsbWeekUsage.end_str" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt id="modules.stat_processor.init">
+<code class="sig-name descname"><span class="pre">init</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.init" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py function">
+<dt id="modules.stat_processor.get_matches_in_time">
+<code class="sig-name descname"><span class="pre">get_matches_in_time</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.get_matches_in_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="modules.stat_processor.get_previous_week">
+<code class="sig-name descname"><span class="pre">get_previous_week</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.get_previous_week" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="modules.stat_processor.get_new_stats">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">get_new_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1618999509</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.get_new_stats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="modules.stat_processor.PsbWeekUsage">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">PsbWeekUsage</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">week_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.PsbWeekUsage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt id="modules.stat_processor.PsbWeekUsage.get_num_matches">
 <code class="sig-name descname"><span class="pre">get_num_matches</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.PsbWeekUsage.get_num_matches" title="Permalink to this definition">¶</a></dt>
@@ -206,31 +221,16 @@
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">start_str</span></code><a class="headerlink" href="#modules.stat_processor.PsbWeekUsage.start_str" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt id="modules.stat_processor.PsbWeekUsage.end_str">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">end_str</span></code><a class="headerlink" href="#modules.stat_processor.PsbWeekUsage.end_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py function">
 <dt id="modules.stat_processor.format_for_psb">
-<code class="sig-prename descclassname"><span class="pre">modules.stat_processor.</span></code><code class="sig-name descname"><span class="pre">format_for_psb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.format_for_psb" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.stat_processor.get_matches_in_time">
-<code class="sig-prename descclassname"><span class="pre">modules.stat_processor.</span></code><code class="sig-name descname"><span class="pre">get_matches_in_time</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.get_matches_in_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.stat_processor.get_new_stats">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">modules.stat_processor.</span></code><code class="sig-name descname"><span class="pre">get_new_stats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1618413910</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.get_new_stats" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.stat_processor.get_previous_week">
-<code class="sig-prename descclassname"><span class="pre">modules.stat_processor.</span></code><code class="sig-name descname"><span class="pre">get_previous_week</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.get_previous_week" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.stat_processor.init">
-<code class="sig-prename descclassname"><span class="pre">modules.stat_processor.</span></code><code class="sig-name descname"><span class="pre">init</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.init" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">format_for_psb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.stat_processor.format_for_psb" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

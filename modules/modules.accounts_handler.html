@@ -187,24 +187,27 @@
             
   <div class="section" id="module-modules.accounts_handler">
 <span id="accounts-handler"></span><h1>Accounts handler<a class="headerlink" href="#module-modules.accounts_handler" title="Permalink to this headline">¶</a></h1>
-<p>This module handle the POG Jaeger accounts</p>
+<div class="line-block">
+<div class="line">This module handle the POG Jaeger accounts.</div>
+<div class="line">Initialize or reload the module with <a class="reference internal" href="#modules.accounts_handler.init" title="modules.accounts_handler.init"><code class="xref py py-meth docutils literal notranslate"><span class="pre">init()</span></code></a>.</div>
+<div class="line">Then call <a class="reference internal" href="#modules.accounts_handler.give_account" title="modules.accounts_handler.give_account"><code class="xref py py-meth docutils literal notranslate"><span class="pre">give_account()</span></code></a> and <a class="reference internal" href="#modules.accounts_handler.send_account" title="modules.accounts_handler.send_account"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_account()</span></code></a> to hand an account to an in-match player.</div>
+<div class="line">Use <a class="reference internal" href="#modules.accounts_handler.terminate_account" title="modules.accounts_handler.terminate_account"><code class="xref py py-meth docutils literal notranslate"><span class="pre">terminate_account()</span></code></a> to remove the account from the player.</div>
+</div>
 <dl class="py function">
-<dt id="modules.accounts_handler.get_not_validated_accounts">
-<code class="sig-prename descclassname"><span class="pre">modules.accounts_handler.</span></code><code class="sig-name descname"><span class="pre">get_not_validated_accounts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../classes/classes.teams.html#classes.teams.Team" title="classes.teams.Team"><span class="pre">classes.teams.Team</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">list</span><a class="headerlink" href="#modules.accounts_handler.get_not_validated_accounts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find all the accounts that were not validated within the team.</p>
+<dt id="modules.accounts_handler.init">
+<code class="sig-name descname"><span class="pre">init</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secret_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.accounts_handler.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the accounts from the google sheet.
+If called later, reload the account usernames and passwords.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>team</strong> – Team to check</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>List containing the players who didn’t accept their accounts.</p>
+<dd class="field-odd"><p><strong>secret_file</strong> – Name of the gspread authentication json file.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="modules.accounts_handler.give_account">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">modules.accounts_handler.</span></code><code class="sig-name descname"><span class="pre">give_account</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_player</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../classes/classes.players.html#classes.players.ActivePlayer" title="classes.players.ActivePlayer"><span class="pre">classes.players.ActivePlayer</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#modules.accounts_handler.give_account" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">give_account</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_player</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../classes/classes.players.html#classes.players.ActivePlayer" title="classes.players.ActivePlayer"><span class="pre">classes.players.ActivePlayer</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#modules.accounts_handler.give_account" title="Permalink to this definition">¶</a></dt>
 <dd><p>Give an account to a_player. We want each player to use as little accounts as possible.
 So we try to give an account the player already used.</p>
 <dl class="field-list simple">
@@ -218,25 +221,8 @@ So we try to give an account the player already used.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="modules.accounts_handler.init">
-<code class="sig-prename descclassname"><span class="pre">modules.accounts_handler.</span></code><code class="sig-name descname"><span class="pre">init</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secret_file</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.accounts_handler.init" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize the accounts from the google sheet.
-If called later, reload the account usernames and passwords.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>secret_file</strong> – Name of the gspread authentication json file.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="modules.accounts_handler.on_account_reaction">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">modules.accounts_handler.</span></code><code class="sig-name descname"><span class="pre">on_account_reaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.accounts_handler.on_account_reaction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt id="modules.accounts_handler.send_account">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">modules.accounts_handler.</span></code><code class="sig-name descname"><span class="pre">send_account</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">discord.channel.TextChannel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_player</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../classes/classes.players.html#classes.players.ActivePlayer" title="classes.players.ActivePlayer"><span class="pre">classes.players.ActivePlayer</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.accounts_handler.send_account" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">send_account</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">discord.channel.TextChannel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_player</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../classes/classes.players.html#classes.players.ActivePlayer" title="classes.players.ActivePlayer"><span class="pre">classes.players.ActivePlayer</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.accounts_handler.send_account" title="Permalink to this definition">¶</a></dt>
 <dd><p>Actually send its account to the player.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -250,11 +236,25 @@ If called later, reload the account usernames and passwords.</p>
 
 <dl class="py function">
 <dt id="modules.accounts_handler.terminate_account">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">modules.accounts_handler.</span></code><code class="sig-name descname"><span class="pre">terminate_account</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_player</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../classes/classes.players.html#classes.players.ActivePlayer" title="classes.players.ActivePlayer"><span class="pre">classes.players.ActivePlayer</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.accounts_handler.terminate_account" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">terminate_account</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_player</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../classes/classes.players.html#classes.players.ActivePlayer" title="classes.players.ActivePlayer"><span class="pre">classes.players.ActivePlayer</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.accounts_handler.terminate_account" title="Permalink to this definition">¶</a></dt>
 <dd><p>Terminate the account: ask the user to log off and remove the reaction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>a_player</strong> – Player whose account should be terminated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.accounts_handler.get_not_validated_accounts">
+<code class="sig-name descname"><span class="pre">get_not_validated_accounts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="../classes/classes.teams.html#classes.teams.Team" title="classes.teams.Team"><span class="pre">classes.teams.Team</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">list</span><a class="headerlink" href="#modules.accounts_handler.get_not_validated_accounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find all the accounts that were not validated within the team.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>team</strong> – Team to check</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List containing the players who didn’t accept their accounts.</p>
 </dd>
 </dl>
 </dd></dl>

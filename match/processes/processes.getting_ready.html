@@ -189,16 +189,41 @@
 <span id="getting-ready"></span><h1>Getting ready<a class="headerlink" href="#module-match.processes.getting_ready" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="match.processes.getting_ready.GettingReady">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">match.processes.getting_ready.</span></code><code class="sig-name descname"><span class="pre">GettingReady</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.getting_ready.GettingReady" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">GettingReady</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.getting_ready.GettingReady" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="processes.process.html#match.processes.process.Process" title="match.processes.process.Process"><code class="xref py py-class docutils literal notranslate"><span class="pre">match.processes.process.Process</span></code></a></p>
+<dl class="py attribute">
+<dt id="match.processes.getting_ready.GettingReady.init">
+<code class="sig-name descname"><span class="pre">init</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.InitFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt id="match.processes.getting_ready.GettingReady.clear">
 <code class="sig-name descname"><span class="pre">clear</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.clear" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="match.processes.getting_ready.GettingReady.do_sub">
-<code class="sig-name descname"><span class="pre">do_sub</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.do_sub" title="Permalink to this definition">¶</a></dt>
+<dt id="match.processes.getting_ready.GettingReady.info">
+<code class="sig-name descname"><span class="pre">info</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.processes.getting_ready.GettingReady.on_team_ready">
+<code class="sig-name descname"><span class="pre">on_team_ready</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ready</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.getting_ready.GettingReady.on_team_ready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="match.processes.getting_ready.GettingReady.ready_check">
+<code class="sig-name descname"><span class="pre">ready_check</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.getting_ready.GettingReady.ready_check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.getting_ready.GettingReady.ready">
+<code class="sig-name descname"><span class="pre">ready</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.ready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="match.processes.getting_ready.GettingReady.remove_account">
+<code class="sig-name descname"><span class="pre">remove_account</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.remove_account" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -207,13 +232,8 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="match.processes.getting_ready.GettingReady.info">
-<code class="sig-name descname"><span class="pre">info</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.info" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.getting_ready.GettingReady.init">
-<code class="sig-name descname"><span class="pre">init</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.InitFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.init" title="Permalink to this definition">¶</a></dt>
+<dt id="match.processes.getting_ready.GettingReady.do_sub">
+<code class="sig-name descname"><span class="pre">do_sub</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.do_sub" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -231,29 +251,9 @@
 <code class="sig-name descname"><span class="pre">meta_status</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'Waiting</span> <span class="pre">for</span> <span class="pre">teams</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">ready'</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.meta_status" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="match.processes.getting_ready.GettingReady.on_team_ready">
-<code class="sig-name descname"><span class="pre">on_team_ready</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ready</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.getting_ready.GettingReady.on_team_ready" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py attribute">
 <dt id="match.processes.getting_ready.GettingReady.pick_status">
 <code class="sig-name descname"><span class="pre">pick_status</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.pick_status" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.getting_ready.GettingReady.ready">
-<code class="sig-name descname"><span class="pre">ready</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.ready" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="match.processes.getting_ready.GettingReady.ready_check">
-<code class="sig-name descname"><span class="pre">ready_check</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#match.processes.getting_ready.GettingReady.ready_check" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="match.processes.getting_ready.GettingReady.remove_account">
-<code class="sig-name descname"><span class="pre">remove_account</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;match.processes.process.PublicFunc</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#match.processes.getting_ready.GettingReady.remove_account" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

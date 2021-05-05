@@ -179,255 +179,47 @@
 <span id="players"></span><h1>Players<a class="headerlink" href="#module-classes.players" title="Permalink to this headline">¶</a></h1>
 <p>Contains player classes</p>
 <dl class="py exception">
-<dt id="classes.players.AccountNotFound">
-<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">classes.players.</span></code><code class="sig-name descname"><span class="pre">AccountNotFound</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.AccountNotFound" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-</dd></dl>
-
-<dl class="py class">
-<dt id="classes.players.ActivePlayer">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">classes.players.</span></code><code class="sig-name descname"><span class="pre">ActivePlayer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">team</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>ActivePlayer class, with more data than Player class, for when match is happening</p>
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.accept_account">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">accept_account</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer.accept_account" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.account">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">account</span></code><a class="headerlink" href="#classes.players.ActivePlayer.account" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.bench">
-<code class="sig-name descname"><span class="pre">bench</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bench</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer.bench" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.change_team">
-<code class="sig-name descname"><span class="pre">change_team</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer.change_team" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.clean">
-<code class="sig-name descname"><span class="pre">clean</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer.clean" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.faction">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">faction</span></code><a class="headerlink" href="#classes.players.ActivePlayer.faction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.has_own_account">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">has_own_account</span></code><a class="headerlink" href="#classes.players.ActivePlayer.has_own_account" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.id">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">id</span></code><a class="headerlink" href="#classes.players.ActivePlayer.id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.ig_id">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ig_id</span></code><a class="headerlink" href="#classes.players.ActivePlayer.ig_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.ig_name">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ig_name</span></code><a class="headerlink" href="#classes.players.ActivePlayer.ig_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.is_benched">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_benched</span></code><a class="headerlink" href="#classes.players.ActivePlayer.is_benched" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.is_captain">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_captain</span></code><a class="headerlink" href="#classes.players.ActivePlayer.is_captain" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.is_playing">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_playing</span></code><a class="headerlink" href="#classes.players.ActivePlayer.is_playing" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.match">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">match</span></code><a class="headerlink" href="#classes.players.ActivePlayer.match" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.mention">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">mention</span></code><a class="headerlink" href="#classes.players.ActivePlayer.mention" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.name">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">name</span></code><a class="headerlink" href="#classes.players.ActivePlayer.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.on_match_starting">
-<code class="sig-name descname"><span class="pre">on_match_starting</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer.on_match_starting" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.on_team_ready">
-<code class="sig-name descname"><span class="pre">on_team_ready</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ready</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer.on_team_ready" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.player_score">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">player_score</span></code><a class="headerlink" href="#classes.players.ActivePlayer.player_score" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.team">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">team</span></code><a class="headerlink" href="#classes.players.ActivePlayer.team" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.ActivePlayer.unique_usages">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">unique_usages</span></code><a class="headerlink" href="#classes.players.ActivePlayer.unique_usages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py exception">
-<dt id="classes.players.CharAlreadyExists">
-<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">classes.players.</span></code><code class="sig-name descname"><span class="pre">CharAlreadyExists</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.CharAlreadyExists" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.players.CharNotFound">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">CharNotFound</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.CharNotFound" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="py exception">
 <dt id="classes.players.CharInvalidWorld">
-<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">classes.players.</span></code><code class="sig-name descname"><span class="pre">CharInvalidWorld</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.CharInvalidWorld" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">CharInvalidWorld</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.CharInvalidWorld" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="classes.players.CharAlreadyExists">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">CharAlreadyExists</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.CharAlreadyExists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="py exception">
 <dt id="classes.players.CharMissingFaction">
-<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">classes.players.</span></code><code class="sig-name descname"><span class="pre">CharMissingFaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">faction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.CharMissingFaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-</dd></dl>
-
-<dl class="py exception">
-<dt id="classes.players.CharNotFound">
-<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">classes.players.</span></code><code class="sig-name descname"><span class="pre">CharNotFound</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.CharNotFound" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">CharMissingFaction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">faction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.CharMissingFaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="py class">
 <dt id="classes.players.Player">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">classes.players.</span></code><code class="sig-name descname"><span class="pre">Player</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Player</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Basic player class, every registered user matches a Player object contained in the dictionary</p>
-<dl class="py method">
-<dt id="classes.players.Player.accounts_flipped">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">accounts_flipped</span></code><a class="headerlink" href="#classes.players.Player.accounts_flipped" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.active">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">active</span></code><a class="headerlink" href="#classes.players.Player.active" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.change_name">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">change_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.change_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.cheat_name">
-<code class="sig-name descname"><span class="pre">cheat_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.cheat_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.copy_ig_info">
-<code class="sig-name descname"><span class="pre">copy_ig_info</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.copy_ig_info" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.db_update">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">db_update</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.db_update" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt id="classes.players.Player.get">
 <em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">get</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.get" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="classes.players.Player.remove">
+<code class="sig-name descname"><span class="pre">remove</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="classes.players.Player.get_all_players_list">
 <em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">get_all_players_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.get_all_players_list" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.get_data">
-<code class="sig-name descname"><span class="pre">get_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.get_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.has_own_account">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">has_own_account</span></code><a class="headerlink" href="#classes.players.Player.has_own_account" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.id">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">id</span></code><a class="headerlink" href="#classes.players.Player.id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.ig_ids">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ig_ids</span></code><a class="headerlink" href="#classes.players.Player.ig_ids" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.ig_names">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ig_names</span></code><a class="headerlink" href="#classes.players.Player.ig_names" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.is_lobbied">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_lobbied</span></code><a class="headerlink" href="#classes.players.Player.is_lobbied" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.is_notify">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_notify</span></code><a class="headerlink" href="#classes.players.Player.is_notify" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.is_registered">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_registered</span></code><a class="headerlink" href="#classes.players.Player.is_registered" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.is_timeout">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_timeout</span></code><a class="headerlink" href="#classes.players.Player.is_timeout" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.lobby_stamp">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">lobby_stamp</span></code><a class="headerlink" href="#classes.players.Player.lobby_stamp" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.match">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">match</span></code><a class="headerlink" href="#classes.players.Player.match" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.mention">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">mention</span></code><a class="headerlink" href="#classes.players.Player.mention" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.name">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">name</span></code><a class="headerlink" href="#classes.players.Player.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -446,9 +238,116 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="classes.players.Player.on_lobby_add">
-<code class="sig-name descname"><span class="pre">on_lobby_add</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.on_lobby_add" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.players.Player.get_data">
+<code class="sig-name descname"><span class="pre">get_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.get_data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.db_update">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">db_update</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.db_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.active">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">active</span></code><a class="headerlink" href="#classes.players.Player.active" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.name">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">name</span></code><a class="headerlink" href="#classes.players.Player.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.change_name">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">change_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.change_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.timeout">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">timeout</span></code><a class="headerlink" href="#classes.players.Player.timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.cheat_name">
+<code class="sig-name descname"><span class="pre">cheat_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.cheat_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.is_timeout">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_timeout</span></code><a class="headerlink" href="#classes.players.Player.is_timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.is_notify">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_notify</span></code><a class="headerlink" href="#classes.players.Player.is_notify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.is_lobbied">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_lobbied</span></code><a class="headerlink" href="#classes.players.Player.is_lobbied" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.lobby_stamp">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">lobby_stamp</span></code><a class="headerlink" href="#classes.players.Player.lobby_stamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.stats">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">stats</span></code><a class="headerlink" href="#classes.players.Player.stats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.id">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">id</span></code><a class="headerlink" href="#classes.players.Player.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.mention">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">mention</span></code><a class="headerlink" href="#classes.players.Player.mention" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.ig_names">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ig_names</span></code><a class="headerlink" href="#classes.players.Player.ig_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.ig_ids">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ig_ids</span></code><a class="headerlink" href="#classes.players.Player.ig_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.is_registered">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_registered</span></code><a class="headerlink" href="#classes.players.Player.is_registered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.match">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">match</span></code><a class="headerlink" href="#classes.players.Player.match" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.has_own_account">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">has_own_account</span></code><a class="headerlink" href="#classes.players.Player.has_own_account" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.accounts_flipped">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">accounts_flipped</span></code><a class="headerlink" href="#classes.players.Player.accounts_flipped" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.update_role">
+<code class="sig-name descname"><span class="pre">update_role</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.update_role" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="classes.players.Player.role_task">
+<code class="sig-name descname"><span class="pre">role_task</span></code><a class="headerlink" href="#classes.players.Player.role_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>A background task helper that abstracts the loop and reconnection logic for you.</p>
+<p>The main interface to create this is through <code class="xref py py-func docutils literal notranslate"><span class="pre">loop()</span></code>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="classes.players.Player.on_lobby_leave">
@@ -456,8 +355,18 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="classes.players.Player.on_match_selected">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">on_match_selected</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.on_match_selected" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.players.Player.reset_lobby_timestamp">
+<code class="sig-name descname"><span class="pre">reset_lobby_timestamp</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.reset_lobby_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.on_lobby_add">
+<code class="sig-name descname"><span class="pre">on_lobby_add</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.on_lobby_add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.on_player_clean">
+<code class="sig-name descname"><span class="pre">on_player_clean</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.on_player_clean" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -466,8 +375,13 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="classes.players.Player.on_player_clean">
-<code class="sig-name descname"><span class="pre">on_player_clean</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.on_player_clean" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.players.Player.on_match_selected">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">on_match_selected</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.on_match_selected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.Player.copy_ig_info">
+<code class="sig-name descname"><span class="pre">copy_ig_info</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.copy_ig_info" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -499,43 +413,123 @@
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="classes.players.Player.remove">
-<code class="sig-name descname"><span class="pre">remove</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.remove" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="classes.players.Player.reset_lobby_timestamp">
-<code class="sig-name descname"><span class="pre">reset_lobby_timestamp</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.reset_lobby_timestamp" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="classes.players.Player.role_task">
-<code class="sig-name descname"><span class="pre">role_task</span></code><a class="headerlink" href="#classes.players.Player.role_task" title="Permalink to this definition">¶</a></dt>
-<dd><p>A background task helper that abstracts the loop and reconnection logic for you.</p>
-<p>The main interface to create this is through <code class="xref py py-func docutils literal notranslate"><span class="pre">loop()</span></code>.</p>
 </dd></dl>
 
+<dl class="py class">
+<dt id="classes.players.ActivePlayer">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">ActivePlayer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">team</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>ActivePlayer class, with more data than Player class, for when match is happening</p>
 <dl class="py method">
-<dt id="classes.players.Player.stats">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">stats</span></code><a class="headerlink" href="#classes.players.Player.stats" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.players.ActivePlayer.player_score">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">player_score</span></code><a class="headerlink" href="#classes.players.ActivePlayer.player_score" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="classes.players.Player.timeout">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">timeout</span></code><a class="headerlink" href="#classes.players.Player.timeout" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.players.ActivePlayer.is_benched">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_benched</span></code><a class="headerlink" href="#classes.players.ActivePlayer.is_benched" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="classes.players.Player.update_role">
-<code class="sig-name descname"><span class="pre">update_role</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.Player.update_role" title="Permalink to this definition">¶</a></dt>
+<dt id="classes.players.ActivePlayer.is_captain">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_captain</span></code><a class="headerlink" href="#classes.players.ActivePlayer.is_captain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.is_playing">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_playing</span></code><a class="headerlink" href="#classes.players.ActivePlayer.is_playing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.name">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">name</span></code><a class="headerlink" href="#classes.players.ActivePlayer.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.id">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">id</span></code><a class="headerlink" href="#classes.players.ActivePlayer.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.has_own_account">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">has_own_account</span></code><a class="headerlink" href="#classes.players.ActivePlayer.has_own_account" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.unique_usages">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">unique_usages</span></code><a class="headerlink" href="#classes.players.ActivePlayer.unique_usages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.mention">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">mention</span></code><a class="headerlink" href="#classes.players.ActivePlayer.mention" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.faction">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">faction</span></code><a class="headerlink" href="#classes.players.ActivePlayer.faction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.ig_id">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ig_id</span></code><a class="headerlink" href="#classes.players.ActivePlayer.ig_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.ig_name">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ig_name</span></code><a class="headerlink" href="#classes.players.ActivePlayer.ig_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.account">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">account</span></code><a class="headerlink" href="#classes.players.ActivePlayer.account" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.team">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">team</span></code><a class="headerlink" href="#classes.players.ActivePlayer.team" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.match">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">match</span></code><a class="headerlink" href="#classes.players.ActivePlayer.match" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.bench">
+<code class="sig-name descname"><span class="pre">bench</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bench</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer.bench" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.clean">
+<code class="sig-name descname"><span class="pre">clean</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer.clean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.change_team">
+<code class="sig-name descname"><span class="pre">change_team</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer.change_team" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.on_team_ready">
+<code class="sig-name descname"><span class="pre">on_team_ready</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ready</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer.on_team_ready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.on_match_starting">
+<code class="sig-name descname"><span class="pre">on_match_starting</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer.on_match_starting" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="classes.players.ActivePlayer.accept_account">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">accept_account</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.ActivePlayer.accept_account" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt id="classes.players.TeamCaptain">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">classes.players.</span></code><code class="sig-name descname"><span class="pre">TeamCaptain</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.TeamCaptain" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">TeamCaptain</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classes.players.TeamCaptain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#classes.players.ActivePlayer" title="classes.players.ActivePlayer"><code class="xref py py-class docutils literal notranslate"><span class="pre">classes.players.ActivePlayer</span></code></a></p>
 <p>Team Captain variant of the active player</p>
 <dl class="py method">

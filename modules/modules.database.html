@@ -187,70 +187,200 @@
             
   <div class="section" id="module-modules.database">
 <span id="database"></span><h1>Database<a class="headerlink" href="#module-modules.database" title="Permalink to this headline">¶</a></h1>
-<p>Handle mongodb interaction</p>
+<div class="line-block">
+<div class="line">Handle interaction with the mongodb database.</div>
+</div>
 <dl class="py exception">
 <dt id="modules.database.DatabaseError">
-<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">modules.database.</span></code><code class="sig-name descname"><span class="pre">DatabaseError</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.DatabaseError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span> </em><code class="sig-name descname"><span class="pre">DatabaseError</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.DatabaseError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Raised when an error occur when interacting with the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msg</strong> – Error message.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="modules.database.async_db_call">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">modules.database.</span></code><code class="sig-name descname"><span class="pre">async_db_call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">call</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.async_db_call" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.database.force_update">
-<code class="sig-prename descclassname"><span class="pre">modules.database.</span></code><code class="sig-name descname"><span class="pre">force_update</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.force_update" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is only called from external script for db maintenance</p>
+<dt id="modules.database.init">
+<code class="sig-name descname"><span class="pre">init</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the MongoClient and create a dictionary of available collections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> – Dictionary containing database config. Check <a class="reference internal" href="modules.config.html#modules.config.database" title="modules.config.database"><code class="xref py py-data docutils literal notranslate"><span class="pre">modules.config.database</span></code></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="modules.database.get_all_elements">
-<code class="sig-prename descclassname"><span class="pre">modules.database.</span></code><code class="sig-name descname"><span class="pre">get_all_elements</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_class_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.get_all_elements" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.database.get_element">
-<code class="sig-prename descclassname"><span class="pre">modules.database.</span></code><code class="sig-name descname"><span class="pre">get_element</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.get_element" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.database.get_field">
-<code class="sig-prename descclassname"><span class="pre">modules.database.</span></code><code class="sig-name descname"><span class="pre">get_field</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specific</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.get_field" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.database.init">
-<code class="sig-prename descclassname"><span class="pre">modules.database.</span></code><code class="sig-name descname"><span class="pre">init</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.init" title="Permalink to this definition">¶</a></dt>
-<dd><p>Init</p>
+<code class="sig-name descname"><span class="pre">get_all_elements</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_class_method</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.get_all_elements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all elements of a given collection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>init_class_method</strong> – The data will be passed to this method.</p></li>
+<li><p><strong>collection</strong> – Collection name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#modules.database.DatabaseError" title="modules.database.DatabaseError"><strong>DatabaseError</strong></a> – If an error occurs while passing data.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="modules.database.push_element">
-<code class="sig-prename descclassname"><span class="pre">modules.database.</span></code><code class="sig-name descname"><span class="pre">push_element</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.push_element" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="modules.database.async_db_call">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">async_db_call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">call</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.async_db_call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call a db function asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>call</strong> – Function to call.</p></li>
+<li><p><strong>args</strong> – Args to pass to the called function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Return the result of the call.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
-<dt id="modules.database.remove_element">
-<code class="sig-prename descclassname"><span class="pre">modules.database.</span></code><code class="sig-name descname"><span class="pre">remove_element</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.remove_element" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="modules.database.set_element">
-<code class="sig-prename descclassname"><span class="pre">modules.database.</span></code><code class="sig-name descname"><span class="pre">set_element</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.set_element" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="modules.database.force_update">
+<code class="sig-name descname"><span class="pre">force_update</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elements</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.force_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is typically called from external scripts for db maintenance.
+Replace the whole collection by the provided elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – Collection name.</p></li>
+<li><p><strong>elements</strong> – Elements to insert.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="modules.database.set_field">
-<code class="sig-prename descclassname"><span class="pre">modules.database.</span></code><code class="sig-name descname"><span class="pre">set_field</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.set_field" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update player p into db</p>
+<code class="sig-name descname"><span class="pre">set_field</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.set_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the field of an element. In other words, update an element.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – Collection name.</p></li>
+<li><p><strong>e_id</strong> – Element id.</p></li>
+<li><p><strong>doc</strong> – Data to set.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#modules.database.DatabaseError" title="modules.database.DatabaseError"><strong>DatabaseError</strong></a> – If the element is not in the collection.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="modules.database.unset_field">
-<code class="sig-prename descclassname"><span class="pre">modules.database.</span></code><code class="sig-name descname"><span class="pre">unset_field</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.unset_field" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update player p into db</p>
+<code class="sig-name descname"><span class="pre">unset_field</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.unset_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unset (remove) the field of an element. In other words, update an element.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – Collection name.</p></li>
+<li><p><strong>e_id</strong> – Element id.</p></li>
+<li><p><strong>doc</strong> – Data to unset.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#modules.database.DatabaseError" title="modules.database.DatabaseError"><strong>DatabaseError</strong></a> – If the element is not in the collection.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.database.push_element">
+<code class="sig-name descname"><span class="pre">push_element</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.push_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Push data in the field of an element.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – Collection name.</p></li>
+<li><p><strong>e_id</strong> – Element id.</p></li>
+<li><p><strong>doc</strong> – Data to push. The key should be the field to push to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#modules.database.DatabaseError" title="modules.database.DatabaseError"><strong>DatabaseError</strong></a> – If the element is not in the collection.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.database.get_element">
+<code class="sig-name descname"><span class="pre">get_element</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">collection:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">item_id:</span> <span class="pre">int)</span> <span class="pre">-&gt;</span> <span class="pre">(&lt;class</span> <span class="pre">'dict'&gt;</span></em>, <em class="sig-param"><span class="pre">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.get_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a single element.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – Collection name.</p></li>
+<li><p><strong>item_id</strong> – Element id.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Element found, or None if not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.database.get_field">
+<code class="sig-name descname"><span class="pre">get_field</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specific</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.get_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get one field of a single element.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – Collection name.</p></li>
+<li><p><strong>e_id</strong> – Element id.</p></li>
+<li><p><strong>specific</strong> – Field name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Element found, or None if not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.database.set_element">
+<code class="sig-name descname"><span class="pre">set_element</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.set_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a whole element (with all its field). Replace if the element already exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – Collection name.</p></li>
+<li><p><strong>e_id</strong> – Element id.</p></li>
+<li><p><strong>data</strong> – Element data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="modules.database.remove_element">
+<code class="sig-name descname"><span class="pre">remove_element</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.database.remove_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove an element from the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – Collection name</p></li>
+<li><p><strong>e_id</strong> – Element id.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#modules.database.DatabaseError" title="modules.database.DatabaseError"><strong>DatabaseError</strong></a> – If the element is not in the collection.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
