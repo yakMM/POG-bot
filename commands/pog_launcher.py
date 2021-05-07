@@ -29,13 +29,13 @@ class ProcessGroup:
         self.kill_ts3()
         logging.info("Starting TS3 bot!")
         time.sleep(5)
-        self.ts3_process = subprocess.Popen(f"{os.getcwd()}/ts3_bot_launcher.sh", shell=True, preexec_fn=os.setsid)
+        self.ts3_process = subprocess.Popen(f"{os.getcwd()}/commands/ts3_bot_launcher.sh", shell=True, preexec_fn=os.setsid)
 
     def restart_discord(self):
         self.kill_discord()
         logging.info("Starting discord bot!")
         time.sleep(5)
-        self.discord_process = subprocess.Popen(f"{os.getcwd()}/discord_bot_launcher.sh", shell=True,
+        self.discord_process = subprocess.Popen(f"{os.getcwd()}/commands/discord_bot_launcher.sh", shell=True,
                                                 preexec_fn=os.setsid)
 
     def clear_lobby(self):

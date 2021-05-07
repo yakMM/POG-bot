@@ -96,16 +96,17 @@ def _auto_ping_cancel():
 
 
 def get_sub(player):
+    # Check if someone in lobby, if not return player (might be None)
     if len(_lobby_list) == 0:
         return player
+    # If player is None, take first player in queue
     if not player:
         player = _lobby_list[0]
-    try:
+    # If player chosen is in lobby, remove
+    if player.is_lobbied:
+        _lobby_list.remove(player)
+        _on_lobby_remove()
         _remove_from_warned(player)
-    except ValueError:
-        pass
-    _lobby_list.remove(player)
-    _on_lobby_remove()
     return player
 
 

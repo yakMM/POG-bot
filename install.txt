@@ -1,0 +1,47 @@
+sudo apt-get update
+sudo apt-get upgrade
+
+# TS3 audio bot:
+# 1) .NET:
+wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+sudo dpkg -i packages-microsoft-prod.deb
+rm packages-microsoft-prod.deb
+sudo apt-get update
+sudo apt-get install -y apt-transport-https && sudo apt-get update
+sudo apt-get install -y dotnet-runtime-3.1
+
+# 2) bot
+sudo apt-get install libopus-dev ffmpeg
+mkdir -p TS3-bot && cd TS3-bot
+
+# Copy TS3 bot binaries to the folder
+# Copy TS3 bot config files to the folder
+
+# Test bots are ok with dotnet TS3AudioBot.dll
+
+
+# Mongodb:
+
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+sudo systemctl start mongod
+
+# Test mongo is ok with mongo
+# Restore the db from archive with mongorestore
+
+# discord bot:
+git clone https://github.com/yakMM/POG-bot.git
+sudo apt-get install pipenv
+cd POG-bot
+pipenv install
+pipenv shell
+exit
+
+echo "alias pog=/home/ubuntu/POG-bot/commands/pog.sh" > .bash_aliases
+chmod a+x POG-bot/commands/pog.sh
+# Copy secret files in POG-data/secret
+pog update
+
+

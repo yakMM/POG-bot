@@ -26,6 +26,9 @@ async def on_message(client, message):
     if message.channel.id not in cfg.channels_list:
         return
 
+    if message.content[0] != cfg.general["command_prefix"]:
+        return
+
     # If bot is locked
     if is_all_locked():
         if not is_admin(message.author):

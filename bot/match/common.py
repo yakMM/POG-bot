@@ -83,7 +83,6 @@ async def ping_sub_in_lobby(match, new_player, was_lobbied):
         log.warning(f"Player id:[{new_player.id}], name:[{new_player.name}] is refusing DMs")
 
 
-
 async def after_pick_sub(match, subbed, force_player, clean_subbed=True):
     """
     Substitute a player by another one picked at random in the lobby.

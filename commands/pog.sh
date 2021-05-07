@@ -1,5 +1,8 @@
 #!/bin/bash
 
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
 function my_help
 {
   # Display Help
@@ -27,7 +30,7 @@ function my_error
 function my_stop
 {
   # Stop bot
-  cd "$(dirname "$0")" || my_error
+  cd "$SCRIPT_DIR" || my_error
 
   pkill -SIGINT -f pog_launcher.py
   rm -f running
@@ -37,23 +40,23 @@ function my_stop
 function my_start
 {
   # Start bot
-  cd "$(dirname "$0")" || my_error
+  cd "$SCRIPT_DIR/.." || my_error
 
   if [ -f "running" ]; then
     echo "Bot is already running!"
   else
     touch running
-    mkdir -p ../../POG-data
-    mkdir -p ../../POG-data/logging
-    mkdir -p ../../POG-data/matches
-    nohup python3 -u pog_launcher.py >> ../../POG-data/logging/launcher.out 2>&1 &
+    mkdir -p ../POG-data
+    mkdir -p ../POG-data/logging
+    mkdir -p ../POG-data/matches
+    nohup pipenv run python -u commands/pog_launcher.py >> ../POG-data/logging/launcher.out 2>&1 &
     echo "Bot started..."
   fi
 }
 
 function my_ts3_restart
 {
-  cd "$(dirname "$0")" || my_error
+  cd "$SCRIPT_DIR" || my_error
 
   if [ -f "running" ]; then
     pkill -SIGUSR1 -f pog_launcher.py
@@ -65,7 +68,7 @@ function my_ts3_restart
 
 function my_discord_restart
 {
-  cd "$(dirname "$0")" || my_error
+  cd "$SCRIPT_DIR" || my_error
 
   if [ -f "running" ]; then
     pkill -SIGUSR2 -f pog_launcher.py
@@ -78,8 +81,7 @@ function my_discord_restart
 function my_update
 {
   # Update code from github
-  cd "$(dirname "$0")" || my_error
-  cd ..
+  cd "$SCRIPT_DIR/.." || my_error
   git clean -xdf
   git fetch origin master
   git reset --hard origin/master
@@ -91,15 +93,15 @@ function my_update
 function my_discord_log
 {
   # Show last logs
-  cd "$(dirname "$0")" || my_error
-  tail ../../POG-data/logging/bot_log
+  cd "$SCRIPT_DIR/.." || my_error
+  tail ../POG-data/logging/bot_log
 }
 
 function my_ts3_log
 {
   # Show last logs
-  cd "$(dirname "$0")" || my_error
-  tail ../../POG-data/logging/ts3_bot.out
+  cd "$SCRIPT_DIR/.." || my_error
+  tail ../POG-data/logging/ts3_bot.out
 }
 
 if [ $# -eq 0 ]; then
