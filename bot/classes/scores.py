@@ -1,6 +1,8 @@
 import modules.config as cfg
 import modules.database as db
 
+import operator
+
 
 def ill_weapons_from_data(data):
     ill_weapons = dict()
@@ -179,22 +181,14 @@ class PlayerScore:
 
     def get_main_loadouts(self):
         result = list()
-        all = list(self.__loadouts.values())
-        for i in range(2):
-            max_v = 0
-            max_l = None
-            for ld in all:
-                if ld.weight > max_v:
-                    max_l = ld
-            if max_l:
-                result.append(max_l.name)
-                all.remove(max_l)
-            else:
-                return result
-        return result
+        key = operator.attrgetter("weight")
+        sorted_loadouts = sorted(self.__loadouts.values(), key=key, reverse=True)
+        if len(sorted_loadouts) > 2:
+            sorted_loadouts = sorted_loadouts[:2]
+        return [load.name for load in sorted_loadouts]
 
     def update_stats(self):
-        self.stats.add_stats(self)
+        self.stats.add_data(self.team.match.id, self.team.match.round_length*2, self.get_data())
 
     async def db_update_stats(self):
         self.update_stats()
@@ -247,6 +241,10 @@ class PlayerScore:
     @property
     def team(self):
         return self.__team
+
+    @property
+    def loadouts(self):
+        return self.__loadouts
 
     def get_data(self):
         data = {"discord_id": self.__id,

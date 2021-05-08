@@ -7,16 +7,15 @@ class PlayerStat:
         self.name = name
         if data:
             self.matches = data["matches"]
-            self.kills = data["kills"]
-            self.deaths = data["deaths"]
-            self.net = data["net"]
-            self.score = data["score"]
+            self.time_played = data["time_played"]
+            self.loadouts = dict()
+            for l_data in data["loadouts"]:
+                l_id = l_data["id"]
+                self.loadouts[l_id] = LoadoutStats(l_id, l_data)
         else:
             self.matches = list()
-            self.kills = 0
-            self.deaths = 0
-            self.net = 0
-            self.score = 0
+            self.time_played = 0
+            self.loadouts = dict()
 
     @property
     def nb_matches_played(self):
@@ -24,9 +23,37 @@ class PlayerStat:
 
     @property
     def kpm(self):
-        if self.nb_matches_played == 0:
-            return "{:.1f}".format(0)
-        return "{:.1f}".format(self.kills / self.nb_matches_played)
+        if self.time_played == 0:
+            return 0
+        return self.kills / self.time_played
+
+    @property
+    def score(self):
+        score = 0
+        for loadout in self.loadouts.values():
+            score += loadout.score
+        return score
+
+    @property
+    def kills(self):
+        kills = 0
+        for loadout in self.loadouts.values():
+            kills += loadout.kills
+        return kills
+
+    @property
+    def deaths(self):
+        deaths = 0
+        for loadout in self.loadouts.values():
+            deaths += loadout.deaths
+        return deaths
+
+    @property
+    def net(self):
+        net = 0
+        for loadout in self.loadouts.values():
+            net += loadout.score
+        return net
 
     @property
     def mention(self):
@@ -37,26 +64,54 @@ class PlayerStat:
         dta = await db.async_db_call(db.get_element, "player_stats", p_id)
         return cls(p_id, name=name, data=dta)
 
-    def add_data(self, match_id, dta):
+    def add_data(self, match_id, time_played, dta):
         self.matches.append(match_id)
-        self.kills += dta["kills"]
-        self.deaths += dta["deaths"]
-        self.net += dta["net"]
-        self.score += dta["score"]
-
-    def add_stats(self, player):
-        self.matches.append(player.match.id)
-        self.kills += player.kills
-        self.deaths += player.deaths
-        self.net += player.net
-        self.score += player.score
+        self.time_played += time_played
+        for l_data in dta["loadouts"]:
+            l_id = l_data["loadout_id"]
+            if l_id in self.loadouts:
+                self.loadouts[l_id].add_data(l_data)
+            else:
+                self.loadouts[l_id] = LoadoutStats(l_id, l_data)
 
     def get_data(self):
         dta = dict()
         dta["_id"] = self.id
         dta["matches"] = self.matches
-        dta["kills"] = self.kills
-        dta["deaths"] = self.deaths
-        dta["net"] = self.net
-        dta["score"] = self.score
+        dta["time_played"] = self.time_played
+        dta["loadouts"] = [loadout.get_data() for loadout in self.loadouts.values()]
         return dta
+
+
+class LoadoutStats:
+    def __init__(self, l_id, data=None):
+        self.id = l_id
+        if data:
+            self.weight = data["weight"]
+            self.kills = data["kills"]
+            self.deaths = data["deaths"]
+            self.net = data["net"]
+            self.score = data["score"]
+        else:
+            self.weight = 0
+            self.kills = 0
+            self.deaths = 0
+            self.net = 0
+            self.score = 0
+
+    def add_data(self, dta):
+        self.weight += dta["weight"]
+        self.kills += dta["kills"]
+        self.deaths += dta["deaths"]
+        self.net += dta["net"]
+        self.score += dta["score"]
+
+    def get_data(self):
+        data = {"id": self.id,
+                "score": self.score,
+                "net": self.net,
+                "deaths": self.deaths,
+                "kills": self.kills,
+                "weight": self.weight,
+                }
+        return data

@@ -521,12 +521,12 @@ def player_stats(ctx, stats, recent_stats):
     embed.add_field(name="Recent (last 2 weeks)",
                     value=f"Matches played: {recent_stats.nb_matches_played}\n"
                           f"Score: {recent_stats.score}\n"
-                          f"Kills per match: {recent_stats.kpm}",
+                          f"Kills per minute: {'{:.1f}'.format(recent_stats.kpm)}",
                     inline=False)
     embed.add_field(name="All time",
                     value=f"Matches played: {stats.nb_matches_played}\n"
                           f"Total score: {stats.score}\n"
-                          f"Kills per match: {stats.kpm}",
+                          f"Kills per minute: {'{:.1f}'.format(stats.kpm)}",
                     inline=False)
 
     embed.set_footer(text="Note: Tracking stats only after POG match 569.")

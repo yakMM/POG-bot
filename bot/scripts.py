@@ -9,6 +9,7 @@ import os
 
 import modules.database as db
 import modules.accounts_handler as accounts
+from classes import PlayerStat
 
 if os.path.isfile("test"):
     LAUNCHSTR = "_test"
@@ -17,8 +18,8 @@ else:
 cfg.get_config(LAUNCHSTR)
 db.init(cfg.database)
 
-def get_Accounts():
 
+def get_accounts():
     gc = service_account(filename=f'google_api_secret{LAUNCHSTR}.json')
     sh = gc.open_by_key(cfg.database["accounts"])
     raw_sheet = sh.worksheet("1")
@@ -34,8 +35,9 @@ def get_Accounts():
 
     return accs
 
+
 def push_accounts_to_usage():
-    accs = get_Accounts()
+    accs = get_accounts()
     for acc in accs:
         dta = dict()
         dta["_id"] = int(acc)
@@ -45,7 +47,7 @@ def push_accounts_to_usage():
 
 
 def push_accounts_to_users():
-    accs = get_Accounts()
+    accs = get_accounts()
     loop = asyncio.get_event_loop()
     p_list = list()
 
@@ -93,3 +95,35 @@ def get_all_bases_from_api():
         except KeyError:
             print(f"Key error: {mp}")
     db.force_update("static_bases", all_bases)
+
+
+_all_db_matches = list()
+
+
+class DbMatch:
+    @classmethod
+    def new_from_data(cls, data):
+        obj = cls(data)
+        _all_db_matches.append(obj)
+
+    def __init__(self, data):
+        self.data = data
+        self.id = data["_id"]
+
+
+def fill_player_stats():
+    all_players = dict()
+    db.get_all_elements(DbMatch.new_from_data, "matches")
+    for m in _all_db_matches:
+        for tm in m.data["teams"]:
+            for p in tm["players"]:
+                if p["discord_id"] not in all_players:
+                    all_players[p["discord_id"]] = PlayerStat(p["discord_id"], "N/A")
+                all_players[p["discord_id"]].add_data(m.id, m.data["round_length"] * 2, p)
+    la = list()
+    for x in all_players.values():
+        print(f"add {x.id}")
+        la.append(x.get_data())
+    db.force_update("player_stats", la)
+
+fill_player_stats()
