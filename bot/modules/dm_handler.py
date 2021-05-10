@@ -23,10 +23,7 @@ async def on_dm(message):
         await disp.BOT_DM.send(ContextWrapper.channel(cfg.channels["staff"]), player=player, msg=message)
         await disp.BOT_DM_RECEIVED.send(message.author)
     elif message.content.lower().startswith(("help", "h")):
-        ctx = ContextWrapper.wrap(message.author)
-        ctx.author = message.author
-        ctx.channel_id = message.author.id
-        await disp.HELP.send(ctx)
+        await disp.HELP.send(message.author, is_dm=True)
     spam_checker.unlock(message.author.id)
 
 

@@ -201,7 +201,7 @@ class AllStrings(Enum):
     NO_DATA = Message("No data for this id!")
     ACCOUNT_USAGE = Message("Here is the POG account usage for this user:", embed=embeds.usage)
     DISPLAY_USAGE = Message("<@{}> played {} POG match{} in the last {}. \n(since {})", ping=False)
-    PSB_USAGE = Message("Here is the participation for {}, with start date {}:", ping=False, embed=embeds.psb_usage)
+    PSB_USAGE = Message("Here is the participation for {}, for 8 weeks leading up to {}:", ping=False, embed=embeds.psb_usage)
 
     NOTIFY_REMOVED = Message("You left Notify!")
     NOTIFY_ADDED = Message("You joined Notify!")

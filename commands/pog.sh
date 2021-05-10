@@ -42,10 +42,10 @@ function my_start
   # Start bot
   cd "$SCRIPT_DIR/.." || my_error
 
-  if [ -f "running" ]; then
+  if [ -f "commands/running" ]; then
     echo "Bot is already running!"
   else
-    touch running
+    touch commands/running
     mkdir -p ../POG-data
     mkdir -p ../POG-data/logging
     mkdir -p ../POG-data/matches

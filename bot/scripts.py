@@ -125,5 +125,3 @@ def fill_player_stats():
         print(f"add {x.id}")
         la.append(x.get_data())
     db.force_update("player_stats", la)
-
-fill_player_stats()

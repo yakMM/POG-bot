@@ -254,8 +254,10 @@ def account(ctx, account):
     return embed
 
 
-def auto_help(ctx):
+def auto_help(ctx, is_dm=False):
     """ Return help embed depending on current channel """
+    if is_dm:
+        return dm_help(ctx)
     if ctx.channel_id == cfg.channels['register']:
         return register_help(ctx)
     if ctx.channel_id == cfg.channels['lobby']:
@@ -271,8 +273,6 @@ def auto_help(ctx):
         return admin_help(ctx)
     if ctx.channel_id == cfg.channels['usage']:
         return usage_help(ctx)
-    if ctx.author and ctx.author.id == ctx.channel_id:
-        return dm_help(ctx)
     return default_help(ctx)
 
 
