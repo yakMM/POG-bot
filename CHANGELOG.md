@@ -1,3 +1,16 @@
+# v3.4:
+(wip)
+- Added HSR to scoreboard
+- Score calculation should now be faster
+- Reworked stats (stats are now per-class)
+- Added lobby status to notify ping
+- Now allow separation characters (,;/) instead of only space
+- TODO:
+  - Overhaul sub system so it pings notify if no one in queue
+  - Make it so subbed in people can accept or refuse
+  - Check for inactive players in order to start the matches faster
+
+
 # v3.3:
 - Added stat processor module
 - Added =psb command for usage tracking

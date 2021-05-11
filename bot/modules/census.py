@@ -7,6 +7,7 @@ from modules.asynchttp import api_request_and_retry as http_request, ApiNotReach
 import modules.config as cfg
 from classes import Weapon
 from display import AllStrings as display, ContextWrapper
+from modules.tools import AutoDict
 
 from logging import getLogger
 
@@ -36,74 +37,73 @@ async def process_score(match: 'match.classes.MatchData', start_time: int, match
             if not player.is_disabled:
                 ig_dict[int(player.ig_id)] = player
 
-    # Iterate through all players:
-    for player in ig_dict.values():
-        # URL for current player
-        url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_event/?character_id=' \
-              f'{player.ig_id}&type=KILL&after={start}&before={end}&c:limit=500'
-        j_data = await http_request(url, retries=6)
+    # Request url:
+    url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_event/?character_id=' \
+          f'{",".join(str(p.ig_id) for p in ig_dict.values())}&type=KILL&after={start}&before={end}&c:limit=500'
+    j_data = await http_request(url, retries=5)
 
-        # If no data, skip this player
-        if j_data["returned"] == 0:
-            log.error(f'No kill found for player: id={player.ig_name} (url={url})')
+    if j_data["returned"] == 0:
+        raise ApiNotReachable(f"Empty answer on score calculation (url={url})")
+
+    event_list = j_data["characters_event_list"]
+
+    ill_weapons = dict()
+
+    # Loop through all events retrieved:
+    for event in event_list:
+
+        # Get opponent player
+        oppo = ig_dict.get(int(event["character_id"]))
+        if not oppo:
+            # interaction with outside player, skip it
             continue
+        opo_loadout = oppo.get_loadout(int(event["character_loadout_id"]))
 
-        # Initialize event list, clear illegal weapons list
-        event_list = j_data["characters_event_list"]
-        current_ill_weapons.clear()
+        player = ig_dict.get(int(event["attacker_character_id"]))
+        if not player:
+            # interaction with outside player, skip it
+            continue
+        player_loadout = player.get_loadout(int(int(event["attacker_loadout_id"])))
 
-        # Loop through all events retrieved:
-        for event in event_list:
+        # Get weapon
+        weap_id = int(event["attacker_weapon_id"])
+        is_hs = int(event["is_headshot"]) == 1
+        weapon = Weapon.get(weap_id)
+        if not weapon:
+            log.error(f'Weapon not found in database: id={weap_id}')
+            weapon = Weapon.get(0)
 
-            # Get opponent player
-            oppo = ig_dict.get(int(event["character_id"]))
-            if not oppo:
-                # interaction with outside player, skip it
-                continue
-
-            # Get loadout objects
-            opo_loadout = oppo.get_loadout(int(event["character_loadout_id"]))
-            player_loadout = player.get_loadout(int(int(event["attacker_loadout_id"])))
-
-            # Get weapon
-            weap_id = int(event["attacker_weapon_id"])
-            weapon = Weapon.get(weap_id)
-            if not weapon:
-                log.error(f'Weapon not found in database: id={weap_id}')
-                weapon = Weapon.get(0)
-
-            # Parse event into loadout objects
-            if oppo is player:
-                # Player killed themselves
-                player_loadout.add_one_suicide()
-            elif oppo.team is player.team:
-                # Team-kill
-                player_loadout.add_one_tk()
-                opo_loadout.add_one_death(0)
+        # Parse event into loadout objects
+        if oppo is player:
+            # Player killed themselves
+            player_loadout.add_one_suicide()
+        elif oppo.team is player.team:
+            # Team-kill
+            player_loadout.add_one_tk()
+            opo_loadout.add_one_death(0)
+        else:
+            # Regular kill
+            if not weapon.is_banned:
+                # If weapon is allowed
+                pts = weapon.points
+                player_loadout.add_one_kill(pts, is_hs)
+                opo_loadout.add_one_death(pts)
             else:
-                # Regular kill
-                if not weapon.is_banned:
-                    # If weapon is allowed
-                    pts = weapon.points
-                    player_loadout.add_one_kill(pts)
-                    opo_loadout.add_one_death(pts)
-                else:
-                    # If weapon is banned, add it to illegal weapons list
-                    player_loadout.add_illegal_weapon(weapon.id)
-                    if weapon.id in current_ill_weapons:
-                        current_ill_weapons[weapon.id] += 1
-                    else:
-                        current_ill_weapons[weapon.id] = 1
-                    # TODO: Should we add penalty?
+                # If weapon is banned, add it to illegal weapons list
+                player_loadout.add_illegal_weapon(weapon.id)
+                if player not in ill_weapons:
+                    ill_weapons[player] = AutoDict()
+                ill_weapons[player].auto_add(weapon.id, 1)
 
-        # Display all banned-weapons uses for this player:
-        for weap_id in current_ill_weapons.keys():
+    # Display all banned-weapons uses for this player:
+    for player in ill_weapons.keys():
+        for weap_id in ill_weapons[player]:
             weapon = Weapon.get(weap_id)
             if match_channel:
                 await display.SC_ILLEGAL_WE.send(match_channel, player.mention, weapon.name,
-                                                 match.id, current_ill_weapons[weap_id])
+                                                 match.id, ill_weapons[player][weap_id])
                 await display.SC_ILLEGAL_WE.send(ContextWrapper.channel(cfg.channels["staff"]), player.mention,
-                                                 weapon.name, match.id, current_ill_weapons[weap_id])
+                                                 weapon.name, match.id, ill_weapons[player][weap_id])
 
     # Also get base captures
     await get_captures(match, start, end)
@@ -126,7 +126,7 @@ async def get_captures(match: 'match.classes.MatchData', start: int, end: int):
     # URL to get events
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/world_event/' + \
           f'?world_id=19&after={start}&before={end}&c:limit=500'
-    j_data = await http_request(url, retries=6)
+    j_data = await http_request(url, retries=5)
     if j_data["returned"] == 0:
         # No event
         log.warning(f'No event found for base! (url={url})')

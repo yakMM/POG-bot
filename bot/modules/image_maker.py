@@ -31,6 +31,8 @@ Y_SPACING = 120
 Y_BIG_SPACE = 150
 X_OFFSET = 100
 
+offsets = [300, 300, 300, 400, 300]
+
 
 # Utility functions:
 
@@ -46,8 +48,10 @@ def _draw_score_line(draw: ImageDraw.ImageDraw, x_start: int, y: int, values: li
     :param d_font: Font used for drawing the elements.
     :param fill_color: Tuple: RGB color of the elements.
     """
+    off = 0
     for i in range(len(values)):
-        draw.text((x_start + 300 * i, y), values[i], font=d_font, fill=fill_color)
+        draw.text((x_start + off, y), values[i], font=d_font, fill=fill_color)
+        off += offsets[i]
 
 
 def _cut_off_string(text: str, d_font: ImageFont, threshold: int) -> str:
@@ -104,10 +108,10 @@ def _team_display(img: Image, draw: ImageDraw, team: 'classes.TeamScore', y_offs
     :param y_offset: y coordinate to start drawing score from
     """
     # Draw Titles:
-    _draw_score_line(draw, X_OFFSET + 2200, y_offset, ["Score", "Net", "Kills", "Deaths"], font, yellow)
+    _draw_score_line(draw, X_OFFSET + 2200, y_offset, ["Score", "Net", "Kills", "Deaths", "HSR"], font, yellow)
 
     # Draw team scores:
-    scores = [str(team.score), str(team.net), str(team.kills), str(team.deaths)]
+    scores = [str(team.score), str(team.net), str(team.kills), str(team.deaths), f"{int(team.hsr * 100)}%"]
     _draw_score_line(draw, X_OFFSET + 2200, Y_SPACING + y_offset, scores, big_font, white)
 
     # Draw team name:
@@ -123,7 +127,7 @@ def _team_display(img: Image, draw: ImageDraw, team: 'classes.TeamScore', y_offs
         player = team.players[i]
 
         # Draw scores:
-        scores = [str(player.score), str(player.net), str(player.kills), str(player.deaths)]
+        scores = [str(player.score), str(player.net), str(player.kills), str(player.deaths), f"{int(player.hsr * 100)}%"]
         _draw_score_line(draw, X_OFFSET + 2200, Y_BIG_SPACE * 2 + Y_SPACING * i + y_offset, scores,
                          font, color[i % 2])
 
@@ -170,20 +174,21 @@ def _make_image(match: 'match.classes.MatchData'):
 
     # Create image
     y_max = get_y_off(len(match.teams))
-    x_max = 3600
+    x_max = 4000
     img = Image.new('RGB', (x_max, y_max), color=(17, 0, 68))
 
     # Add POG logo
     logo = Image.open("../logos/bot.png")
     logo = logo.resize((600, 600))
-    img.paste(logo, (300, 100), logo)
+    img.paste(logo, (180, 100), logo)
 
     # Get draw object and x offset
     draw = ImageDraw.Draw(img)
-    x = X_OFFSET + 1100
+
 
     # Draw general information
-    x_title = (3600 - big_font.getsize(f"Planetside Open Games - Match {match.id}")[0]) // 2
+    x_title = (x_max - big_font.getsize(f"Planetside Open Games - Match {match.id}")[0]) // 2
+    x = x_title + 100
     draw.text((x_title, 100), f"Planetside Open Games - Match {match.id}", font=big_font, fill=white)
     draw.text((x, 200 + 100), f"Base: {match.base.name}", font=small_font, fill=white)
 
@@ -217,9 +222,9 @@ def _make_image(match: 'match.classes.MatchData'):
                   fill=yellow, width=10)
 
     # Draw captures points information
-    draw.text((X_OFFSET + 2200, 200 + 100), f"Captures:", font=small_font, fill=white)
+    draw.text((x + 1100, 200 + 100), f"Captures:", font=small_font, fill=white)
     for tm in match.teams:
-        draw.text((X_OFFSET + 2200, 200 + 100 * (tm.id + 2)), f"{tm.name}: {tm.cap} points", font=small_font,
+        draw.text((x + 1100, 200 + 100 * (tm.id + 2)), f"{tm.name}: {tm.cap} points", font=small_font,
                   white=white)
         # Draw teams and players score
         _team_display(img, draw, tm, get_y_off(tm.id))

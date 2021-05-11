@@ -30,14 +30,13 @@ class Loop:
         self._current_loop = 0
         self._task = None
         self._injected = None
-        self._valid_exception = ()
-        # self._valid_exception = (
-        #     OSError,
-        #     discord.GatewayNotFound,
-        #     discord.ConnectionClosed,
-        #     aiohttp.ClientError,
-        #     asyncio.TimeoutError,
-        # )
+        self._valid_exception = (
+            OSError,
+            discord.GatewayNotFound,
+            discord.ConnectionClosed,
+            aiohttp.ClientError,
+            asyncio.TimeoutError,
+        )
 
         self._before_loop = None
         self._after_loop = None
@@ -92,6 +91,7 @@ class Loop:
                     if now > self._next_iteration:
                         self._next_iteration = now
                 except self._valid_exception as exc:
+                    log.warning(f"Task: '{self.coro.__name__}' raised exception: {exc}")
                     self._last_iteration_failed = True
                     if not self.reconnect:
                         raise

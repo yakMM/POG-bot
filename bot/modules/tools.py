@@ -115,3 +115,11 @@ def time_calculator(arg: str):
         return 0
 
     return time
+
+
+class AutoDict(dict):
+    def auto_add(self, key, value):
+        if key in self:
+            self[key] += value
+        else:
+            self[key] = value

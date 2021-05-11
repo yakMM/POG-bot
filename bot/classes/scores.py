@@ -1,5 +1,6 @@
 import modules.config as cfg
 import modules.database as db
+from modules.tools import AutoDict
 
 import operator
 
@@ -32,6 +33,7 @@ class TeamScore:
         self.__net = 0
         self.__score = 0
         self.__cap = 0
+        self.__headshots = 0
         self.__players = list()
 
     @property
@@ -78,6 +80,13 @@ class TeamScore:
     def faction(self):
         return self.__faction
 
+    @property
+    def hsr(self):
+        if self.__kills == 0:
+            return 0
+        else:
+            return self.__headshots / self.__kills
+
     @classmethod
     def from_data(cls, i, match, data):
         obj = cls(i, match, data["name"], data["faction_id"])
@@ -89,6 +98,8 @@ class TeamScore:
         obj.__cap = data["cap_points"]
         for player in data["players"]:
             obj.add_player(PlayerScore.new_from_data(player, obj))
+        for player in obj.players:
+            obj.__headshots += player.headshots
         return obj
 
     def get_data(self):
@@ -106,6 +117,18 @@ class TeamScore:
     def add_player(self, score_player):
         self.__players.append(score_player)
 
+    def reset_score(self):
+        self.__score = 0
+        self.__net = 0
+        self.__deaths = 0
+        self.__kills = 0
+        for p in self.__players:
+            p.reset_score()
+
+    def round_update(self, round_no):
+        for p in self.__players:
+            p.round_update(round_no)
+
     def add_cap(self, points):
         self.__cap += points
         self.__score += points
@@ -117,7 +140,9 @@ class TeamScore:
     def add_net(self, points):
         self.__net += points
 
-    def add_one_kill(self):
+    def add_one_kill(self, is_hs):
+        if is_hs:
+            self.__headshots += 1
         self.__kills += 1
 
     def add_one_death(self):
@@ -136,9 +161,10 @@ class PlayerScore:
         self.__deaths = 0
         self.__net = 0
         self.__score = 0
+        self.__headshots = 0
         self.__is_disabled = False
         self.__rounds = [False, False]
-        self.__illegal_weapons = dict()
+        self.__illegal_weapons = AutoDict()
         self.__loadouts = dict()
 
     @classmethod
@@ -160,6 +186,7 @@ class PlayerScore:
                 obj.__net += ld.net
                 obj.__deaths += ld.deaths
                 obj.__kills += ld.kills
+                obj.__headshots += ld.headshots
                 for weap in ld.ill_weapons.keys():
                     if weap in obj.__illegal_weapons:
                         obj.__illegal_weapons[weap] += ld.ill_weapons[weap]
@@ -172,6 +199,20 @@ class PlayerScore:
 
     def enable(self):
         self.__is_disabled = False
+
+    def reset_score(self):
+        self.__score = 0
+        self.__net = 0
+        self.__deaths = 0
+        self.__kills = 0
+        self.__illegal_weapons.clear()
+        self.__loadouts.clear()
+
+    def round_update(self, round_num):
+        if self.__rounds[round_num]:
+            self.enable()
+        else:
+            self.disable()
 
     def update(self, name, ig_name, ig_id):
         self.__rounds[self.__team.match.round_no - 1] = True
@@ -246,6 +287,17 @@ class PlayerScore:
     def loadouts(self):
         return self.__loadouts
 
+    @property
+    def headshots(self):
+        return self.__headshots
+
+    @property
+    def hsr(self):
+        if self.__kills == 0:
+            return 0
+        else:
+            return self.__headshots / self.__kills
+
     def get_data(self):
         data = {"discord_id": self.__id,
                 "ig_id": self.__ig_id,
@@ -266,9 +318,11 @@ class PlayerScore:
         self.__deaths += 1
         self.__team.add_one_death()
 
-    def add_one_kill(self):
+    def add_one_kill(self, is_hs):
+        if is_hs:
+            self.__headshots += 1
         self.__kills += 1
-        self.__team.add_one_kill()
+        self.__team.add_one_kill(is_hs)
 
     def add_score(self, points):
         self.__score += points
@@ -279,10 +333,7 @@ class PlayerScore:
         self.__team.add_net(points)
 
     def add_illegal_weapon(self, weap_id):
-        if weap_id in self.__illegal_weapons:
-            self.__illegal_weapons[weap_id] += 1
-        else:
-            self.__illegal_weapons[weap_id] = 1
+        self.__illegal_weapons.auto_add(weap_id, 1)
 
 
 class Loadout:
@@ -295,7 +346,8 @@ class Loadout:
         self.__deaths = 0
         self.__score = 0
         self.__net = 0
-        self.__illegal_weapons = dict()
+        self.__headshots = 0
+        self.__illegal_weapons = AutoDict()
         self.__weight = 0
 
     @property
@@ -338,6 +390,10 @@ class Loadout:
     def ill_weapons(self):
         return self.__illegal_weapons
 
+    @property
+    def headshots(self):
+        return self.__headshots
+
     @classmethod
     def new_from_data(cls, p_score, data):
         obj = cls(data["loadout_id"], p_score)
@@ -346,6 +402,7 @@ class Loadout:
         obj.__deaths = data["deaths"]
         obj.__kills = data["kills"]
         obj.__weight = data["weight"]
+        obj.__headshots = data["headshots"]
         obj.__illegal_weapons = ill_weapons_from_data(data["ill_weapons"])
         return obj
 
@@ -356,6 +413,7 @@ class Loadout:
                 "deaths": self.__deaths,
                 "kills": self.__kills,
                 "weight": self.__weight,
+                "headshots": self.__headshots,
                 "ill_weapons": get_ill_weapons_doc(self.__illegal_weapons)
                 }
         return data
@@ -365,14 +423,13 @@ class Loadout:
 
     def add_illegal_weapon(self, weap_id):
         self.__player_score.add_illegal_weapon(weap_id)
-        if weap_id in self.__illegal_weapons:
-            self.__illegal_weapons[weap_id] += 1
-        else:
-            self.__illegal_weapons[weap_id] = 1
+        self.__illegal_weapons.auto_add(weap_id, 1)
 
-    def add_one_kill(self, points):
+    def add_one_kill(self, points, is_hs):
+        if is_hs:
+            self.__headshots += 1
         self.__kills += 1
-        self.__player_score.add_one_kill()
+        self.__player_score.add_one_kill(is_hs)
         self.__add_points(points)
 
     def add_one_death(self, points):
@@ -395,45 +452,3 @@ class Loadout:
         self.__score += points
         self.__player_score.add_score(points)
         self.__player_score.add_net(points)
-
-
-    # def add_loadout_event(self, loadout):
-    #     if loadout in self.__loadouts:
-    #         self.__loadouts[loadout] += 1
-    #     else:
-    #         self.__loadouts[loadout] = 1
-    #
-    # def get_main_loadouts(self):
-    #     max2_v = 0
-    #     max2_k = 0
-    #     max_v = 0
-    #     max_k = 0
-    #     for k in self.__loadouts.keys():
-    #         if self.__loadouts[k] > max_v:
-    #             max2_k = max_k
-    #             max2_v = max_v
-    #             max_v = self.__loadouts[k]
-    #             max_k = k
-    #     return max_k, max2_k
-    #
-    # def get_loadouts(self):
-    #     loadouts = list()
-    #     for k in self.__loadouts.keys():
-    #         try:
-    #             loadouts.append(cfg.loadout_id[k])
-    #         except KeyError:
-    #             pass
-    #     return loadouts
-    #
-    # def get_data(self):
-    #     data = {"discord_id": self.__player.id,
-    #             "ig_id": self.ig_id,
-    #             "ig_name": self.ig_name,
-    #             "ill_weapons": self.__get_ill_weaponsDoc(),
-    #             "loadouts": self.__loadouts,
-    #             "score": self.__score,
-    #             "net": self.__net,
-    #             "deaths": self.__deaths,
-    #             "kills": self.__kills,
-    #             }
-    #     return data

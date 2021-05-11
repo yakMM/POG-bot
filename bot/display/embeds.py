@@ -520,13 +520,17 @@ def player_stats(ctx, stats, recent_stats):
     embed = Embed(title=f"{stats.name}'s Stats:", colour=Color.blue())
     embed.add_field(name="Recent (last 2 weeks)",
                     value=f"Matches played: {recent_stats.nb_matches_played}\n"
+                          f"Play time: {'{:.1f}'.format(recent_stats.time_played / 60)} hours\n"
                           f"Score: {recent_stats.score}\n"
-                          f"Kills per minute: {'{:.1f}'.format(recent_stats.kpm)}",
+                          f"Kills per match: {'{:.1f}'.format(recent_stats.kills_per_match)}\n"
+                          f"Most played class: {recent_stats.most_played_loadout}",
                     inline=False)
     embed.add_field(name="All time",
                     value=f"Matches played: {stats.nb_matches_played}\n"
+                          f"Play time: {'{:.1f}'.format(stats.time_played / 60)} hours\n"
                           f"Total score: {stats.score}\n"
-                          f"Kills per minute: {'{:.1f}'.format(stats.kpm)}",
+                          f"Kills per match: {'{:.1f}'.format(stats.kills_per_match)}\n"
+                          f"Most played class: {stats.most_played_loadout}",
                     inline=False)
 
     embed.set_footer(text="Note: Tracking stats only after POG match 569.")

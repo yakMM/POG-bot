@@ -1,4 +1,7 @@
 import modules.database as db
+import modules.config as cfg
+import modules.tools as tools
+import operator
 
 
 class PlayerStat:
@@ -20,6 +23,10 @@ class PlayerStat:
     @property
     def nb_matches_played(self):
         return len(self.matches)
+
+    @property
+    def kills_per_match(self):
+        return self.kpm * cfg.general["round_length"] * 2
 
     @property
     def kpm(self):
@@ -54,6 +61,23 @@ class PlayerStat:
         for loadout in self.loadouts.values():
             net += loadout.score
         return net
+
+    @property
+    def most_played_loadout(self):
+        l_dict = tools.AutoDict()
+        for loadout in self.loadouts.values():
+            l_name = cfg.loadout_id[loadout.id]
+            l_dict.auto_add(l_name, loadout.weight)
+        try:
+            name = sorted(l_dict.items(), key=operator.itemgetter(1), reverse=True)[0][0]
+            n_l = name.split('_')
+            for i in range(len(n_l)):
+                n_l[i] = n_l[i][0].upper() + n_l[i][1:]
+            name = " ".join(n_l)
+        except IndexError:
+            name = "None"
+
+        return name
 
     @property
     def mention(self):

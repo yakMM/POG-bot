@@ -10,6 +10,7 @@ from aiohttp.client_exceptions import ClientOSError, ClientConnectorError
 from json import loads
 from json.decoder import JSONDecodeError
 from logging import getLogger
+from discord.backoff import ExponentialBackoff
 import asyncio
 
 # Custom modules
@@ -52,16 +53,11 @@ async def api_request_and_retry(url: str, retries: int = 3) -> dict:
     :return: Json dictionary returned by the API.
     :raise ApiNotReachable: if the request failed.
     """
+    backoff = ExponentialBackoff()
     for i in range(retries):
         try:
-            if i == 0:
-                pass
-            elif i <= 2:
-                await asyncio.sleep(0.01)
-            elif i <= 4:
-                await asyncio.sleep(0.1)
-            else:
-                await asyncio.sleep(0.5)
+            if i != 0:
+                await asyncio.sleep(backoff.delay())
             j_data = await _request(url)
         except (ClientOSError, ClientConnectorError, JSONDecodeError) as e:
             log.warning(f"API request: {e} on try {i} for {url}")

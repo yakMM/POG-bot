@@ -175,6 +175,14 @@ class MatchData:
         dta["teams"] = [tm.get_data() for tm in self.teams]
         return dta
 
+    def reset_score(self):
+        for tm in self.teams:
+            tm.reset_score()
+
+    def round_update(self, round_no):
+        for tm in self.teams:
+            tm.round_update(round_no)
+
     def clean(self):
         self.id = 0
         self.teams = [None, None]
