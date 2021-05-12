@@ -1,4 +1,5 @@
 from logging import getLogger
+
 from lib.tasks import loop
 from display.strings import AllStrings as disp
 
@@ -9,6 +10,7 @@ import modules.config as cfg
 import modules.accounts_handler as accounts
 from modules.tools import UnexpectedError
 import modules.lobby as lobby
+import modules.stat_processor as stat_processor
 
 from match.processes import CaptainSelection, PlayerPicking, FactionPicking, BasePicking, GettingReady, MatchPlaying
 from match.commands import CommandFactory
@@ -192,6 +194,7 @@ class MatchData:
 
     async def push_db(self):
         await db.async_db_call(db.set_element, "matches", self.id, self.get_data())
+        stat_processor.add_match(self)
         for tm in self.teams:
             for p in tm.players:
                 await p.db_update_stats()

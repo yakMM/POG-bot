@@ -16,11 +16,15 @@ oldest = 0
 
 def init():
     # Create timestamp dict
-    def add_match(match):
+    def db_match(match):
         global oldest
         _match_stamps[match["_id"]] = match["round_stamps"][0]
         oldest = match["round_stamps"][0] if oldest == 0 else min(match["round_stamps"][0], oldest)
-    db.get_all_elements(add_match, "matches")
+    db.get_all_elements(db_match, "matches")
+
+
+def add_match(match_data):
+    _match_stamps[match_data.id] = match_data.round_stamps[0]
 
 
 def get_matches_in_time(player, time):

@@ -26,6 +26,9 @@ async def on_message(client, message):
     if message.channel.id not in cfg.channels_list:
         return
 
+    if len(message.content) == 0:
+        return
+
     if message.content[0] != cfg.general["command_prefix"]:
         return
 
