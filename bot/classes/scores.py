@@ -87,6 +87,14 @@ class TeamScore:
         else:
             return self.__headshots / self.__kills
 
+    @property
+    def ig_ids_list(self):
+        new_list = list()
+        for p in self.__players:
+            if not p.is_disabled:
+                new_list.append(p)
+        return ",".join(str(p.ig_id) for p in new_list)
+
     @classmethod
     def from_data(cls, i, match, data):
         obj = cls(i, match, data["name"], data["faction_id"])

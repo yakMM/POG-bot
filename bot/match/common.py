@@ -101,7 +101,7 @@ async def after_pick_sub(match, subbed, force_player, clean_subbed=True):
     # Get active version of the player and clean the player object
     a_sub = subbed.active
     if clean_subbed:
-        subbed.on_player_clean()
+        a_sub.on_player_clean()
     team = a_sub.team
     # Args for the display later
     args = [match.channel, new_player.mention, a_sub.mention, team.name]

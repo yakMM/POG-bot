@@ -1,7 +1,9 @@
 from .logger import SimpleLogger
 from .ts3_interface import AudioBot
+from .squittal_interface import SquittalInterface
 from logging import getLogger
 
+# _plugins = [SimpleLogger, AudioBot, SquittalInterface]
 _plugins = [SimpleLogger, AudioBot]
 
 log = getLogger("pog_bot")

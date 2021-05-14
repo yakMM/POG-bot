@@ -29,6 +29,9 @@ class Plugin:
     def on_match_starting(self):
         pass
 
+    def on_match_started(self):
+        pass
+
     def on_round_over(self):
         pass
 

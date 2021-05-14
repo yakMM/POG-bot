@@ -54,6 +54,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         await sleep(10)
         player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
         await disp.MATCH_STARTED.send(self.match.channel, *player_pings, self.match.round_no)
+        self.match.plugin_manager.on_match_started()
         self.match.round_stamps.append(tools.timestamp_now())
         super().change_status(MatchStatus.IS_PLAYING)
         self.match_loop.start()

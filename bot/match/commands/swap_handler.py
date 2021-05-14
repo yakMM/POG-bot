@@ -1,7 +1,6 @@
 from .command import InstantiatedCommand, Command, picking_states
 from match.classes import CaptainValidator
-from match.common import after_pick_sub, get_check_captain
-from match import MatchStatus
+from match.common import get_check_captain
 
 from display import AllStrings as disp, ContextWrapper
 

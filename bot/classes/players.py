@@ -542,7 +542,9 @@ class ActivePlayer:
             else:
                 self.__player_score.enable()
 
-    def clean(self):
+    def on_player_clean(self):
+        if self.__player_score:
+            self.__player_score.disable()
         self.__player.on_player_clean()
 
     def change_team(self, team):

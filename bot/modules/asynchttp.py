@@ -5,7 +5,7 @@
 """
 
 # External imports
-from aiohttp import ClientSession
+from aiohttp import ClientSession, TCPConnector
 from aiohttp.client_exceptions import ClientOSError, ClientConnectorError
 from json import loads
 from json.decoder import JSONDecodeError
@@ -42,6 +42,14 @@ async def request_code(url: str) -> int:
     async with ClientSession() as client:
         result = await _fetch_code(client, url)
         return result
+
+
+async def post_request(url, data):
+    headers = {'content-type': 'application/json'}
+    async with ClientSession(connector=TCPConnector(verify_ssl=False)) as client:
+        async with client.post(url, data=f'"{data}"', headers=headers) as response:
+            result = await response.text()
+            print(f"result: {result}")
 
 
 async def api_request_and_retry(url: str, retries: int = 3) -> dict:

@@ -133,7 +133,6 @@ class Match:
     def spin_up(self, p_list):
         Match._last_match_id += 1
         self.__objects.on_spin_up(p_list)
-        self.__data.on_spin_up()
         db.set_field("restart_data", 0, {"last_match_id": Match._last_match_id})
 
     @property
@@ -164,9 +163,6 @@ class MatchData:
             self.base = None
             self.round_length = 0
             self.round_stamps = list()
-
-    def on_spin_up(self):
-        self.round_length = cfg.general["round_length"]
 
     def get_data(self):
         dta = dict()
@@ -261,6 +257,7 @@ class MatchObjects:
 
     def on_spin_up(self, p_list):
         self.data.id = Match._last_match_id
+        self.data.round_length = cfg.general["round_length"]
         self.ready_next_process(p_list)
         self.clean_channel.cancel()
         self.plugin_manager.on_match_launching()
