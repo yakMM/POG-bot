@@ -542,8 +542,8 @@ class ActivePlayer:
             else:
                 self.__player_score.enable()
 
-    def on_player_clean(self):
-        if self.__player_score:
+    def clean(self, team_clean=False):
+        if not team_clean and self.__player_score:
             self.__player_score.disable()
         self.__player.on_player_clean()
 
@@ -559,7 +559,7 @@ class ActivePlayer:
             self.__player_score.disable()
             self.__player_score = None
         if not self.__player_score and not self.__is_benched:
-            self.__player_score = PlayerScore(self.id, self.team.team_score)
+            self.__player_score = PlayerScore(self.id, team_score)
             self.__player_score.stats = self.__player.stats
             team_score.add_player(self.__player_score)
         if self.__player_score:

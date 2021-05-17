@@ -98,16 +98,14 @@ async def after_pick_sub(match, subbed, force_player, clean_subbed=True):
     if not new_player:
         return
 
-    # Get active version of the player and clean the player object
-    a_sub = subbed.active
     if clean_subbed:
-        a_sub.on_player_clean()
-    team = a_sub.team
+        subbed.clean()
+    team = subbed.team
     # Args for the display later
-    args = [match.channel, new_player.mention, a_sub.mention, team.name]
+    args = [match.channel, new_player.mention, subbed.mention, team.name]
 
     # Sub the player
-    team.sub(a_sub, new_player)
+    team.sub(subbed, new_player)
 
     # Display what happened
     if new_player.active.is_captain:

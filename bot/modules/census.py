@@ -36,6 +36,8 @@ async def process_score(match: 'match.classes.MatchData', start_time: int, match
         for player in tm.players:
             if not player.is_disabled:
                 ig_dict[int(player.ig_id)] = player
+            else:
+                print(f"{player.name} is disabled!")
 
     # Request url:
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/characters_event/?character_id=' \

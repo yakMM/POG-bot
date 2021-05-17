@@ -29,7 +29,7 @@ class SubHandler(InstantiatedCommand):
             if self.sub_func:
                 await self.sub_func(subbed, force_player)
             else:
-                await after_pick_sub(self.match, subbed, force_player)
+                await after_pick_sub(self.match, subbed.active, force_player)
 
     def on_clean(self, hard=False):
         if self.validator:

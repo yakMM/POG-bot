@@ -99,7 +99,7 @@ class Team:
 
     def clean(self):
         for a_player in self.__players:
-            a_player.on_player_clean()
+            a_player.clean(team_clean=True)
 
     def add_player(self, p_class, player):
         active = p_class(player, self)

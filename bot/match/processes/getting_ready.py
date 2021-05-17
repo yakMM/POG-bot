@@ -162,12 +162,12 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
 
     @Process.public
     async def do_sub(self, subbed, force_player):
-        new_player = await after_pick_sub(self.match, subbed, force_player, clean_subbed=False)
+        new_player = await after_pick_sub(self.match, subbed.active, force_player, clean_subbed=False)
         if not new_player:
             return
         if not subbed.active.has_own_account:
             await self.remove_account(subbed.active)
-        subbed.active.on_player_clean()
+        subbed.active.clean()
         if not new_player.active.has_own_account:
             await self.give_account(new_player.active)
 

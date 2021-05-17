@@ -53,7 +53,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
         # If subbed one has already been picked
         if subbed.active:
-            await after_pick_sub(self.match, subbed, force_player)
+            await after_pick_sub(self.match, subbed.active, force_player)
         else:
             # Get a new player for substitution
             new_player = await get_substitute(self.match, subbed, player=force_player)

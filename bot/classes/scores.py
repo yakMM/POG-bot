@@ -4,6 +4,13 @@ from modules.tools import AutoDict
 
 import operator
 
+_name_getter_func = None
+
+
+def init(name_getter_func):
+    global _name_getter_func
+    _name_getter_func = name_getter_func
+
 
 def ill_weapons_from_data(data):
     ill_weapons = dict()
@@ -20,6 +27,7 @@ def get_ill_weapons_doc(ill_weapons):
                }
         data.append(doc)
     return data
+
 
 
 class TeamScore:
@@ -176,13 +184,14 @@ class PlayerScore:
         self.__loadouts = dict()
 
     @classmethod
-    def new_from_data(cls, data, team, name="N/A"):
+    def new_from_data(cls, data, team):
         try:
             ig_name = data["ig_name"]
         except KeyError:
             ig_name = "N/A"
         obj = cls(data["discord_id"], team)
-        obj.__name = name
+        if _name_getter_func:
+            obj.__name = _name_getter_func(data["discord_id"])
         obj.__ig_name = ig_name
         obj.__ig_id = data["ig_id"]
         obj.__rounds = data["rounds"]
