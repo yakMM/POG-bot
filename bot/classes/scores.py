@@ -138,6 +138,7 @@ class TeamScore:
         self.__net = 0
         self.__deaths = 0
         self.__kills = 0
+        self.__headshots = 0
         for p in self.__players:
             p.reset_score()
 
@@ -222,6 +223,7 @@ class PlayerScore:
         self.__net = 0
         self.__deaths = 0
         self.__kills = 0
+        self.__headshots = 0
         self.__illegal_weapons.clear()
         self.__loadouts.clear()
 

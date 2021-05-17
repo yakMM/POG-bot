@@ -1,6 +1,3 @@
-
-
-from match.classes import Match
 import modules.database as db
 from datetime import datetime as dt, timezone as tz, date as dt_date, time as dt_time, timedelta as dt_delta
 import modules.tools as tools
@@ -47,11 +44,11 @@ def get_previous_week(date):
     return start, end
 
 
-async def get_new_stats(player, time=tools.timestamp_now()-1209600):
+async def get_new_stats(match_cls, player, time=tools.timestamp_now()-1209600):
     m_list = get_matches_in_time(player, time)
     new_p_stats = PlayerStat(player.id, player.name)
     for m_id in m_list:
-        match = await Match.get_from_database(m_id)
+        match = await match_cls.get_from_database(m_id)
         if not match:
             log.error(f"get_new_stats: Couldn't find match {m_id} in database!")
             continue
@@ -109,12 +106,17 @@ def format_for_psb(player, args):
         date = dt.now(tz.utc)
     req_date = date.strftime("%Y-%m-%d")
 
+    date = date + dt_delta(weeks=1)
+    start, end = get_previous_week(date)
+    all_weeks.append(PsbWeekUsage(player, 0, start, end))
+    date = start
+
     for i in range(8):
         start, end = get_previous_week(date)
-        all_weeks.append(PsbWeekUsage(player, 8-i, start, end))
+        all_weeks.append(PsbWeekUsage(player, i+1, start, end))
         date = start
 
-    return req_date, all_weeks
+    return req_date, all_weeks[::-1]
 
 
 

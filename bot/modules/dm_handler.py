@@ -1,4 +1,5 @@
 from classes import Player, PlayerStat
+from match.classes import Match
 import modules.config as cfg
 from display import AllStrings as disp, ContextWrapper
 from logging import getLogger
@@ -34,5 +35,5 @@ async def on_stats(user):
         return
     log.info(f"Stats request from player id: [{player.id}], name: [{player.name}]")
     stat_player = await PlayerStat.get_from_database(player.id, player.name)
-    recent_stats = await stat_processor.get_new_stats(stat_player)
+    recent_stats = await stat_processor.get_new_stats(Match, stat_player)
     await disp.DISPLAY_STATS.send(user, stats=stat_player, recent_stats=recent_stats)

@@ -508,8 +508,9 @@ def psb_usage(ctx, player, usages):
     for use in usages[::-1]:
         bef = "✅" if use.num else "❌"
         pref = "**" if use.num else ""
+        week = f"{use.week_num} week{'s' if use.week_num > 1 else ''} ago" if use.week_num else f"Current week"
         match_str = "matches" if use.num > 1 else "match"
-        string_list.append(f"{bef} {pref}Week {use.week_num} "
+        string_list.append(f"{bef} {pref}{week} "
                            f"[{use.start_str} - {use.end_str}] {use.num} {match_str}{pref}")
     embed.add_field(name="Participation", value="\n".join(string_list), inline=False)
 
