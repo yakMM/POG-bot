@@ -593,5 +593,5 @@ class TeamCaptain(ActivePlayer):
         return self.__is_turn
 
     @is_turn.setter
-    def is_turn(self, bool):
-        self.__is_turn = bool
+    def is_turn(self, bl):
+        self.__is_turn = bl

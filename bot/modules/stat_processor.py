@@ -116,7 +116,7 @@ def format_for_psb(player, args):
         all_weeks.append(PsbWeekUsage(player, i+1, start, end))
         date = start
 
-    return req_date, all_weeks[::-1]
+    return req_date, all_weeks
 
 
 

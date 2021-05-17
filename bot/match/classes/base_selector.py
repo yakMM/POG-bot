@@ -125,10 +125,9 @@ class BaseSelector:
         else:
             await disp.BASE_SELECTED.send(ctx, self.__selected.name, base=self.__selected, is_booked=self.is_booked)
 
-    async def process_request(self, ctx, a_player, args):
-        if a_player:
-            if await self.__validator.check_message(ctx, a_player, args):
-                return
+    async def process_request(self, ctx, captain, args):
+        if await self.__validator.check_message(ctx, captain, args):
+            return
 
         if len(args) == 0:
             # If no arg in the command
@@ -140,11 +139,11 @@ class BaseSelector:
                 return
             if args[0].isnumeric():
                 # If arg is a number
-                await self.select_by_index(ctx, a_player, int(args[0]) - 1)
+                await self.select_by_index(ctx, captain, int(args[0]) - 1)
                 return
 
         # If any other arg (expecting base name)
-        await self.select_by_name(ctx, a_player, args)
+        await self.select_by_name(ctx, captain, args)
 
     async def display_all(self, ctx, force=False, mentions=None):
         if self.__selected and not force:

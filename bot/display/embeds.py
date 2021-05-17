@@ -498,14 +498,7 @@ def psb_usage(ctx, player, usages):
         title='POG participation',
         description=f"Handle: {player.mention}\nName: {player.name}\nID: `{player.id}`\n"
     )
-    # for use in usages[::-1]:
-    #     bef = "✅" if use.num else "❌"
-    #     pref = "**" if use.num else ""
-    #     match_str = "matches" if use.num > 1 else "match"
-    #     embed.add_field(name=f"{bef} Week {use.week_num}",
-    #                     value=f"From {use.start_str} to {use.end_str}\n{pref}{use.num} {match_str}{pref}",
-    #                     inline=False)
-    for use in usages[::-1]:
+    for use in usages:
         bef = "✅" if use.num else "❌"
         pref = "**" if use.num else ""
         week = f"{use.week_num} week{'s' if use.week_num > 1 else ''} ago" if use.week_num else f"Current week"
@@ -515,7 +508,6 @@ def psb_usage(ctx, player, usages):
     embed.add_field(name="Participation", value="\n".join(string_list), inline=False)
 
     return embed
-
 
 def player_stats(ctx, stats, recent_stats):
     embed = Embed(title=f"{stats.name}'s Stats:", colour=Color.blue())

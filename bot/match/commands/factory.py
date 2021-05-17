@@ -170,20 +170,19 @@ class CommandFactory(metaclass=MetaFactory):
             return
 
         # Check player status
-        a_player = None
-        if not roles.is_admin(ctx.author):
-            a_player, msg = get_check_captain(ctx, self.match, check_turn=False)
-            # If player doesn't have the proper status
-            if msg:
-                if len(args) == 0:
-                    # If player just want to get base status, we give him
-                    await self.match.base_selector.show_base_status(ctx)
-                    # We will not use the message
-                    msg.close()
-                else:
-                    # Else we display the error message
-                    await msg
+        captain = None
+        captain, msg = get_check_captain(ctx, self.match, check_turn=False)
+        # If player doesn't have the proper status
+        if msg:
+            if len(args) == 0:
+                # If player just want to get base status, we give him
+                await self.match.base_selector.show_base_status(ctx)
+                msg.close()
                 return
+            elif not roles.is_admin(ctx.author):
+                await msg
+                return
+            msg.close()
 
         if self.match.teams[0].is_playing or self.match.teams[1].is_playing:
             if len(args) == 0:
@@ -192,7 +191,7 @@ class CommandFactory(metaclass=MetaFactory):
                 await disp.BASE_NO_READY.send(ctx)
             return
 
-        await self.match.base_selector.process_request(ctx, a_player, args)
+        await self.match.base_selector.process_request(ctx, captain, args)
 
     @Command.command(*captains_ok_states, MatchStatus.IS_CAPTAIN)
     async def clear(self, ctx, args):
