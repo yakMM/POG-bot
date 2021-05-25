@@ -18,22 +18,31 @@ class SquittalInterface(Plugin):
         self.lobby = False
 
     def on_match_launching(self):
-        Loop(coro=post_request, count=1).start(f"https://localhost:5001/api/title",
-                                               f"Match {self.match.id}")
-        Loop(coro=post_request, count=1).start(f"https://localhost:5001/api/length",
-                                               str(self.match.round_length * 60))
+        self.match_start.start()
 
     def on_base_selected(self, base):
-        Loop(coro=post_request, count=1).start(f"https://localhost:5001/api/base",
+        Loop(coro=post_request, count=1).start(f"{cfg.general['squittal_url']}/api/base",
                                                str(self.match.base.id))
 
     def on_match_starting(self):
         for tm in self.match.teams:
-            Loop(coro=post_request, count=1).start(f"https://localhost:5001/api/teams/{tm.id+1}",
+            Loop(coro=post_request, count=1).start(f"{cfg.general['squittal_url']}/api/teams/{tm.id+1}",
                                                    tm.team_score.ig_ids_list)
 
     def on_match_started(self):
-        Loop(coro=post_request, count=1).start(f"https://localhost:5001/api/start", "")
+        Loop(coro=post_request, count=1).start(f"{cfg.general['squittal_url']}/api/start")
+
+
+    @loop(count=1)
+    async def match_start(self):
+        await post_request(f"{cfg.general['squittal_url']}/api/clear")
+        await sleep(1)
+        await post_request(f"{cfg.general['squittal_url']}/api/title", f"Match {self.match.id}")
+        await sleep(1)
+        await post_request(f"{cfg.general['squittal_url']}/api/length", str(self.match.round_length * 60))
+
+
+
 
 
 

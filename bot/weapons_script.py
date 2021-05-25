@@ -36,7 +36,7 @@ we_cats = {
     139: 'Infantry Abilities',  # BAN
     4: 'Shotgun',  # BAN
     6: 'LMG',  # DET
-    13: 'Rocket Launcher',  # NP
+    13: 'Rocket Launcher',  # NP, DET
     11: 'Sniper Rifle',  # DET
     18: 'Explosive',  # BAN
     17: 'Grenade',  # DET
@@ -51,7 +51,7 @@ we_cats = {
     22: 'AI MAX (Right)',  # BAN
     9: 'AV MAX (Left)',  # BAN
     23: 'AA MAX (Left)',  # BAN
-    147: 'Aerial Combat Weapon',  # BAN
+    147: 'Aerial Combat Weapon',  # ALL
     104: 'Vehicle Weapons',  # BAN
     211: 'Colossus Primary Weapon',  # BAN
     144: 'ANT Top Turret',  # BAN
@@ -64,9 +64,9 @@ we_cats = {
 
 # Discrimination per category
 ignored_categories = []  # [104,211,144,157,126,208,209,210,139] Switched this to banned
-banned_categories = [21, 20, 22, 9, 23, 10, 18, 147, 14, 4, 104, 211, 144, 157, 126, 208, 209, 210, 139]
-allowed_categories = [24, 12]
-detailed = [2, 3, 5, 6, 7, 8, 11, 17, 19]
+banned_categories = [21, 20, 22, 9, 23, 10, 18, 14, 4, 104, 211, 144, 157, 126, 208, 209, 210, 139]
+allowed_categories = [24, 12, 147]
+detailed = [2, 3, 5, 6, 7, 8, 11, 17, 19, 13]
 no_point = [13, 17]
 
 
@@ -164,6 +164,10 @@ def get_banned_per_category(cat: int, w_id: int) -> bool:
             1914: "TRAC-Shot",
             1919: "Eclipse VE3A"
         }
+    elif cat == 13:
+        d = {
+            1964: "The Kraken"
+        }
     # Sniper Rifle
     elif cat == 11:
         d = {
@@ -184,6 +188,9 @@ def get_banned_per_category(cat: int, w_id: int) -> bool:
     # Grenades
     elif cat == 17:
         d = {
+            880: "Sticky Grenade",
+            881: "Sticky Grenade",
+            882: "Sticky Grenade",
             6050: "Decoy Grenade",
             6003418: "NSX Fujin",
             6004742: "Water Balloon",
@@ -239,6 +246,9 @@ def push_all_weapons(push_db=False):
         j_data = json.loads(response.content)
         print(we_cats[cat])  # Print category name
 
+        print(url)
+        if "returned" not in j_data:
+            raise ValueError("Nothing returned!")
         if j_data["returned"] == 0:
             raise ValueError("Nothing returned!")
 
@@ -303,7 +313,7 @@ def push_all_weapons(push_db=False):
     else:
         print("DB not updated! Use arg 'push_db=True' to update")
 
-
+push_all_weapons()
 def display_weapons_from_category(cat):
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/item/' \
           f'?item_type_id=26&is_vehicle_weapon=0&item_category_id={cat}' \

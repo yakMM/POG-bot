@@ -44,12 +44,15 @@ async def request_code(url: str) -> int:
         return result
 
 
-async def post_request(url, data):
+async def post_request(url, data=None):
     headers = {'content-type': 'application/json'}
-    async with ClientSession(connector=TCPConnector(verify_ssl=False)) as client:
-        async with client.post(url, data=f'"{data}"', headers=headers) as response:
-            result = await response.text()
-            print(f"result: {result}")
+    #async with ClientSession(connector=TCPConnector(verify_ssl=False)) as client:
+    async with ClientSession() as client:
+        if data:
+            response = await client.post(url, data=f'"{data}"', headers=headers)
+        else:
+            response = await client.post(url)
+        log.debug(f"POST call at {url} returned: {response}")
 
 
 async def api_request_and_retry(url: str, retries: int = 3) -> dict:
