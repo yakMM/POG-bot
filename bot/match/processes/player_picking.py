@@ -1,7 +1,7 @@
 from display import AllStrings as disp
 from lib.tasks import loop
 
-from classes import TeamCaptain, ActivePlayer, Player, Team
+from classes import ActivePlayer, Player, Team
 
 from match.common import get_substitute, after_pick_sub, switch_turn
 from match import MatchStatus
@@ -101,7 +101,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             ----------
             ctx : Context
                 discord command context, contains the message received
-            captain : TeamCaptain
+            captain : ActivePlayer
                 The captain currently picking
             args : list
                 Differents arguments found in the command (not used in this case)

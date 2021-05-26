@@ -6,7 +6,7 @@ import discord
 from match import MatchStatus
 from .process import Process
 
-from classes import TeamCaptain, Player, Team
+from classes import ActivePlayer, Team
 
 from lib.tasks import loop
 
@@ -163,7 +163,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             await self.accept_rh.auto_add(msg)
 
     async def add_captain(self, i, player):
-        self.match.teams[i].add_player(TeamCaptain, player)
+        self.match.teams[i].add_player(ActivePlayer, player)
         self.captains[i] = player
         self.p_list.remove(player)
         if player.id in self.players:

@@ -467,7 +467,15 @@ class ActivePlayer:
 
     @property
     def is_captain(self):
-        return False
+        return self.__team.is_captain(self)
+
+    @property
+    def is_turn(self):
+        return self.__team.is_turn
+
+    @is_turn.setter
+    def is_turn(self, bl):
+        self.__team.is_turn = bl
 
     @property
     def is_playing(self):
@@ -574,24 +582,3 @@ class ActivePlayer:
                                                         {"unique_usages": account_id})
             except db.DatabaseError:
                 pass
-
-
-class TeamCaptain(ActivePlayer):
-    """ Team Captain variant of the active player
-    """
-
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.__is_turn = False
-
-    @property
-    def is_captain(self):
-        return True
-
-    @property
-    def is_turn(self):
-        return self.__is_turn
-
-    @is_turn.setter
-    def is_turn(self, bl):
-        self.__is_turn = bl

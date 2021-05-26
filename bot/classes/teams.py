@@ -16,6 +16,7 @@ class Team:
         self.__match = match
         self.__is_playing = False
         self.__team_score = None
+        self.__is_turn = False
 
     @property
     def id(self):
@@ -81,6 +82,20 @@ class Team:
     @property
     def match(self):
         return self.__match
+
+    @property
+    def is_turn(self):
+        return self.__is_turn
+
+    @is_turn.setter
+    def is_turn(self, bl):
+        self.__is_turn = bl
+
+    def is_captain(self, player):
+        try:
+            return player is self.__players[0]
+        except IndexError:
+            return False
 
     def on_team_ready(self, ready):
         self.__is_playing = ready

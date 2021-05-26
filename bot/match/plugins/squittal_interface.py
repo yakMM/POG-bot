@@ -32,7 +32,6 @@ class SquittalInterface(Plugin):
     def on_match_started(self):
         Loop(coro=post_request, count=1).start(f"{cfg.general['squittal_url']}/api/start")
 
-
     @loop(count=1)
     async def match_start(self):
         await post_request(f"{cfg.general['squittal_url']}/api/clear")
