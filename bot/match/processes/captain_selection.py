@@ -4,6 +4,7 @@ from random import choice as random_choice
 import discord
 
 from match import MatchStatus
+from match.common import get_substitute, after_pick_sub
 from .process import Process
 
 from classes import ActivePlayer, Team
@@ -204,3 +205,50 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             threshold -= 5
 
         return random_choice(potential)
+
+    @Process.public
+    async def do_sub(self, subbed, force_player=None):
+        """ Substitute a player by another one picked at random \
+            in the lobby.
+
+            Parameters
+            ----------
+            subbed : Player
+                Player to be substituted
+        """
+
+        # If subbed one has already been picked
+        if subbed.active:
+            await after_pick_sub(self.match, subbed.active, force_player)
+        else:
+            # Get a new player for substitution
+            new_player = await get_substitute(self.match, subbed, player=force_player)
+            if not new_player:
+                return
+
+            # Remove player suggestion
+            i = -1
+            if subbed is self.captains[0]:
+                i = 0
+            elif subbed is self.captains[1]:
+                i = 1
+            if i != -1:
+                self.captains[i] = None
+                self.auto_captain.restart()
+
+            # Remove them from the player list
+            if subbed.id in self.players:
+                del self.players[subbed.id]
+            self.p_list.remove(subbed)
+            # Put the new player instead
+            self.players[new_player.id] = new_player
+            self.p_list.append(new_player)
+            # Clean subbed one and send message
+            subbed.on_player_clean()
+            msg = await disp.SUB_OKAY.send(self.match.channel, new_player.mention,
+                                           subbed.mention, match=self.match.proxy)
+            await self.volunteer_rh.set_new_msg(msg)
+
+            if i != -1:
+                await self.get_new_auto(i)
+            return

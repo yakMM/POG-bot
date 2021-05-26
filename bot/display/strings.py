@@ -243,6 +243,7 @@ class AllStrings(Enum):
     SUB_OKAY = Message("{} replaced {}!", ping=False, embed=embeds.team_update)
     SUB_LOBBY = Message("{} you have been designated as a substitute, join <#{}>!", embed=embeds.lobby_list)
     SUB_OK_CONFIRM = Message("Subbing {}! {} accept if you agree! (use `=sub accept/decline` or react below)", ping=False)
+    SUB_ONLY_ADMIN = Message("Only staff can sub players before captains are selected!")
 
     SWAP_OK = Message("Successfully swapped {} and {}", ping=False, embed=embeds.team_update)
     SWAP_MENTION_2 = Message("Invalid request! @ mention two players to swap!")

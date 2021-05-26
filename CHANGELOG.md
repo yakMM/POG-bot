@@ -7,6 +7,7 @@
 - Now allow separation characters (,;/) instead of only space
 - Added squittal script plugin (beta)
 - TeamCaptains can now be subbed and swapped
+- Admin can now sub players in the captainSelection phase
 - TODO:
   - Overhaul sub system so it pings notify if no one in queue
   - Make it so subbed in people can accept or refuse

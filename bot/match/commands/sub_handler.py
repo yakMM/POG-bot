@@ -49,10 +49,13 @@ class SubHandler(InstantiatedCommand):
             if player.active and (player.active.team is team):
                 self.validator.clean()
 
-    @Command.command(*picking_states)
+    @Command.command(*picking_states, MatchStatus.IS_CAPTAIN)
     async def sub(self, ctx, args):
         captain = None
         if not roles.is_admin(ctx.author):
+            if self.match.status is MatchStatus.IS_CAPTAIN:
+                await disp.SUB_ONLY_ADMIN.send(ctx)
+                return
             captain, msg = get_check_captain(ctx, self.match, check_turn=False)
             if msg:
                 await msg
