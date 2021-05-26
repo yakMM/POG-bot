@@ -1,6 +1,7 @@
 from .command import InstantiatedCommand, Command, picking_states
 from match.classes import CaptainValidator
 from match.common import get_check_captain
+from match import MatchStatus
 
 from display import AllStrings as disp, ContextWrapper
 
@@ -65,9 +66,6 @@ class SwapHandler(InstantiatedCommand):
                 return
             if not(p.match and p.active and p.match.id == self.match.id):
                 await disp.SWAP_NO.send(ctx, p.mention)
-                return
-            if p.active.is_captain:
-                await disp.RM_CAP.send(ctx, p.mention)
                 return
             if p.active.is_playing:
                 await disp.SWAP_RDY.send(ctx)

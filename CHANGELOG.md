@@ -5,6 +5,8 @@
 - Reworked stats (stats are now per-class)
 - Added lobby status to notify ping
 - Now allow separation characters (,;/) instead of only space
+- Added squittal script plugin (beta)
+- TeamCaptains can now be subbed and swapped
 - TODO:
   - Overhaul sub system so it pings notify if no one in queue
   - Make it so subbed in people can accept or refuse

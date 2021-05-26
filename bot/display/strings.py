@@ -75,7 +75,6 @@ class AllStrings(Enum):
     PK_FACTION_HELP = Message("Waiting for {} to pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting below!",
                               ping=False)
     PK_OVER_READY = Message("Can't do that if your team is ready!")
-    PK_RESIGNED = Message("Successfully resigned! {} is the new captain for {}!", embed=embeds.team_update)
     PK_BASING_INFO = Message("Waiting for captains to pick a base with `=base`!\n"
                              "Captains can change faction with `=pick` `tr`/`vs`/`nc`!")
 
@@ -140,6 +139,7 @@ class AllStrings(Enum):
     CAP_ACCEPT_NO = Message("You can't do that! Volunteer if you want to be captain!")
     CAP_DENY_NO = Message("You can't do that, you were not designated as team captain!")
     CAP_DENY_OK = Message("You declined the team captain role!")
+    CAP_NEW = Message("{} is the new captain for {}!")
 
     MATCH_DM_PING = Message("POG match {} is starting! Please join `{}` channel in the Jaeger Events discord!", ping=False)
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
@@ -221,9 +221,6 @@ class AllStrings(Enum):
     RM_TIMEOUT_INVALID = Message("Invalid use of the command!", embed=embeds.timeout_help)
     RM_TIMEOUT_INFO = Message("Player is muted until {}!")
     RM_TIMEOUT_NO = Message("Player is not muted!")
-    RM_DEMOTE_NO = Message("Can't demote this player!")
-    RM_DEMOTE_OK = Message("Successfully demoted! {} is the new captain for {}!", ping=False, embed=embeds.team_update)
-    RM_DEMOTE_NO_TURN = Message("Can't demote a captain if it's not their turn to pick!")
     RM_NAME_CHANGED = Message("Changed {}'s name to `{}`!", ping=False)
     RM_CAP = Message("Invalid request! {} is a team captain!", ping=False)
 
@@ -264,6 +261,7 @@ class AllStrings(Enum):
     UNBENCH_OK = Message("Successfully un-benched {}!", ping=False, embed=embeds.team_update)
     BENCH_ALREADY = Message("Player is already benched!", ping=False)
     BENCH_NOT = Message("Player is not benched!", ping=False)
+    BENCH_ALL = Message("Can't bench {}, no active player left in the team!")
 
     async def send(self, ctx, *args, **kwargs):
         """

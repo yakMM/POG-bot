@@ -91,6 +91,22 @@ class Team:
     def is_turn(self, bl):
         self.__is_turn = bl
 
+    def demote_captain(self):
+        if len(self.__players) < 2:
+            return False
+        if self.__players[1].is_benched:
+            return False
+        else:
+            self.__players.append(self.__players.pop(0))
+            return True
+
+    def on_player_bench(self, player):
+        if player is self.__players[-1]:
+            return
+        else:
+            self.__players.remove(player)
+            self.__players.append(player)
+
     def is_captain(self, player):
         try:
             return player is self.__players[0]

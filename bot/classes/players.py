@@ -544,6 +544,7 @@ class ActivePlayer:
 
     def bench(self, bench):
         self.__is_benched = bench
+        self.__team.on_player_bench(self)
         if self.__player_score:
             if bench:
                 self.__player_score.disable()

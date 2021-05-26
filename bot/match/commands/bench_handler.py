@@ -1,6 +1,7 @@
 from .command import InstantiatedCommand, Command, picking_states
 from match.classes import CaptainValidator
 from match.common import get_check_captain
+from match import MatchStatus
 
 from display import AllStrings as disp, ContextWrapper
 
@@ -23,6 +24,14 @@ class BenchHandler(InstantiatedCommand):
 
         @self.validator.confirm
         async def do_bench(ctx, player, bench):
+            team = player.team
+            if bench and player.is_captain:
+                if team.demote_captain():
+                    await disp.CAP_NEW.send(self.match.channel, team.captain.mention, team.name)
+                else:
+                    await disp.BENCH_ALL.send(self.match.channel, player.mention)
+                    return
+
             player.bench(bench)
             if bench:
                 await disp.BENCH_OK.send(self.match.channel, player.mention, match=self.match.proxy)
@@ -61,9 +70,6 @@ class BenchHandler(InstantiatedCommand):
             return
         if not (p.match and p.active and p.match.id == self.match.id):
             await disp.BENCH_NO.send(ctx, p.mention)
-            return
-        if p.active.is_captain:
-            await disp.RM_CAP.send(ctx, p.mention)
             return
         if p.active.is_playing:
             await disp.BENCH_RDY.send(ctx)
