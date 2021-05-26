@@ -8,6 +8,7 @@
 - Added squittal script plugin (beta)
 - TeamCaptains can now be subbed and swapped
 - Admin can now sub players in the captainSelection phase
+- Subbing, benching, picking, etc are now possible when teams are ready. THe ready state will be automatically toggled.
 - TODO:
   - Overhaul sub system so it pings notify if no one in queue
   - Make it so subbed in people can accept or refuse

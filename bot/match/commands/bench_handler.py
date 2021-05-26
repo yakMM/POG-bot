@@ -71,15 +71,15 @@ class BenchHandler(InstantiatedCommand):
         if not (p.match and p.active and p.match.id == self.match.id):
             await disp.BENCH_NO.send(ctx, p.mention)
             return
-        if p.active.is_playing:
-            await disp.BENCH_RDY.send(ctx)
-            return
         if bench and p.active.is_benched:
             await disp.BENCH_ALREADY.send(ctx)
             return
         if not bench and not p.active.is_benched:
             await disp.BENCH_NOT.send(ctx)
             return
+        if p.active.is_playing:
+            p.active.team.captain.is_turn = True
+            p.active.team.on_team_ready(False)
 
         player = p.active
 

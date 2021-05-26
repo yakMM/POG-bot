@@ -78,8 +78,8 @@ class CommandFactory(metaclass=MetaFactory):
             return
 
         if captain.team.is_playing:
-            await disp.READY_NO_COMMAND.send(ctx)
-            return
+            captain.is_turn = True
+            captain.team.on_team_ready(False)
 
         try:
             await self.match.get_process_attr("pick")(ctx, captain, args)
@@ -187,9 +187,11 @@ class CommandFactory(metaclass=MetaFactory):
         if self.match.teams[0].is_playing or self.match.teams[1].is_playing:
             if len(args) == 0:
                 await self.match.base_selector.show_base_status(ctx)
+                return
             else:
-                await disp.BASE_NO_READY.send(ctx)
-            return
+                for tm in self.match.teams:
+                    tm.captain.is_turn = True
+                    tm.on_team_ready(False)
 
         await self.match.base_selector.process_request(ctx, captain, args)
 

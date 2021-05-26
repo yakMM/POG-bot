@@ -74,7 +74,6 @@ class AllStrings(Enum):
     PK_FACTION_INFO = Message("Captains can change faction with `=pick` `tr`/`vs`/`nc`!")
     PK_FACTION_HELP = Message("Waiting for {} to pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting below!",
                               ping=False)
-    PK_OVER_READY = Message("Can't do that if your team is ready!")
     PK_BASING_INFO = Message("Waiting for captains to pick a base with `=base`!\n"
                              "Captains can change faction with `=pick` `tr`/`vs`/`nc`!")
 
@@ -109,7 +108,6 @@ class AllStrings(Enum):
     CONFIRM_CANCELED = Message("You canceled the request!")
     CANCEL_NOTHING = Message("Nothing to cancel!")
     CANCEL_NOT_CAPTAIN = Message("You can't cancel this request!")
-    READY_NO_COMMAND = Message("Can't do that while your team is ready!")
     NO_RULE = Message("You have to accept the rules before using `{}`! Check <#{}>")
     DISPLAY_STATS = Message("Here are your POG stats:", embed=embeds.player_stats)
 
@@ -234,7 +232,6 @@ class AllStrings(Enum):
     SC_RESULT_HALF = Message("Match {} - **halftime**")
     SC_RESULT = Message("Match {}")
 
-    SUB_RDY = Message("Can't sub a player whose team is ready!")
     SUB_NO = Message("This player can't be subbed!")
     SUB_NOT_OK = Message("Can't sub a player at this stage!")
     SUB_NO_PLAYER = Message("Subbing {}: no player is available to substitute!")
@@ -248,13 +245,11 @@ class AllStrings(Enum):
     SWAP_OK = Message("Successfully swapped {} and {}", ping=False, embed=embeds.team_update)
     SWAP_MENTION_2 = Message("Invalid request! @ mention two players to swap!")
     SWAP_NO = Message("{} can't be swapped!", ping=False)
-    SWAP_RDY = Message("Can't swap a player whose team is ready!")
     SWAP_SAME_TEAM = Message("Invalid request! Can't swap two players of the same team!", ping=False)
     SWAP_OK_CONFIRM = Message("Swapping players! {} accept if you agree! (use `=swap accept/decline` or react below)")
 
     BENCH_MENTION = Message("Invalid request! @ mention one player to bench!")
     BENCH_NO = Message("{} can't be benched!", ping=False)
-    BENCH_RDY = Message("Can't bench a player whose team is ready!")
     BENCH_OK_CONFIRM = Message("Benching player! {} accept if you agree! (use `=bench accept/decline` or react below)")
     UNBENCH_OK_CONFIRM = Message("Un-benching player! {} accept if you agree! "
                                  "(use `=unbench accept/decline` or react below)")

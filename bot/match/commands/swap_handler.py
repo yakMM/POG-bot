@@ -68,8 +68,8 @@ class SwapHandler(InstantiatedCommand):
                 await disp.SWAP_NO.send(ctx, p.mention)
                 return
             if p.active.is_playing:
-                await disp.SWAP_RDY.send(ctx)
-                return
+                p.active.team.captain.is_turn = True
+                p.active.team.on_team_ready(False)
             players.append(p.active)
 
         if players[0].team is players[1].team:

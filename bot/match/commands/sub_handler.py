@@ -76,8 +76,8 @@ class SubHandler(InstantiatedCommand):
             await disp.SUB_NO.send(ctx)
             return
         if subbed.active and subbed.active.is_playing:
-            await disp.SUB_RDY.send(ctx)
-            return
+            subbed.active.team.captain.is_turn = True
+            subbed.active.team.on_team_ready(False)
 
         # Can't have a swap command running at the same time
         self.factory.swap.on_clean()
