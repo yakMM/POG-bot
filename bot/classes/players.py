@@ -12,6 +12,7 @@ from lib.tasks import loop
 from modules.roles import role_update
 import modules.database as db
 import modules.tools as tools
+import re
 
 from .stats import PlayerStat
 from .scores import PlayerScore
@@ -86,6 +87,8 @@ class Player:
                 log.warning(f"name_check_remove KeyError for player [id={p.id}], [key={p.ig_ids[i]}]")
 
     def __init__(self, p_id, name):
+        if not re.match(cfg.name_regex, name):
+            name = "N/A"
         self.__name = name
         self.__id = p_id
         self.__ig_names = ["N/A", "N/A", "N/A"]
@@ -103,6 +106,7 @@ class Player:
     @classmethod
     def new_from_data(cls, data):  # make a new Player object from database data
         obj = cls(data["_id"], data["name"])
+        obj.__name = data["name"]
         obj.__notify = data["notify"]
         obj.__is_registered = data["is_registered"]
         if "ig_ids" in data:
@@ -155,8 +159,11 @@ class Player:
         return self.__name
 
     async def change_name(self, new_name):
+        if not re.match(cfg.name_regex, new_name):
+            return False
         self.__name = new_name
         await self.db_update("name")
+        return True
 
     @property
     def timeout(self):

@@ -101,8 +101,10 @@ class AdminCog(commands.Cog, name='admin'):
             await disp.WRONG_USAGE.send(ctx, ctx.command.name)
             return
         new_name = " ".join(args)
-        await player.change_name(new_name)
-        await disp.RM_NAME_CHANGED.send(ctx, player.mention, new_name)
+        if await player.change_name(new_name):
+            await disp.RM_NAME_CHANGED.send(ctx, player.mention, new_name)
+        else:
+            await disp.RM_NAME_INVALID.send(ctx)
 
     @commands.command()
     @commands.guild_only()

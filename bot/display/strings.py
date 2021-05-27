@@ -220,6 +220,7 @@ class AllStrings(Enum):
     RM_TIMEOUT_INFO = Message("Player is muted until {}!")
     RM_TIMEOUT_NO = Message("Player is not muted!")
     RM_NAME_CHANGED = Message("Changed {}'s name to `{}`!", ping=False)
+    RM_NAME_INVALID = Message("Rename failed! The name contains invalid characters!")
     RM_CAP = Message("Invalid request! {} is a team captain!", ping=False)
 
     MUTE_SHOW = Message("You are muted from POG until {}!")

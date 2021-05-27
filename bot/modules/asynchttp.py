@@ -12,6 +12,7 @@ from json.decoder import JSONDecodeError
 from logging import getLogger
 from discord.backoff import ExponentialBackoff
 import asyncio
+import modules.config as cfg
 
 # Custom modules
 from modules.tools import UnexpectedError
@@ -46,9 +47,10 @@ async def request_code(url: str) -> int:
 
 async def post_request(url, data=None):
     # async with ClientSession(connector=TCPConnector(verify_ssl=False)) as client:
-    async with ClientSession() as client:
+    ssl = cfg.LAUNCH_STR != "_test"
+    async with ClientSession(connector=TCPConnector(verify_ssl=ssl)) as client:
         if data:
-            kwargs = {"data": f'"{data}"', "headers": {'content-type': 'application/json'}}
+            kwargs = {"data": f'{data}', "headers": {'content-type': 'application/json'}}
         else:
             kwargs = dict()
         async with client.post(url, **kwargs) as response:

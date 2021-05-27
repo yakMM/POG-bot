@@ -31,13 +31,14 @@ class SquittalInterface(Plugin):
     def on_base_selected(self, base):
         if self.available:
             Loop(coro=post_request, count=1).start(f"{cfg.general['squittal_url']}/api/base",
-                                                   str(self.match.base.id))
+                                                   f'"{self.match.base.id}"')
 
     def on_teams_updated(self):
         if self.available:
             for tm in self.match.teams:
+                print(str(tm.players_to_dict).replace("'", '"'))
                 Loop(coro=post_request, count=1).start(f"{cfg.general['squittal_url']}/api/teams/{tm.id+1}",
-                                                       tm.ig_ids_list)
+                                                       str(tm.players_to_dict).replace("'", '"'))
 
     def on_match_started(self):
         if self.available:
@@ -48,9 +49,9 @@ class SquittalInterface(Plugin):
         await sleep(1)
         await post_request(f"{cfg.general['squittal_url']}/api/clear")
         await sleep(1)
-        await post_request(f"{cfg.general['squittal_url']}/api/title", f"Match {self.match.id}")
+        await post_request(f"{cfg.general['squittal_url']}/api/title", f'"Match {self.match.id}"')
         await sleep(1)
-        await post_request(f"{cfg.general['squittal_url']}/api/length", str(self.match.round_length * 60))
+        await post_request(f"{cfg.general['squittal_url']}/api/length", f'"{self.match.round_length * 60}"')
 
     def on_clean(self):
         if self.available:

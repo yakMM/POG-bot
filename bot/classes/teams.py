@@ -92,12 +92,12 @@ class Team:
         self.__is_turn = bl
 
     @property
-    def ig_ids_list(self):
-        new_list = list()
+    def players_to_dict(self):
+        players = list()
         for p in self.__players:
             if not p.is_benched:
-                new_list.append(p)
-        return ",".join(str(p.ig_id) for p in new_list)
+                players.append({"id": str(p.ig_id), "alias": p.name})
+        return players
 
     def demote_captain(self):
         if len(self.__players) < 2:

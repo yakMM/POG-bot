@@ -25,7 +25,7 @@ class ConfigError(Exception):
 
 ## STATIC PARAMETERS:
 
-AFK_TIME = 15  # minutes
+name_regex = r"^[ -■]{1,32}$"
 
 #: Dictionary to retrieve faction name by id.
 factions = {
