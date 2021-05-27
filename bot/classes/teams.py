@@ -91,6 +91,14 @@ class Team:
     def is_turn(self, bl):
         self.__is_turn = bl
 
+    @property
+    def ig_ids_list(self):
+        new_list = list()
+        for p in self.__players:
+            if not p.is_benched:
+                new_list.append(p)
+        return ",".join(str(p.ig_id) for p in new_list)
+
     def demote_captain(self):
         if len(self.__players) < 2:
             return False

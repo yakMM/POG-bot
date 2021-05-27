@@ -115,6 +115,7 @@ class BaseSelector:
             await disp.BASE_ON_SELECT.send(ctx, base.name, base=base, is_booked=self.is_booked)
             if self.__match.status is MatchStatus.IS_BASING:
                 self.__match.proxy.on_base_found()
+            self.__match.plugin_manager.on_base_selected(base)
 
     async def show_base_status(self, ctx):
         if self.__selected is None:

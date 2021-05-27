@@ -103,6 +103,9 @@ class CommandFactory(metaclass=MetaFactory):
                 team.faction = faction
                 await disp.PK_FACTION_CHANGED.send(ctx, team.name, cfg.factions[faction])
 
+            if self.match.status is MatchStatus.IS_WAITING:
+                self.match.plugin_manager.on_teams_updated()
+
     @Command.has_help(disp.CAP_HELP)
     @Command.has_status("info")
     @Command.command(MatchStatus.IS_CAPTAIN)

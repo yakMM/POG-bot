@@ -38,6 +38,9 @@ class BenchHandler(InstantiatedCommand):
             else:
                 await disp.UNBENCH_OK.send(self.match.channel, player.mention, match=self.match.proxy)
 
+            if self.match.status is MatchStatus.IS_WAITING:
+                self.match.plugin_manager.on_teams_updated()
+
     def on_clean(self, hard=False):
         if self.validator:
             self.validator.clean()

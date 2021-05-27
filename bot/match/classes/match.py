@@ -281,6 +281,7 @@ class MatchObjects:
             raise AttributeError(f"Current process has no attribute '{name}'")
 
     def clean_critical(self):
+        self.plugin_manager.on_clean()
         self.status = MatchStatus.IS_RUNNING
         self.command_factory.on_clean()
         if self.base_selector:
@@ -297,7 +298,7 @@ class MatchObjects:
         await self.clean_async()
 
     async def clean_async(self):
-        await self.plugin_manager.clean()
+        await self.plugin_manager.async_clean()
         on_match_over(self.data.id)
         for a_player in self.players_with_account:
             await accounts.terminate_account(a_player)

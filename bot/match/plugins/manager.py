@@ -31,10 +31,10 @@ class PluginManager:
             except Exception as e:
                 log.error(f"Error occurred in plugin {type(p).__name__}\n{e}")
 
-    async def clean(self):
+    async def async_clean(self):
         for p in self.plugins:
             try:
-                await p.clean()
+                await p.async_clean()
             except Exception as e:
                 log.error(f"Error occurred when clearing plugin {type(p).__name__}\n{e}")
 

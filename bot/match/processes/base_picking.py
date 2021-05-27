@@ -23,7 +23,6 @@ class BasePicking(Process, status=MatchStatus.IS_BASING):
     @Process.public
     def on_base_found(self):
         self.match.ready_next_process()
-        self.match.plugin_manager.on_base_selected(self.match.base)
         self.match.start_next_process()
 
     @Process.public

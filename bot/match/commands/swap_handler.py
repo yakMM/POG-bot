@@ -32,6 +32,9 @@ class SwapHandler(InstantiatedCommand):
             p_2.change_team(team1)
             await disp.SWAP_OK.send(self.match.channel, p_1.mention, p_2.mention, match=self.match.proxy)
 
+            if self.match.status is MatchStatus.IS_WAITING:
+                self.match.plugin_manager.on_teams_updated()
+
     def on_clean(self, hard=False):
         if self.validator:
             self.validator.clean()

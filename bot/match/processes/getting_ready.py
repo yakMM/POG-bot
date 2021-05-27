@@ -77,7 +77,9 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
                 await self.rh.set_new_msg(msg)
                 break
             except discord.NotFound as e:
-                log.warning(f"Error in `faction_picking` init loop:{e}")
+                log.warning(f"Error in `getting_ready` init loop:{e}")
+
+        self.match.plugin_manager.on_teams_updated()
 
     @Process.public
     async def clear(self, ctx):
@@ -170,6 +172,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         subbed.active.clean()
         if not new_player.active.has_own_account:
             await self.give_account(new_player.active)
+        self.match.plugin_manager.on_teams_updated()
 
     @Process.public
     async def pick_status(self, ctx):

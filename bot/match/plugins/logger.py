@@ -67,6 +67,6 @@ class SimpleLogger(Plugin):
         self.data["match_over"] = timestamp_now()
         self.__event("on_match_over")
 
-    async def clean(self):
+    async def async_clean(self):
         await db.async_db_call(db.set_element, "match_logs", self.match.id, self.data)
         self.data.clear()

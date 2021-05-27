@@ -60,7 +60,7 @@ class AudioBot(Plugin):
             _TaskAudio(self).task_audio.start("switch_sides", wait=0)
             _TaskAudio(self).task_audio.start("type_ready", wait=1)
 
-    async def clean(self):
+    def on_clean(self):
         self.lobby = False
 
 

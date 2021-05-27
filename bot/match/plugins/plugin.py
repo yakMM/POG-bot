@@ -23,6 +23,9 @@ class Plugin:
     def on_base_selected(self, base):
         pass
 
+    def on_teams_updated(self):
+        pass
+
     def on_team_ready(self, team):
         pass
 
@@ -38,5 +41,8 @@ class Plugin:
     def on_match_over(self):
         pass
 
-    async def clean(self):
+    def on_clean(self):
+        pass
+
+    async def async_clean(self):
         pass
