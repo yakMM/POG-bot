@@ -2,13 +2,24 @@
 """
 
 from display import AllStrings as disp, ContextWrapper
-from discord import DMChannel
+from discord import DMChannel, NotFound
 import modules.config as cfg
 from modules.loader import is_all_locked
 from modules.roles import is_admin
 from asyncio import sleep
 import modules.spam_checker as spam_checker
 from modules.dm_handler import on_dm
+
+
+class FakeMember:
+    def __init__(self, id):
+        self.id = id
+        self.name = "Unknown"
+
+    @property
+    def mention(self):
+        return f'<@{self.id}>'
+
 
 
 async def on_message(client, message):
@@ -68,7 +79,11 @@ async def on_message(client, message):
                 if member:
                     message.mentions.append(member)
                     continue
-                member = await message.channel.guild.fetch_member(arg_int)
+                try:
+                    member = await message.channel.guild.fetch_member(arg_int)
+                except NotFound:
+                    message.mentions.append(FakeMember(arg_int))
+                    continue
                 if member:
                     message.mentions.append(member)
                     continue
