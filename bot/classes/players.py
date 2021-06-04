@@ -307,7 +307,7 @@ class Player:
                 self.__has_own_account = False
                 await self.db_update("account")
                 try:
-                    await self.__match.give_account(self.active)
+                    await self.__match.give_account(self.active, update=True)
                 except AttributeError:
                     pass
                 return True
@@ -331,7 +331,7 @@ class Player:
                     await self.db_update("register")
                 else:
                     try:
-                        await self.__match.try_remove_account(self.active)
+                        await self.__match.try_remove_account(self.active, update=True)
                     except AttributeError:
                         pass
                 # If updated

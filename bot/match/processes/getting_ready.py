@@ -147,20 +147,22 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
                 await self.rh.set_new_msg(msg)
 
     @Process.public
-    async def try_remove_account(self, a_player):
+    async def try_remove_account(self, a_player, update=False):
         if a_player.account:
             await accounts.terminate_account(a_player)
             self.match.players_with_account.remove(a_player)
-        self.match.plugin_manager.on_teams_updated()
+        if update:
+            self.match.plugin_manager.on_teams_updated()
 
     @Process.public
-    async def give_account(self, a_player):
+    async def give_account(self, a_player, update=False):
         success = await accounts.give_account(a_player)
         if success:
             self.match.players_with_account.append(a_player)
             await accounts.send_account(self.match.channel, a_player)
             await disp.ACC_GIVING.send(self.match.channel, a_player.mention)
-            self.match.plugin_manager.on_teams_updated()
+            if update:
+                self.match.plugin_manager.on_teams_updated()
         else:
             await disp.ACC_NOT_ENOUGH.send(self.match.channel)
             await self.clear()

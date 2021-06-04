@@ -65,7 +65,7 @@ async def process_score(match: 'match.classes.MatchData', start_time: int, match
         if not player:
             # interaction with outside player, skip it
             continue
-        player_loadout = player.get_loadout(int(int(event["attacker_loadout_id"])))
+        player_loadout = player.get_loadout(int(event["attacker_loadout_id"]))
 
         # Get weapon
         weap_id = int(event["attacker_weapon_id"])
