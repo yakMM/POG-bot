@@ -161,7 +161,7 @@ def _add_main_handlers(client):
         await modules.roles.role_update(player)
 
     @client.event
-    async def on_member_update(before, after):
+    async def on_presence_update(before, after):
         if before.status != after.status:
             await on_status_update(after)
 
@@ -247,6 +247,7 @@ def _define_log(launch_str):
     log.setLevel(level)
     file_handler.setLevel(level)
     file_handler.setFormatter(formatter)
+
     class StreamToLogger(object):
         """
         Fake file-like stream object that redirects writes to a logger instance.
@@ -347,7 +348,11 @@ def main(launch_str=""):
 
 
 if __name__ == "__main__":
+    # To run in 'DEV' mode, create a file called 'test' next to 'main.py'
     if os.path.isfile("test"):
+        print("Running mode: 'DEV'")
         main("_test")
     else:
+        print("Running mode: 'PROD', all output will be redirected to log files!\n"
+              "Make sure to run in 'DEV' mode if you want debug output!")
         main()

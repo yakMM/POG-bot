@@ -18,7 +18,7 @@ from display import AllStrings as disp, ContextWrapper
 log = getLogger("pog_bot")
 
 
-class RegisterCog(commands.Cog, name='muted'):
+class RegisterCog(commands.Cog, name='usage'):
     """
     Muted cog, handle the commands from register channel
     """
