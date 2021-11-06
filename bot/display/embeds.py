@@ -304,7 +304,7 @@ def offline_list(ctx, p_list):
         title='Offline Players',
         description=f'If your character info is incorrect, re-register using `=r` in <#{cfg.channels["register"]}>!'
     )
-    embed.add_field(name="The following players are not online ingame:",
+    embed.add_field(name=f"The following {'players are' if len(p_list) > 1 else 'player is'} not online ingame:",
                     value="\n".join(f"{p.ig_name} ({p.mention})" for p in p_list),
                     inline=False)
 

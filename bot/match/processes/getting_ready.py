@@ -133,6 +133,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
                     if len(offline_players) != 0:
                         await disp.MATCH_PLAYERS_OFFLINE.send(ctx, captain.team.name,
                                                               " ".join(p.mention for p in offline_players),
+                                                              "are" if len(offline_players) > 1 else "is",
                                                               p_list=offline_players)
                         return
                 except ApiNotReachable as e:
