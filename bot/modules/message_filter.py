@@ -40,6 +40,9 @@ async def on_message(client, message):
     if len(message.content) == 0:
         return
 
+    if message.content == cfg.emojis['info']:
+        message.content = "=info"
+
     if message.content[0] != cfg.general["command_prefix"]:
         return
 

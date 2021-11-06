@@ -153,7 +153,8 @@ roles = {
 emojis = {
     "VS": "",
     "TR": "",
-    "NC": ""
+    "NC": "",
+    "info": ""
 }
 
 #: Contains scoring parameters.
