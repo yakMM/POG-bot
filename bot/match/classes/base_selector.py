@@ -115,7 +115,7 @@ class BaseSelector:
             self.__match.plugin_manager.on_base_selected(base)
 
         @interaction_handler.callback('base_selector')
-        async def base_select(interaction, value):
+        async def base_select(interaction_id, interaction, value):
             picker = None
             author = interaction.user
             if not is_admin(author):
@@ -124,17 +124,17 @@ class BaseSelector:
                         picker = team.captain
                         break
                 if not picker:
-                    await disp.PK_NOT_CAPTAIN.send_ephemeral(interaction.response, ephemeral=True)
+                    await disp.PK_NOT_CAPTAIN.send_ephemeral(interaction.response)
                     raise InteractionNotAllowed
             ctx = ContextWrapper.wrap(self.__match.channel)
             ctx.author = author
             try:
                 value = int(value[0])
             except (ValueError, IndexError):
-                raise InteractionInvalid
+                raise InteractionInvalid("invalid value!")
             base = self.find_by_id(value)
             if not base:
-                raise InteractionInvalid
+                raise InteractionInvalid("unknown base!")
             await self.__select_base(ctx, picker, base)
 
     async def show_base_status(self, ctx):
@@ -147,9 +147,6 @@ class BaseSelector:
             await disp.BASE_SELECTED.send(ctx, self.__selected.name, base=self.__selected, is_booked=self.is_booked)
 
     async def process_request(self, ctx, captain, args):
-        if await self.__validator.check_message(ctx, captain, args):
-            return
-
         if len(args) == 0:
             # If no arg in the command
             await self.display_all(ctx)
@@ -198,8 +195,8 @@ class BaseSelector:
             await self.__validator.force_confirm(ctx, base=base)
             return
         other_captain = self.__match.teams[picker.team.id - 1].captain
-        msg = await disp.BASE_OK_CONFIRM.send(ctx, base.name, other_captain.mention)
-        await self.__validator.wait_valid(picker, msg, base=base)
+        self.__validator.arm(picker, base=base)
+        await self.__validator.send(disp.BASE_OK_CONFIRM, ctx, base.name, other_captain.mention)
         if self.is_base_booked(base):
             await disp.BASE_BOOKED.send(ctx, other_captain.mention, base.name)
 

@@ -28,7 +28,7 @@ class AllStrings(Enum):
 
     LB_ALREADY_IN = Message("You are already in queue!")
     LB_IN_MATCH = Message("You are already in a match!")
-    LB_ADDED = Message("You've been added to the queue!", embed=embeds.lobby_list)
+    LB_ADDED = Message("You've been added to the queue!", embed=embeds.lobby_list, ui_view=views.validation_view)
     LB_REMOVED = Message("You've been removed from the queue!", embed=embeds.lobby_list)
     LB_NOT_IN = Message("You're not in queue!")
     LB_QUEUE = Message("Current players in queue:", embed=embeds.lobby_list)
@@ -178,7 +178,7 @@ class AllStrings(Enum):
     BASE_CALENDAR = Message("{} Pick an available base!", ping=False, embed=embeds.jaeger_calendar)
     BASE_NO_BASE = Message("No base yet selected!")
     BASE_NO_BASE_WAITING = Message("Waiting for captains to pick a base...")
-    BASE_OK_CONFIRM = Message("Picked **{}**! {} accept if you agree! (use `=b accept/decline` or react below)")
+    BASE_OK_CONFIRM = Message("Picked **{}**! {} accept if you agree!", ui_view=views.validation_view)
     BASE_NO_CHANGE = Message("It's not possible to change the match base anymore!")
     BASE_NO_READY = Message("Can't change the base if a team is ready!")
 
@@ -239,7 +239,7 @@ class AllStrings(Enum):
     SUB_OKAY_CAP = Message("{} replaced {} as {}'s captain", ping=False, embed=embeds.team_update)
     SUB_OKAY = Message("{} replaced {}!", ping=False, embed=embeds.team_update)
     SUB_LOBBY = Message("{} you have been designated as a substitute, join <#{}>!", embed=embeds.lobby_list)
-    SUB_OK_CONFIRM = Message("Subbing {}! {} accept if you agree! (use `=sub accept/decline` or react below)", ping=False)
+    SUB_OK_CONFIRM = Message("Subbing {}! {} accept if you agree!", ping=False, ui_view=views.validation_view)
     SUB_ONLY_ADMIN = Message("Only staff can sub players before captains are selected!")
 
     SWAP_OK = Message("Successfully swapped {} and {}", ping=False, embed=embeds.team_update)
@@ -250,9 +250,8 @@ class AllStrings(Enum):
 
     BENCH_MENTION = Message("Invalid request! @ mention one player to bench!")
     BENCH_NO = Message("{} can't be benched!", ping=False)
-    BENCH_OK_CONFIRM = Message("Benching player! {} accept if you agree! (use `=bench accept/decline` or react below)")
-    UNBENCH_OK_CONFIRM = Message("Un-benching player! {} accept if you agree! "
-                                 "(use `=unbench accept/decline` or react below)")
+    BENCH_OK_CONFIRM = Message("Benching player! {} accept if you agree!", ui_view=views.validation_view)
+    UNBENCH_OK_CONFIRM = Message("Un-benching player! {} accept if you agree!", ui_view=views.validation_view)
     BENCH_OK = Message("Successfully benched {}!", ping=False, embed=embeds.team_update)
     UNBENCH_OK = Message("Successfully un-benched {}!", ping=False, embed=embeds.team_update)
     BENCH_ALREADY = Message("Player is already benched!", ping=False)

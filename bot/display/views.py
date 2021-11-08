@@ -1,4 +1,4 @@
-from discord import ui, SelectOption, Interaction
+from discord import ui, SelectOption, ButtonStyle
 import operator
 
 
@@ -33,5 +33,20 @@ def selected_bases(ctx, bases_list, callback):
     view = ui.View(timeout=None)
 
     view.add_item(select)
+
+    return view
+
+
+def validation_view(ctx, callback):
+    decline = ui.Button(label="Decline", style=ButtonStyle.red, custom_id='accept')
+    accept = ui.Button(label="Accept", style=ButtonStyle.green, custom_id='decline')
+
+    decline.callback = callback
+    accept.callback = callback
+
+    view = ui.View(timeout=None)
+
+    view.add_item(accept)
+    view.add_item(decline)
 
     return view

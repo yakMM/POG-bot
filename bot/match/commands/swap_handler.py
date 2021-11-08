@@ -54,9 +54,6 @@ class SwapHandler(InstantiatedCommand):
                 await msg
                 return
 
-            if await self.validator.check_message(ctx, captain, args):
-                return
-
         if len(ctx.message.mentions) != 2:
             await disp.SWAP_MENTION_2.send(ctx)
             return
@@ -88,5 +85,7 @@ class SwapHandler(InstantiatedCommand):
             return
         else:
             other_captain = self.match.teams[captain.team.id - 1].captain
-            msg = await disp.SWAP_OK_CONFIRM.send(self.match.channel, other_captain.mention)
-            await self.validator.wait_valid(captain, msg, p_1=players[0], p_2=players[1])
+            self.validator.arm(captain, p_1=players[0], p_2=players[1])
+            await self.validator.send(disp.SWAP_OK_CONFIRM,
+                                      self.match.channel,
+                                      other_captain.mention)

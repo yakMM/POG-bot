@@ -61,9 +61,6 @@ class SubHandler(InstantiatedCommand):
                 await msg
                 return
 
-            if await self.validator.check_message(ctx, captain, args):
-                return
-
         if len(ctx.message.mentions) not in (1, 2):
             await disp.RM_MENTION_ONE.send(ctx)
             return
@@ -97,5 +94,5 @@ class SubHandler(InstantiatedCommand):
             return
         else:
             other_captain = self.match.teams[captain.team.id - 1].captain
-            msg = await disp.SUB_OK_CONFIRM.send(self.match.channel, subbed.mention, other_captain.mention)
-            await self.validator.wait_valid(captain, msg, subbed=subbed)
+            self.validator.arm(captain, subbed=subbed)
+            await self.validator.send(disp.SUB_OK_CONFIRM, self.match.channel, subbed.mention, other_captain.mention)

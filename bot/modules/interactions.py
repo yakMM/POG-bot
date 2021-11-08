@@ -13,7 +13,11 @@ class InteractionNotAllowed(Exception):
 
 
 class InteractionInvalid(Exception):
-    pass
+    def __init__(self, msg):
+        self.reason = msg
+        message = "Invalid interaction: " + msg
+        log.error(message)
+        super().__init__(message)
 
 
 class InteractionHandler:
@@ -34,23 +38,24 @@ class InteractionHandler:
     async def run(self, interaction: Interaction):
         if self.__locked:
             return
-        self.__locked = True
 
         user = interaction.user
 
         if await is_spam(user, interaction.message.channel):
             return
 
+        self.__locked = True
+
         interaction_id = interaction.data['custom_id']
-        interaction_values = interaction.data['values']
+        interaction_values = interaction.data.get('values', None)
 
         try:
             funcs = self.__f_dict[interaction_id]
             for func in funcs:
                 if is_coroutine(func):
-                    await func(interaction, interaction_values)
+                    await func(interaction_id, interaction, interaction_values)
                 else:
-                    func(interaction, interaction_values)
+                    func(interaction_id, interaction, interaction_values)
                 if self.__disable_after_use:
                     self.clean()
         except (KeyError, InteractionNotAllowed, NotFound, InteractionInvalid):

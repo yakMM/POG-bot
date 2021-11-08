@@ -60,9 +60,6 @@ class BenchHandler(InstantiatedCommand):
                 await msg
                 return
 
-            if await self.validator.check_message(ctx, captain, args):
-                return
-
         if len(ctx.message.mentions) != 1:
             await disp.BENCH_MENTION.send(ctx)
             return
@@ -95,8 +92,12 @@ class BenchHandler(InstantiatedCommand):
             return
         else:
             other_captain = self.match.teams[captain.team.id - 1].captain
+            self.validator.arm(captain, player=player, bench=bench)
             if bench:
-                msg = await disp.BENCH_OK_CONFIRM.send(self.match.channel, other_captain.mention)
+                await self.validator.send(disp.BENCH_OK_CONFIRM,
+                                          self.match.channel,
+                                          other_captain.mention)
             else:
-                msg = await disp.UNBENCH_OK_CONFIRM.send(self.match.channel, other_captain.mention)
-            await self.validator.wait_valid(captain, msg, player=player, bench=bench)
+                await self.validator.send(disp.UNBENCH_OK_CONFIRM,
+                                          self.match.channel,
+                                          other_captain.mention)

@@ -72,9 +72,8 @@ class MatchesCog(commands.Cog, name='matches'):
         # To allow changing base with =p:
         if arg not in ("vs", "tr", "nc", "help", "h"):  # Those args are reserved for =p
             # bl is True if arg is detected to relate to base picking
-            bl = arg in ("a", "d", "c", "accept", "decline", "cancel", "list", "l")
+            bl = arg in ("list", "l")
             bl = bl or Base.get_bases_from_name(arg, base_pool=True)
-            bl = bl or arg.isnumeric()
             if bl:
                 await match.command.base(ctx, args)
                 return
