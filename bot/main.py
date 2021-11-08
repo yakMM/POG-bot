@@ -354,5 +354,6 @@ if __name__ == "__main__":
         main("_test")
     else:
         print("Running mode: 'PROD', all output will be redirected to log files!\n"
-              "Make sure to run in 'DEV' mode if you want debug output!")
+              "Make sure to run in 'DEV' mode if you want debug output!"
+              "Add a file called 'test' next to main.py to switch to 'DEV' mode")
         main()

@@ -45,7 +45,7 @@ class RegisterCog(commands.Cog, name='register'):
             await display.NO_RULE.send(ctx, f"={ctx.command.name}", cfg.channels["rules"])
             return
 
-        msg = await _register(player, ctx, args)
+        await _register(player, ctx, args)
 
     @commands.command()
     @commands.guild_only()
