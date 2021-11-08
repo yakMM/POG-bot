@@ -1,7 +1,7 @@
 from lib.tasks import loop
 from asyncio import get_event_loop
 from logging import getLogger
-from random import randint
+from modules.interactions import InteractionHandler, InteractionNotAllowed, InteractionInvalid
 
 from classes.bases import Base
 
@@ -11,7 +11,6 @@ from .captain_validator import CaptainValidator
 from display import AllStrings as disp, ContextWrapper
 
 from modules.jaeger_calendar import get_booked_bases
-import modules.reactions as reactions
 from modules.roles import is_admin
 import modules.tools as tools
 
@@ -31,7 +30,7 @@ def push_last_bases(base):
 
 def is_last_used(base):
     for i in range(2):
-        if base.id is last_base[i][0]:
+        if base.id == last_base[i][0]:
             if last_base[i][1] > (tools.timestamp_now() - 14400):
                 return True
     return False
@@ -55,7 +54,8 @@ class BaseSelector:
         self.__selected = None
         self.__booked = list()
         self.__validator = CaptainValidator(self.__match)
-        self.add_callbacks(self.__validator)
+        self.__base_interaction = InteractionHandler(disable_after_use=False)
+        self.add_callbacks(self.__validator, self.__base_interaction)
         # self.__nav = BaseNavigator(self, match.channel)
         self._get_booked_from_calendar.start()
 
@@ -83,18 +83,15 @@ class BaseSelector:
         return base in self.__booked or self.__is_used(base)
 
     @property
-    def string_list(self):
+    def bases_list(self):
         result = list()
-        for i in range(len(self.__selection)):
-            base = self.__selection[i]
-            if self.is_base_booked(base):
-                base_string = f"~~{base.name}~~"
-            else:
-                base_string = f"{base.name}"
-            last_used = ""
-            if is_last_used(base):
-                last_used = " **(recently played)**"
-            result.append(f"**{str(i + 1)}**: {base_string}{last_used}")
+        for base in self.__selection:
+            result.append(
+                {'name': base.name,
+                 'id': base.id,
+                 'is_booked': self.is_base_booked(base),
+                 'was_played_recently': is_last_used(base)
+                 })
         return result
 
     @property
@@ -104,7 +101,7 @@ class BaseSelector:
     def get_base_from_selection(self, index):
         return self.__selection[index]
 
-    def add_callbacks(self, validator):
+    def add_callbacks(self, validator, interaction_handler):
         @validator.confirm
         async def do_confirm(ctx, base):
             self.__reset_selection()
@@ -113,9 +110,35 @@ class BaseSelector:
             self.__match.data.base = base
             # self.__nav.reaction_handler.clear()
             await disp.BASE_ON_SELECT.send(ctx, base.name, base=base, is_booked=self.is_booked)
+            await self.__base_interaction.remove_view()
             if self.__match.status is MatchStatus.IS_BASING:
                 self.__match.proxy.on_base_found()
             self.__match.plugin_manager.on_base_selected(base)
+
+        @interaction_handler.callback('base_selector')
+        async def base_select(interaction, value):
+            #         ctx = ContextWrapper.wrap(self.channel)
+            #         ctx.author = user
+            picker = None
+            author = interaction.user
+            if not is_admin(author):
+                for team in self.__match.teams:
+                    if author.id == team.captain.id:
+                        picker = team.captain
+                        break
+                if not picker:
+                    await disp.PK_NOT_CAPTAIN.send_ephemeral(interaction.response, ephemeral=True)
+                    raise InteractionNotAllowed
+            ctx = ContextWrapper.wrap(self.__match.channel)
+            ctx.author = author
+            try:
+                value = int(value[0])
+            except (ValueError, IndexError):
+                raise InteractionInvalid
+            base = self.find_by_id(value)
+            if not base:
+                raise InteractionInvalid
+            await self.__select_base(ctx, picker, base)
 
     async def show_base_status(self, ctx):
         if self.__selected is None:
@@ -138,24 +161,32 @@ class BaseSelector:
             if args[0] == "list" or args[0] == "l":
                 await self.display_all(ctx, force=True)
                 return
-            if args[0].isnumeric():
-                # If arg is a number
-                await self.select_by_index(ctx, captain, int(args[0]) - 1)
-                return
+            # Not possible anymore
+            # if args[0].isnumeric():
+            #     # If arg is a number
+            #     await self.select_by_index(ctx, captain, int(args[0]) - 1)
+            #     return
 
-        # If any other arg (expecting base name)
+        # If any other arg (expecting a base name)
         await self.select_by_name(ctx, captain, args)
 
     async def display_all(self, ctx, force=False, mentions=None):
         if self.__selected and not force:
             await self.show_base_status(ctx)
             return
+        if force:
+            self.__reset_selection()
         if not mentions:
             mentions = ctx.author.mention
         await disp.BASE_CALENDAR.send(ctx, mentions)
         if self.__selection:
-            await disp.BASE_SHOW_LIST.send(ctx, bases_list=self.string_list)
+            await self.__base_interaction.send(disp.BASE_SHOW_LIST, ctx, bases_list=self.bases_list)
             # await self.__nav.reload()
+
+    def find_by_id(self, base_id):
+        for base in self.__selection:
+            if base.id == base_id:
+                return base
 
     async def select_by_name(self, ctx, picker, args):
         arg = " ".join(args)
@@ -169,14 +200,15 @@ class BaseSelector:
         else:
             self.__selection = current_list
             self.__validator.clean()
-            await disp.BASE_SHOW_LIST.send(ctx, bases_list=self.string_list)
+            await self.__base_interaction.send(disp.BASE_SHOW_LIST, ctx, bases_list=self.bases_list)
             # await self.__nav.reload()
 
-    async def select_by_index(self, ctx, captain, index):
-        if 0 <= index < len(self.__selection):
-            await self.__select_base(ctx, captain, self.__selection[index])
-            return
-        await disp.BASE_NOT_FOUND.send(ctx)
+    # Not possible anymore
+    # async def select_by_index(self, ctx, captain, index):
+    #     if 0 <= index < len(self.__selection):
+    #         await self.__select_base(ctx, captain, self.__selection[index])
+    #         return
+    #     await disp.BASE_NOT_FOUND.send(ctx)
 
     async def __select_base(self, ctx, picker, base):
         if is_admin(ctx.author):

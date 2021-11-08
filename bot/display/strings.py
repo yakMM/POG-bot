@@ -1,8 +1,7 @@
 from enum import Enum
-from display import embeds
+from display import embeds, views
 
-from display.classes import Message, ContextWrapper
-
+from .classes import Message, ContextWrapper
 
 class AllStrings(Enum):
     """ List of different message strings available
@@ -169,7 +168,7 @@ class AllStrings(Enum):
     BASE_TOO_MUCH = Message("Too many bases found! Try to be more precise")
     BASE_NOT_FOUND = Message("Couldn't find a result for your search!")
     BASE_ON_SELECT = Message("Successfully selected **{}**", embed=embeds.base_display)
-    BASE_SHOW_LIST = Message("Select a base with `=base Name` or `=base number`:", ping=False, embed=embeds.selected_bases)
+    BASE_SHOW_LIST = Message("Select a base with `=base Name`", ping=False, ui_view=views.selected_bases)
     BASE_SELECTED = Message("This match will be played on **{}**:", embed=embeds.base_display)
     BASE_DISPLAY = Message("Base navigator:", ping=False, embed=embeds.base_display)
     BASE_BOOKED = Message("{} WARNING: **{}** seems unavailable. Please check occupation "
@@ -271,25 +270,32 @@ class AllStrings(Enum):
         """
         if not isinstance(ctx, ContextWrapper):
             ctx = ContextWrapper.wrap(ctx)
-        kwargs = self.value.get_elements(ctx, string=args, embed=kwargs)
+        kwargs = self.value.get_elements(ctx, string_args=args, ui_kwargs=kwargs)
+        return await ctx.send(**kwargs)
+
+    async def send_ephemeral(self, ctx, *args, **kwargs):
+        if not isinstance(ctx, ContextWrapper):
+            ctx = ContextWrapper.wrap(ctx)
+        kwargs = self.value.get_elements(ctx, string_args=args, ui_kwargs=kwargs)
+        kwargs['ephemeral'] = True
         return await ctx.send(**kwargs)
 
     async def edit(self, msg, *args, **kwargs):
         """
         Edit the message
 
-        :param msg:  context.
+        :param msg: Message to edit.
         :param args: Additional strings to format the main string with.
         :param kwargs: Keywords arguments to pass to the embed function.
         :return: The message edited.
         """
-        kwargs = self.value.get_elements(msg, string=args, embed=kwargs)
+        kwargs = self.value.get_elements(msg, string_args=args, ui_kwargs=kwargs)
         return await msg.edit(**kwargs)
 
     async def image_send(self, ctx, image_path, *args):
         if not isinstance(ctx, ContextWrapper):
             ctx = ContextWrapper.wrap(ctx)
-        kwargs = self.value.get_elements(ctx, string=args, image=image_path)
+        kwargs = self.value.get_elements(ctx, string_args=args, image_path=image_path)
         return await ctx.send(**kwargs)
 
 

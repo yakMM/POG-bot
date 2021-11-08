@@ -1,16 +1,17 @@
-from discord import File
+from discord import File, ui
 import modules.config as cfg
 
 
 class Message:
     """ Class for the enum to use
     """
-    def __init__(self, string, ping=True, embed=None):
+    def __init__(self, string, ping=True, embed=None, ui_view=None):
         self.__str = string
         self.__embed_fct = embed
+        self.__ui_view = ui_view
         self.__ping = ping
 
-    def get_embed(self, ctx, elements, kwargs):
+    def get_ui(self, ctx, elements, kwargs):
         if self.__embed_fct:
             embed = self.__embed_fct(ctx, **kwargs)
             # Fixes the embed mobile bug:
@@ -18,7 +19,10 @@ class Message:
             url="https://docs.google.com/document/d/13rsrWA4r16gpB-F3gvx5HWf2T974mdHLraPSjh5DO1Q/",
             icon_url = "https://media.discordapp.net/attachments/739231714554937455/739522071423614996/logo_png.png")
 
-            elements["embed"] = embed
+            elements['embed'] = embed
+        if self.__ui_view:
+            view = self.__ui_view(ctx, **kwargs)
+            elements['view'] = view
 
     def get_string(self, ctx, elements, args):
         if self.__str:
@@ -32,18 +36,18 @@ class Message:
                 except AttributeError:
                     pass
 
-            elements["content"] = string
+            elements['content'] = string
 
     def get_image(self, ctx, elements, image_path):
         if image_path:
-            elements["file"] = File(image_path)
+            elements['file'] = File(image_path)
 
     def get_elements(self, ctx, **kwargs):
 
         elements = dict()
-        self.get_string(ctx, elements, kwargs.get("string"))
-        self.get_embed(ctx, elements, kwargs.get("embed"))
-        self.get_image(ctx, elements, kwargs.get("image"))
+        self.get_string(ctx, elements, kwargs.get('string_args'))
+        self.get_ui(ctx, elements, kwargs.get('ui_kwargs'))
+        self.get_image(ctx, elements, kwargs.get('image_path'))
 
         return elements
 
@@ -74,7 +78,10 @@ class ContextWrapper:
             message = ctx.message
         except AttributeError:
             message = None
-        return cls(author, cmd_name, channel_id, message, ctx.send)
+        try:
+            return cls(author, cmd_name, channel_id, message, ctx.send)
+        except AttributeError:
+            return cls(author, cmd_name, channel_id, message, ctx.send_message)
 
     @classmethod
     def user(cls, user_id):

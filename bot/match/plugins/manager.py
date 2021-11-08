@@ -1,6 +1,7 @@
 from .logger import SimpleLogger
 from .ts3_interface import AudioBot
 from logging import getLogger
+import modules.config as cfg
 
 _plugins = [SimpleLogger, AudioBot]
 
@@ -20,8 +21,9 @@ class PluginManager:
     def __init__(self, match):
         self.match = match
         self.plugins = list()
-        for Plug in _plugins:
-            self.plugins.append(Plug(self.match))
+        if cfg.LAUNCH_STR != "_test":
+            for Plug in _plugins:
+                self.plugins.append(Plug(self.match))
 
     def on_event(self, event, *args, **kwargs):
         for p in self.plugins:
