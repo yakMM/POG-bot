@@ -1,5 +1,5 @@
 # v3.4:
-(wip)
+This is the last version with the reaction system, newer versions will use discord UI component.
 - Added HSR to scoreboard
 - Score calculation should now be faster
 - Reworked stats (stats are now per-class)
@@ -8,11 +8,8 @@
 - Added squittal script plugin (beta)
 - TeamCaptains can now be subbed and swapped
 - Admin can now sub players in the captainSelection phase
-- Subbing, benching, picking, etc are now possible when teams are ready. THe ready state will be automatically toggled.
-- TODO:
-  - Overhaul sub system so it pings notify if no one in queue
-  - Make it so subbed in people can accept or refuse
-  - Check for inactive players in order to start the matches faster
+- Subbing, benching, picking, etc are now possible when teams are ready. The ready state will be automatically toggled.
+- Small string fixes
 
 
 # v3.3:
