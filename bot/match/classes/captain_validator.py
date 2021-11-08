@@ -88,5 +88,5 @@ class CaptainValidator:
         self.expected = other
         self.kwargs = kwargs
 
-    async def send(self, disp_object, ctx, *args, **kwargs):
-        await self.ih.send(disp_object, ctx, *args, **kwargs)
+    async def show(self, disp_object, ctx, *args, **kwargs):
+        await self.ih.show(disp_object, ctx, *args, **kwargs)

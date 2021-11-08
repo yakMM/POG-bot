@@ -48,14 +48,15 @@ class BaseSelector:
             self.__all_bases = Base.get_pool()
         else:
             self.__all_bases = Base.get_bases()
+        self.__was_selection_modified = True
         self.__selection = list()
-        self.__reset_selection()
         self.__match = match
         self.__selected = None
         self.__booked = list()
+        self.__reset_selection()
         self.__validator = CaptainValidator(self.__match)
         self.__base_interaction = InteractionHandler(disable_after_use=False)
-        self.add_callbacks(self.__validator, self.__base_interaction)
+        self.__add_callbacks(self.__validator, self.__base_interaction)
         self._get_booked_from_calendar.start()
 
     @loop(count=1)
@@ -93,14 +94,7 @@ class BaseSelector:
                  })
         return result
 
-    @property
-    def current_selection(self):
-        return self.__selection
-
-    def get_base_from_selection(self, index):
-        return self.__selection[index]
-
-    def add_callbacks(self, validator, interaction_handler):
+    def __add_callbacks(self, validator, interaction_handler):
         @validator.confirm
         async def do_confirm(ctx, base):
             self.__reset_selection()
@@ -163,13 +157,12 @@ class BaseSelector:
         if self.__selected and not force:
             await self.show_base_status(ctx)
             return
-        if force:
-            self.__reset_selection()
+        self.__reset_selection()
         if not mentions:
             mentions = ctx.author.mention
         await disp.BASE_CALENDAR.send(ctx, mentions)
         if self.__selection:
-            await self.__base_interaction.send(disp.BASE_SHOW_LIST, ctx, bases_list=self.bases_list)
+            await self.__base_interaction.show(disp.BASE_SHOW_LIST, ctx, bases_list=self.bases_list)
 
     def find_by_id(self, base_id):
         for base in self.__selection:
@@ -187,8 +180,9 @@ class BaseSelector:
             await disp.BASE_TOO_MUCH.send(ctx)
         else:
             self.__selection = current_list
+            self.__was_selection_modified = True
             self.__validator.clean()
-            await self.__base_interaction.send(disp.BASE_SHOW_LIST, ctx, bases_list=self.bases_list)
+            await self.__base_interaction.show(disp.BASE_SHOW_LIST, ctx, bases_list=self.bases_list)
 
     async def __select_base(self, ctx, picker, base):
         if is_admin(ctx.author):
@@ -196,12 +190,14 @@ class BaseSelector:
             return
         other_captain = self.__match.teams[picker.team.id - 1].captain
         self.__validator.arm(picker, base=base)
-        await self.__validator.send(disp.BASE_OK_CONFIRM, ctx, base.name, other_captain.mention)
+        await self.__validator.show(disp.BASE_OK_CONFIRM, ctx, base.name, other_captain.mention)
         if self.is_base_booked(base):
             await disp.BASE_BOOKED.send(ctx, other_captain.mention, base.name)
 
     def __reset_selection(self):
-        if len(self.__all_bases) <= MAX_SELECTED:
-            self.__selection = self.__all_bases.copy()
-        else:
-            self.__selection.clear()
+        if self.__was_selection_modified:
+            self.__was_selection_modified = False
+            if len(self.__all_bases) <= MAX_SELECTED:
+                self.__selection = self.__all_bases.copy()
+            else:
+                self.__selection.clear()

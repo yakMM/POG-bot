@@ -27,7 +27,7 @@ class InteractionHandler:
         self.__msg = None
         self.__locked = False
 
-    async def send(self, disp_object, ctx, *args, **kwargs):
+    async def show(self, disp_object, ctx, *args, **kwargs):
         self.__locked = True
         if self.__msg:
             self.clean()
