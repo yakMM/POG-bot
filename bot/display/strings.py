@@ -79,7 +79,7 @@ class AllStrings(Enum):
     EXT_NOT_REGISTERED = Message("You are not registered! Check <#{}>")
     UNKNOWN_ERROR = Message("Something unexpected happened! Please try again or contact staff if it keeps happening.\n"
                             "Details: *{}*")
-    STOP_SPAM = Message("Please avoid spamming!")
+    STOP_SPAM = Message("Previous request is being processed... Please avoid spamming!")
     HELP = Message("Available commands:", embed=embeds.auto_help)
     INVALID_COMMAND = Message("Invalid command! Type `=help` for the list of available commands.")
     WRONG_USAGE = Message("Wrong usage of the command `={}`!")

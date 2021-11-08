@@ -31,13 +31,15 @@ class InteractionHandler:
         self.__msg = await disp_object.send(ctx, *args, **kwargs)
         self.__locked = False
 
-    async def run(self, interaction):
+    async def run(self, interaction: Interaction):
         if self.__locked:
             return
         self.__locked = True
-        msg = interaction.message
 
-        print(interaction.data)
+        user = interaction.user
+
+        if await is_spam(user, interaction.message.channel):
+            return
 
         interaction_id = interaction.data['custom_id']
         interaction_values = interaction.data['values']
@@ -55,6 +57,7 @@ class InteractionHandler:
             pass
         finally:
             self.__locked = False
+            unlock(user.id)
 
     def add_callback(self, custom_id, fct):
         if custom_id not in self.__f_dict:
