@@ -59,58 +59,60 @@ async def on_message(client, message):
     if await spam_checker.is_spam(message.author, message.channel):
         return
 
-    # Make the message lower-case:
-    if not message.content.lower().startswith("=rename"):
-        message.content = message.content.lower()
+    try:
+        # Make the message lower-case:
+        if not message.content.lower().startswith("=rename"):
+            message.content = message.content.lower()
 
-    message.content = message.content.replace(",", " ").replace("/", " ").replace(";", " ")
+        message.content = message.content.replace(",", " ").replace("/", " ").replace(";", " ")
 
-    # Split on whitespaces
-    args = message.content.split()
+        # Split on whitespaces
+        args = message.content.split()
 
-    new_args = list()
-    for arg in args:
-        if '@' in arg:
-            continue
-        try:
-            arg_int = int(arg)
-        except ValueError:
-            pass
-        else:
-            if arg_int >= 21154535154122752:  # minimum number for discord id
-                member = message.channel.guild.get_member(arg_int)
-                if member:
-                    message.mentions.append(member)
-                    continue
-                try:
-                    member = await message.channel.guild.fetch_member(arg_int)
-                except NotFound:
-                    message.mentions.append(FakeMember(arg_int))
-                    continue
-                if member:
-                    message.mentions.append(member)
-                    continue
+        new_args = list()
+        for arg in args:
+            if '@' in arg:
+                continue
+            try:
+                arg_int = int(arg)
+            except ValueError:
+                pass
+            else:
+                if arg_int >= 21154535154122752:  # minimum number for discord id
+                    member = message.channel.guild.get_member(arg_int)
+                    if member:
+                        message.mentions.append(member)
+                        continue
+                    try:
+                        member = await message.channel.guild.fetch_member(arg_int)
+                    except NotFound:
+                        message.mentions.append(FakeMember(arg_int))
+                        continue
+                    if member:
+                        message.mentions.append(member)
+                        continue
 
-        new_args.append(arg)
+            new_args.append(arg)
 
-    message.content = " ".join(new_args)
+        message.content = " ".join(new_args)
 
-    # Check for =as command
-    if is_admin(message.author) and message.content[0:3] == "=as":
-        try:
-            message.author = message.mentions[0]
-            del message.mentions[0]
-            i = message.content[1:].index('=')
-            message.content = message.content[i+1:]
-        except (ValueError, IndexError):
-            ctx = ContextWrapper.wrap(message.channel)
-            ctx.author = actual_author
-            await disp.WRONG_USAGE.send(ctx, "as")
-            spam_checker.unlock(actual_author.id)
-            return
+        # Check for =as command
+        if is_admin(message.author) and message.content[0:3] == "=as":
+            try:
+                message.author = message.mentions[0]
+                del message.mentions[0]
+                i = message.content[1:].index('=')
+                message.content = message.content[i+1:]
+            except (ValueError, IndexError):
+                ctx = ContextWrapper.wrap(message.channel)
+                ctx.author = actual_author
+                await disp.WRONG_USAGE.send(ctx, "as")
+                spam_checker.unlock(actual_author.id)
+                return
 
-    await client.process_commands(message)  # if not spam, processes
+        await client.process_commands(message)  # if not spam, processes
 
-    # Call finished, we can release user
-    await sleep(0.5)
-    spam_checker.unlock(actual_author.id)
+        # Call finished, we can release user
+        await sleep(0.5)
+    finally:
+        spam_checker.unlock(actual_author.id)

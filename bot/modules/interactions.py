@@ -21,9 +21,10 @@ class InteractionInvalid(Exception):
 
 
 class InteractionHandler:
-    def __init__(self, disable_after_use=True):
+    def __init__(self, disable_after_use=True, single_callback=None):
         self.__disable_after_use = disable_after_use
         self.__f_dict = dict()
+        self.__callback = single_callback
         self.__msg = None
         self.__locked = False
 
@@ -50,7 +51,10 @@ class InteractionHandler:
         interaction_values = interaction.data.get('values', None)
 
         try:
-            funcs = self.__f_dict[interaction_id]
+            if not self.__callback:
+                funcs = self.__f_dict[interaction_id]
+            else:
+                funcs = [self.__callback]
             for func in funcs:
                 if is_coroutine(func):
                     await func(interaction_id, interaction, interaction_values)

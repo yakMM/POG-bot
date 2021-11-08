@@ -2,7 +2,7 @@ from discord import ui, SelectOption, ButtonStyle
 import operator
 
 
-def selected_bases(ctx, bases_list, callback):
+def selected_bases(ctx, callback, bases_list):
     """ Returns a list of bases currently selected
     """
 
@@ -50,3 +50,16 @@ def validation_view(ctx, callback):
     view.add_item(decline)
 
     return view
+
+
+def player_view(ctx, **kwargs):
+    match = kwargs['match']
+    if 'callback' in kwargs:
+        players = match.get_left_players()
+        if players:
+            view = ui.View(timeout=None)
+            for p in match.get_left_players():
+                button = ui.Button(label=p.name, style=ButtonStyle.gray, custom_id=str(p.id))
+                button.callback = kwargs['callback']
+                view.add_item(button)
+            return view

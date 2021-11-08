@@ -28,7 +28,7 @@ class AllStrings(Enum):
 
     LB_ALREADY_IN = Message("You are already in queue!")
     LB_IN_MATCH = Message("You are already in a match!")
-    LB_ADDED = Message("You've been added to the queue!", embed=embeds.lobby_list, ui_view=views.validation_view)
+    LB_ADDED = Message("You've been added to the queue!", embed=embeds.lobby_list)
     LB_REMOVED = Message("You've been removed from the queue!", embed=embeds.lobby_list)
     LB_NOT_IN = Message("You're not in queue!")
     LB_QUEUE = Message("Current players in queue:", embed=embeds.lobby_list)
@@ -52,12 +52,12 @@ class AllStrings(Enum):
     PK_WRONG_CHANNEL = Message("You are in the wrong channel! Check <#{}> instead")
     PK_NOT_TURN = Message("It's not your turn!")
     PK_NOT_CAPTAIN = Message("You are not Team Captain!")
-    PK_SHOW_TEAMS = Message("Match status:", embed=embeds.team_update, ping=False)
+    PK_SHOW_TEAMS = Message("Match status:", embed=embeds.team_update, ui_view=views.player_view, ping=False)
     PK_PLAYERS_HELP = Message("Waiting for {} to pick a player with `=p @mention`", ping=False)
     PK_NO_ARG = Message("@ mention a player to pick!")
     PK_TOO_MUCH = Message("You can't pick more than one player at the same time!")
     PK_INVALID = Message("You can't pick that player!")
-    PK_OK = Message("Player picked! {} your turn, pick a player!", embed=embeds.team_update, ping=False)
+    PK_OK = Message("Player picked! {} your turn, pick a player!", embed=embeds.team_update, ui_view=views.player_view, ping=False)
     PK_OK_2 = Message("Player picked!", ping=False)
     PK_LAST = Message("Assigned {} to {}!", embed=embeds.team_update)
     PK_OK_FACTION = Message("Teams are ready! {} pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting below!",
@@ -140,7 +140,7 @@ class AllStrings(Enum):
 
     MATCH_DM_PING = Message("POG match {} is starting! Please join `{}` channel in the Jaeger Events discord!", ping=False)
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
-    MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ping=False)
+    MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ui_view=views.player_view, ping=False)
     MATCH_BASE_AUTO = Message("Match will be on **{}**", ping=False)
     MATCH_CONFIRM = Message("{} {} Type `=ready` or react below when your team is inside their sunderer, ready to start",
                             embed=embeds.team_update)
@@ -237,7 +237,7 @@ class AllStrings(Enum):
     SUB_NO_PLAYER = Message("Subbing {}: no player is available to substitute!")
     SUB_OKAY_TEAM = Message("{} replaced {} in {}", ping=False, embed=embeds.team_update)
     SUB_OKAY_CAP = Message("{} replaced {} as {}'s captain", ping=False, embed=embeds.team_update)
-    SUB_OKAY = Message("{} replaced {}!", ping=False, embed=embeds.team_update)
+    SUB_OKAY = Message("{} replaced {}!", ping=False, embed=embeds.team_update, ui_view=views.player_view)
     SUB_LOBBY = Message("{} you have been designated as a substitute, join <#{}>!", embed=embeds.lobby_list)
     SUB_OK_CONFIRM = Message("Subbing {}! {} accept if you agree!", ping=False, ui_view=views.validation_view)
     SUB_ONLY_ADMIN = Message("Only staff can sub players before captains are selected!")

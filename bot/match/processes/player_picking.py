@@ -1,13 +1,14 @@
-from display import AllStrings as disp
+from display import AllStrings as disp, ContextWrapper
 from lib.tasks import loop
 
 from classes import ActivePlayer, Player, Team
 
-from match.common import get_substitute, after_pick_sub, switch_turn
+from match.common import get_substitute, after_pick_sub, switch_turn, get_check_captain
 from match import MatchStatus
 from .process import Process
 from match.classes import BaseSelector
 
+from modules.interactions import InteractionHandler, InteractionInvalid, InteractionNotAllowed
 
 class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
@@ -17,6 +18,8 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
         self.match.base_selector = BaseSelector(self.match, base_pool=True)
 
+        self.interaction_handler = InteractionHandler(disable_after_use=False, single_callback=self.interaction_callback)
+
         self.match.teams[0].captain.is_turn = True
         self.match.teams[1].captain.is_turn = False
 
@@ -25,14 +28,37 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
         super().__init__(match)
 
+    async def interaction_callback(self, interaction_id, interaction, interaction_values):
+        player = Player.get(interaction.user.id)
+        if not player:
+            raise InteractionNotAllowed
+        ctx = ContextWrapper.wrap(interaction.response)
+        ctx.author = interaction.user
+        captain, msg = get_check_captain(ctx, self.match.proxy, ephemeral=True)
+        if msg:
+            await msg
+            return
+        try:
+            picked = self.players[int(interaction_id)]
+        except (ValueError, KeyError):
+            raise InteractionInvalid(f"could not find a player matching interaction_id: {interaction_id}")
+
+        ctx = ContextWrapper.wrap(self.match.channel)
+        ctx.author = interaction.user
+        await self.pick_end(ctx, picked, captain)
+
     @Process.init_loop
     async def init(self):
         """ Init the match channel, ping players, find two captains \
             and ask them to start picking players.
         """
         # Ready for players to pick
-        await disp.MATCH_SHOW_PICKS.send(self.match.channel, self.match.teams[0].captain.mention,
+        await self.interaction_handler.show(disp.MATCH_SHOW_PICKS, self.match.channel, self.match.teams[0].captain.mention,
                                          match=self.match.proxy)
+
+    @Process.public
+    async def info(self, ctx=None):
+        await self.interaction_handler.show(disp.PK_SHOW_TEAMS, self.match.channel, match=self.match.proxy)
 
     @property
     def picking_captain(self):
@@ -65,20 +91,20 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             self.players[new_player.id] = new_player
             # Clean subbed one and send message
             subbed.on_player_clean()
-            await disp.SUB_OKAY.send(self.match.channel, new_player.mention, subbed.mention, match=self.match.proxy)
+            await self.interaction_handler.show(disp.SUB_OKAY, self.match.channel, new_player.mention, subbed.mention, match=self.match.proxy)
             return
 
     @Process.public
-    def get_left_players_pings(self) -> list:
+    def get_left_players(self) -> list:
         """ The list of mentions of all players left to pick.
         """
-        pings = [f"- {p.mention} ({p.name})" for p in self.players.values()]
-        return pings
+        return list(self.players.values())
 
     @Process.public
     async def clear(self, ctx):
         for p in self.players.values():
             p.on_player_clean()
+        self.interaction_handler.clean()
         await self.match.clean_all_auto()
         await disp.MATCH_CLEARED.send(ctx)
 
@@ -130,6 +156,10 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             return
 
         # Do selection
+        await self.pick_end(ctx, picked, captain)
+
+    async def pick_end(self, ctx, picked, captain):
+        # Do selection
         team = captain.team
         self.do_pick(team, picked)
 
@@ -139,7 +169,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         # Else ping the other captain
         else:
             other = self.match.teams[team.id - 1]
-            await disp.PK_OK.send(ctx, other.captain.mention, match=self.match.proxy)
+            await self.interaction_handler.show(disp.PK_OK, ctx, other.captain.mention, match=self.match.proxy)
 
     def do_pick(self, team: Team, player):
         """
@@ -171,6 +201,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         elif len(self.players) == 0:
             # Start next step
             self.match.ready_next_process()
+            self.interaction_handler.clean()
             self.match.plugin_manager.on_teams_done()
             self.match.start_next_process()
 

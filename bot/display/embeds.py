@@ -351,10 +351,11 @@ def flip_accounts(ctx, account_names):
     return embed
 
 
-def team_update(arg, match):
+def team_update(ctx, **kwargs):
     """ Returns the current teams
     """
     # title = ""
+    match = kwargs['match']
     if match.round_no != 0:
         title = f"Match {match.id} - Round {match.round_no}"
     else:
@@ -401,7 +402,8 @@ def team_update(arg, match):
     if match.next_status is MatchStatus.IS_CAPTAIN:
         name = "Players"
     if name:
-        embed.add_field(name=name, value="\n".join(match.get_left_players_pings()), inline=False)
+        players_string = "\n".join([f"- {p.mention} ({p.name})" for p in match.get_left_players()])
+        embed.add_field(name=name, value=players_string, inline=False)
     return embed
 
 

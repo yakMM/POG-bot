@@ -116,31 +116,35 @@ async def after_pick_sub(match, subbed, force_player, clean_subbed=True):
     return new_player
 
 
-def get_check_captain(ctx, match, check_turn=True):
+def get_check_captain(ctx, match, check_turn=True, ephemeral=False):
     """ Test if the player is in position to issue a match command
         Returns the player object if yes, None if not
     """
     msg = None
     a_player = None
+    if ephemeral:
+        send_command = 'send_ephemeral'
+    else:
+        send_command = 'send'
     player = Player.get(ctx.author.id)
     if player is None or (player and not player.is_registered):
         # player not registered
-        msg = disp.EXT_NOT_REGISTERED.send(ctx, cfg.channels["register"])
+        msg = getattr(disp.EXT_NOT_REGISTERED, send_command)(ctx, cfg.channels["register"])
     elif player.match is None:
         # if player not in match
-        msg = disp.PK_NO_LOBBIED.send(ctx, cfg.channels["lobby"])
+        msg = getattr(disp.PK_NO_LOBBIED, send_command)(ctx, cfg.channels["lobby"])
     elif player.match.channel.id != match.channel.id:
         # if player not in the right match channel
-        msg = disp.PK_WRONG_CHANNEL.send(ctx, player.match.channel.id)
+        msg = getattr(disp.PK_WRONG_CHANNEL, send_command)(ctx, player.match.channel.id)
     elif player.active is None:
         # Player is in the pick list
-        msg = disp.PK_WAIT_FOR_PICK.send(ctx)
+        msg = getattr(disp.PK_WAIT_FOR_PICK, send_command)(ctx)
     elif not player.active.is_captain:
         # Player is not team captain
-        msg = disp.PK_NOT_CAPTAIN.send(ctx)
+        msg = getattr(disp.PK_NOT_CAPTAIN, send_command)(ctx)
     elif check_turn and not player.active.is_turn:
         # Not player's turn
-        msg = disp.PK_NOT_TURN.send(ctx)
+        msg = getattr(disp.PK_NOT_TURN, send_command)(ctx)
     else:
         a_player = player.active
     return a_player, msg

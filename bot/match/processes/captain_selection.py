@@ -184,11 +184,10 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             await self.info()
 
     @Process.public
-    def get_left_players_pings(self) -> list:
+    def get_left_players(self) -> list:
         """ The list of mentions of all players left to pick.
         """
-        pings = [f"- {p.mention} ({p.name})" for p in self.p_list]
-        return pings
+        return self.p_list
 
     def find_captain(self):
         """
