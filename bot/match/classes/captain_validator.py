@@ -45,7 +45,7 @@ class CaptainValidator:
                     else:
                         raise interactions.InteractionInvalid("no confirm function!")
                 elif interaction_id == "decline":
-                    if self.expected:
+                    if a_p is self.expected:
                         self.clean()
                         await disp.CONFIRM_DECLINE.send(ctx)
                     else:

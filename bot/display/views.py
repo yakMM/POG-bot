@@ -38,8 +38,8 @@ def selected_bases(ctx, bases_list, callback):
 
 
 def validation_view(ctx, callback):
-    decline = ui.Button(label="Decline", style=ButtonStyle.red, custom_id='accept')
-    accept = ui.Button(label="Accept", style=ButtonStyle.green, custom_id='decline')
+    decline = ui.Button(label="Decline", style=ButtonStyle.red, custom_id='decline')
+    accept = ui.Button(label="Accept", style=ButtonStyle.green, custom_id='accept')
 
     decline.callback = callback
     accept.callback = callback
