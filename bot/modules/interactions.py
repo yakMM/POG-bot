@@ -2,8 +2,8 @@ from modules.spam_checker import is_spam, unlock
 from discord import Interaction
 from logging import getLogger
 from inspect import iscoroutinefunction as is_coroutine
-from display import AllStrings as disp
 from discord.errors import NotFound
+from lib.tasks import Loop
 
 log = getLogger("pog_bot")
 
@@ -26,7 +26,7 @@ class InteractionHandler:
     async def send(self, disp_object, ctx, *args, **kwargs):
         self.__locked = True
         if self.__msg:
-            await self.remove_view()
+            self.clean()
         kwargs['callback'] = self.run
         self.__msg = await disp_object.send(ctx, *args, **kwargs)
         self.__locked = False
@@ -49,13 +49,12 @@ class InteractionHandler:
                     await func(interaction, interaction_values)
                 else:
                     func(interaction, interaction_values)
+                if self.__disable_after_use:
+                    self.clean()
         except (KeyError, InteractionNotAllowed, NotFound, InteractionInvalid):
             pass
-
-        if self.__disable_after_use:
-            await msg.edit(view=None)
-
-        self.__locked = False
+        finally:
+            self.__locked = False
 
     def add_callback(self, custom_id, fct):
         if custom_id not in self.__f_dict:
@@ -67,14 +66,16 @@ class InteractionHandler:
             for custom_id in args:
                 self.add_callback(custom_id, func)
             return func
-
         return decorator
 
-    async def remove_view(self):
-        msg = self.__msg
+    def clean(self):
+        self.__locked = True
+        if self.__msg:
+            Loop(coro=self._remove_msg, count=1).start(self.__msg)
         self.__msg = None
-        if msg:
-            try:
-                await msg.edit(view=None)
-            except NotFound:
-                pass
+
+    async def _remove_msg(self, msg):
+        try:
+            await msg.edit(view=None)
+        except NotFound:
+            pass

@@ -66,6 +66,7 @@ class BaseSelector:
 
     def clean(self):
         self.__validator.clean()
+        self.__base_interaction.clean()
         # self.__nav.reaction_handler.clear()
 
     def __is_used(self, base):
@@ -109,8 +110,8 @@ class BaseSelector:
             _pog_selected_bases[self.__match.id] = base.id
             self.__match.data.base = base
             # self.__nav.reaction_handler.clear()
+            self.__base_interaction.clean()
             await disp.BASE_ON_SELECT.send(ctx, base.name, base=base, is_booked=self.is_booked)
-            await self.__base_interaction.remove_view()
             if self.__match.status is MatchStatus.IS_BASING:
                 self.__match.proxy.on_base_found()
             self.__match.plugin_manager.on_base_selected(base)
