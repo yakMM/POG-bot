@@ -61,7 +61,7 @@ class ContextWrapper:
         cls.client = client
 
     @classmethod
-    def wrap(cls, ctx, ephemeral=False):
+    def wrap(cls, ctx, author=None):
         try:
             cmd_name = ctx.command.name
         except AttributeError:
@@ -70,22 +70,27 @@ class ContextWrapper:
             channel_id = ctx.channel.id
         except AttributeError:
             channel_id = 0
-        try:
-            author = ctx.author
-        except AttributeError:
+        if not author:
+            try:
+                author = ctx.author
+            except AttributeError:
+                pass
+        if not author:
             try:
                 author = ctx.user
             except AttributeError:
-                author = None
+                pass
         try:
             message = ctx.message
         except AttributeError:
             message = None
-        try:
-            obj = cls(author, cmd_name, channel_id, message, ctx.send)
-        except AttributeError:
-            # Ephemeral only allowed for interaction response
-            obj = cls(author, cmd_name, channel_id, message, ctx.send_message, ephemeral)
+        return cls(author, cmd_name, channel_id, message, ctx.send)
+
+    @classmethod
+    def interaction(cls, interaction, ephemeral=True):
+
+        if ephemeral:
+            obj.ephemeral = True
         return obj
 
     @classmethod
@@ -98,21 +103,36 @@ class ContextWrapper:
         channel = cls.client.get_channel(channel_id)
         return cls(None, cmd_name, channel_id, None, channel.send)
 
-    def __init__(self, author, cmd_name, channel_id, message, send, ephemeral=False):
+    def __init__(self, author, cmd_name, channel_id, message, send):
         self.author = author
         self.cmd_name = cmd_name
         self.channel_id = channel_id
         self.send_fct = send
         self.message = message
-        self.__ephemeral = ephemeral
         self.callback = None
         self.message_callback = None
 
     async def send(self, kwargs):
-        if self.__ephemeral:
-            kwargs['ephemeral'] = True
         msg = await self.send_fct(**kwargs)
         if self.message_callback:
             self.message_callback(msg)
         return msg
+
+
+class InteractionContext(ContextWrapper):
+    def __init__(self, interaction, ephemeral=True):
+        cmd_name = "?"
+        channel_id = interaction.channel_id
+        author = interaction.user
+        message = interaction.message
+        send = interaction.response.send_message
+        self.ephemeral = ephemeral
+        super().__init__(author, cmd_name, channel_id, message, send)
+
+    async def send(self, kwargs):
+        if self.ephemeral:
+            kwargs['ephemeral'] = True
+        await super().send(kwargs)
+
+
 

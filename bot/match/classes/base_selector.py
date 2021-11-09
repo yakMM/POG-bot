@@ -8,11 +8,13 @@ from classes.bases import Base
 from match.match_status import MatchStatus
 from .captain_validator import CaptainValidator
 
-from display import AllStrings as disp, ContextWrapper
+from display import AllStrings as disp, ContextWrapper, InteractionContext
 
 from modules.jaeger_calendar import get_booked_bases
 from modules.roles import is_admin
 import modules.tools as tools
+
+from match.common import get_check_captain
 
 
 log = getLogger("pog_bot")
@@ -101,7 +103,6 @@ class BaseSelector:
             self.__selected = base
             _pog_selected_bases[self.__match.id] = base.id
             self.__match.data.base = base
-            # self.__nav.reaction_handler.clear()
             self.__base_interaction.clean()
             await disp.BASE_ON_SELECT.send(ctx, base.name, base=base, is_booked=self.is_booked)
             if self.__match.status is MatchStatus.IS_BASING:
@@ -109,29 +110,24 @@ class BaseSelector:
             self.__match.plugin_manager.on_base_selected(base)
 
         @interaction_handler.callback('base_selector')
-        async def base_select(interaction_id, interaction, value):
-            picker = None
+        async def base_select(player, interaction_id, interaction, values):
             author = interaction.user
+            captain = None
             if not is_admin(author):
-                for team in self.__match.teams:
-                    if author.id == team.captain.id:
-                        picker = team.captain
-                        break
-                if not picker:
-                    interaction_ctx = ContextWrapper.wrap(interaction.response,
-                                                          ephemeral=True)
-                    await disp.PK_NOT_CAPTAIN.send(interaction_ctx)
+                i_ctx = InteractionContext(interaction)
+                captain, msg = get_check_captain(i_ctx, self.__match, check_turn=False)
+                if msg:
+                    await msg
                     raise InteractionNotAllowed
-            ctx = ContextWrapper.wrap(self.__match.channel)
-            ctx.author = author
+            ctx = ContextWrapper.wrap(self.__match.channel, author=author)
             try:
-                value = int(value[0])
+                value = int(values[0])
             except (ValueError, IndexError):
                 raise InteractionInvalid("invalid value!")
             base = self.find_by_id(value)
             if not base:
                 raise InteractionInvalid("unknown base!")
-            await self.__select_base(ctx, picker, base)
+            await self.__select_base(ctx, captain, base)
 
     async def show_base_status(self, ctx):
         if self.__selected is None:

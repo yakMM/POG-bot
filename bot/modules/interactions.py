@@ -5,6 +5,7 @@ from inspect import iscoroutinefunction as is_coroutine
 from discord.errors import NotFound
 from lib.tasks import Loop
 from display import ContextWrapper
+from classes import Player
 
 log = getLogger("pog_bot")
 
@@ -51,6 +52,10 @@ class InteractionHandler:
 
         user = interaction.user
 
+        player = Player.get(interaction.user.id)
+        if not player:
+            return
+
         if await is_spam(user, interaction.message.channel):
             return
 
@@ -66,7 +71,7 @@ class InteractionHandler:
                 funcs = [self.__callback]
             for func in funcs:
                 if is_coroutine(func):
-                    await func(interaction_id, interaction, interaction_values)
+                    await func(player, interaction_id, interaction, interaction_values)
                 else:
                     func(interaction_id, interaction, interaction_values)
                 if self.__disable_after_use:

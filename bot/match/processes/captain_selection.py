@@ -15,6 +15,7 @@ import modules.config as cfg
 import modules.reactions as reactions
 import modules.roles as roles
 from modules.tools import UnexpectedError
+import modules.interactions as interactions
 
 log = getLogger("pog_bot")
 
@@ -29,9 +30,19 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         self.captains = [None, None]
 
         self.volunteer_rh = reactions.SingleMessageReactionHandler()
+        self.volunteer_ih = interactions.InteractionHandler(disable_after_use=False)
 
         self.accept_rh = reactions.ReactionHandler(auto_destroy=True)
+        self.accept_ih = interactions.InteractionHandler()
         self.accept_msg = [None, None]
+
+        @self.volunteer_ih.callback('volunteer')
+        async def volunteer(player, interaction_id, interaction, interaction_values):
+            pass
+
+        @self.accept_ih.callback('accept', 'decline')
+        async def answer(player, interaction_id, interaction, interaction_values):
+            pass
 
         @self.volunteer_rh.reaction("🖐️")
         async def volunteer(reaction, player, user, msg):
@@ -137,8 +148,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             await self.add_captain(i, player)
         else:
             self.captains[i] = None
-            ctx = ContextWrapper.wrap(self.match.channel)
-            ctx.author = player
+            ctx = ContextWrapper.wrap(self.match.channel, author=player)
             await disp.CAP_DENY_OK.send(ctx)
             self.auto_captain.restart()
             await self.get_new_auto(i)

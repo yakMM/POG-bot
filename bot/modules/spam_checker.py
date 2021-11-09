@@ -23,8 +23,7 @@ async def is_spam(author, channel):
     if __spam_list[a_id] == 1:
         return False
     if __spam_list[a_id] % __SPAM_MSG_FREQUENCY == 0:
-        ctx = ContextWrapper.wrap(channel)
-        ctx.author = author
+        ctx = ContextWrapper.wrap(channel, author=author)
         await disp.STOP_SPAM.send(ctx)
     return True
 

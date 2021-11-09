@@ -104,8 +104,7 @@ async def on_message(client, message):
                 i = message.content[1:].index('=')
                 message.content = message.content[i+1:]
             except (ValueError, IndexError):
-                ctx = ContextWrapper.wrap(message.channel)
-                ctx.author = actual_author
+                ctx = ContextWrapper.wrap(message.channel, author=actual_author)
                 await disp.WRONG_USAGE.send(ctx, "as")
                 spam_checker.unlock(actual_author.id)
                 return

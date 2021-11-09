@@ -1,4 +1,4 @@
-from display import AllStrings as disp, ContextWrapper
+from display import AllStrings as disp, ContextWrapper, InteractionContext
 from lib.tasks import loop
 
 from classes import ActivePlayer, Player, Team
@@ -8,7 +8,7 @@ from match import MatchStatus
 from .process import Process
 from match.classes import BaseSelector
 
-from modules.interactions import InteractionHandler, InteractionInvalid, InteractionNotAllowed
+import modules.interactions as interactions
 
 
 class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
@@ -19,7 +19,10 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
         self.match.base_selector = BaseSelector(self.match, base_pool=True)
 
-        self.interaction_handler = InteractionHandler(disable_after_use=False, single_callback=self.interaction_callback)
+        self.interaction_handler = interactions.InteractionHandler(
+            disable_after_use=False,
+            single_callback=self.interaction_callback
+        )
 
         self.match.teams[0].captain.is_turn = True
         self.match.teams[1].captain.is_turn = False
@@ -29,23 +32,20 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
         super().__init__(match)
 
-    async def interaction_callback(self, interaction_id, interaction, interaction_values):
-        player = Player.get(interaction.user.id)
-        if not player:
-            raise InteractionNotAllowed
-        ctx = ContextWrapper.wrap(interaction.response, ephemeral=True)
-        ctx.author = interaction.user
-        captain, msg = get_check_captain(ctx, self.match.proxy)
+    async def interaction_callback(self, player, interaction_id, interaction, values):
+        i_ctx = InteractionContext(interaction)
+        captain, msg = get_check_captain(i_ctx, self.match.proxy)
         if msg:
             await msg
-            return
+            raise interactions.InteractionNotAllowed
         try:
             picked = self.players[int(interaction_id)]
         except (ValueError, KeyError):
-            raise InteractionInvalid(f"could not find a player matching interaction_id: {interaction_id}")
+            raise interactions.InteractionInvalid(
+                f"could not find a player matching interaction_id: {interaction_id}"
+            )
 
-        ctx = ContextWrapper.wrap(self.match.channel)
-        ctx.author = interaction.user
+        ctx = ContextWrapper.wrap(self.match.channel, author=interaction.user)
         await self.pick_end(ctx, picked, captain, ping_player=True)
 
     @Process.init_loop

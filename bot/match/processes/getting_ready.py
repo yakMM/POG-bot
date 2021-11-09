@@ -41,8 +41,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
                 raise reactions.UserLackingPermission
             if player.active not in (self.match.teams[0].captain, self.match.teams[1].captain):
                 raise reactions.UserLackingPermission
-            ctx = ContextWrapper.wrap(self.match.channel)
-            ctx.author = user
+            ctx = ContextWrapper.wrap(self.match.channel, author=user)
             ctx.cmd_name = "ready"
             await self.ready(ctx, player.active)
 

@@ -1,2 +1,2 @@
 from .strings import AllStrings
-from .classes import ContextWrapper
+from .classes import ContextWrapper, InteractionContext

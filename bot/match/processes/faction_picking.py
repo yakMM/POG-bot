@@ -55,8 +55,7 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
         async def pick_faction(reaction, player, user, msg):
             for faction in ["VS", "NC", "TR"]:
                 if str(reaction) == cfg.emojis[faction]:
-                    ctx = ContextWrapper.wrap(self.match.channel)
-                    ctx.author = user
+                    ctx = ContextWrapper.wrap(self.match.channel, author=user)
                     msg = await self.do_pick(ctx, player.active.team, faction)
                     if msg:
                         await self.reaction_handler.set_new_msg(msg)

@@ -2,10 +2,11 @@ import modules.reactions as reactions
 import modules.interactions as interactions
 from modules.tools import UnexpectedError
 
-from display import AllStrings as disp, ContextWrapper
+from display import AllStrings as disp, ContextWrapper, InteractionContext
 from match import MatchStatus
 from classes import Player
 import modules.config as cfg
+from match.common import get_check_captain
 
 
 class CaptainValidator:
@@ -17,49 +18,42 @@ class CaptainValidator:
         self.channel = match.channel
         self.confirm_func = None
 
-        @self.ih.callback('accept', 'decline')
-        async def interaction_result(interaction_id, interaction, values):
-            if self.match.status is MatchStatus.IS_RUNNING:
-                raise interactions.InteractionInvalid("Match is running!")
-            user = interaction.user
-            player = Player.get(user.id)
-            if not player:
+        self.add_callbacks(self.ih)
+
+    async def callback_check(self, interaction):
+        if self.match.status is MatchStatus.IS_RUNNING:
+            raise interactions.InteractionInvalid("Match is running!")
+        i_ctx = InteractionContext(interaction)
+        captain, msg = get_check_captain(i_ctx, self.match, check_turn=False)
+        if msg:
+            await msg
+            raise interactions.InteractionNotAllowed
+        return i_ctx, captain
+
+    def add_callbacks(self, ih):
+        @self.ih.callback('accept')
+        async def accept(player, interaction_id, interaction, values):
+            interaction_ctx, captain = await self.callback_check(interaction)
+            ctx = ContextWrapper.wrap(self.match.channel, author=interaction.user)
+            if captain is not self.expected:
+                await disp.CONFIRM_NOT_CAPTAIN.send(interaction_ctx, self.expected.mention)
                 raise interactions.InteractionNotAllowed
-            interaction_ctx = ContextWrapper.wrap(interaction.response, ephemeral=True)
-            if player.active:
-                a_p = player.active
-                ctx = ContextWrapper.wrap(self.channel)
-                ctx.author = user
-                if not self.is_captain(a_p):
-                    await disp.PK_NOT_CAPTAIN.send(
-                        interaction_ctx)
-                    raise interactions.InteractionNotAllowed
-                if interaction_id == "accept":
-                    if a_p is not self.expected:
-                        await disp.CONFIRM_NOT_CAPTAIN.send(
-                            interaction_ctx,
-                            self.expected.mention)
-                        raise interactions.InteractionNotAllowed
-                    elif self.confirm_func:
-                        kwargs = self.kwargs
-                        self.clean()
-                        await self.confirm_func(ctx, **kwargs)
-                    else:
-                        raise interactions.InteractionInvalid("no confirm function!")
-                elif interaction_id == "decline":
-                    if a_p is self.expected:
-                        self.clean()
-                        await disp.CONFIRM_DECLINE.send(ctx)
-                    else:
-                        self.clean()
-                        await disp.CONFIRM_CANCELED.send(ctx)
-            elif player.match:
-                await disp.PK_WAIT_FOR_PICK.send(interaction_ctx)
-                raise interactions.InteractionNotAllowed
+            elif self.confirm_func:
+                kwargs = self.kwargs
+                self.clean()
+                await self.confirm_func(ctx, **kwargs)
             else:
-                await disp.PK_NO_LOBBIED.send(interaction_ctx,
-                                                        cfg.channels["lobby"])
-                raise interactions.InteractionNotAllowed
+                raise interactions.InteractionInvalid("no confirm function!")
+
+        @self.ih.callback('decline')
+        async def decline(player, interaction_id, interaction, values):
+            interaction_ctx, captain = await self.callback_check(interaction)
+            ctx = ContextWrapper.wrap(self.match.channel, author=interaction.user)
+            self.clean()
+            if captain is self.expected:
+                await disp.CONFIRM_DECLINE.send(ctx)
+            else:
+                await disp.CONFIRM_CANCELED.send(ctx)
 
     def is_captain(self, captain):
         if not captain.is_captain:
