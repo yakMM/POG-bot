@@ -32,9 +32,9 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         player = Player.get(interaction.user.id)
         if not player:
             raise InteractionNotAllowed
-        ctx = ContextWrapper.wrap(interaction.response)
+        ctx = ContextWrapper.wrap(interaction.response, ephemeral=True)
         ctx.author = interaction.user
-        captain, msg = get_check_captain(ctx, self.match.proxy, ephemeral=True)
+        captain, msg = get_check_captain(ctx, self.match.proxy)
         if msg:
             await msg
             return
@@ -53,12 +53,14 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             and ask them to start picking players.
         """
         # Ready for players to pick
-        await self.interaction_handler.show(disp.MATCH_SHOW_PICKS, self.match.channel, self.match.teams[0].captain.mention,
+        ctx = self.interaction_handler.get_new_context(self.match.channel)
+        await disp.MATCH_SHOW_PICKS.send(ctx, self.match.teams[0].captain.mention,
                                          match=self.match.proxy)
 
     @Process.public
     async def info(self, ctx=None):
-        await self.interaction_handler.show(disp.PK_SHOW_TEAMS, self.match.channel, match=self.match.proxy)
+        ctx = self.interaction_handler.get_new_context(self.match.channel)
+        await disp.PK_SHOW_TEAMS.send(ctx, match=self.match.proxy)
 
     @property
     def picking_captain(self):
@@ -91,7 +93,8 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             self.players[new_player.id] = new_player
             # Clean subbed one and send message
             subbed.on_player_clean()
-            await self.interaction_handler.show(disp.SUB_OKAY, self.match.channel, new_player.mention, subbed.mention, match=self.match.proxy)
+            ctx = self.interaction_handler.get_new_context(self.match.channel)
+            await disp.SUB_OKAY.send(ctx, new_player.mention, subbed.mention, match=self.match.proxy)
             return
 
     @Process.public
@@ -169,7 +172,8 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         # Else ping the other captain
         else:
             other = self.match.teams[team.id - 1]
-            await self.interaction_handler.show(disp.PK_OK, ctx, other.captain.mention, match=self.match.proxy)
+            ctx = self.interaction_handler.get_new_context(ctx)
+            await disp.PK_OK.send(ctx, other.captain.mention, match=self.match.proxy)
 
     def do_pick(self, team: Team, player):
         """

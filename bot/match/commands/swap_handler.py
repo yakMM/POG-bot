@@ -85,7 +85,5 @@ class SwapHandler(InstantiatedCommand):
             return
         else:
             other_captain = self.match.teams[captain.team.id - 1].captain
-            self.validator.arm(captain, p_1=players[0], p_2=players[1])
-            await self.validator.show(disp.SWAP_OK_CONFIRM,
-                                      self.match.channel,
-                                      other_captain.mention)
+            ctx = self.validator.arm(self.match.channel, captain, p_1=players[0], p_2=players[1])
+            await disp.SWAP_OK_CONFIRM.send(ctx, other_captain.mention)

@@ -94,5 +94,5 @@ class SubHandler(InstantiatedCommand):
             return
         else:
             other_captain = self.match.teams[captain.team.id - 1].captain
-            self.validator.arm(captain, subbed=subbed)
-            await self.validator.show(disp.SUB_OK_CONFIRM, self.match.channel, subbed.mention, other_captain.mention)
+            ctx = self.validator.arm(self.match.channel, captain, subbed=subbed)
+            await disp.SUB_OK_CONFIRM.send(ctx, subbed.mention, other_captain.mention)

@@ -2,7 +2,7 @@ from discord import ui, SelectOption, ButtonStyle
 import operator
 
 
-def selected_bases(ctx, callback, bases_list):
+def selected_bases(ctx, bases_list):
     """ Returns a list of bases currently selected
     """
 
@@ -28,7 +28,7 @@ def selected_bases(ctx, callback, bases_list):
         options.append(SelectOption(label=base['name'], description=description, emoji=emoji, value=base['id']))
 
     select = ui.Select(placeholder='Choose a base...', options=options, custom_id='base_selector')
-    select.callback = callback
+    select.callback = ctx.callback
     # select.disabled = True
     view = ui.View(timeout=None)
 
@@ -37,12 +37,12 @@ def selected_bases(ctx, callback, bases_list):
     return view
 
 
-def validation_view(ctx, callback):
+def validation_view(ctx):
     decline = ui.Button(label="Decline", style=ButtonStyle.red, custom_id='decline')
     accept = ui.Button(label="Accept", style=ButtonStyle.green, custom_id='accept')
 
-    decline.callback = callback
-    accept.callback = callback
+    decline.callback = ctx.callback
+    accept.callback = ctx.callback
 
     view = ui.View(timeout=None)
 
@@ -54,12 +54,11 @@ def validation_view(ctx, callback):
 
 def player_view(ctx, **kwargs):
     match = kwargs['match']
-    if 'callback' in kwargs:
-        players = match.get_left_players()
-        if players:
-            view = ui.View(timeout=None)
-            for p in match.get_left_players():
-                button = ui.Button(label=p.name, style=ButtonStyle.gray, custom_id=str(p.id))
-                button.callback = kwargs['callback']
-                view.add_item(button)
-            return view
+    players = match.get_left_players()
+    if players:
+        view = ui.View(timeout=None)
+        for p in match.get_left_players():
+            button = ui.Button(label=p.name, style=ButtonStyle.gray, custom_id=str(p.id))
+            button.callback = ctx.callback
+            view.add_item(button)
+        return view

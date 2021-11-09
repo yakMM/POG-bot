@@ -118,7 +118,9 @@ class BaseSelector:
                         picker = team.captain
                         break
                 if not picker:
-                    await disp.PK_NOT_CAPTAIN.send_ephemeral(interaction.response)
+                    interaction_ctx = ContextWrapper.wrap(interaction.response,
+                                                          ephemeral=True)
+                    await disp.PK_NOT_CAPTAIN.send(interaction_ctx)
                     raise InteractionNotAllowed
             ctx = ContextWrapper.wrap(self.__match.channel)
             ctx.author = author
@@ -162,7 +164,8 @@ class BaseSelector:
             mentions = ctx.author.mention
         await disp.BASE_CALENDAR.send(ctx, mentions)
         if self.__selection:
-            await self.__base_interaction.show(disp.BASE_SHOW_LIST, ctx, bases_list=self.bases_list)
+            ctx = self.__base_interaction.get_new_context(ctx)
+            await disp.BASE_SHOW_LIST.send(ctx, bases_list=self.bases_list)
 
     def find_by_id(self, base_id):
         for base in self.__selection:
@@ -182,15 +185,16 @@ class BaseSelector:
             self.__selection = current_list
             self.__was_selection_modified = True
             self.__validator.clean()
-            await self.__base_interaction.show(disp.BASE_SHOW_LIST, ctx, bases_list=self.bases_list)
+            ctx = self.__base_interaction.get_new_context(ctx)
+            await disp.BASE_SHOW_LIST.send(ctx, bases_list=self.bases_list)
 
     async def __select_base(self, ctx, picker, base):
         if is_admin(ctx.author):
             await self.__validator.force_confirm(ctx, base=base)
             return
         other_captain = self.__match.teams[picker.team.id - 1].captain
-        self.__validator.arm(picker, base=base)
-        await self.__validator.show(disp.BASE_OK_CONFIRM, ctx, base.name, other_captain.mention)
+        ctx = self.__validator.arm(ctx, picker, base=base)
+        await disp.BASE_OK_CONFIRM.send(ctx, base.name, other_captain.mention)
         if self.is_base_booked(base):
             await disp.BASE_BOOKED.send(ctx, other_captain.mention, base.name)
 

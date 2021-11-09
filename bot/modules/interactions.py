@@ -4,6 +4,7 @@ from logging import getLogger
 from inspect import iscoroutinefunction as is_coroutine
 from discord.errors import NotFound
 from lib.tasks import Loop
+from display import ContextWrapper
 
 log = getLogger("pog_bot")
 
@@ -28,12 +29,20 @@ class InteractionHandler:
         self.__msg = None
         self.__locked = False
 
-    async def show(self, disp_object, ctx, *args, **kwargs):
+    def get_new_context(self, ctx):
         self.__locked = True
         if self.__msg:
             self.clean()
-        kwargs['callback'] = self.run
-        self.__msg = await disp_object.send(ctx, *args, **kwargs)
+        if not isinstance(ctx, ContextWrapper):
+            ctx = ContextWrapper.wrap(ctx)
+        ctx.callback = self.run
+        ctx.message_callback = self.message_callback
+        return ctx
+
+    def message_callback(self, msg):
+        if self.__msg:
+            self.clean()
+        self.__msg = msg
         self.__locked = False
 
     async def run(self, interaction: Interaction):

@@ -25,19 +25,21 @@ class CaptainValidator:
             player = Player.get(user.id)
             if not player:
                 raise interactions.InteractionNotAllowed
+            interaction_ctx = ContextWrapper.wrap(interaction.response, ephemeral=True)
             if player.active:
                 a_p = player.active
                 ctx = ContextWrapper.wrap(self.channel)
                 ctx.author = user
                 if not self.is_captain(a_p):
-                    await disp.PK_NOT_CAPTAIN.send_ephemeral(
-                        interaction.response)
+                    await disp.PK_NOT_CAPTAIN.send(
+                        interaction_ctx)
                     raise interactions.InteractionNotAllowed
                 if interaction_id == "accept":
                     if a_p is not self.expected:
-                        await disp.CONFIRM_NOT_CAPTAIN.send_ephemeral(
-                            interaction.response,
+                        await disp.CONFIRM_NOT_CAPTAIN.send(
+                            interaction_ctx,
                             self.expected.mention)
+                        raise interactions.InteractionNotAllowed
                     elif self.confirm_func:
                         kwargs = self.kwargs
                         self.clean()
@@ -52,10 +54,10 @@ class CaptainValidator:
                         self.clean()
                         await disp.CONFIRM_CANCELED.send(ctx)
             elif player.match:
-                await disp.PK_WAIT_FOR_PICK.send_ephemeral(interaction.response)
+                await disp.PK_WAIT_FOR_PICK.send(interaction_ctx)
                 raise interactions.InteractionNotAllowed
             else:
-                await disp.PK_NO_LOBBIED.send_ephemeral(interaction.response,
+                await disp.PK_NO_LOBBIED.send(interaction_ctx,
                                                         cfg.channels["lobby"])
                 raise interactions.InteractionNotAllowed
 
@@ -81,12 +83,10 @@ class CaptainValidator:
             self.clean()
             await self.confirm_func(ctx, **kwargs)
 
-    def arm(self, captain, **kwargs):
+    def arm(self, ctx, captain, **kwargs):
         if not self.is_captain(captain):
             raise UnexpectedError("Request from unknown player!")
         other = self.match.teams[captain.team.id - 1].captain
         self.expected = other
         self.kwargs = kwargs
-
-    async def show(self, disp_object, ctx, *args, **kwargs):
-        await self.ih.show(disp_object, ctx, *args, **kwargs)
+        return self.ih.get_new_context(ctx)

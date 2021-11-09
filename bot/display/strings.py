@@ -270,14 +270,8 @@ class AllStrings(Enum):
         if not isinstance(ctx, ContextWrapper):
             ctx = ContextWrapper.wrap(ctx)
         kwargs = self.value.get_elements(ctx, string_args=args, ui_kwargs=kwargs)
-        return await ctx.send(**kwargs)
+        return await ctx.send(kwargs)
 
-    async def send_ephemeral(self, ctx, *args, **kwargs):
-        if not isinstance(ctx, ContextWrapper):
-            ctx = ContextWrapper.wrap(ctx)
-        kwargs = self.value.get_elements(ctx, string_args=args, ui_kwargs=kwargs)
-        kwargs['ephemeral'] = True
-        return await ctx.send(**kwargs)
 
     async def edit(self, msg, *args, **kwargs):
         """
@@ -295,6 +289,6 @@ class AllStrings(Enum):
         if not isinstance(ctx, ContextWrapper):
             ctx = ContextWrapper.wrap(ctx)
         kwargs = self.value.get_elements(ctx, string_args=args, image_path=image_path)
-        return await ctx.send(**kwargs)
+        return await ctx.send(kwargs)
 
 

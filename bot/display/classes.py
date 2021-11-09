@@ -20,7 +20,7 @@ class Message:
             icon_url = "https://media.discordapp.net/attachments/739231714554937455/739522071423614996/logo_png.png")
 
             elements['embed'] = embed
-        if self.__ui_view:
+        if self.__ui_view and ctx.callback:
             view = self.__ui_view(ctx, **kwargs)
             elements['view'] = view
 
@@ -61,7 +61,7 @@ class ContextWrapper:
         cls.client = client
 
     @classmethod
-    def wrap(cls, ctx):
+    def wrap(cls, ctx, ephemeral=False):
         try:
             cmd_name = ctx.command.name
         except AttributeError:
@@ -73,15 +73,20 @@ class ContextWrapper:
         try:
             author = ctx.author
         except AttributeError:
-            author = None
+            try:
+                author = ctx.user
+            except AttributeError:
+                author = None
         try:
             message = ctx.message
         except AttributeError:
             message = None
         try:
-            return cls(author, cmd_name, channel_id, message, ctx.send)
+            obj = cls(author, cmd_name, channel_id, message, ctx.send)
         except AttributeError:
-            return cls(author, cmd_name, channel_id, message, ctx.send_message)
+            # Ephemeral only allowed for interaction response
+            obj = cls(author, cmd_name, channel_id, message, ctx.send_message, ephemeral)
+        return obj
 
     @classmethod
     def user(cls, user_id):
@@ -93,9 +98,21 @@ class ContextWrapper:
         channel = cls.client.get_channel(channel_id)
         return cls(None, cmd_name, channel_id, None, channel.send)
 
-    def __init__(self, author, cmd_name, channel_id, message, send):
+    def __init__(self, author, cmd_name, channel_id, message, send, ephemeral=False):
         self.author = author
         self.cmd_name = cmd_name
         self.channel_id = channel_id
-        self.send = send
+        self.send_fct = send
         self.message = message
+        self.__ephemeral = ephemeral
+        self.callback = None
+        self.message_callback = None
+
+    async def send(self, kwargs):
+        if self.__ephemeral:
+            kwargs['ephemeral'] = True
+        msg = await self.send_fct(**kwargs)
+        if self.message_callback:
+            self.message_callback(msg)
+        return msg
+

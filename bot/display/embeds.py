@@ -351,11 +351,10 @@ def flip_accounts(ctx, account_names):
     return embed
 
 
-def team_update(ctx, **kwargs):
+def team_update(ctx, match):
     """ Returns the current teams
     """
     # title = ""
-    match = kwargs['match']
     if match.round_no != 0:
         title = f"Match {match.id} - Round {match.round_no}"
     else:
