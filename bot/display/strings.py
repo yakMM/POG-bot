@@ -58,7 +58,11 @@ class AllStrings(Enum):
     PK_TOO_MUCH = Message("You can't pick more than one player at the same time!")
     PK_INVALID = Message("You can't pick that player!")
     PK_OK = Message("Player picked! {} your turn, pick a player!", embed=embeds.team_update, ui_view=views.player_view, ping=False)
+    PK_P_OK = Message("Picked {}! {} your turn, pick a player!",
+                    embed=embeds.team_update, ui_view=views.player_view,
+                    ping=False)
     PK_OK_2 = Message("Player picked!", ping=False)
+    PK_P_OK_2 = Message("Picked {}!", ping=False)
     PK_LAST = Message("Assigned {} to {}!", embed=embeds.team_update)
     PK_OK_FACTION = Message("Teams are ready! {} pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting below!",
                             ping=False)

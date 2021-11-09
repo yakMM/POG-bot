@@ -10,6 +10,7 @@ from match.classes import BaseSelector
 
 from modules.interactions import InteractionHandler, InteractionInvalid, InteractionNotAllowed
 
+
 class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
     def __init__(self, match, p_list):
@@ -45,7 +46,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
         ctx = ContextWrapper.wrap(self.match.channel)
         ctx.author = interaction.user
-        await self.pick_end(ctx, picked, captain)
+        await self.pick_end(ctx, picked, captain, ping_player=True)
 
     @Process.init_loop
     async def init(self):
@@ -161,19 +162,25 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         # Do selection
         await self.pick_end(ctx, picked, captain)
 
-    async def pick_end(self, ctx, picked, captain):
+    async def pick_end(self, ctx, picked, captain, ping_player=False):
         # Do selection
         team = captain.team
         self.do_pick(team, picked)
 
         # If player pick is over
         if len(self.players) == 0:
-            await disp.PK_OK_2.send(ctx, match=self.match.proxy)
+            if ping_player:
+                await disp.PK_P_OK_2.send(ctx, picked.mention, match=self.match.proxy)
+            else:
+                await disp.PK_OK_2.send(ctx, match=self.match.proxy)
         # Else ping the other captain
         else:
             other = self.match.teams[team.id - 1]
             ctx = self.interaction_handler.get_new_context(ctx)
-            await disp.PK_OK.send(ctx, other.captain.mention, match=self.match.proxy)
+            if ping_player:
+                await disp.PK_P_OK.send(ctx, picked.mention, other.captain.mention, match=self.match.proxy)
+            else:
+                await disp.PK_OK.send(ctx, other.captain.mention, match=self.match.proxy)
 
     def do_pick(self, team: Team, player):
         """
