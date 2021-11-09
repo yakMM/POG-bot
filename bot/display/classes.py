@@ -5,10 +5,10 @@ import modules.config as cfg
 class Message:
     """ Class for the enum to use
     """
-    def __init__(self, string, ping=True, embed=None, ui_view=None):
+    def __init__(self, string, ping=True, embed=None, view=None):
         self.__str = string
         self.__embed_fct = embed
-        self.__ui_view = ui_view
+        self.__view = view
         self.__ping = ping
 
     def get_ui(self, ctx, elements, kwargs):
@@ -20,8 +20,8 @@ class Message:
             icon_url = "https://media.discordapp.net/attachments/739231714554937455/739522071423614996/logo_png.png")
 
             elements['embed'] = embed
-        if self.__ui_view and ctx.callback:
-            view = self.__ui_view(ctx, **kwargs)
+        if self.__view and ctx.callback:
+            view = self.__view(ctx, **kwargs)
             elements['view'] = view
 
     def get_string(self, ctx, elements, args):

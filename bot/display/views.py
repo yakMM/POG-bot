@@ -1,8 +1,28 @@
 from discord import ui, SelectOption, ButtonStyle
 import operator
 
+views_dict = dict()
 
-def selected_bases(ctx, bases_list):
+
+def view(func):
+    def view_func(ctx, *args):
+        ui_elements = func(*args)
+        if not isinstance(ui_elements, list):
+            ui_elements = [ui_elements]
+        ui_view = ui.View(timeout=None)
+        for ui_element in ui_elements:
+            ui_element.callback = ctx.callback
+            ui_view.add_item(ui_element)
+        return ui_view
+    name = func.__name__
+    if name in views_dict:
+        raise ValueError(f"'{name}' view already exists!")
+    views_dict[name] = view_func
+    return view_func
+
+
+@view
+def bases_selection(ctx, bases_list):
     """ Returns a list of bases currently selected
     """
 
@@ -27,45 +47,24 @@ def selected_bases(ctx, bases_list):
 
         options.append(SelectOption(label=base['name'], description=description, emoji=emoji, value=base['id']))
 
-    select = ui.Select(placeholder='Choose a base...', options=options, custom_id='base_selector')
-    select.callback = ctx.callback
-    # select.disabled = True
-    view = ui.View(timeout=None)
-
-    view.add_item(select)
-
-    return view
+    return ui.Select(placeholder='Choose a base...', options=options, custom_id='base_selector')
 
 
-def validation_view(ctx):
+@view
+def validation_buttons(ctx):
     decline = ui.Button(label="Decline", style=ButtonStyle.red, custom_id='decline')
     accept = ui.Button(label="Accept", style=ButtonStyle.green, custom_id='accept')
 
-    decline.callback = ctx.callback
-    accept.callback = ctx.callback
-
-    view = ui.View(timeout=None)
-
-    view.add_item(accept)
-    view.add_item(decline)
-
-    return view
+    return [decline, accept]
 
 
-def player_view(ctx, match):
+@view
+def players_buttons(ctx, match):
     players = match.get_left_players()
     if players:
-        view = ui.View(timeout=None)
-        for p in match.get_left_players():
-            button = ui.Button(label=p.name, style=ButtonStyle.gray, custom_id=str(p.id))
-            button.callback = ctx.callback
-            view.add_item(button)
-        return view
+        return [ui.Button(label=p.name, style=ButtonStyle.gray, custom_id=str(p.id)) for p in players]
 
 
-def volunteer_view(ctx, match):
-    volunteer = ui.Button(label="Volunteer", style=ButtonStyle.gray, custom_id='volunteer', emoji="🖐️")
-    volunteer.callback = ctx.callback
-    view = ui.View(timeout=None)
-    view.add_item(volunteer)
-    return view
+@view
+def volunteer_button(ctx, match):
+    return ui.Button(label="Volunteer", style=ButtonStyle.gray, custom_id='volunteer', emoji="🖐️")
