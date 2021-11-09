@@ -23,12 +23,13 @@ class InteractionInvalid(Exception):
 
 
 class InteractionHandler:
-    def __init__(self, disable_after_use=True, single_callback=None):
+    def __init__(self, view, disable_after_use=True, single_callback=None):
         self.__disable_after_use = disable_after_use
         self.__f_dict = dict()
         self.__callback = single_callback
         self.__msg = None
         self.__locked = False
+        self.__view = view
 
     def get_new_context(self, ctx):
         self.__locked = True
@@ -38,6 +39,7 @@ class InteractionHandler:
             ctx = ContextWrapper.wrap(ctx)
         ctx.callback = self.run
         ctx.message_callback = self.message_callback
+        ctx.view = self.__view
         return ctx
 
     def message_callback(self, msg):

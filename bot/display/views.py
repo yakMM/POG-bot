@@ -5,8 +5,8 @@ views_dict = dict()
 
 
 def view(func):
-    def view_func(ctx, *args):
-        ui_elements = func(*args)
+    def view_func(ctx, **kwargs):
+        ui_elements = func(ctx, **kwargs)
         if not isinstance(ui_elements, list):
             ui_elements = [ui_elements]
         ui_view = ui.View(timeout=None)

@@ -6,6 +6,7 @@ from discord.ext import commands
 from logging import getLogger
 import modules.config as cfg
 import modules.lobby as lobby
+import modules.database as db
 
 from match import MatchStatus
 
@@ -13,6 +14,8 @@ from display import ContextWrapper
 import modules.tools as tools
 
 log = getLogger("pog_bot")
+
+bot = None
 
 
 def get_ids():
@@ -48,10 +51,22 @@ def test_hand(client):
         t_str = tools.time_diff(ts)
         print(t_str)
 
+    global bot
+    bot = client
+
 
 async def launch(ctx, id_list, tier):
     print("TIER 1")
-    players = [Player.get(id) for id in id_list]
+    players = list()
+    for p_id in id_list:
+        player = Player.get(p_id)
+        if not player:
+            print(f"user {p_id}")
+            user = await bot.fetch_user(p_id)
+            player = Player(user.id, user.name)
+            await db.async_db_call(db.set_element, "users", player.id, player.get_data())
+            await player.register(None)
+        players.append(player)
 
     for p in players:
         lobby.add_to_lobby(p)

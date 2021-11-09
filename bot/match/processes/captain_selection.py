@@ -1,4 +1,4 @@
-from display import AllStrings as disp, ContextWrapper, InteractionContext
+from display import AllStrings as disp, ContextWrapper, InteractionContext, views
 from logging import getLogger
 from random import choice as random_choice
 import discord
@@ -29,10 +29,10 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
         self.captains = [None, None]
 
-        self.volunteer_ih = interactions.InteractionHandler(disable_after_use=False)
+        self.volunteer_ih = interactions.InteractionHandler(views.volunteer_button, disable_after_use=False)
 
         self.accept_rh = reactions.ReactionHandler(auto_destroy=True)
-        self.accept_ih = interactions.InteractionHandler()
+        self.accept_ih = interactions.InteractionHandler(views.validation_buttons)
         self.accept_msg = [None, None]
 
         @self.volunteer_ih.callback('volunteer')

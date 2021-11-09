@@ -2,7 +2,7 @@ import modules.reactions as reactions
 import modules.interactions as interactions
 from modules.tools import UnexpectedError
 
-from display import AllStrings as disp, ContextWrapper, InteractionContext
+from display import AllStrings as disp, ContextWrapper, InteractionContext, views
 from match import MatchStatus
 from classes import Player
 import modules.config as cfg
@@ -11,7 +11,7 @@ from match.common import get_check_captain
 
 class CaptainValidator:
     def __init__(self, match):
-        self.ih = interactions.InteractionHandler(disable_after_use=True)
+        self.ih = interactions.InteractionHandler(views.validation_buttons, disable_after_use=True)
         self.match = match
         self.expected = None
         self.kwargs = dict()

@@ -8,7 +8,7 @@ from classes.bases import Base
 from match.match_status import MatchStatus
 from .captain_validator import CaptainValidator
 
-from display import AllStrings as disp, ContextWrapper, InteractionContext
+from display import AllStrings as disp, ContextWrapper, InteractionContext, views
 
 from modules.jaeger_calendar import get_booked_bases
 from modules.roles import is_admin
@@ -57,7 +57,7 @@ class BaseSelector:
         self.__booked = list()
         self.__reset_selection()
         self.__validator = CaptainValidator(self.__match)
-        self.__base_interaction = InteractionHandler(disable_after_use=False)
+        self.__base_interaction = InteractionHandler(views.bases_selection, disable_after_use=False)
         self.__add_callbacks(self.__validator, self.__base_interaction)
         self._get_booked_from_calendar.start()
 

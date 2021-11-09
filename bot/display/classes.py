@@ -20,7 +20,10 @@ class Message:
             icon_url = "https://media.discordapp.net/attachments/739231714554937455/739522071423614996/logo_png.png")
 
             elements['embed'] = embed
-        if self.__view and ctx.callback:
+        if ctx.view:
+            view = ctx.view(ctx, **kwargs)
+            elements['view'] = view
+        elif self.__view:
             view = self.__view(ctx, **kwargs)
             elements['view'] = view
 
@@ -104,6 +107,7 @@ class ContextWrapper:
         self.message = message
         self.callback = None
         self.message_callback = None
+        self.view = None
 
     async def send(self, kwargs):
         msg = await self.send_fct(**kwargs)

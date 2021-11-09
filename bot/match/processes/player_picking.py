@@ -1,4 +1,4 @@
-from display import AllStrings as disp, ContextWrapper, InteractionContext
+from display import AllStrings as disp, ContextWrapper, InteractionContext, views
 from lib.tasks import loop
 
 from classes import ActivePlayer, Player, Team
@@ -20,6 +20,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         self.match.base_selector = BaseSelector(self.match, base_pool=True)
 
         self.interaction_handler = interactions.InteractionHandler(
+            views.players_buttons,
             disable_after_use=False,
             single_callback=self.interaction_callback
         )
