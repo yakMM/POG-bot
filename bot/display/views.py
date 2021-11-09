@@ -52,8 +52,7 @@ def validation_view(ctx):
     return view
 
 
-def player_view(ctx, **kwargs):
-    match = kwargs['match']
+def player_view(ctx, match):
     players = match.get_left_players()
     if players:
         view = ui.View(timeout=None)
@@ -62,3 +61,11 @@ def player_view(ctx, **kwargs):
             button.callback = ctx.callback
             view.add_item(button)
         return view
+
+
+def volunteer_view(ctx, match):
+    volunteer = ui.Button(label="Volunteer", style=ButtonStyle.gray, custom_id='volunteer', emoji="🖐️")
+    volunteer.callback = ctx.callback
+    view = ui.View(timeout=None)
+    view.add_item(volunteer)
+    return view

@@ -87,13 +87,6 @@ class ContextWrapper:
         return cls(author, cmd_name, channel_id, message, ctx.send)
 
     @classmethod
-    def interaction(cls, interaction, ephemeral=True):
-
-        if ephemeral:
-            obj.ephemeral = True
-        return obj
-
-    @classmethod
     def user(cls, user_id):
         user = cls.client.get_user(user_id)
         return cls(user, "?", user_id, None, user.send)

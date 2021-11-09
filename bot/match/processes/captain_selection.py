@@ -1,4 +1,4 @@
-from display import AllStrings as disp, ContextWrapper
+from display import AllStrings as disp, ContextWrapper, InteractionContext
 from logging import getLogger
 from random import choice as random_choice
 import discord
@@ -29,7 +29,6 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
         self.captains = [None, None]
 
-        self.volunteer_rh = reactions.SingleMessageReactionHandler()
         self.volunteer_ih = interactions.InteractionHandler(disable_after_use=False)
 
         self.accept_rh = reactions.ReactionHandler(auto_destroy=True)
@@ -38,17 +37,15 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
         @self.volunteer_ih.callback('volunteer')
         async def volunteer(player, interaction_id, interaction, interaction_values):
-            pass
+            if player not in self.p_list:
+                ctx = InteractionContext(interaction)
+                # TODO: display message according to player status
+                raise interactions.InteractionNotAllowed
+            await self.on_volunteer(player)
 
         @self.accept_ih.callback('accept', 'decline')
         async def answer(player, interaction_id, interaction, interaction_values):
             pass
-
-        @self.volunteer_rh.reaction("🖐️")
-        async def volunteer(reaction, player, user, msg):
-            if player not in self.p_list:
-                raise reactions.UserLackingPermission
-            await self.on_volunteer(player)
 
         @self.accept_rh.reaction("✅", "❌")
         async def answer(reaction, player, user, msg):
@@ -107,14 +104,14 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             p.on_player_clean()
         reactions.auto_clear(self.accept_msg[0])
         reactions.auto_clear(self.accept_msg[1])
-        self.volunteer_rh.clear()
+        self.volunteer_ih.clean()
         await self.match.clean_all_auto()
         await disp.MATCH_CLEARED.send(ctx)
 
     @Process.public
     async def info(self, ctx=None):
-        msg = await disp.CAP_WAITING.send(self.match.channel, match=self.match.proxy)
-        await self.volunteer_rh.set_new_msg(msg)
+        ctx = self.volunteer_ih.get_new_context(self.match.channel)
+        await disp.CAP_WAITING.send(ctx, match=self.match.proxy)
 
     @Process.public
     async def on_volunteer(self, player):
@@ -185,7 +182,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         if all_captains_selected:
             self.match.ready_next_process(self.p_list)
             self.auto_captain.cancel()
-            self.volunteer_rh.clear()
+            self.volunteer_ih.clean()
         await disp.CAP_OK.send(self.match.channel, player.mention, self.match.teams[i].name)
         if all_captains_selected:
             self.match.plugin_manager.on_captains_selected()
@@ -256,7 +253,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             subbed.on_player_clean()
             msg = await disp.SUB_OKAY.send(self.match.channel, new_player.mention,
                                            subbed.mention, match=self.match.proxy)
-            await self.volunteer_rh.set_new_msg(msg)
+            # await self.volunteer_rh.set_new_msg(msg)
 
             if i != -1:
                 await self.get_new_auto(i)

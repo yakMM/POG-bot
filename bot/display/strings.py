@@ -130,7 +130,7 @@ class AllStrings(Enum):
                          "environment and all the rewards that I get are insults and wickedness :(")
 
     CAP_WAITING = Message("Waiting for captain(s), use `=captain volunteer` or react below if you want to be one",
-                          ping=False, embed=embeds.team_update)
+                          ping=False, embed=embeds.team_update, ui_view=views.volunteer_view)
     CAP_AUTO_ANNOUNCE = Message("Captains will be automatically suggested in 1 minute!")
     CAP_OK = Message("{} will be captain for {}!", ping=False)
     CAP_AUTO = Message("{} has been designated as captain for {}\n"
