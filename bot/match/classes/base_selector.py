@@ -115,9 +115,8 @@ class BaseSelector:
             captain = None
             if not is_admin(author):
                 i_ctx = InteractionContext(interaction)
-                captain, msg = get_check_captain(i_ctx, self.__match, check_turn=False)
-                if msg:
-                    await msg
+                captain = await get_check_captain(i_ctx, self.__match, check_turn=False)
+                if not captain:
                     raise InteractionNotAllowed
             ctx = ContextWrapper.wrap(self.__match.channel, author=author)
             try:

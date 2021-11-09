@@ -116,12 +116,8 @@ async def after_pick_sub(match, subbed, force_player, clean_subbed=True):
     return new_player
 
 
-def get_check_captain(ctx, match, check_turn=True):
-    """ Test if the player is in position to issue a match command
-        Returns the player object if yes, None if not
-    """
+def get_check_player_sync(ctx, match):
     msg = None
-    a_player = None
     player = Player.get(ctx.author.id)
     if player is None or (player and not player.is_registered):
         # player not registered
@@ -132,7 +128,20 @@ def get_check_captain(ctx, match, check_turn=True):
     elif player.match.channel.id != match.channel.id:
         # if player not in the right match channel
         msg = disp.PK_WRONG_CHANNEL.send(ctx, player.match.channel.id)
-    elif player.active is None:
+    else:
+        return player, msg
+    return None, msg
+
+
+def get_check_captain_sync(ctx, match, check_turn=True):
+    """ Test if the player is in position to issue a match command
+        Returns the player object if yes, None if not
+    """
+    a_player = None
+    player, msg = get_check_player_sync(ctx, match)
+    if msg:
+        return a_player, msg
+    if player.active is None:
         # Player is in the pick list
         msg = disp.PK_WAIT_FOR_PICK.send(ctx)
     elif not player.active.is_captain:
@@ -144,3 +153,17 @@ def get_check_captain(ctx, match, check_turn=True):
     else:
         a_player = player.active
     return a_player, msg
+
+
+async def get_check_player(ctx, match):
+    player, msg = get_check_player_sync(ctx, match)
+    if msg:
+        await msg
+    return player
+
+
+async def get_check_captain(ctx, match, check_turn=True):
+    captain, msg = get_check_captain_sync(ctx, match, check_turn)
+    if msg:
+        await msg
+    return captain

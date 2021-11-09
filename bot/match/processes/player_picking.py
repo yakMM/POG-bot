@@ -35,9 +35,8 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
     async def interaction_callback(self, player, interaction_id, interaction, values):
         i_ctx = InteractionContext(interaction)
-        captain, msg = get_check_captain(i_ctx, self.match.proxy)
-        if msg:
-            await msg
+        captain = await get_check_captain(i_ctx, self.match.proxy)
+        if not captain:
             raise interactions.InteractionNotAllowed
         try:
             picked = self.players[int(interaction_id)]

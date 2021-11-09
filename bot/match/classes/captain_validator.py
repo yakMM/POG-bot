@@ -24,9 +24,8 @@ class CaptainValidator:
         if self.match.status is MatchStatus.IS_RUNNING:
             raise interactions.InteractionInvalid("Match is running!")
         i_ctx = InteractionContext(interaction)
-        captain, msg = get_check_captain(i_ctx, self.match, check_turn=False)
-        if msg:
-            await msg
+        captain = await get_check_captain(i_ctx, self.match, check_turn=False)
+        if not captain:
             raise interactions.InteractionNotAllowed
         return i_ctx, captain
 

@@ -8,7 +8,7 @@ from match import MatchStatus
 import modules.config as cfg
 import modules.roles as roles
 from classes import Player
-from match.common import check_faction, get_check_captain
+from match.common import check_faction, get_check_captain_sync, get_check_captain
 from logging import getLogger
 
 import modules.accounts_handler as accounts
@@ -72,9 +72,8 @@ class CommandFactory(metaclass=MetaFactory):
             return
 
         check_turn = self.match.status not in (MatchStatus.IS_BASING, MatchStatus.IS_WAITING)
-        captain, msg = get_check_captain(ctx, self.match, check_turn=check_turn)
-        if msg:
-            await msg
+        captain = await get_check_captain(ctx, self.match, check_turn=check_turn)
+        if not captain:
             return
 
         if captain.team.is_playing:
@@ -145,9 +144,8 @@ class CommandFactory(metaclass=MetaFactory):
     @Command.command(MatchStatus.IS_WAITING)
     async def ready(self, ctx, args):
         match = self.match.proxy
-        captain, msg = get_check_captain(ctx, match, check_turn=False)
-        if msg:
-            await msg
+        captain = await get_check_captain(ctx, match, check_turn=False)
+        if not captain:
             return
         await match.ready(ctx, captain)
 
@@ -174,7 +172,7 @@ class CommandFactory(metaclass=MetaFactory):
 
         # Check player status
         captain = None
-        captain, msg = get_check_captain(ctx, self.match, check_turn=False)
+        captain, msg = get_check_captain_sync(ctx, self.match, check_turn=False)
         # If player doesn't have the proper status
         if msg:
             if len(args) == 0:

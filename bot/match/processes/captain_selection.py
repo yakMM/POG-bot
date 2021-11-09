@@ -4,7 +4,7 @@ from random import choice as random_choice
 import discord
 
 from match import MatchStatus
-from match.common import get_substitute, after_pick_sub
+from match.common import get_substitute, after_pick_sub, get_check_player
 from .process import Process
 
 from classes import ActivePlayer, Team
@@ -37,10 +37,16 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
         @self.volunteer_ih.callback('volunteer')
         async def volunteer(player, interaction_id, interaction, interaction_values):
-            if player not in self.p_list:
-                ctx = InteractionContext(interaction)
-                # TODO: display message according to player status
+            i_ctx = InteractionContext(interaction)
+            player = await get_check_player(i_ctx, self.match.proxy)
+            if not player:
                 raise interactions.InteractionNotAllowed
+            if player in self.captains:
+                await disp.CAP_ALREADY.send(i_ctx)
+                raise interactions.InteractionNotAllowed
+            if player not in self.p_list:
+                # Should never happen
+                raise interactions.InteractionInvalid("player is valid but not in player list")
             await self.on_volunteer(player)
 
         @self.accept_ih.callback('accept', 'decline')

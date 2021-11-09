@@ -55,9 +55,8 @@ class BenchHandler(InstantiatedCommand):
     async def bench(self, ctx, args, bench):
         captain = None
         if not roles.is_admin(ctx.author):
-            captain, msg = get_check_captain(ctx, self.match, check_turn=False)
-            if msg:
-                await msg
+            captain = await get_check_captain(ctx, self.match, check_turn=False)
+            if not captain:
                 return
 
         if len(ctx.message.mentions) != 1:

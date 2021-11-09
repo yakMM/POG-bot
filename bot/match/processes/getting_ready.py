@@ -12,7 +12,6 @@ import modules.accounts_handler as accounts
 import modules.census as census
 import modules.reactions as reactions
 
-from match.common import get_check_captain
 from modules.asynchttp import ApiNotReachable
 
 log = getLogger("pog_bot")
