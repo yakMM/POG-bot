@@ -85,12 +85,12 @@ async def launch(ctx, id_list, tier):
     cap_1_ctx = ContextWrapper.wrap(ctx.channel)
     cap_1_ctx.message = ctx.message
     cap_1_ctx.author = ctx.guild.get_member(players[0].id)
-    await match.command.captain(cap_1_ctx, ["v"])
+    await match.on_volunteer(players[0])
 
     cap_2_ctx = ContextWrapper.wrap(ctx.channel)
     cap_2_ctx.message = ctx.message
     cap_2_ctx.author = ctx.guild.get_member(players[1].id)
-    await match.command.captain(cap_2_ctx, ["v"])
+    await match.on_volunteer(players[1])
 
     if tier == 2:
         return

@@ -189,7 +189,7 @@ def match_help(ctx):
                     value='`=p @player` - Pick a player in your team\n'
                           '`=p VS`/`NC`/`TR` - Pick a faction\n'
                           '`=base` (`=b`) - Command for the base selection, use `=b help` to know more\n'
-                          '`=ready` - To toggle the ready status of your team\n'
+                          '`=ready` (`=rdy`) - To toggle the ready status of your team\n'
                           '`=sub @player` - Pick someone in queue to replace the player mentioned\n'
                           '`=swap @player1 @player2` - Swap the two players from one team to the other\n'
                           '`=bench`/`=unbench @player` - Bench or un-bench player from the match',
@@ -197,6 +197,7 @@ def match_help(ctx):
     if is_admin(ctx.author):
         embed.add_field(name="Staff commands",
                         value='`=clear` - Clear the match\n'
+                              '`=captain @player` - Make @player a team captain\n'
                               '`=sub @player1 @player2` - Replace player1 by player2\n'
                               '`=check account/online` - Disable account or online check\n'
                               '`=channel freeze`/`unfreeze` - Prevent / Allow players to send messages',

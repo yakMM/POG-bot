@@ -65,9 +65,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def unregister(self, ctx):
-        msg = _check_channels(ctx, cfg.channels["register"])
-        if msg:
-            await msg
+        if not await _check_channels(ctx, cfg.channels["register"]):
             return
         player = await get_check_player(ctx)
         if not player:
@@ -90,9 +88,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def rename(self, ctx, *args):
-        msg = _check_channels(ctx, cfg.channels["register"])
-        if msg:
-            await msg
+        if not _check_channels(ctx, cfg.channels["register"]):
             return
         player = await get_check_player(ctx)
         if not player:
@@ -109,9 +105,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def check(self, ctx, *args):
-        msg = _check_channels(ctx, cfg.channels["matches"])
-        if msg:
-            await msg
+        if not await _check_channels(ctx, cfg.channels["matches"]):
             return
         match = Match.get(ctx.channel.id)
         if match.status is MatchStatus.IS_FREE:
@@ -325,16 +319,35 @@ class AdminCog(commands.Cog, name='admin'):
         else:
             await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
 
+    @commands.command()
+    @commands.guild_only()
+    async def captain(self, ctx):
+        if not await _check_channels(ctx, cfg.channels["matches"]):
+            return
+        match = Match.get(ctx.channel.id)
+        player = await get_check_player(ctx)
+        if not player:
+            return
+        if match.status is not MatchStatus.IS_CAPTAIN:
+            await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
+            return
+        if player.match is match and not player.active:
+            await match.on_volunteer(player)
+        else:
+            await disp.CAP_NOT_OK.send(ctx, player.mention)
+
 
 def setup(client):
     client.add_cog(AdminCog(client))
 
 
-def _check_channels(ctx, channels):
+async def _check_channels(ctx, channels):
     if not isinstance(channels, list):
         channels = [channels]
     if ctx.channel.id not in channels:
-        return disp.WRONG_CHANNEL.send(ctx, ctx.command.name, ", ".join(f"<#{c_id}>" for c_id in channels))
+        await disp.WRONG_CHANNEL.send(ctx, ctx.command.name, ", ".join(f"<#{c_id}>" for c_id in channels))
+        return False
+    return True
 
 
 async def get_check_player(ctx):

@@ -141,6 +141,7 @@ class AllStrings(Enum):
     CAP_DENY_NO = Message("You can't do that, you were not designated as team captain!")
     CAP_DENY_OK = Message("You declined the team captain role!")
     CAP_NEW = Message("{} is the new captain for {}!", ping=False)
+    CAP_NOT_OK = Message("Can't make {} a captain!", ping=False)
 
     MATCH_DM_PING = Message("POG match {} is starting! Please join `{}` channel in the Jaeger Events discord!", ping=False)
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
