@@ -22,6 +22,13 @@ class InteractionInvalid(Exception):
         super().__init__(message)
 
 
+class InteractionPayload:
+    def __init__(self, ih):
+        self.callback = ih.run
+        self.message_callback = ih.message_callback
+        self.view = ih.view
+
+
 class InteractionHandler:
     def __init__(self, view, disable_after_use=True, single_callback=None):
         self.__disable_after_use = disable_after_use
@@ -30,6 +37,7 @@ class InteractionHandler:
         self.__msg = None
         self.__locked = False
         self.__view = view
+        self.__payload = InteractionPayload(self)
 
     def get_new_context(self, ctx):
         self.__locked = True
@@ -37,9 +45,7 @@ class InteractionHandler:
             self.clean()
         if not isinstance(ctx, ContextWrapper):
             ctx = ContextWrapper.wrap(ctx)
-        ctx.callback = self.run
-        ctx.message_callback = self.message_callback
-        ctx.view = self.__view
+        ctx.interaction_payload = self.__payload
         return ctx
 
     def message_callback(self, msg):
@@ -47,6 +53,10 @@ class InteractionHandler:
             self.clean()
         self.__msg = msg
         self.__locked = False
+
+    @property
+    def view(self):
+        return self.__view
 
     async def run(self, interaction: Interaction):
         if self.__locked:

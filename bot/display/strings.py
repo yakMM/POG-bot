@@ -276,7 +276,6 @@ class AllStrings(Enum):
         kwargs = self.value.get_elements(ctx, string_args=args, ui_kwargs=kwargs)
         return await ctx.send(kwargs)
 
-
     async def edit(self, msg, *args, **kwargs):
         """
         Edit the message
