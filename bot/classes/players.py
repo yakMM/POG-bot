@@ -373,7 +373,10 @@ class Player:
 
         # If only 1 string, we add faction names
         if len(char_list) == 1:
-            char_list = [char_list[0] + 'VS', char_list[0] + 'NC', char_list[0] + 'TR']
+            char_name = char_list[0]
+            if char_name[-2::].lower() in ('vs', 'nc', 'tr'):
+                char_name = char_name[:-2:]
+            char_list = [char_name + 'VS', char_name + 'NC', char_name + 'TR']
 
         # Else it should be 3 strings
         if len(char_list) != 3:
