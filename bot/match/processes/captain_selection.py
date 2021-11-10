@@ -228,13 +228,20 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             subbed : Player
                 Player to be substituted
         """
-
+        ctx = self.volunteer_ih.get_new_context(self.match.channel)
         # If subbed one has already been picked
         if subbed.active:
-            await after_pick_sub(self.match, subbed.active, force_player)
+            player = await after_pick_sub(self.match.proxy, subbed.active, force_player, ctx=ctx)
+            if player:
+                if subbed is self.captains[0]:
+                    self.captains[0] = player
+                elif subbed is self.captains[1]:
+                    self.captains[1] = player
+                else:
+                    raise UnexpectedError("Captain not found!")
         else:
             # Get a new player for substitution
-            new_player = await get_substitute(self.match, subbed, player=force_player)
+            new_player = await get_substitute(ctx, self.match.proxy, subbed, player=force_player)
             if not new_player:
                 return
 
@@ -257,9 +264,8 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             self.p_list.append(new_player)
             # Clean subbed one and send message
             subbed.on_player_clean()
-            msg = await disp.SUB_OKAY.send(self.match.channel, new_player.mention,
+            await disp.SUB_OKAY.send(ctx, new_player.mention,
                                            subbed.mention, match=self.match.proxy)
-            # await self.volunteer_rh.set_new_msg(msg)
 
             if i != -1:
                 await self.get_new_auto(i)

@@ -50,7 +50,7 @@ def switch_turn(process, team):
     return other
 
 
-async def get_substitute(match, subbed, player=None):
+async def get_substitute(ctx, match, subbed, player=None):
     """
     Get a substitute player from lobby, return it
 
@@ -63,12 +63,12 @@ async def get_substitute(match, subbed, player=None):
     was_lobbied = (not player) or (player and player.is_lobbied)
     player = get_sub(player)
     if player is None:
-        await disp.SUB_NO_PLAYER.send(match.channel, subbed.mention)
+        await disp.SUB_NO_PLAYER.send(ctx, subbed.mention)
         return
 
     Loop(coro=ping_sub_in_lobby, count=1).start(match, player, was_lobbied)
 
-    await player.on_match_selected(match.proxy)
+    await player.on_match_selected(match)
     return player
 
 
@@ -83,7 +83,7 @@ async def ping_sub_in_lobby(match, new_player, was_lobbied):
         log.warning(f"Player id:[{new_player.id}], name:[{new_player.name}] is refusing DMs")
 
 
-async def after_pick_sub(match, subbed, force_player, clean_subbed=True):
+async def after_pick_sub(match, subbed, force_player, ctx=None, clean_subbed=True):
     """
     Substitute a player by another one picked at random in the lobby.
 
@@ -94,7 +94,9 @@ async def after_pick_sub(match, subbed, force_player, clean_subbed=True):
     :return: Nothing
     """
     # Get a new player for substitution
-    new_player = await get_substitute(match, subbed, player=force_player)
+    if not ctx:
+        ctx = match.channel
+    new_player = await get_substitute(ctx, match, subbed, player=force_player)
     if not new_player:
         return
 
@@ -102,16 +104,16 @@ async def after_pick_sub(match, subbed, force_player, clean_subbed=True):
         subbed.clean()
     team = subbed.team
     # Args for the display later
-    args = [match.channel, new_player.mention, subbed.mention, team.name]
+    args = [ctx, new_player.mention, subbed.mention, team.name]
 
     # Sub the player
     team.sub(subbed, new_player)
 
     # Display what happened
     if new_player.active.is_captain:
-        await disp.SUB_OKAY_CAP.send(*args, match=match.proxy)
+        await disp.SUB_OKAY_CAP.send(*args, match=match)
     else:
-        await disp.SUB_OKAY_TEAM.send(*args, match=match.proxy)
+        await disp.SUB_OKAY_TEAM.send(*args, match=match)
 
     return new_player
 

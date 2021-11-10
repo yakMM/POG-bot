@@ -79,13 +79,13 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             subbed : Player
                 Player to be substituted
         """
-
+        ctx = self.interaction_handler.get_new_context(self.match.channel)
         # If subbed one has already been picked
         if subbed.active:
-            await after_pick_sub(self.match, subbed.active, force_player)
+            await after_pick_sub(self.match.proxy, subbed.active, force_player, ctx=ctx)
         else:
             # Get a new player for substitution
-            new_player = await get_substitute(self.match, subbed, player=force_player)
+            new_player = await get_substitute(ctx, self.match.proxy, subbed, player=force_player)
             if not new_player:
                 return
             # Remove them fro the player list
@@ -94,7 +94,6 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             self.players[new_player.id] = new_player
             # Clean subbed one and send message
             subbed.on_player_clean()
-            ctx = self.interaction_handler.get_new_context(self.match.channel)
             await disp.SUB_OKAY.send(ctx, new_player.mention, subbed.mention, match=self.match.proxy)
             return
 

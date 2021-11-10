@@ -21,8 +21,11 @@ class Message:
 
             elements['embed'] = embed
         if ctx.interaction_payload:
-            view = ctx.interaction_payload.view(ctx, **kwargs)
-            elements['view'] = view
+            try:
+                view = ctx.interaction_payload.view(ctx, **kwargs)
+                elements['view'] = view
+            except TypeError:
+                pass
         elif self.__view:
             view = self.__view(ctx, **kwargs)
             elements['view'] = view
