@@ -285,8 +285,10 @@ class AllStrings(Enum):
         :param kwargs: Keywords arguments to pass to the embed function.
         :return: The message edited.
         """
+        if not isinstance(msg, ContextWrapper):
+            msg = ContextWrapper.wrap(msg)
         kwargs = self.value.get_elements(msg, string_args=args, ui_kwargs=kwargs)
-        return await msg.edit(**kwargs)
+        return await msg.edit(kwargs)
 
     async def image_send(self, ctx, image_path, *args):
         if not isinstance(ctx, ContextWrapper):

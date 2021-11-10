@@ -121,6 +121,42 @@ class CommandFactory(metaclass=MetaFactory):
         else:
             await disp.SC_PLAYERS_STRING.send(ctx, "\n".join(tm.ig_string for tm in self.match.teams))
 
+    @Command.has_help(disp.CAP_HELP)
+    @Command.has_status("info")
+    @Command.command(MatchStatus.IS_CAPTAIN)
+    async def captain(self, ctx, args):
+        match = self.match.proxy
+        player = Player.get(ctx.author.id)
+        if player is None or (player and not player.is_registered):
+            # player not registered
+            await disp.EXT_NOT_REGISTERED.send(ctx, cfg.channels["register"])
+            return
+        elif player.match is None:
+            # if player not in match
+            await disp.PK_NO_LOBBIED.send(ctx, cfg.channels["lobby"])
+            return
+        elif player.match.channel.id != match.channel.id:
+            # if player not in the right match channel
+            await disp.PK_WRONG_CHANNEL.send(ctx, player.match.channel.id)
+            return
+        if len(args) == 1:
+            arg = args[0]
+            if player.active and player.active.is_captain:
+                await disp.CAP_ALREADY.send(ctx)
+                return
+            if arg in ("volunteer", "vol", "v"):
+                await match.on_volunteer(player)
+                return
+            elif arg in ("accept", "acc", "a"):
+                if not await match.on_answer(player, is_accept=True):
+                    await disp.CAP_ACCEPT_NO.send(ctx)
+                return
+            elif arg in ("decline", "dec", "d"):
+                if not await match.on_answer(player, is_accept=False):
+                    await disp.CAP_DENY_NO.send(ctx)
+                return
+        await disp.WRONG_USAGE.send(ctx, ctx.command.name)
+
     @Command.has_help(disp.BASE_HELP)
     @Command.command(*captains_ok_states, MatchStatus.IS_STARTING)
     async def base(self, ctx, args):

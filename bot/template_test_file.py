@@ -127,7 +127,7 @@ async def launch(ctx, id_list, tier):
         await asyncio.sleep(1)
 
     # We assume tester is an admin
-    await match.command.base(ctx, ["1"])
+    await match.command.base(ctx, ["ceres"])
 
     if tier == 5:
         return

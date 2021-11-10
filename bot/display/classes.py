@@ -90,28 +90,35 @@ class ContextWrapper:
             message = ctx.message
         except AttributeError:
             message = None
-        return cls(author, cmd_name, channel_id, message, ctx.send)
+        return cls(author, cmd_name, channel_id, message, ctx)
 
     @classmethod
     def user(cls, user_id):
         user = cls.client.get_user(user_id)
-        return cls(user, "?", user_id, None, user.send)
+        return cls(user, "?", user_id, None, user)
 
     @classmethod
     def channel(cls, channel_id, cmd_name="?"):
         channel = cls.client.get_channel(channel_id)
-        return cls(None, cmd_name, channel_id, None, channel.send)
+        return cls(None, cmd_name, channel_id, None, channel)
 
-    def __init__(self, author, cmd_name, channel_id, message, send):
+    def __init__(self, author, cmd_name, channel_id, message, original_ctx):
         self.author = author
         self.cmd_name = cmd_name
         self.channel_id = channel_id
-        self.send_fct = send
+        self.original_ctx = original_ctx
+        self.send_command = 'send'
         self.message = message
         self.interaction_payload = None
 
     async def send(self, kwargs):
-        msg = await self.send_fct(**kwargs)
+        msg = await getattr(self.original_ctx, self.send_command)(**kwargs)
+        if self.interaction_payload:
+            self.interaction_payload.message_callback(msg)
+        return msg
+
+    async def edit(self, kwargs):
+        msg = await getattr(self.original_ctx, 'edit')(**kwargs)
         if self.interaction_payload:
             self.interaction_payload.message_callback(msg)
         return msg
@@ -123,9 +130,10 @@ class InteractionContext(ContextWrapper):
         channel_id = interaction.channel_id
         author = interaction.user
         message = interaction.message
-        send = interaction.response.send_message
+        ctx = interaction.response
         self.ephemeral = ephemeral
-        super().__init__(author, cmd_name, channel_id, message, send)
+        super().__init__(author, cmd_name, channel_id, message, ctx)
+        self.send_command = 'send_message'
 
     async def send(self, kwargs):
         if self.ephemeral:
