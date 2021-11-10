@@ -7,6 +7,8 @@ Now using discord components instead of the reaction system
 - Now using buttons for CaptainValidator
 - Added buttons for player picking
 - Now using buttons for captain selection phase
+- =captain command is now admin-only
+- It is no longer possible to use message command for accept/decline: only interactions will work
 
 # v3.4:
 This is the last version with the reaction system, newer versions will use discord UI component.
