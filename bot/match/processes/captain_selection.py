@@ -161,7 +161,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             await self.get_new_auto(i)
         return True
 
-    @loop(seconds=20, delay=1, count=2)
+    @loop(minutes=1, delay=1, count=2)
     async def auto_captain(self):
         for i in range(2):
             await self.get_new_auto(i)
