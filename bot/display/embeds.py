@@ -183,7 +183,6 @@ def match_help(ctx):
     embed = Embed(colour=Color.blurple())
     embed.add_field(name='Match commands',
                     value='`=info` (`=i`) - Display the match status and team composition\n'
-                          '`=captain` (`=c`) - Command for captain selection, use `=c help` to know more\n'
                           "`=squittal` - Display player data for integration in Chirtle's script",
                     inline=False)
     embed.add_field(name='Team Captain commands',

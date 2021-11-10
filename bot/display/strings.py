@@ -129,12 +129,12 @@ class AllStrings(Enum):
     BOT_U_DUMB = Message("That's not really nice, I'm doing my best to bring 24/7 Jaeger matches in a friendly "
                          "environment and all the rewards that I get are insults and wickedness :(")
 
-    CAP_WAITING = Message("Waiting for captain(s), use `=captain volunteer` or react below if you want to be one",
+    CAP_WAITING = Message("Waiting for captain(s), volunteer if you want to be one",
                           ping=False, embed=embeds.team_update, view=views.volunteer_button)
     CAP_AUTO_ANNOUNCE = Message("Captains will be automatically suggested in 1 minute!")
     CAP_OK = Message("{} will be captain for {}!", ping=False)
     CAP_AUTO = Message("{} has been designated as captain for {}\n"
-                       "Accept or decline with `=captain accept/decline` or by reacting below!")
+                       "Accept if you agree!", view=views.validation_buttons)
     CAP_HELP = Message("Here are the available captain commands:", embed=embeds.captain_help)
     CAP_ALREADY = Message("You can't do that! You are already a team captain!")
     CAP_ACCEPT_NO = Message("You can't do that! Volunteer if you want to be captain!")
@@ -250,7 +250,7 @@ class AllStrings(Enum):
     SWAP_MENTION_2 = Message("Invalid request! @ mention two players to swap!")
     SWAP_NO = Message("{} can't be swapped!", ping=False)
     SWAP_SAME_TEAM = Message("Invalid request! Can't swap two players of the same team!", ping=False)
-    SWAP_OK_CONFIRM = Message("Swapping players! {} accept if you agree! (use `=swap accept/decline` or react below)")
+    SWAP_OK_CONFIRM = Message("Swapping players! {} accept if you agree!", view=views.validation_buttons)
 
     BENCH_MENTION = Message("Invalid request! @ mention one player to bench!")
     BENCH_NO = Message("{} can't be benched!", ping=False)

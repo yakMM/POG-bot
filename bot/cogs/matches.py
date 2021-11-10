@@ -27,13 +27,6 @@ class MatchesCog(commands.Cog, name='matches'):
     =squittal
     """
 
-    @commands.command(aliases=['c', 'cap'])
-    @commands.guild_only()
-    @commands.max_concurrency(number=1, wait=True)
-    async def captain(self, ctx, *args):
-        match = Match.get(ctx.channel.id)
-        await match.command.captain(ctx, args)
-
     @commands.command()
     @commands.guild_only()
     @commands.max_concurrency(number=1, wait=True)

@@ -31,9 +31,11 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
         self.volunteer_ih = interactions.InteractionHandler(views.volunteer_button, disable_after_use=False)
 
-        self.accept_rh = reactions.ReactionHandler(auto_destroy=True)
-        self.accept_ih = interactions.InteractionHandler(views.validation_buttons)
-        self.accept_msg = [None, None]
+        self.accept_ihs = [interactions.InteractionHandler(views.validation_buttons),
+                           interactions.InteractionHandler(views.validation_buttons)]
+
+        for i in range(2):
+            self.add_callbacks(i, self.accept_ihs[i])
 
         @self.volunteer_ih.callback('volunteer')
         async def volunteer(player, interaction_id, interaction, interaction_values):
@@ -41,7 +43,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             player = await get_check_player(i_ctx, self.match.proxy)
             if not player:
                 raise interactions.InteractionNotAllowed
-            if player in self.captains:
+            if player.active:
                 await disp.CAP_ALREADY.send(i_ctx)
                 raise interactions.InteractionNotAllowed
             if player not in self.p_list:
@@ -49,26 +51,28 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
                 raise interactions.InteractionInvalid("player is valid but not in player list")
             await self.on_volunteer(player)
 
-        @self.accept_ih.callback('accept', 'decline')
-        async def answer(player, interaction_id, interaction, interaction_values):
-            pass
-
-        @self.accept_rh.reaction("✅", "❌")
-        async def answer(reaction, player, user, msg):
-            if player is self.captains[0]:
-                i = 0
-            elif player is self.captains[1]:
-                i = 1
-            else:
-                raise reactions.UserLackingPermission
-            if not self.accept_msg[i]:
-                raise reactions.UserLackingPermission
-            if msg.id != self.accept_msg[i].id:
-                raise reactions.UserLackingPermission
-            if not await self.on_answer(player, is_accept=(str(reaction) == "✅")):
-                raise reactions.UserLackingPermission
-
         super().__init__(match)
+
+    def add_callbacks(self, i, accept_ih):
+        @accept_ih.callback('accept', 'decline')
+        async def on_answer(player, interaction_id, interaction, interaction_values):
+            i_ctx = InteractionContext(interaction)
+            player = await get_check_player(i_ctx, self.match.proxy)
+            if not player:
+                raise interactions.InteractionNotAllowed
+            if player.active:
+                await disp.CAP_ALREADY.send(i_ctx)
+                raise interactions.InteractionNotAllowed
+            if player not in self.captains:
+                if interaction_id == 'accept':
+                    await disp.CAP_ACCEPT_NO.send(i_ctx)
+                elif interaction_id == 'decline':
+                    await disp.CAP_DENY_NO.send(i_ctx)
+                raise interactions.InteractionNotAllowed
+            bl = await self.on_answer(player, is_accept=(interaction_id == 'accept'))
+            bl = bl and player is self.captains[i]
+            if not bl:
+                raise interactions.InteractionNotAllowed
 
     @Process.init_loop
     async def init(self):
@@ -108,8 +112,8 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         self.auto_captain.cancel()
         for p in self.p_list:
             p.on_player_clean()
-        reactions.auto_clear(self.accept_msg[0])
-        reactions.auto_clear(self.accept_msg[1])
+        for ih in self.accept_ihs:
+            ih.clean()
         self.volunteer_ih.clean()
         await self.match.clean_all_auto()
         await disp.MATCH_CLEARED.send(ctx)
@@ -157,14 +161,14 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             await self.get_new_auto(i)
         return True
 
-    @loop(minutes=1, delay=1, count=2)
+    @loop(seconds=20, delay=1, count=2)
     async def auto_captain(self):
         for i in range(2):
             await self.get_new_auto(i)
         self.auto_captain.restart()
 
     async def get_new_auto(self, i):
-        reactions.auto_clear(self.accept_msg[i])
+        self.accept_ihs[i].clean()
         captain = self.captains[i]
         if not captain or (captain and not captain.active):
             if not self.players:
@@ -172,9 +176,8 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
                     self.players[p.id] = p
             player = self.players.pop(self.find_captain())
             self.captains[i] = player
-            msg = await disp.CAP_AUTO.send(self.match.channel, player.mention, self.match.teams[i].name)
-            self.accept_msg[i] = msg
-            await self.accept_rh.auto_add(msg)
+            ctx = self.accept_ihs[i].get_new_context(self.match.channel)
+            await disp.CAP_AUTO.send(ctx, player.mention, self.match.teams[i].name)
 
     async def add_captain(self, i, player):
         self.match.teams[i].add_player(ActivePlayer, player)
@@ -182,7 +185,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         self.p_list.remove(player)
         if player.id in self.players:
             del self.players[player.id]
-        reactions.auto_clear(self.accept_msg[i])
+        self.accept_ihs[i].clean()
         self.match.plugin_manager.on_captain_selected(i, player)
         all_captains_selected = self.captains[i - 1] and self.captains[i - 1].active
         if all_captains_selected:
