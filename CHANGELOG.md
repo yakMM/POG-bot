@@ -1,3 +1,13 @@
+# v3.5:
+## (WIP)
+Now using discord components instead of the reaction system
+- Refactored ContextWrapper system and display classes
+- Added Interaction module
+- Now using a select menu for base selection
+- Now using buttons for CaptainValidator
+- Added buttons for player picking
+- Now using buttons for captain selection phase
+
 # v3.4:
 This is the last version with the reaction system, newer versions will use discord UI component.
 - Added HSR to scoreboard
