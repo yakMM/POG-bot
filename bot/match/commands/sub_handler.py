@@ -29,7 +29,11 @@ class SubHandler(InstantiatedCommand):
             if self.sub_func:
                 await self.sub_func(subbed, force_player)
             else:
-                await after_pick_sub(self.match, subbed.active, force_player)
+                try:
+                    ctx = self.match.get_process_attr("get_current_context")(ctx)
+                except AttributeError:
+                    pass
+                await after_pick_sub(self.match.proxy, subbed.active, force_player, ctx=ctx)
 
     def on_clean(self, hard=False):
         if self.validator:

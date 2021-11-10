@@ -27,16 +27,20 @@ class BenchHandler(InstantiatedCommand):
             team = player.team
             if bench and player.is_captain:
                 if team.demote_captain():
-                    await disp.CAP_NEW.send(self.match.channel, team.captain.mention, team.name)
+                    await disp.CAP_NEW.send(ctx, team.captain.mention, team.name)
                 else:
-                    await disp.BENCH_ALL.send(self.match.channel, player.mention)
+                    await disp.BENCH_ALL.send(ctx, player.mention)
                     return
 
             player.bench(bench)
+            try:
+                ctx = self.match.get_process_attr("get_current_context")(ctx)
+            except AttributeError:
+                pass
             if bench:
-                await disp.BENCH_OK.send(self.match.channel, player.mention, match=self.match.proxy)
+                await disp.BENCH_OK.send(ctx, player.mention, match=self.match.proxy)
             else:
-                await disp.UNBENCH_OK.send(self.match.channel, player.mention, match=self.match.proxy)
+                await disp.UNBENCH_OK.send(ctx, player.mention, match=self.match.proxy)
 
             if self.match.status is MatchStatus.IS_WAITING:
                 self.match.plugin_manager.on_teams_updated()

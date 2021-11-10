@@ -52,7 +52,7 @@ class AllStrings(Enum):
     PK_WRONG_CHANNEL = Message("You are in the wrong channel! Check <#{}> instead")
     PK_NOT_TURN = Message("It's not your turn!")
     PK_NOT_CAPTAIN = Message("You are not Team Captain!")
-    PK_SHOW_TEAMS = Message("Match status:", embed=embeds.team_update, ping=False)
+    PK_SHOW_TEAMS = Message("Match status:", embed=embeds.team_update)
     PK_PLAYERS_HELP = Message("Waiting for {} to pick a player with `=p @mention`", ping=False)
     PK_NO_ARG = Message("@ mention a player to pick!")
     PK_TOO_MUCH = Message("You can't pick more than one player at the same time!")
@@ -140,7 +140,7 @@ class AllStrings(Enum):
     CAP_ACCEPT_NO = Message("You can't do that! Volunteer if you want to be captain!")
     CAP_DENY_NO = Message("You can't do that, you were not designated as team captain!")
     CAP_DENY_OK = Message("You declined the team captain role!")
-    CAP_NEW = Message("{} is the new captain for {}!")
+    CAP_NEW = Message("{} is the new captain for {}!", ping=False)
 
     MATCH_DM_PING = Message("POG match {} is starting! Please join `{}` channel in the Jaeger Events discord!", ping=False)
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
@@ -238,7 +238,7 @@ class AllStrings(Enum):
 
     SUB_NO = Message("This player can't be subbed!")
     SUB_NOT_OK = Message("Can't sub a player at this stage!")
-    SUB_NO_PLAYER = Message("Subbing {}: no player is available to substitute!")
+    SUB_NO_PLAYER = Message("Subbing {}: no player is available to substitute!", ping=False)
     SUB_OKAY_TEAM = Message("{} replaced {} in {}", ping=False, embed=embeds.team_update)
     SUB_OKAY_CAP = Message("{} replaced {} as {}'s captain", ping=False, embed=embeds.team_update)
     SUB_OKAY = Message("{} replaced {}!", ping=False, embed=embeds.team_update)
@@ -260,7 +260,7 @@ class AllStrings(Enum):
     UNBENCH_OK = Message("Successfully un-benched {}!", ping=False, embed=embeds.team_update)
     BENCH_ALREADY = Message("Player is already benched!", ping=False)
     BENCH_NOT = Message("Player is not benched!", ping=False)
-    BENCH_ALL = Message("Can't bench {}, no active player left in the team!")
+    BENCH_ALL = Message("Can't bench {}, no active player left in the team!", ping=False)
 
     async def send(self, ctx, *args, **kwargs):
         """

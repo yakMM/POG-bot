@@ -204,8 +204,11 @@ class CommandFactory(metaclass=MetaFactory):
 
     @Command.command(*captains_ok_states, MatchStatus.IS_CAPTAIN, MatchStatus.IS_STARTING)
     async def info(self, ctx, args):
-        match = self.match.proxy
         try:
-            await match.info()
+            await self.match.get_process_attr("info")()
         except AttributeError:
-            await disp.PK_SHOW_TEAMS.send(ctx, match=match)
+            try:
+                ctx = self.match.get_process_attr("get_current_context")(ctx)
+            except AttributeError:
+                pass
+            await disp.PK_SHOW_TEAMS.send(ctx, match=self.match.proxy)

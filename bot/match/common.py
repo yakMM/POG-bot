@@ -50,7 +50,7 @@ def switch_turn(process, team):
     return other
 
 
-async def get_substitute(ctx, match, subbed, player=None):
+async def get_substitute(match, subbed, player=None):
     """
     Get a substitute player from lobby, return it
 
@@ -63,7 +63,7 @@ async def get_substitute(ctx, match, subbed, player=None):
     was_lobbied = (not player) or (player and player.is_lobbied)
     player = get_sub(player)
     if player is None:
-        await disp.SUB_NO_PLAYER.send(ctx, subbed.mention)
+        await disp.SUB_NO_PLAYER.send(match.channel, subbed.mention)
         return
 
     Loop(coro=ping_sub_in_lobby, count=1).start(match, player, was_lobbied)
@@ -96,7 +96,7 @@ async def after_pick_sub(match, subbed, force_player, ctx=None, clean_subbed=Tru
     # Get a new player for substitution
     if not ctx:
         ctx = match.channel
-    new_player = await get_substitute(ctx, match, subbed, player=force_player)
+    new_player = await get_substitute(match, subbed, player=force_player)
     if not new_player:
         return
 

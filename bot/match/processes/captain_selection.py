@@ -202,6 +202,10 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         """
         return self.p_list
 
+    @Process.public
+    def get_current_context(self, ctx):
+        return self.volunteer_ih.get_new_context(ctx)
+
     def find_captain(self):
         """
         Pick at random a captain.
@@ -241,7 +245,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
                     raise UnexpectedError("Captain not found!")
         else:
             # Get a new player for substitution
-            new_player = await get_substitute(ctx, self.match.proxy, subbed, player=force_player)
+            new_player = await get_substitute(self.match.proxy, subbed, player=force_player)
             if not new_player:
                 return
 

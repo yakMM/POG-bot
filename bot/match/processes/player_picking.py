@@ -58,11 +58,6 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         await disp.MATCH_SHOW_PICKS.send(ctx, self.match.teams[0].captain.mention,
                                          match=self.match.proxy)
 
-    @Process.public
-    async def info(self, ctx=None):
-        ctx = self.interaction_handler.get_new_context(self.match.channel)
-        await disp.PK_SHOW_TEAMS.send(ctx, match=self.match.proxy)
-
     @property
     def picking_captain(self):
         for tm in self.match.teams:
@@ -85,7 +80,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             await after_pick_sub(self.match.proxy, subbed.active, force_player, ctx=ctx)
         else:
             # Get a new player for substitution
-            new_player = await get_substitute(ctx, self.match.proxy, subbed, player=force_player)
+            new_player = await get_substitute(self.match.proxy, subbed, player=force_player)
             if not new_player:
                 return
             # Remove them fro the player list
@@ -102,6 +97,10 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         """ The list of mentions of all players left to pick.
         """
         return list(self.players.values())
+
+    @Process.public
+    def get_current_context(self, ctx):
+        return self.interaction_handler.get_new_context(ctx)
 
     @Process.public
     async def clear(self, ctx):
