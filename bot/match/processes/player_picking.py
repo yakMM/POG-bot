@@ -3,12 +3,12 @@ from lib.tasks import loop
 
 from classes import ActivePlayer, Player, Team
 
-from match.common import get_substitute, after_pick_sub, switch_turn, get_check_captain
+from match.common import get_substitute, after_pick_sub, switch_turn
 from match import MatchStatus
 from .process import Process
 from match.classes import BaseSelector
 
-import modules.interactions as interactions
+import match.classes.interactions as interactions
 
 
 class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
@@ -19,7 +19,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
         self.match.base_selector = BaseSelector(self.match, base_pool=True)
 
-        self.interaction_handler = interactions.InteractionHandler(
+        self.interaction_handler = interactions.CaptainInteractionHandler(
             self.match.proxy,
             views.players_buttons,
             disable_after_use=False,
@@ -34,11 +34,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
         super().__init__(match)
 
-    async def interaction_callback(self, player, interaction_id, interaction, values):
-        i_ctx = InteractionContext(interaction)
-        captain = await get_check_captain(i_ctx, self.match.proxy)
-        if not captain:
-            raise interactions.InteractionNotAllowed
+    async def interaction_callback(self, captain, interaction_id, interaction, values):
         try:
             picked = self.players[int(interaction_id)]
         except (ValueError, KeyError):

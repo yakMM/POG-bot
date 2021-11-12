@@ -6,6 +6,7 @@ from discord.errors import NotFound
 from lib.tasks import Loop
 from display import ContextWrapper
 from classes import Player
+from modules.roles import is_admin
 
 log = getLogger("pog_bot")
 
@@ -31,8 +32,9 @@ class InteractionPayload:
 
 
 class InteractionHandler:
-    def __init__(self, owner, view, disable_after_use=True, single_callback=None):
+    def __init__(self, owner, view, disable_after_use=True, single_callback=None, is_admin_allowed=False):
         self.__disable_after_use = disable_after_use
+        self.__is_admin_allowed = is_admin_allowed
         self.__f_dict = dict()
         self.__callback = single_callback
         self.__msg = None
@@ -54,6 +56,13 @@ class InteractionHandler:
         self.__msg = msg
         self.__locked = False
 
+    async def run_player_check(self, player, interaction):
+        # For inheritance purposes
+        return player
+
+    def __is_admin(self, user):
+        return is_admin(user) and self.__is_admin_allowed
+
     async def run(self, interaction: Interaction):
         if self.__locked:
             return
@@ -61,7 +70,7 @@ class InteractionHandler:
         user = interaction.user
 
         player = Player.get(interaction.user.id)
-        if not player:
+        if not player and not self.__is_admin(user):
             return
 
         if await is_spam(user, interaction.message.channel):
@@ -73,6 +82,9 @@ class InteractionHandler:
         interaction_values = interaction.data.get('values', None)
 
         try:
+            player = await self.run_player_check(player, interaction)
+            if not player and not self.__is_admin(user):
+                raise InteractionNotAllowed
             if not self.__callback:
                 funcs = self.__f_dict[interaction_id]
             else:
@@ -84,8 +96,12 @@ class InteractionHandler:
                     func(interaction_id, interaction, interaction_values)
                 if self.__disable_after_use:
                     self.clean()
-        except (KeyError, InteractionNotAllowed, NotFound, InteractionInvalid):
+        except (InteractionNotAllowed, InteractionInvalid):
             pass
+        except KeyError as e:
+            log.warning(f"KeyError when processing interaction: {e}")
+        except NotFound as e:
+            log.warning(f"NotFound when processing interaction: {e}")
         finally:
             self.__locked = False
             unlock(user.id)

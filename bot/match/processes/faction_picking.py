@@ -1,14 +1,12 @@
 from display import AllStrings as disp, ContextWrapper, InteractionContext, views
 from asyncio import sleep
-import discord
 from logging import getLogger
 
 import modules.config as cfg
 
 from match import MatchStatus
 from .process import Process
-import modules.reactions as reactions
-import modules.interactions as interactions
+import match.classes.interactions as interactions
 
 from match.common import check_faction, switch_turn, get_check_captain
 
@@ -22,8 +20,8 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
 
         self.picked_faction = ""
 
-        self.interaction_handler = interactions.InteractionHandler(self.match.proxy, views.faction_buttons,
-                                                                   disable_after_use=False)
+        self.interaction_handler = interactions.CaptainInteractionHandler(self.match.proxy, views.faction_buttons,
+                                                                          disable_after_use=False)
         self.add_callbacks(self.interaction_handler)
 
         self.match.teams[1].captain.is_turn = True
@@ -38,13 +36,9 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
     def add_callbacks(self, ih):
 
         @ih.callback('VS', 'NC', 'TR')
-        async def check(player, interaction_id, interaction, interaction_values):
-            i_ctx = InteractionContext(interaction)
-            captain = await get_check_captain(i_ctx, self.match.proxy)
-            if not captain:
-                raise interactions.InteractionNotAllowed
+        async def check(captain, interaction_id, interaction, interaction_values):
             ctx = self.interaction_handler.get_new_context(self.match.channel)
-            await self.do_pick(ctx, player.active.team, interaction_id)
+            await self.do_pick(ctx, captain.team, interaction_id)
 
     @Process.public
     async def pick_status(self, ctx):

@@ -15,7 +15,7 @@ import modules.config as cfg
 import modules.reactions as reactions
 import modules.roles as roles
 from modules.tools import UnexpectedError
-import modules.interactions as interactions
+import match.classes.interactions as interactions
 
 log = getLogger("pog_bot")
 
@@ -29,21 +29,18 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
         self.captains = [None, None]
 
-        self.volunteer_ih = interactions.InteractionHandler(self.match.proxy, views.volunteer_button, disable_after_use=False)
+        self.volunteer_ih = interactions.PlayerInteractionHandler(self.match.proxy, views.volunteer_button, disable_after_use=False)
 
-        self.accept_ihs = [interactions.InteractionHandler(self.match.proxy, views.validation_buttons),
-                           interactions.InteractionHandler(self.match.proxy, views.validation_buttons)]
+        self.accept_ihs = [interactions.PlayerInteractionHandler(self.match.proxy, views.validation_buttons),
+                           interactions.PlayerInteractionHandler(self.match.proxy, views.validation_buttons)]
 
         for i in range(2):
             self.add_callbacks(i, self.accept_ihs[i])
 
         @self.volunteer_ih.callback('volunteer')
         async def volunteer(player, interaction_id, interaction, interaction_values):
-            i_ctx = InteractionContext(interaction)
-            player = await get_check_player(i_ctx, self.match.proxy)
-            if not player:
-                raise interactions.InteractionNotAllowed
             if player.active:
+                i_ctx = InteractionContext(interaction)
                 await disp.CAP_ALREADY.send(i_ctx)
                 raise interactions.InteractionNotAllowed
             if player not in self.p_list:
@@ -57,9 +54,6 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         @accept_ih.callback('accept', 'decline')
         async def on_answer(player, interaction_id, interaction, interaction_values):
             i_ctx = InteractionContext(interaction)
-            player = await get_check_player(i_ctx, self.match.proxy)
-            if not player:
-                raise interactions.InteractionNotAllowed
             if player.active:
                 await disp.CAP_ALREADY.send(i_ctx)
                 raise interactions.InteractionNotAllowed

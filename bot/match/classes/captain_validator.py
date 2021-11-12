@@ -1,17 +1,12 @@
-import modules.reactions as reactions
-import modules.interactions as interactions
 from modules.tools import UnexpectedError
+from .interactions import CaptainInteractionHandler, InteractionNotAllowed, InteractionInvalid
 
 from display import AllStrings as disp, ContextWrapper, InteractionContext, views
-from match import MatchStatus
-from classes import Player
-import modules.config as cfg
-from match.common import get_check_captain
 
 
 class CaptainValidator:
     def __init__(self, match):
-        self.ih = interactions.InteractionHandler(match, views.validation_buttons, disable_after_use=True)
+        self.ih = CaptainInteractionHandler(match, views.validation_buttons, check_turn=False, disable_after_use=True)
         self.match = match
         self.expected = None
         self.kwargs = dict()
@@ -20,33 +15,23 @@ class CaptainValidator:
 
         self.add_callbacks(self.ih)
 
-    async def callback_check(self, interaction):
-        if self.match.status is MatchStatus.IS_RUNNING:
-            raise interactions.InteractionInvalid("Match is running!")
-        i_ctx = InteractionContext(interaction)
-        captain = await get_check_captain(i_ctx, self.match, check_turn=False)
-        if not captain:
-            raise interactions.InteractionNotAllowed
-        return i_ctx, captain
-
     def add_callbacks(self, ih):
         @self.ih.callback('accept')
-        async def accept(player, interaction_id, interaction, values):
-            interaction_ctx, captain = await self.callback_check(interaction)
-            ctx = ContextWrapper.wrap(self.match.channel, author=interaction.user)
+        async def accept(captain, interaction_id, interaction, values):
             if captain is not self.expected:
-                await disp.CONFIRM_NOT_CAPTAIN.send(interaction_ctx, self.expected.mention)
-                raise interactions.InteractionNotAllowed
+                i_ctx = InteractionContext(interaction)
+                await disp.CONFIRM_NOT_CAPTAIN.send(i_ctx, self.expected.mention)
+                raise InteractionNotAllowed
             elif self.confirm_func:
+                ctx = ContextWrapper.wrap(self.match.channel, author=interaction.user)
                 kwargs = self.kwargs
                 self.clean()
                 await self.confirm_func(ctx, **kwargs)
             else:
-                raise interactions.InteractionInvalid("no confirm function!")
+                raise InteractionInvalid("no confirm function!")
 
         @self.ih.callback('decline')
-        async def decline(player, interaction_id, interaction, values):
-            interaction_ctx, captain = await self.callback_check(interaction)
+        async def decline(captain, interaction_id, interaction, values):
             ctx = ContextWrapper.wrap(self.match.channel, author=interaction.user)
             self.clean()
             if captain is self.expected:

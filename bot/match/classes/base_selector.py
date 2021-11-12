@@ -57,7 +57,8 @@ class BaseSelector:
         self.__booked = list()
         self.__reset_selection()
         self.__validator = CaptainValidator(self.__match)
-        self.__base_interaction = InteractionHandler(self, views.bases_selection, disable_after_use=False)
+        self.__base_interaction = InteractionHandler(self, views.bases_selection, disable_after_use=False,
+                                                     is_admin_allowed=True)
         self.__add_callbacks(self.__validator, self.__base_interaction)
         self._get_booked_from_calendar.start()
 
