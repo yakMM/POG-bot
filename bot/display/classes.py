@@ -1,6 +1,10 @@
 from discord import File, ui
 import modules.config as cfg
 from logging import getLogger
+from aiohttp.client_exceptions import ClientError
+from discord.backoff import ExponentialBackoff
+import asyncio
+from modules.tools import UnexpectedError
 
 log = getLogger("pog_bot")
 
@@ -106,21 +110,30 @@ class ContextWrapper:
         self.cmd_name = cmd_name
         self.channel_id = channel_id
         self.original_ctx = original_ctx
-        self.send_command = 'send'
         self.message = message
         self.interaction_payload = None
 
     async def send(self, kwargs):
-        msg = await getattr(self.original_ctx, self.send_command)(**kwargs)
-        if self.interaction_payload:
-            self.interaction_payload.message_callback(msg)
-        return msg
+        return await self._do_send('send', kwargs)
 
     async def edit(self, kwargs):
-        msg = await getattr(self.original_ctx, 'edit')(**kwargs)
-        if self.interaction_payload:
-            self.interaction_payload.message_callback(msg)
-        return msg
+        return await self._do_send('edit', kwargs)
+
+    async def _do_send(self, command, kwargs):
+        backoff = ExponentialBackoff()
+        for i in range(5):
+            try:
+                if i != 0:
+                    await asyncio.sleep(backoff.delay())
+                msg = await getattr(self.original_ctx, command)(**kwargs)
+                if self.interaction_payload:
+                    self.interaction_payload.message_callback(msg)
+                return msg
+            except ClientError as e:
+                log.warning(f"ContextWrapper: Network error when sending message on try {i}!"
+                            f"\n {e}")
+        log.error(f"ContextWrapper: Network error when sending message after 5 retries! Giving up...")
+        raise UnexpectedError("ContextWrapper could not send message after 5 retries!")
 
 
 class InteractionContext(ContextWrapper):
@@ -132,12 +145,11 @@ class InteractionContext(ContextWrapper):
         ctx = interaction.response
         self.ephemeral = ephemeral
         super().__init__(author, cmd_name, channel_id, message, ctx)
-        self.send_command = 'send_message'
 
     async def send(self, kwargs):
         if self.ephemeral:
             kwargs['ephemeral'] = True
-        await super().send(kwargs)
+        return await self._do_send('send_message', kwargs)
 
 
 

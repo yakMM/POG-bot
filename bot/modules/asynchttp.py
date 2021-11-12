@@ -6,7 +6,7 @@
 
 # External imports
 from aiohttp import ClientSession, TCPConnector
-from aiohttp.client_exceptions import ClientOSError, ClientConnectorError
+from aiohttp.client_exceptions import ClientError
 from json import loads
 from json.decoder import JSONDecodeError
 from logging import getLogger
@@ -72,7 +72,7 @@ async def api_request_and_retry(url: str, retries: int = 3) -> dict:
             if i != 0:
                 await asyncio.sleep(backoff.delay())
             j_data = await _request(url)
-        except (ClientOSError, ClientConnectorError, JSONDecodeError) as e:
+        except (ClientError, JSONDecodeError) as e:
             log.warning(f"API request: {e} on try {i} for {url}")
             # Try again
             continue
