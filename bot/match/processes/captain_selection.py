@@ -97,12 +97,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         self.match.teams[0] = Team(0, f"Team 1", self.match.proxy)
         self.match.teams[1] = Team(1, f"Team 2", self.match.proxy)
 
-        for i in range(3):
-            try:
-                await self.info()
-                break
-            except discord.NotFound as e:
-                log.warning(f"Error in `captain_selection` init loop:{e}")
+        await self.info()
 
         self.auto_captain.start()
         await disp.CAP_AUTO_ANNOUNCE.send(self.match.channel)

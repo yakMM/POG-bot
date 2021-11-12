@@ -33,12 +33,7 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
     async def init_loop(self):
         await sleep(0)
         ctx = self.interaction_handler.get_new_context(self.match.channel)
-        for i in range(3):
-            try:
-                await disp.PK_OK_FACTION.send(ctx, self.picking_captain.mention)
-                break
-            except discord.NotFound as e:
-                log.warning(f"Error in `faction_picking` init loop:{e}")
+        await disp.PK_OK_FACTION.send(ctx, self.picking_captain.mention)
 
     def add_callbacks(self, ih):
 
