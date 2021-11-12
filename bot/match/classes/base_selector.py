@@ -57,7 +57,7 @@ class BaseSelector:
         self.__booked = list()
         self.__reset_selection()
         self.__validator = CaptainValidator(self.__match)
-        self.__base_interaction = InteractionHandler(views.bases_selection, disable_after_use=False)
+        self.__base_interaction = InteractionHandler(self, views.bases_selection, disable_after_use=False)
         self.__add_callbacks(self.__validator, self.__base_interaction)
         self._get_booked_from_calendar.start()
 
@@ -160,7 +160,7 @@ class BaseSelector:
         await disp.BASE_CALENDAR.send(ctx, mentions)
         if self.__selection:
             ctx = self.__base_interaction.get_new_context(ctx)
-            await disp.BASE_SHOW_LIST.send(ctx, bases_list=self.bases_list)
+            await disp.BASE_SHOW_LIST.send(ctx)
 
     def find_by_id(self, base_id):
         for base in self.__selection:
@@ -181,7 +181,7 @@ class BaseSelector:
             self.__was_selection_modified = True
             self.__validator.clean()
             ctx = self.__base_interaction.get_new_context(ctx)
-            await disp.BASE_SHOW_LIST.send(ctx, bases_list=self.bases_list)
+            await disp.BASE_SHOW_LIST.send(ctx)
 
     async def __select_base(self, ctx, picker, base):
         if is_admin(ctx.author):

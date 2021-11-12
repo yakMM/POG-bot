@@ -57,9 +57,9 @@ class AllStrings(Enum):
     PK_NO_ARG = Message("@ mention a player to pick!")
     PK_TOO_MUCH = Message("You can't pick more than one player at the same time!")
     PK_INVALID = Message("You can't pick that player!")
-    PK_OK = Message("Player picked! {} your turn, pick a player!", embed=embeds.team_update, view=views.players_buttons, ping=False)
+    PK_OK = Message("Player picked! {} your turn, pick a player!", embed=embeds.team_update, ping=False)
     PK_P_OK = Message("Picked {}! {} your turn, pick a player!",
-                    embed=embeds.team_update, view=views.players_buttons,
+                    embed=embeds.team_update,
                     ping=False)
     PK_OK_2 = Message("Player picked!", ping=False)
     PK_P_OK_2 = Message("Picked {}!", ping=False)
@@ -130,11 +130,11 @@ class AllStrings(Enum):
                          "environment and all the rewards that I get are insults and wickedness :(")
 
     CAP_WAITING = Message("Waiting for captain(s), volunteer if you want to be one",
-                          ping=False, embed=embeds.team_update, view=views.volunteer_button)
+                          ping=False, embed=embeds.team_update)
     CAP_AUTO_ANNOUNCE = Message("Captains will be automatically suggested in 1 minute!")
     CAP_OK = Message("{} will be captain for {}!", ping=False)
     CAP_AUTO = Message("{} has been designated as captain for {}\n"
-                       "Accept if you agree!", view=views.validation_buttons)
+                       "Accept if you agree!")
     CAP_HELP = Message("Here are the available captain commands:", embed=embeds.captain_help)
     CAP_ALREADY = Message("You can't do that! You are already a team captain!")
     CAP_ACCEPT_NO = Message("You can't do that! Volunteer if you want to be captain!")
@@ -145,7 +145,7 @@ class AllStrings(Enum):
 
     MATCH_DM_PING = Message("POG match {} is starting! Please join `{}` channel in the Jaeger Events discord!", ping=False)
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
-    MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, view=views.players_buttons, ping=False)
+    MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ping=False)
     MATCH_BASE_AUTO = Message("Match will be on **{}**", ping=False)
     MATCH_CONFIRM = Message("{} {} Type `=ready` or react below when your team is inside their sunderer, ready to start",
                             embed=embeds.team_update)
@@ -173,7 +173,7 @@ class AllStrings(Enum):
     BASE_TOO_MUCH = Message("Too many bases found! Try to be more precise")
     BASE_NOT_FOUND = Message("Couldn't find a result for your search!")
     BASE_ON_SELECT = Message("Successfully selected **{}**", embed=embeds.base_display)
-    BASE_SHOW_LIST = Message("Select a base with `=base Name`", ping=False, view=views.bases_selection)
+    BASE_SHOW_LIST = Message("Select a base with `=base Name`", ping=False)
     BASE_SELECTED = Message("This match will be played on **{}**:", embed=embeds.base_display)
     BASE_DISPLAY = Message("Base navigator:", ping=False, embed=embeds.base_display)
     BASE_BOOKED = Message("{} WARNING: **{}** seems unavailable. Please check occupation "
@@ -183,7 +183,7 @@ class AllStrings(Enum):
     BASE_CALENDAR = Message("{} Pick an available base!", ping=False, embed=embeds.jaeger_calendar)
     BASE_NO_BASE = Message("No base yet selected!")
     BASE_NO_BASE_WAITING = Message("Waiting for captains to pick a base...")
-    BASE_OK_CONFIRM = Message("Picked **{}**! {} accept if you agree!", view=views.validation_buttons)
+    BASE_OK_CONFIRM = Message("Picked **{}**! {} accept if you agree!")
     BASE_NO_CHANGE = Message("It's not possible to change the match base anymore!")
     BASE_NO_READY = Message("Can't change the base if a team is ready!")
 
@@ -251,12 +251,12 @@ class AllStrings(Enum):
     SWAP_MENTION_2 = Message("Invalid request! @ mention two players to swap!")
     SWAP_NO = Message("{} can't be swapped!", ping=False)
     SWAP_SAME_TEAM = Message("Invalid request! Can't swap two players of the same team!", ping=False)
-    SWAP_OK_CONFIRM = Message("Swapping players! {} accept if you agree!", view=views.validation_buttons)
+    SWAP_OK_CONFIRM = Message("Swapping players! {} accept if you agree!")
 
     BENCH_MENTION = Message("Invalid request! @ mention one player to bench!")
     BENCH_NO = Message("{} can't be benched!", ping=False)
-    BENCH_OK_CONFIRM = Message("Benching player! {} accept if you agree!", view=views.validation_buttons)
-    UNBENCH_OK_CONFIRM = Message("Un-benching player! {} accept if you agree!", view=views.validation_buttons)
+    BENCH_OK_CONFIRM = Message("Benching player! {} accept if you agree!")
+    UNBENCH_OK_CONFIRM = Message("Un-benching player! {} accept if you agree!")
     BENCH_OK = Message("Successfully benched {}!", ping=False, embed=embeds.team_update)
     UNBENCH_OK = Message("Successfully un-benched {}!", ping=False, embed=embeds.team_update)
     BENCH_ALREADY = Message("Player is already benched!", ping=False)

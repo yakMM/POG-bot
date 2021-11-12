@@ -23,21 +23,21 @@ class InteractionInvalid(Exception):
 
 
 class InteractionPayload:
-    def __init__(self, ih):
+    def __init__(self, ih, owner, view):
         self.callback = ih.run
         self.message_callback = ih.message_callback
-        self.view = ih.view
+        self.view = view
+        self.owner = owner
 
 
 class InteractionHandler:
-    def __init__(self, view, disable_after_use=True, single_callback=None):
+    def __init__(self, owner, view, disable_after_use=True, single_callback=None):
         self.__disable_after_use = disable_after_use
         self.__f_dict = dict()
         self.__callback = single_callback
         self.__msg = None
         self.__locked = False
-        self.__view = view
-        self.__payload = InteractionPayload(self)
+        self.__payload = InteractionPayload(self, owner, view)
 
     def get_new_context(self, ctx):
         self.__locked = True
@@ -53,10 +53,6 @@ class InteractionHandler:
             self.clean()
         self.__msg = msg
         self.__locked = False
-
-    @property
-    def view(self):
-        return self.__view
 
     async def run(self, interaction: Interaction):
         if self.__locked:

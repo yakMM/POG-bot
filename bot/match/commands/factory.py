@@ -84,7 +84,7 @@ class CommandFactory(metaclass=MetaFactory):
             await self.match.get_process_attr("pick")(ctx, captain, args)
         except AttributeError:
             # Check if faction is valid
-            if await check_faction(ctx, args):
+            if not await check_faction(ctx, args):
                 # If error, return
                 return
 

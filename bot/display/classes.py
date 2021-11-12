@@ -1,14 +1,16 @@
 from discord import File, ui
 import modules.config as cfg
+from logging import getLogger
+
+log = getLogger("pog_bot")
 
 
 class Message:
     """ Class for the enum to use
     """
-    def __init__(self, string, ping=True, embed=None, view=None):
+    def __init__(self, string, ping=True, embed=None):
         self.__str = string
         self.__embed_fct = embed
-        self.__view = view
         self.__ping = ping
 
     def get_ui(self, ctx, elements, kwargs):
@@ -22,13 +24,10 @@ class Message:
             elements['embed'] = embed
         if ctx.interaction_payload:
             try:
-                view = ctx.interaction_payload.view(ctx, **kwargs)
+                view = ctx.interaction_payload.view(ctx)
                 elements['view'] = view
-            except TypeError:
-                pass
-        elif self.__view:
-            view = self.__view(ctx, **kwargs)
-            elements['view'] = view
+            except TypeError as e:
+                log.warning(f"TypeError when getting view: {e}")
 
     def get_string(self, ctx, elements, args):
         if self.__str:

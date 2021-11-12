@@ -20,6 +20,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         self.match.base_selector = BaseSelector(self.match, base_pool=True)
 
         self.interaction_handler = interactions.InteractionHandler(
+            self.match.proxy,
             views.players_buttons,
             disable_after_use=False,
             single_callback=self.interaction_callback
@@ -168,9 +169,9 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         # If player pick is over
         if len(self.players) == 0:
             if ping_player:
-                await disp.PK_P_OK_2.send(ctx, picked.mention, match=self.match.proxy)
+                await disp.PK_P_OK_2.send(ctx, picked.mention)
             else:
-                await disp.PK_OK_2.send(ctx, match=self.match.proxy)
+                await disp.PK_OK_2.send(ctx)
         # Else ping the other captain
         else:
             other = self.match.teams[team.id - 1]

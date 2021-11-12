@@ -20,17 +20,19 @@ async def check_faction(ctx, args):
     :param args: args to be examined
     :return: Message that was sent (None if no error message)
     """
-    # Don't want a mentioned player
+
     if len(ctx.message.mentions) != 0:
-        return await disp.PK_FACTION_NOT_PLAYER.send(ctx)
-
-    # All factions are in one word
-    if len(args) != 1:
-        return await disp.PK_NOT_VALID_FACTION.send(ctx)
-
-    # Check for faction string
-    if args[0].upper() not in cfg.i_factions:
-        return await disp.PK_NOT_VALID_FACTION.send(ctx)
+        # Don't want a mentioned player
+        await disp.PK_FACTION_NOT_PLAYER.send(ctx)
+    elif len(args) != 1:
+        # All factions are in one word
+        await disp.PK_NOT_VALID_FACTION.send(ctx)
+    elif args[0].upper() not in cfg.i_factions:
+        # Check for faction string
+        await disp.PK_NOT_VALID_FACTION.send(ctx)
+    else:
+        return True
+    return False
 
 
 def switch_turn(process, team):

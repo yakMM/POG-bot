@@ -29,10 +29,10 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
         self.captains = [None, None]
 
-        self.volunteer_ih = interactions.InteractionHandler(views.volunteer_button, disable_after_use=False)
+        self.volunteer_ih = interactions.InteractionHandler(self.match.proxy, views.volunteer_button, disable_after_use=False)
 
-        self.accept_ihs = [interactions.InteractionHandler(views.validation_buttons),
-                           interactions.InteractionHandler(views.validation_buttons)]
+        self.accept_ihs = [interactions.InteractionHandler(self.match.proxy, views.validation_buttons),
+                           interactions.InteractionHandler(self.match.proxy, views.validation_buttons)]
 
         for i in range(2):
             self.add_callbacks(i, self.accept_ihs[i])

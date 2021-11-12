@@ -11,7 +11,7 @@ from match.common import get_check_captain
 
 class CaptainValidator:
     def __init__(self, match):
-        self.ih = interactions.InteractionHandler(views.validation_buttons, disable_after_use=True)
+        self.ih = interactions.InteractionHandler(match, views.validation_buttons, disable_after_use=True)
         self.match = match
         self.expected = None
         self.kwargs = dict()

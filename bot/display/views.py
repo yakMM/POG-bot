@@ -1,10 +1,11 @@
 from discord import ui, SelectOption, ButtonStyle
 import operator
+import modules.config as cfg
 
 
 def _view(func):
-    def view_func(ctx, **kwargs):
-        ui_elements = func(ctx, **kwargs)
+    def view_func(ctx):
+        ui_elements = func(ctx)
         if not isinstance(ui_elements, list):
             ui_elements = [ui_elements]
         ui_view = ui.View(timeout=None)
@@ -16,13 +17,13 @@ def _view(func):
 
 
 @_view
-def bases_selection(ctx, bases_list):
+def bases_selection(ctx):
     """ Returns a list of bases currently selected
     """
 
     options = list()
 
-    bases_list = sorted(bases_list, key=operator.itemgetter('name'))
+    bases_list = sorted(ctx.interaction_payload.owner.bases_list, key=operator.itemgetter('name'))
 
     for base in bases_list:
         description_args = list()
@@ -53,12 +54,22 @@ def validation_buttons(ctx):
 
 
 @_view
-def players_buttons(ctx, match):
-    players = match.get_left_players()
+def players_buttons(ctx):
+    players = ctx.interaction_payload.owner.get_left_players()
     if players:
         return [ui.Button(label=p.name, style=ButtonStyle.gray, custom_id=str(p.id)) for p in players]
 
 
 @_view
-def volunteer_button(ctx, match):
+def volunteer_button(ctx):
     return ui.Button(label="Volunteer", style=ButtonStyle.gray, custom_id='volunteer', emoji="🖐️")
+
+
+@_view
+def faction_buttons(ctx):
+    buttons = list()
+    picked_faction = ctx.interaction_payload.owner.get_picked_faction()
+    for faction in ['VS', 'TR', 'NC']:
+        if cfg.i_factions[faction] != picked_faction:
+            buttons.append(ui.Button(label=faction, style=ButtonStyle.grey, custom_id=faction, emoji=cfg.emojis[faction]))
+    return buttons
