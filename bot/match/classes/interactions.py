@@ -10,7 +10,7 @@ class CaptainInteractionHandler(InteractionHandler):
         self.check_turn = check_turn
         super().__init__(match, view, **kwargs)
 
-    async def run_player_check(self, player, interaction):
+    async def run_player_check(self, interaction):
         if self.match.status is MatchStatus.IS_RUNNING:
             raise InteractionInvalid("Match is running!")
         i_ctx = InteractionContext(interaction)
@@ -25,7 +25,7 @@ class PlayerInteractionHandler(InteractionHandler):
         self.match = match
         super().__init__(match, view, **kwargs)
 
-    async def run_player_check(self, player, interaction):
+    async def run_player_check(self, interaction):
         if self.match.status is MatchStatus.IS_RUNNING:
             raise InteractionInvalid("Match is running!")
         i_ctx = InteractionContext(interaction)

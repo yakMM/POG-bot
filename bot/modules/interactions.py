@@ -5,7 +5,6 @@ from inspect import iscoroutinefunction as is_coroutine
 from discord.errors import NotFound
 from lib.tasks import Loop
 from display import ContextWrapper
-from classes import Player
 from modules.roles import is_admin
 
 log = getLogger("pog_bot")
@@ -55,9 +54,9 @@ class InteractionHandler:
         self.__msg = msg
         self.__locked = False
 
-    async def run_player_check(self, player, interaction):
+    async def run_player_check(self, interaction):
         # For inheritance purposes
-        return player
+        return None
 
     def __is_admin(self, user):
         return self.__is_admin_allowed and is_admin(user)
@@ -67,10 +66,7 @@ class InteractionHandler:
             return
 
         user = interaction.user
-
-        player = Player.get(interaction.user.id)
-        if not player and not self.__is_admin(user):
-            return
+        player = None
 
         if await is_spam(user, interaction.message.channel):
             return
@@ -82,9 +78,7 @@ class InteractionHandler:
 
         try:
             if not self.__is_admin(user):
-                player = await self.run_player_check(player, interaction)
-                if not player:
-                    raise InteractionNotAllowed
+                player = await self.run_player_check(interaction)
             if not self.__callback:
                 funcs = self.__f_dict[interaction_id]
             else:

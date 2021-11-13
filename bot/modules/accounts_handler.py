@@ -13,9 +13,8 @@ import discord.errors
 
 # Internal imports
 import classes
-from display import AllStrings as disp, ContextWrapper
+from display import AllStrings as disp, ContextWrapper, views
 import modules.database as db
-import modules.reactions as reactions
 import modules.config as cfg
 from modules.tools import UnexpectedError
 
@@ -26,21 +25,9 @@ log = getLogger("pog_bot")
 _busy_accounts = dict()
 _available_accounts = dict()
 
-# Will handle account acceptance reactions
-_reaction_handler = reactions.ReactionHandler(rem_user_react=False, rem_bot_react=True)
-
 # Offsets in the google sheet
 X_OFFSET = 1
 Y_OFFSET = 2
-
-
-# Reaction handler callback on validation reaction
-@_reaction_handler.reaction('✅')
-async def on_account_reaction(reaction, player, user, msg):
-    # Get account, validate it and update the account message
-    account = player.active.account
-    await account.validate()
-    await disp.ACC_UPDATE.edit(account.message, account=account)
 
 
 # Will be called at bot init or on account reload
@@ -163,16 +150,14 @@ async def send_account(channel: discord.TextChannel, a_player: classes.ActivePla
     """
     msg = None
     # Try 3 times to send a DM:
+    ctx = a_player.account.get_new_context(ContextWrapper.user(a_player.id))
     for j in range(3):
         try:
-            msg = await disp.ACC_UPDATE.send(ContextWrapper.user(a_player.id), account=a_player.account)
+            msg = await disp.ACC_UPDATE.send(ctx, account=a_player.account)
             break
         except discord.errors.Forbidden:
             pass
-    if msg:
-        # If DM ok, add the reaction handler for the validation
-        await _reaction_handler.auto_add(msg)
-    else:
+    if not msg:
         # Else validate the account and send it to staff channel instead
         await disp.ACC_CLOSED.send(channel, a_player.mention)
         await a_player.account.validate()
@@ -194,14 +179,11 @@ async def terminate_account(a_player: classes.ActivePlayer):
     acc.terminate()
 
     # Remove the reaction handler and update the account message
-    reactions.rem_handler(acc.message.id)
     await disp.ACC_UPDATE.edit(acc.message, account=acc)
 
     # If account was validated, ask the player to log off:
     if acc.is_validated and acc.message.channel.id != cfg.channels["staff"]:
         await disp.ACC_OVER.send(ContextWrapper.user(acc.a_player.id))
-    else:
-        await _reaction_handler.auto_remove_reactions(acc.message)
 
     # If account was validated, update the db with usage
     if acc.is_validated:

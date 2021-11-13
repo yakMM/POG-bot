@@ -12,8 +12,9 @@
 from logging import getLogger
 import modules.database as db
 import modules.tools as tools
+import modules.interactions as interactions
 
-QUIT_DELAY = 300
+from display import views, AllStrings as disp
 
 log = getLogger("pog_bot")
 
@@ -32,6 +33,12 @@ class Account:
         self.__is_destroyed = False  # flag account to be destroyed (removing account info from the message)
         self.__last_usage = None
         self.__unique_usages = unique_usages
+        self.__ih = interactions.InteractionHandler(self, views.accept_button)
+
+        @self.__ih.callback('accept')
+        async def on_accept(player, interaction_id, interaction, interaction_values):
+            await self.validate()
+            await disp.ACC_UPDATE.edit(self.message, account=self)
 
     def update(self, username, password):
         self.__username = username
@@ -40,6 +47,9 @@ class Account:
     @property
     def is_destroyed(self):
         return self.__is_destroyed
+
+    def get_new_context(self, ctx):
+        return self.__ih.get_new_context(ctx)
 
     @property
     def nb_unique_usages(self):
@@ -95,3 +105,4 @@ class Account:
     def terminate(self):
         self.__last_usage["time_stop"] = tools.timestamp_now()
         self.__is_destroyed = True
+        self.__ih.clean()
