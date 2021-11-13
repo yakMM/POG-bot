@@ -135,7 +135,6 @@ class CommandFactory(metaclass=MetaFactory):
             return
 
         # Check player status
-        captain = None
         captain, msg = get_check_captain_sync(ctx, self.match, check_turn=False)
         # If player doesn't have the proper status
         if msg:

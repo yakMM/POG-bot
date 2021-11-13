@@ -2,7 +2,7 @@ import discord
 
 from match import MatchStatus
 
-from display import AllStrings as disp, ContextWrapper
+from display import AllStrings as disp, ContextWrapper, views
 from logging import getLogger
 
 from .process import Process
@@ -10,7 +10,7 @@ from match.common import after_pick_sub
 
 import modules.accounts_handler as accounts
 import modules.census as census
-import modules.reactions as reactions
+import match.classes.interactions as interactions
 
 from modules.asynchttp import ApiNotReachable
 
@@ -32,17 +32,14 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         self.match.teams[0].captain.is_turn = True
         self.match.teams[0].on_team_ready(False)
 
-        self.rh = reactions.SingleMessageReactionHandler()
+        self.ih = interactions.CaptainInteractionHandler(self.match, views.ready_button, check_turn=False,
+                                                         disable_after_use=False)
 
-        @self.rh.reaction('✅')
-        async def on_ready_reaction(reaction, player, user, msg):
-            if not player.active:
-                raise reactions.UserLackingPermission
-            if player.active not in (self.match.teams[0].captain, self.match.teams[1].captain):
-                raise reactions.UserLackingPermission
-            ctx = ContextWrapper.wrap(self.match.channel, author=user)
+        @self.ih.callback('ready')
+        async def on_ready(captain, interaction_id, interaction, interaction_values):
+            ctx = ContextWrapper.wrap(self.match.channel, author=interaction.user)
             ctx.cmd_name = "ready"
-            await self.ready(ctx, player.active)
+            await self.ready(ctx, captain)
 
         super().__init__(match)
 
@@ -68,27 +65,22 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
 
             await disp.ACC_SENT.send(self.match.channel)
 
-        for i in range(3):
-            try:
-                msg = await disp.MATCH_CONFIRM.send(self.match.channel, self.match.teams[0].captain.mention,
-                                                    self.match.teams[1].captain.mention, match=self.match.proxy)
-                await self.rh.set_new_msg(msg)
-                break
-            except discord.NotFound as e:
-                log.warning(f"Error in `getting_ready` init loop:{e}")
+        ctx = self.ih.get_new_context(self.match.channel)
+        await disp.MATCH_CONFIRM.send(ctx, self.match.teams[0].captain.mention,
+                                           self.match.teams[1].captain.mention, match=self.match.proxy)
 
         self.match.plugin_manager.on_teams_updated()
 
     @Process.public
     async def clear(self, ctx):
-        self.rh.clear()
+        self.ih.clean()
         await self.match.clean_all_auto()
         await disp.MATCH_CLEARED.send(ctx)
 
     @Process.public
     async def info(self):
-        msg = await disp.PK_SHOW_TEAMS.send(self.match.channel, match=self.match.proxy)
-        await self.rh.set_new_msg(msg)
+        ctx = self.ih.get_new_context(self.match.channel)
+        await disp.PK_SHOW_TEAMS.send(ctx, match=self.match.proxy)
 
     def on_team_ready(self, team, ready):
         team.captain.is_turn = not ready
@@ -104,7 +96,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         # If other is_turn, then not ready
         # Else everyone ready
         if not other.captain.is_turn:
-            self.rh.clear()
+            self.ih.clean()
             self.match.ready_next_process()
             for tm in self.match.teams:
                 tm.on_match_starting()
@@ -115,8 +107,8 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
     async def ready(self, ctx, captain):
         if not captain.is_turn:
             self.on_team_ready(captain.team, False)
-            msg = await disp.MATCH_TEAM_UNREADY.send(ctx, captain.team.name, match=self.match.proxy)
-            await self.rh.set_new_msg(msg)
+            ctx = self.ih.get_new_context(ctx)
+            await disp.MATCH_TEAM_UNREADY.send(ctx, captain.team.name, match=self.match.proxy)
             return
         if captain.is_turn:
             if self.match.check_validated:
@@ -139,11 +131,11 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
                     await disp.API_READY_ERROR.send(ctx)
             self.on_team_ready(captain.team, True)
             is_over = self.ready_check(captain.team)
-            msg = await disp.MATCH_TEAM_READY.send(ctx, captain.team.name, match=self.match.proxy)
+            if not is_over:
+                ctx = self.ih.get_new_context(ctx)
+            await disp.MATCH_TEAM_READY.send(ctx, captain.team.name, match=self.match.proxy)
             if is_over:
                 self.match.start_next_process()
-            else:
-                await self.rh.set_new_msg(msg)
 
     @Process.public
     async def try_remove_account(self, a_player, update=False):
@@ -168,7 +160,8 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
 
     @Process.public
     async def do_sub(self, subbed, force_player):
-        new_player = await after_pick_sub(self.match.proxy, subbed.active, force_player, clean_subbed=False)
+        ctx = self.ih.get_new_context(self.match.channel)
+        new_player = await after_pick_sub(self.match.proxy, subbed.active, force_player, clean_subbed=False, ctx=ctx)
         if not new_player:
             return
         if not subbed.active.has_own_account:

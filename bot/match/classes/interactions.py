@@ -14,7 +14,7 @@ class CaptainInteractionHandler(InteractionHandler):
         if self.match.status is MatchStatus.IS_RUNNING:
             raise InteractionInvalid("Match is running!")
         i_ctx = InteractionContext(interaction)
-        captain = await get_check_captain(i_ctx, self.match, check_turn=self.check_turn)
+        captain = await get_check_captain(i_ctx, self.match.proxy, check_turn=self.check_turn)
         if not captain:
             raise InteractionNotAllowed
         return captain
