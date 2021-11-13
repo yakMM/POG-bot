@@ -1,4 +1,4 @@
-from display import AllStrings as disp, ContextWrapper
+from display import AllStrings as disp, ContextWrapper, views
 from asyncio import sleep
 from datetime import datetime as dt, timezone as tz
 from lib.tasks import Loop, loop
@@ -8,7 +8,7 @@ from match import MatchStatus
 from .process import Process
 
 import modules.config as cfg
-import modules.reactions as reactions
+import modules.interactions as interactions
 
 from modules.asynchttp import ApiNotReachable
 
@@ -27,11 +27,12 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         self.match = match
         self.match_loop = Loop(coro=self.on_match_over, minutes=match.round_length, delay=1, count=2)
 
-        self.rh = reactions.SingleMessageReactionHandler(remove_msg=True)
+        self.ih = interactions.InteractionHandler(self.match, views.refresh_button, disable_after_use=False)
+        self.info_message = None
 
-        @self.rh.reaction('🔁')
-        async def refresh_info(reaction, player, user, msg):
-            await disp.PK_SHOW_TEAMS.edit(self.rh.msg, match=self.match.proxy)
+        @self.ih.callback('refresh')
+        async def refresh(player, interaction_id, interaction, interaction_values):
+            await disp.PK_SHOW_TEAMS.edit(self.info_message, match=self.match.proxy)
 
         super().__init__(match)
 
@@ -63,13 +64,14 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
 
     @Process.public
     async def info(self, ctx=None):
-        msg = await disp.PK_SHOW_TEAMS.send(self.match.channel, match=self.match.proxy)
-        await self.rh.set_new_msg(msg)
+        ctx = self.ih.get_new_context(self.match.channel)
+        msg = await disp.PK_SHOW_TEAMS.send(ctx, match=self.match.proxy)
+        self.info_message = msg
 
     @loop(seconds=15)
     async def auto_info_loop(self):
-        if self.rh.is_msg:
-            await disp.PK_SHOW_TEAMS.edit(self.rh.msg, match=self.match.proxy)
+        if self.info_message:
+            await disp.PK_SHOW_TEAMS.edit(self.info_message, match=self.match.proxy)
         else:
             await self.info()
 
@@ -85,7 +87,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
     async def on_match_over(self):
         player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
         self.auto_info_loop.cancel()
-        self.rh.clear()
+        self.ih.clean()
         self.match.plugin_manager.on_round_over()
         round_no = self.match.round_no
         self.match.ready_next_process()
@@ -108,7 +110,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         self.start_match_loop.cancel()
         self.auto_info_loop.cancel()
         self.match_loop.cancel()
-        self.rh.clear()
+        self.ih.clean()
         player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
         self.match.clean_critical()
         self.match.plugin_manager.on_round_over()

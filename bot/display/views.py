@@ -74,6 +74,12 @@ def faction_buttons(ctx):
             buttons.append(ui.Button(label=faction, style=ButtonStyle.grey, custom_id=faction, emoji=cfg.emojis[faction]))
     return buttons
 
+
 @_view
 def ready_button(ctx):
     return ui.Button(label="Ready", style=ButtonStyle.green, custom_id='ready')
+
+
+@_view
+def refresh_button(ctx):
+    return ui.Button(label="Refresh", style=ButtonStyle.blurple, custom_id='refresh')
