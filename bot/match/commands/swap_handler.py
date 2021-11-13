@@ -32,10 +32,10 @@ class SwapHandler(InstantiatedCommand):
             p_2.change_team(team1)
 
             try:
-                ctx = self.match.get_process_attr("get_current_context")(ctx)
+                ctx = self.match.get_current_context(ctx)
             except AttributeError:
                 pass
-            await disp.SWAP_OK.send(ctx, p_1.mention, p_2.mention, match=self.match.proxy)
+            await disp.SWAP_OK.send(ctx, p_1.mention, p_2.mention, match=self.match)
 
             if self.match.status is MatchStatus.IS_WAITING:
                 self.match.plugin_manager.on_teams_updated()

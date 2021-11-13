@@ -71,6 +71,13 @@ class ContextWrapper:
 
     @classmethod
     def wrap(cls, ctx, author=None):
+        if isinstance(ctx, cls):
+            cmd_name = ctx.cmd_name
+            channel_id = ctx.channel_id
+            author = ctx.author
+            message = ctx.message
+            original_ctx = ctx.original_ctx
+            return cls(author, cmd_name, channel_id, message, original_ctx)
         try:
             cmd_name = ctx.command.name
         except AttributeError:

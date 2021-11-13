@@ -21,8 +21,9 @@ async def check_faction(ctx, args):
     :return: Message that was sent (None if no error message)
     """
 
-    if len(ctx.message.mentions) != 0:
+    if ctx.message.mentions:
         # Don't want a mentioned player
+        print(ctx.message.mentions)
         await disp.PK_FACTION_NOT_PLAYER.send(ctx)
     elif len(args) != 1:
         # All factions are in one word
@@ -123,13 +124,13 @@ async def after_pick_sub(match, subbed, force_player, ctx=None, clean_subbed=Tru
 def get_check_player_sync(ctx, match):
     msg = None
     player = Player.get(ctx.author.id)
-    if player is None or (player and not player.is_registered):
+    if not player or (player and not player.is_registered):
         # player not registered
         msg = disp.EXT_NOT_REGISTERED.send(ctx, cfg.channels["register"])
-    elif player.match is None:
+    elif not player.match:
         # if player not in match
         msg = disp.PK_NO_LOBBIED.send(ctx, cfg.channels["lobby"])
-    elif player.match.channel.id != match.channel.id:
+    elif player.match is not match:
         # if player not in the right match channel
         msg = disp.PK_WRONG_CHANNEL.send(ctx, player.match.channel.id)
     else:

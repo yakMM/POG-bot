@@ -81,7 +81,7 @@ class CommandFactory(metaclass=MetaFactory):
             captain.team.on_team_ready(False)
 
         try:
-            await self.match.get_process_attr("pick")(ctx, captain, args)
+            await self.match.pick(ctx, captain, args)
         except AttributeError:
             # Check if faction is valid
             if not await check_faction(ctx, args):
@@ -107,7 +107,7 @@ class CommandFactory(metaclass=MetaFactory):
 
     @Command.command(MatchStatus.IS_WAITING)
     async def ready(self, ctx, args):
-        match = self.match.proxy
+        match = self.match
         captain = await get_check_captain(ctx, match, check_turn=False)
         if not captain:
             return
@@ -162,17 +162,17 @@ class CommandFactory(metaclass=MetaFactory):
 
     @Command.command(*captains_ok_states, MatchStatus.IS_CAPTAIN)
     async def clear(self, ctx, args):
-        match = self.match.proxy
+        match = self.match
         await disp.MATCH_CLEAR.send(ctx)
         await match.clear(ctx)
 
     @Command.command(*captains_ok_states, MatchStatus.IS_CAPTAIN, MatchStatus.IS_STARTING)
     async def info(self, ctx, args):
         try:
-            await self.match.get_process_attr("info")()
+            await self.match.info()
         except AttributeError:
             try:
-                ctx = self.match.get_process_attr("get_current_context")(ctx)
+                ctx = self.match.get_current_context(ctx)
             except AttributeError:
                 pass
-            await disp.PK_SHOW_TEAMS.send(ctx, match=self.match.proxy)
+            await disp.PK_SHOW_TEAMS.send(ctx, match=self.match)

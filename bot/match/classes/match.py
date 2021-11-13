@@ -118,6 +118,12 @@ class Match:
     def round_length(self):
         return self.__data.round_length
 
+    @property
+    def base_selector(self):
+        if not self.__objects:
+            raise AttributeError("Match instance is not bound, no attribute 'round_no'")
+        return self.__objects.base_selector
+
     def change_check(self, arg):
         if not self.__objects:
             raise AttributeError("Match instance is not bound, no attribute 'change_check'")
@@ -214,8 +220,8 @@ class MatchObjects:
         self.check_offline = True
         self.check_validated = True
         self.players_with_account = list()
-        self.command_factory = CommandFactory(self)
-        self.plugin_manager = PluginManager(self)
+        self.command_factory = CommandFactory(self.proxy)
+        self.plugin_manager = PluginManager(self.proxy)
         self.clean_channel.start(display=False)
 
     @property

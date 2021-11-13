@@ -45,8 +45,7 @@ class InteractionHandler:
         self.__locked = True
         if self.__msg:
             self.clean()
-        if not isinstance(ctx, ContextWrapper):
-            ctx = ContextWrapper.wrap(ctx)
+        ctx = ContextWrapper.wrap(ctx)
         ctx.interaction_payload = self.__payload
         return ctx
 

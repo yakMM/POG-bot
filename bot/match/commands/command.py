@@ -96,7 +96,7 @@ class InstantiatedCommand:
         if self.__has_status:
             if (len(args) == 0 and not ctx.message.mentions) or (len(args) == 1 and (args[0] == "help" or args[0] == "h")):
                 try:
-                    await self.__parent.match.get_process_attr(self.__has_status)(ctx)
+                    await getattr(self.__parent.match, self.__has_status)(ctx)
                     return
                 except AttributeError:
                     # This should not happen
