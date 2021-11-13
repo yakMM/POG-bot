@@ -1,7 +1,7 @@
 from lib.tasks import loop
 from asyncio import get_event_loop
 from logging import getLogger
-from modules.interactions import InteractionHandler, InteractionNotAllowed, InteractionInvalid
+from .interactions import CaptainInteractionHandler, InteractionNotAllowed, InteractionInvalid
 
 from classes.bases import Base
 
@@ -13,8 +13,6 @@ from display import AllStrings as disp, ContextWrapper, InteractionContext, view
 from modules.jaeger_calendar import get_booked_bases
 from modules.roles import is_admin
 import modules.tools as tools
-
-from match.common import get_check_captain
 
 
 log = getLogger("pog_bot")
@@ -57,8 +55,9 @@ class BaseSelector:
         self.__booked = list()
         self.__reset_selection()
         self.__validator = CaptainValidator(self.__match)
-        self.__base_interaction = InteractionHandler(self, views.bases_selection, disable_after_use=False,
-                                                     is_admin_allowed=True)
+        self.__base_interaction = CaptainInteractionHandler(self.__match.proxy, views.bases_selection,
+                                                            disable_after_use=False,
+                                                            is_admin_allowed=True)
         self.__add_callbacks(self.__validator, self.__base_interaction)
         self._get_booked_from_calendar.start()
 
@@ -111,15 +110,9 @@ class BaseSelector:
             self.__match.plugin_manager.on_base_selected(base)
 
         @interaction_handler.callback('base_selector')
-        async def base_select(player, interaction_id, interaction, values):
+        async def base_select(captain, interaction_id, interaction, values):
             author = interaction.user
-            captain = None
-            if not is_admin(author):
-                i_ctx = InteractionContext(interaction)
-                captain = await get_check_captain(i_ctx, self.__match, check_turn=False)
-                if not captain:
-                    raise InteractionNotAllowed
-            ctx = ContextWrapper.wrap(self.__match.channel, author=author)
+            ctx = ContextWrapper.wrap(self.__match.channel, author=interaction.user)
             try:
                 value = int(values[0])
             except (ValueError, IndexError):

@@ -23,7 +23,7 @@ def bases_selection(ctx):
 
     options = list()
 
-    bases_list = sorted(ctx.interaction_payload.owner.bases_list, key=operator.itemgetter('name'))
+    bases_list = sorted(ctx.interaction_payload.owner.base_selector.bases_list, key=operator.itemgetter('name'))
 
     for base in bases_list:
         description_args = list()

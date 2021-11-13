@@ -60,7 +60,7 @@ class InteractionHandler:
         return player
 
     def __is_admin(self, user):
-        return is_admin(user) and self.__is_admin_allowed
+        return self.__is_admin_allowed and is_admin(user)
 
     async def run(self, interaction: Interaction):
         if self.__locked:
@@ -81,9 +81,10 @@ class InteractionHandler:
         interaction_values = interaction.data.get('values', None)
 
         try:
-            player = await self.run_player_check(player, interaction)
-            if not player and not self.__is_admin(user):
-                raise InteractionNotAllowed
+            if not self.__is_admin(user):
+                player = await self.run_player_check(player, interaction)
+                if not player:
+                    raise InteractionNotAllowed
             if not self.__callback:
                 funcs = self.__f_dict[interaction_id]
             else:
