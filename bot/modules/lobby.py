@@ -1,6 +1,5 @@
 import modules.config as cfg
-from display.strings import AllStrings as disp
-from display.classes import ContextWrapper
+from display import AllStrings as disp, ContextWrapper, views
 
 from lib.tasks import Loop, loop
 from logging import getLogger
@@ -19,10 +18,7 @@ _warned_players = dict()
 
 
 def reset_timeout(player):
-    for k in list(_warned_players.keys()):
-        if _warned_players[k] is player:
-            reactions.auto_clear(k)
-            del _warned_players[k]
+    _remove_from_warned(player)
     player.reset_lobby_timestamp()
 
 
@@ -35,30 +31,27 @@ def init(m_cls, client):
 
 
 def _remove_from_warned(p):
-    for k in list(_warned_players.keys()):
-        if _warned_players[k] is p:
-            reactions.auto_clear(k)
-            del _warned_players[k]
+    _warned_players[p].clean()
+    del _warned_players[p]
 
 
 def _clear_warned():
-    for k in list(_warned_players.keys()):
-        reactions.auto_clear(k)
+    for k in list(_warned_players.values()):
+        k.clean()
     _warned_players.clear()
 
 
-def _add_callback(ih):
-    @ih.callback('reload')
-    async def on_user_react(reaction, player, user, msg):
-        if msg in _warned_players:
-            if _warned_players[msg] is player:
-                ctx = ContextWrapper.channel(cfg.channels["lobby"])
-                ctx.author = user
-                player.reset_lobby_timestamp()
-                del _warned_players[msg]
-                await disp.LB_REFRESHED.send(ctx)
-                return
-        raise reactions.UserLackingPermission
+def _add_ih_callback(ih, player):
+    @ih.callback('reset')
+    async def on_user_react(p, interaction_id, interaction, interaction_values):
+        user = interaction.user
+        if user.id == player.id:
+            ctx = ContextWrapper.channel(cfg.channels["lobby"])
+            ctx.author = user
+            reset_timeout(player)
+            await disp.LB_REFRESHED.send(ctx)
+        else:
+            raise interactions.InteractionNotAllowed
 
 
 def is_lobby_stuck():
@@ -80,10 +73,12 @@ async def _lobby_loop():
             await disp.LB_TOO_LONG.send(ContextWrapper.channel(cfg.channels["lobby"]), p.mention,
                                         names_in_lobby=get_all_names_in_lobby())
         elif p.lobby_stamp < (now - 7200):
-            if p not in _warned_players.values():
-                msg = await disp.LB_WARNING.send(ContextWrapper.channel(cfg.channels["lobby"]), p.mention)
-                await _rh.auto_add(msg)
-                _warned_players[msg] = p
+            if p not in _warned_players:
+                ih = interactions.InteractionHandler(p, views.reset_button)
+                _warned_players[p] = ih
+                _add_ih_callback(ih, p)
+                ctx = ih.get_new_context(ContextWrapper.channel(cfg.channels["lobby"]))
+                await disp.LB_WARNING.send(ctx, p.mention)
 
 
 def _auto_ping_threshold():

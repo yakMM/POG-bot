@@ -37,7 +37,7 @@ class AllStrings(Enum):
     LB_STUCK_JOIN = Message("You can't join the lobby, it is already full!")
     LB_MATCH_STARTING = Message("Lobby full, match can start! Join <#{}> for team selection!", ping=False,
                                 embed=embeds.join_ts)
-    LB_WARNING = Message("{} you will be timed out of the lobby soon! Use `=reset` or react below to remain in the queue!")
+    LB_WARNING = Message("{} you will be timed out of the lobby soon! Use `=reset` to remain in the queue!")
     LB_TOO_LONG = Message("{} was removed from the lobby by timeout!", embed=embeds.lobby_list)
     LB_CLEARED = Message("Lobby has been cleared!", embed=embeds.lobby_list)
     LB_EMPTY = Message("Lobby is already empty!")
@@ -64,18 +64,18 @@ class AllStrings(Enum):
     PK_OK_2 = Message("Player picked!", ping=False)
     PK_P_OK_2 = Message("Picked {}!", ping=False)
     PK_LAST = Message("Assigned {} to {}!", embed=embeds.team_update)
-    PK_OK_FACTION = Message("Teams are ready! {} pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting below!",
+    PK_OK_FACTION = Message("Teams are ready! {} pick a faction with `=pick` `tr`/`vs`/`nc`!",
                             ping=False)
     PK_NOT_VALID_FACTION = Message("Incorrect input!")
     PK_FACTION_OK = Message("{} chose {}!", ping=False)
     PK_FACTION_ALREADY = Message("Your team is already {}!")
     PK_FACTION_OTHER = Message("Faction already picked by the other team!")
-    PK_FACTION_OK_NEXT = Message("{} chose {}! {} pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting below!",
+    PK_FACTION_OK_NEXT = Message("{} chose {}! {} pick a faction with `=pick` `tr`/`vs`/`nc`!",
                                  ping=False)
     PK_FACTION_CHANGED = Message("{} changed to {}!", ping=False)
     PK_FACTION_NOT_PLAYER = Message("Pick a faction, not a player!")
     PK_FACTION_INFO = Message("Captains can change faction with `=pick` `tr`/`vs`/`nc`!")
-    PK_FACTION_HELP = Message("Waiting for {} to pick a faction with `=pick` `tr`/`vs`/`nc` or by reacting below!",
+    PK_FACTION_HELP = Message("Waiting for {} to pick a faction with `=pick` `tr`/`vs`/`nc`!",
                               ping=False)
     PK_BASING_INFO = Message("Waiting for captains to pick a base with `=base`!\n"
                              "Captains can change faction with `=pick` `tr`/`vs`/`nc`!")
@@ -147,7 +147,7 @@ class AllStrings(Enum):
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ping=False)
     MATCH_BASE_AUTO = Message("Match will be on **{}**", ping=False)
-    MATCH_CONFIRM = Message("{} {} Type `=ready` or react below when your team is inside their sunderer, ready to start",
+    MATCH_CONFIRM = Message("{} {} Type `=ready` when your team is inside their sunderer, ready to start",
                             embed=embeds.team_update)
     MATCH_TEAM_READY = Message("{} is now ready!", embed=embeds.team_update)
     MATCH_TEAM_UNREADY = Message("{} is no longer ready!", embed=embeds.team_update)

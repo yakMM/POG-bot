@@ -88,3 +88,8 @@ def refresh_button(ctx):
 @_view
 def accept_button(ctx):
     return ui.Button(label="Accept", style=ButtonStyle.green, custom_id='accept')
+
+
+@_view
+def reset_button(ctx):
+    return ui.Button(label="Reset timeout", style=ButtonStyle.blurple, custom_id='reset')
