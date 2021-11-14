@@ -21,7 +21,7 @@ from time import gmtime
 from modules.tools import UnexpectedError
 
 # Display
-from display.strings import AllStrings as disp
+from display.strings import AllStrings as disp, views
 from display.classes import ContextWrapper
 
 # Custom modules
@@ -35,12 +35,16 @@ import modules.message_filter
 import modules.accounts_handler
 import modules.signal
 import modules.stat_processor
+import modules.interactions
 
 # Classes
 from match.classes.match import Match
 from classes import Player, Base, Weapon
 
 log = logging.getLogger("pog_bot")
+
+_interactions_handler = modules.interactions.InteractionHandler(None, views.accept_button, disable_after_use=False)
+
 
 def _add_main_handlers(client):
     """_add_main_handlers, private function
@@ -118,25 +122,7 @@ def _add_main_handlers(client):
     # Reaction update handler (for rule acceptance)
     @client.event
     # Has to be on_raw cause the message already exists when the bot starts
-    async def on_raw_reaction_add(payload):
-        if payload.member is None or payload.member.bot:  # If bot, do nothing
-            return
-        if modules.loader.is_all_locked():
-            return
-        # reaction to the rule message?
-        if payload.message_id == cfg.general["rules_msg_id"]:
-            # print(str(payload.emoji))
-            if str(payload.emoji) == "✅":
-                p = Player.get(payload.member.id)
-                if not p:  # if new player
-                    # create a new profile
-                    p = Player(payload.member.id, payload.member.name)
-                    await modules.roles.role_update(p)
-                    await modules.database.async_db_call(modules.database.set_element, "users", p.id, p.get_data())
-                    await disp.REG_RULES.send(ContextWrapper.channel(cfg.channels["register"]), payload.member.mention)
-                else:
-                    await modules.roles.role_update(p)
-            await modules.roles.rules_msg.remove_reaction(payload.emoji, payload.member)
+
 
     @client.event
     async def on_member_join(member):
@@ -160,6 +146,24 @@ def _add_main_handlers(client):
 
 def _add_init_handlers(client):
 
+    @_interactions_handler.callback('accept')
+    async def on_rule_accept(player, interaction_id, interaction, interaction_values):
+        user = interaction.user
+        if modules.loader.is_all_locked():
+            raise modules.interactions.InteractionNotAllowed
+        # reaction to the rule message?
+        p = Player.get(user.id)
+        if not p:  # if new player
+            # create a new profile
+            p = Player(user.id, user.name)
+            await modules.roles.role_update(p)
+            await modules.database.async_db_call(modules.database.set_element, "users", p.id, p.get_data())
+            await disp.REG_RULES.send(ContextWrapper.channel(cfg.channels["register"]),
+                                      user.mention)
+        else:
+            await modules.roles.role_update(p)
+            await modules.roles.role_update(p)
+
     @client.event
     async def on_ready():
         # Initialise matches channels
@@ -170,7 +174,13 @@ def _add_init_handlers(client):
         modules.signal.init()
 
         # fetch rule message, remove all reaction but the bot's
-        await modules.roles.update_rule_msg()
+        channel = client.get_channel(cfg.channels["rules"])
+        msg = await channel.fetch_message(channel.last_message_id)
+        ctx = _interactions_handler.get_new_context(msg)
+        if msg.author.id == client.user.id:
+            await disp.RULES.edit(ctx)
+        else:
+            await disp.RULES.send(ctx)
 
         # Update all players roles
         for p in Player.get_all_players_list():
@@ -283,9 +293,9 @@ def main(launch_str=""):
     intents.messages = True
     # intents.guild_messages Activated by the previous one
     # intents.dm_messages Activated by the previous one
-    intents.reactions = True
-    # intents.guild_reactions Activated by the previous one
-    # intents.dm_reactions Activated by the previous one
+    intents.reactions = False
+    # intents.guild_reactions
+    # intents.dm_reactions
     intents.typing = False
     intents.guild_typing = False
     intents.dm_typing = False

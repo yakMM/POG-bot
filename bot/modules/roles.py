@@ -3,11 +3,9 @@
 import modules.config as cfg
 
 from discord import Status
-from asyncio import sleep
 
 _roles_dict = dict()
 _guild = None
-rules_msg = None
 
 
 def init(client):
@@ -23,14 +21,6 @@ def is_admin(member):
     if member is None:
         return False
     return _roles_dict["admin"] in member.roles
-
-
-async def update_rule_msg():
-    global rules_msg
-    rules_msg = await _guild.get_channel(cfg.channels["rules"]).fetch_message(cfg.general["rules_msg_id"])
-    await rules_msg.clear_reactions()
-    await sleep(0.2)
-    await rules_msg.add_reaction('✅')
 
 
 def is_muted(member):

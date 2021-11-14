@@ -114,7 +114,6 @@ general = {
     "command_prefix": "",
     "lobby_size": 0,
     'round_length': 0,
-    "rules_msg_id": 0,
     "squittal_url": ""
 }
 

@@ -100,6 +100,7 @@ class AllStrings(Enum):
     CHECK_ACCOUNT = Message("Your account password may have been flipped!\n"
                             "Re-register in <#{}> to confirm you still have access to it!", embed=embeds.flip_accounts)
     RDY = Message("Bot just started and is now ready. Version `{}`")
+    RULES = Message("Click below to accept the rules", ping=False)
     STOP = Message("Bot shutting down! Saving state...")
     SPAM_CLEARED = Message("Cleared the spam list!")
     SPAM_DEBUG = Message("Here are the players in the spam filter:{}")
