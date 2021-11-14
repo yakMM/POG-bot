@@ -13,6 +13,7 @@ Now using discord components instead of the reaction system:
 - Now using buttons for status refresh
 - Now using buttons for lobby timeout reset
 - Now using buttons for account validation
+- Now using buttons for rule acceptance
 - It is no longer possible to use message command for accept/decline: only interactions will work
 - Removed the reaction module
 
