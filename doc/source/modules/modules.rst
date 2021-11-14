@@ -17,7 +17,7 @@ This package contains general utilities used by the rest of the application.
    modules.loader
    modules.lobby
    modules.message_filter
-   modules.reactions
+   modules.interactions
    modules.roles
    modules.signal
    modules.spam_checker

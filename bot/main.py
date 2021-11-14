@@ -27,7 +27,6 @@ from display.classes import ContextWrapper
 # Custom modules
 import modules.config as cfg
 import modules.roles
-import modules.reactions
 import modules.jaeger_calendar
 import modules.loader
 import modules.lobby
@@ -138,20 +137,6 @@ def _add_main_handlers(client):
                 else:
                     await modules.roles.role_update(p)
             await modules.roles.rules_msg.remove_reaction(payload.emoji, payload.member)
-
-    # Reaction update handler (for accounts)
-    @client.event
-    async def on_reaction_add(reaction, user):
-        # If the reaction is from the bot
-        if user == client.user:
-            return
-        # If the reaction is not to a message of the bot
-        if reaction.message.author != client.user:
-            return
-        player = Player.get(user.id)
-        if not player:
-            return
-        await modules.reactions.reaction_handler(reaction, user, player)
 
     @client.event
     async def on_member_join(member):
@@ -323,9 +308,6 @@ def main(launch_str=""):
 
     # Initialise display module
     ContextWrapper.init(client)
-
-    # Initialise reaction handlers
-    modules.reactions.init(client)
 
     # Init lobby
     modules.lobby.init(Match, client)

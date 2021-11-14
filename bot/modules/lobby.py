@@ -5,7 +5,6 @@ from lib.tasks import Loop, loop
 from logging import getLogger
 
 import modules.tools as tools
-import modules.reactions as reactions
 import modules.interactions as interactions
 
 log = getLogger("pog_bot")

@@ -12,7 +12,6 @@ from classes import ActivePlayer, Team
 from lib.tasks import loop
 
 import modules.config as cfg
-import modules.reactions as reactions
 import modules.roles as roles
 from modules.tools import UnexpectedError
 import match.classes.interactions as interactions
