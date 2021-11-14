@@ -1,14 +1,28 @@
 # v3.5:
-## (WIP)
-Now using discord components instead of the reaction system
+Now using discord components instead of the reaction system:
 - Refactored ContextWrapper system and display classes
 - Added Interaction module
+- Added Captain and Player interaction classes
+- Now using buttons for captain selection phase
+- Added buttons for player picking
+- Now using buttons for faction selection phase
 - Now using a select menu for base selection
 - Now using buttons for CaptainValidator
 - Added buttons for player picking
-- Now using buttons for captain selection phase
-- =captain command is now admin-only
+- Now using buttons for getting-ready phase
+- Now using buttons for status refresh
+- Now using buttons for lobby timeout reset
+- Now using buttons for account validation
 - It is no longer possible to use message command for accept/decline: only interactions will work
+- Removed the reaction module
+
+Other fixes:
+- =captain command is now admin-only
+- Improved resilience to network client error
+- Fixed the signal module to save the lobby on restart
+- Updated the weapon script
+- Standardized the use of match.proxy
+- Small Jaeger character registration improvement
 
 # v3.4:
 This is the last version with the reaction system, newer versions will use discord UI component.
