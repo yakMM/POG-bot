@@ -106,6 +106,10 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         self.match.start_next_process()
 
     @Process.public
+    def get_current_context(self, ctx):
+        return self.ih.get_new_context(ctx)
+
+    @Process.public
     async def clear(self, ctx):
         self.start_match_loop.cancel()
         self.auto_info_loop.cancel()

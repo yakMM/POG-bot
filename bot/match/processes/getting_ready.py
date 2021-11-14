@@ -67,7 +67,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
 
         ctx = self.ih.get_new_context(self.match.channel)
         await disp.MATCH_CONFIRM.send(ctx, self.match.teams[0].captain.mention,
-                                           self.match.teams[1].captain.mention, match=self.match.proxy)
+                                      self.match.teams[1].captain.mention, match=self.match.proxy)
 
         self.match.plugin_manager.on_teams_updated()
 
@@ -159,9 +159,13 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
             await self.clear()
 
     @Process.public
+    def get_current_context(self, ctx):
+        return self.ih.get_new_context(ctx)
+
+    @Process.public
     async def do_sub(self, subbed, force_player):
         ctx = self.ih.get_new_context(self.match.channel)
-        new_player = await after_pick_sub(self.match.proxy, subbed.active, force_player, clean_subbed=False, ctx=ctx)
+        new_player = await after_pick_sub(self.match, subbed.active, force_player, clean_subbed=False, ctx=ctx)
         if not new_player:
             return
         if not subbed.active.has_own_account:

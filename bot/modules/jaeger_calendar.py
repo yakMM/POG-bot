@@ -59,7 +59,7 @@ def get_booked_bases(base_class, booked_bases_list):  # runs on class init, save
                 for booked in booked_bases:
                     if booked is not None and booked not in booked_bases_list:
                         booked_bases_list.append(booked)
-        except ValueError as e:
+        except (ValueError, TypeError) as e:
             log.warning(f"Skipping invalid line in Jaeger Calendar:\n{booking}\nError: {e}")
 
 

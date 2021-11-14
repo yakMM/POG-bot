@@ -118,12 +118,6 @@ class Match:
     def round_length(self):
         return self.__data.round_length
 
-    @property
-    def base_selector(self):
-        if not self.__objects:
-            raise AttributeError("Match instance is not bound, no attribute 'round_no'")
-        return self.__objects.base_selector
-
     def change_check(self, arg):
         if not self.__objects:
             raise AttributeError("Match instance is not bound, no attribute 'change_check'")
@@ -137,6 +131,8 @@ class Match:
             raise KeyError
 
     def spin_up(self, p_list):
+        if not self.__objects:
+            raise AttributeError("Match instance is not bound, no attribute 'spin_up'")
         Match._last_match_id += 1
         self.__objects.on_spin_up(p_list)
         db.set_field("restart_data", 0, {"last_match_id": Match._last_match_id})
@@ -146,6 +142,12 @@ class Match:
         if not self.__objects:
             raise AttributeError(f"Match instance is not bound, no attribute 'command'")
         return self.__objects.command
+
+    @property
+    def bases_list(self):
+        if not self.__objects:
+            raise AttributeError(f"Match instance is not bound, no attribute 'bases_list'")
+        return self.__objects.base_selector.bases_list
 
     def __getattr__(self, name):
         if not self.__objects:
@@ -220,7 +222,7 @@ class MatchObjects:
         self.check_offline = True
         self.check_validated = True
         self.players_with_account = list()
-        self.command_factory = CommandFactory(self.proxy)
+        self.command_factory = CommandFactory(self)
         self.plugin_manager = PluginManager(self.proxy)
         self.clean_channel.start(display=False)
 

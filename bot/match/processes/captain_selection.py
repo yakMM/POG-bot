@@ -29,10 +29,11 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
         self.captains = [None, None]
 
-        self.volunteer_ih = interactions.PlayerInteractionHandler(self.match.proxy, views.volunteer_button, disable_after_use=False)
+        self.volunteer_ih = interactions.PlayerInteractionHandler(self.match, views.volunteer_button,
+                                                                  disable_after_use=False)
 
-        self.accept_ihs = [interactions.PlayerInteractionHandler(self.match.proxy, views.validation_buttons),
-                           interactions.PlayerInteractionHandler(self.match.proxy, views.validation_buttons)]
+        self.accept_ihs = [interactions.PlayerInteractionHandler(self.match, views.validation_buttons),
+                           interactions.PlayerInteractionHandler(self.match, views.validation_buttons)]
 
         for i in range(2):
             self.add_callbacks(i, self.accept_ihs[i])
@@ -227,7 +228,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         ctx = self.volunteer_ih.get_new_context(self.match.channel)
         # If subbed one has already been picked
         if subbed.active:
-            player = await after_pick_sub(self.match.proxy, subbed.active, force_player, ctx=ctx)
+            player = await after_pick_sub(self.match, subbed.active, force_player, ctx=ctx)
             if player:
                 if subbed is self.captains[0]:
                     self.captains[0] = player
@@ -237,7 +238,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
                     raise UnexpectedError("Captain not found!")
         else:
             # Get a new player for substitution
-            new_player = await get_substitute(self.match.proxy, subbed, player=force_player)
+            new_player = await get_substitute(self.match, subbed, player=force_player)
             if not new_player:
                 return
 
@@ -261,7 +262,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
             # Clean subbed one and send message
             subbed.on_player_clean()
             await disp.SUB_OKAY.send(ctx, new_player.mention,
-                                           subbed.mention, match=self.match.proxy)
+                                     subbed.mention, match=self.match.proxy)
 
             if i != -1:
                 await self.get_new_auto(i)

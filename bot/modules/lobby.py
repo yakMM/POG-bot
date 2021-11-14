@@ -7,6 +7,7 @@ from logging import getLogger
 
 import modules.tools as tools
 import modules.reactions as reactions
+import modules.interactions as interactions
 
 log = getLogger("pog_bot")
 
@@ -15,7 +16,6 @@ _lobby_stuck = False
 _MatchClass = None
 _client = None
 _warned_players = dict()
-_rh = reactions.ReactionHandler(rem_bot_react=True)
 
 
 def reset_timeout(player):
@@ -47,17 +47,18 @@ def _clear_warned():
     _warned_players.clear()
 
 
-@_rh.reaction('🔁')
-async def on_user_react(reaction, player, user, msg):
-    if msg in _warned_players:
-        if _warned_players[msg] is player:
-            ctx = ContextWrapper.channel(cfg.channels["lobby"])
-            ctx.author = user
-            player.reset_lobby_timestamp()
-            del _warned_players[msg]
-            await disp.LB_REFRESHED.send(ctx)
-            return
-    raise reactions.UserLackingPermission
+def _add_callback(ih):
+    @ih.callback('reload')
+    async def on_user_react(reaction, player, user, msg):
+        if msg in _warned_players:
+            if _warned_players[msg] is player:
+                ctx = ContextWrapper.channel(cfg.channels["lobby"])
+                ctx.author = user
+                player.reset_lobby_timestamp()
+                del _warned_players[msg]
+                await disp.LB_REFRESHED.send(ctx)
+                return
+        raise reactions.UserLackingPermission
 
 
 def is_lobby_stuck():

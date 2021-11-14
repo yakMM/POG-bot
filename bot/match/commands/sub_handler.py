@@ -30,7 +30,7 @@ class SubHandler(InstantiatedCommand):
                 await self.sub_func(subbed, force_player)
             else:
                 try:
-                    ctx = self.match.get_current_context(ctx)
+                    ctx = self.match.get_process_attr('get_current_context')(ctx)
                 except AttributeError:
                     pass
                 await after_pick_sub(self.match, subbed.active, force_player, ctx=ctx)
@@ -43,7 +43,7 @@ class SubHandler(InstantiatedCommand):
 
     def on_update(self):
         try:
-            self.sub_func = self.match.do_sub
+            self.sub_func = self.match.get_process_attr('do_sub')
         except AttributeError:
             self.sub_func = None
 
@@ -72,7 +72,7 @@ class SubHandler(InstantiatedCommand):
         if not subbed:
             await disp.RM_NOT_IN_DB.send(ctx)
             return
-        if not(subbed.match and subbed.match.id == self.match.id):
+        if not(subbed.match and subbed.match is self.match.proxy):
             await disp.SUB_NO.send(ctx)
             return
         if subbed.active and subbed.active.is_playing:

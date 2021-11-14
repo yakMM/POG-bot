@@ -8,13 +8,13 @@ class CaptainInteractionHandler(InteractionHandler):
     def __init__(self, match, view, check_turn=True, **kwargs):
         self.match = match
         self.check_turn = check_turn
-        super().__init__(match, view, **kwargs)
+        super().__init__(match.proxy, view, **kwargs)
 
     async def run_player_check(self, interaction):
         if self.match.status is MatchStatus.IS_RUNNING:
             raise InteractionInvalid("Match is running!")
         i_ctx = InteractionContext(interaction)
-        captain = await get_check_captain(i_ctx, self.match.proxy, check_turn=self.check_turn)
+        captain = await get_check_captain(i_ctx, self.match, check_turn=self.check_turn)
         if not captain:
             raise InteractionNotAllowed
         return captain
@@ -23,7 +23,7 @@ class CaptainInteractionHandler(InteractionHandler):
 class PlayerInteractionHandler(InteractionHandler):
     def __init__(self, match, view, **kwargs):
         self.match = match
-        super().__init__(match, view, **kwargs)
+        super().__init__(match.proxy, view, **kwargs)
 
     async def run_player_check(self, interaction):
         if self.match.status is MatchStatus.IS_RUNNING:

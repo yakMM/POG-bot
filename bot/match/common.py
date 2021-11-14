@@ -36,11 +36,11 @@ async def check_faction(ctx, args):
     return False
 
 
-def switch_turn(process, team):
+def switch_turn(match, team):
     """
     Change the team who can pick.
 
-    :param process: Process object calling this function
+    :param match: Match object
     :param team: The team who is currently picking
     :return: Next team to pick
     """
@@ -48,7 +48,7 @@ def switch_turn(process, team):
     team.captain.is_turn = False
 
     # Get the other team
-    other = process.match.teams[team.id - 1]
+    other = match.teams[team.id - 1]
     other.captain.is_turn = True
     return other
 
@@ -71,7 +71,7 @@ async def get_substitute(match, subbed, player=None):
 
     Loop(coro=ping_sub_in_lobby, count=1).start(match, player, was_lobbied)
 
-    await player.on_match_selected(match)
+    await player.on_match_selected(match.proxy)
     return player
 
 
@@ -79,11 +79,11 @@ async def ping_sub_in_lobby(match, new_player, was_lobbied):
     if was_lobbied:
         await disp.SUB_LOBBY.send(ContextWrapper.channel(cfg.channels["lobby"]), new_player.mention, match.channel.id,
                                   names_in_lobby=get_all_names_in_lobby())
-    ctx = ContextWrapper.user(new_player.id)
-    try:
-        await disp.MATCH_DM_PING.send(ctx, match.id, match.channel.name)
-    except discord.errors.Forbidden:
-        log.warning(f"Player id:[{new_player.id}], name:[{new_player.name}] is refusing DMs")
+    # ctx = ContextWrapper.user(new_player.id)
+    # try:
+    #     await disp.MATCH_DM_PING.send(ctx, match.id, match.channel.name)
+    # except discord.errors.Forbidden:
+    #     log.warning(f"Player id:[{new_player.id}], name:[{new_player.name}] is refusing DMs")
 
 
 async def after_pick_sub(match, subbed, force_player, ctx=None, clean_subbed=True):
@@ -114,9 +114,9 @@ async def after_pick_sub(match, subbed, force_player, ctx=None, clean_subbed=Tru
 
     # Display what happened
     if new_player.active.is_captain:
-        await disp.SUB_OKAY_CAP.send(*args, match=match)
+        await disp.SUB_OKAY_CAP.send(*args, match=match.proxy)
     else:
-        await disp.SUB_OKAY_TEAM.send(*args, match=match)
+        await disp.SUB_OKAY_TEAM.send(*args, match=match.proxy)
 
     return new_player
 
@@ -130,7 +130,7 @@ def get_check_player_sync(ctx, match):
     elif not player.match:
         # if player not in match
         msg = disp.PK_NO_LOBBIED.send(ctx, cfg.channels["lobby"])
-    elif player.match is not match:
+    elif player.match is not match.proxy:
         # if player not in the right match channel
         msg = disp.PK_WRONG_CHANNEL.send(ctx, player.match.channel.id)
     else:

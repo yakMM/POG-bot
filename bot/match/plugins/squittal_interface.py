@@ -36,7 +36,7 @@ class SquittalInterface(Plugin):
 
     def on_base_selected(self, base):
         if self.available:
-            self.operation_queue.put(("base", f'"{self.match.base.id}"'))
+            self.operation_queue.put(("base", f'"{base.id}"'))
             if self.initialized:
                 try:
                     self.do_all.start()

@@ -20,7 +20,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         self.match.base_selector = BaseSelector(self.match, base_pool=True)
 
         self.interaction_handler = interactions.CaptainInteractionHandler(
-            self.match.proxy,
+            self.match,
             views.players_buttons,
             disable_after_use=False,
             single_callback=self.interaction_callback
@@ -74,10 +74,10 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         ctx = self.interaction_handler.get_new_context(self.match.channel)
         # If subbed one has already been picked
         if subbed.active:
-            await after_pick_sub(self.match.proxy, subbed.active, force_player, ctx=ctx)
+            await after_pick_sub(self.match, subbed.active, force_player, ctx=ctx)
         else:
             # Get a new player for substitution
-            new_player = await get_substitute(self.match.proxy, subbed, player=force_player)
+            new_player = await get_substitute(self.match, subbed, player=force_player)
             if not new_player:
                 return
             # Remove them fro the player list
@@ -86,7 +86,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             self.players[new_player.id] = new_player
             # Clean subbed one and send message
             subbed.on_player_clean()
-            await disp.SUB_OKAY.send(ctx, new_player.mention, subbed.mention, match=self.match.proxy)
+            await disp.SUB_OKAY.send(ctx, new_player.mention, subbed.mention, match=self.match)
             return
 
     @Process.public
@@ -189,7 +189,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         self.players.pop(player.id)
 
         # It's other team captain's time to pick
-        other = switch_turn(self, team)
+        other = switch_turn(self.match, team)
 
         # Check if no player left to pick
         self.pick_check(other)

@@ -56,6 +56,7 @@ class BaseSelector:
         self.__reset_selection()
         self.__validator = CaptainValidator(self.__match)
         self.__base_interaction = CaptainInteractionHandler(self.__match, views.bases_selection,
+                                                            check_turn=False,
                                                             disable_after_use=False,
                                                             is_admin_allowed=True)
         self.__add_callbacks(self.__validator, self.__base_interaction)

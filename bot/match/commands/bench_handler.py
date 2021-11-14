@@ -34,13 +34,13 @@ class BenchHandler(InstantiatedCommand):
 
             player.bench(bench)
             try:
-                ctx = self.match.get_current_context(ctx)
+                ctx = self.match.get_process_attr('get_current_context')(ctx)
             except AttributeError:
                 pass
             if bench:
-                await disp.BENCH_OK.send(ctx, player.mention, match=self.match)
+                await disp.BENCH_OK.send(ctx, player.mention, match=self.match.proxy)
             else:
-                await disp.UNBENCH_OK.send(ctx, player.mention, match=self.match)
+                await disp.UNBENCH_OK.send(ctx, player.mention, match=self.match.proxy)
 
             if self.match.status is MatchStatus.IS_WAITING:
                 self.match.plugin_manager.on_teams_updated()
@@ -71,7 +71,7 @@ class BenchHandler(InstantiatedCommand):
         if not p:
             await disp.RM_NOT_IN_DB.send(ctx)
             return
-        if not (p.match and p.active and p.match.id == self.match.id):
+        if not (p.match and p.active and p.match is self.match.proxy):
             await disp.BENCH_NO.send(ctx, p.mention)
             return
         if bench and p.active.is_benched:

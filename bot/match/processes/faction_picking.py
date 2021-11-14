@@ -15,17 +15,18 @@ log = getLogger("pog_bot")
 
 class FactionPicking(Process, status=MatchStatus.IS_FACTION):
     def __init__(self, match):
-        super().__init__(match)
         self.match = match
 
         self.picked_faction = ""
 
-        self.interaction_handler = interactions.CaptainInteractionHandler(self.match.proxy, views.faction_buttons,
+        self.interaction_handler = interactions.CaptainInteractionHandler(self.match, views.faction_buttons,
                                                                           disable_after_use=False)
         self.add_callbacks(self.interaction_handler)
 
         self.match.teams[1].captain.is_turn = True
         self.match.teams[0].captain.is_turn = False
+
+        super().__init__(match)
 
     @Process.init_loop
     async def init_loop(self):
@@ -89,7 +90,7 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
 
         # If not, select the faction and give turn to other team
         team.faction = faction
-        switch_turn(self, team)
+        switch_turn(self.match, team)
 
         self.match.plugin_manager.on_faction_pick(team)
 

@@ -87,16 +87,24 @@ class InstantiatedCommand:
             if len(args) == 1 and (args[0] == "help" or args[0] == "h"):
                 await self.__has_help.send(ctx)
                 return
+        cmd_name = "unknown"
+        try:
+            cmd_name = ctx.cmd_name
+        except AttributeError:
+            try:
+                cmd_name = ctx.command.name
+            except AttributeError:
+                pass
         if self.__parent.match.status is MatchStatus.IS_FREE:
-            await disp.MATCH_NO_MATCH.send(ctx, ctx.command.name)
+            await disp.MATCH_NO_MATCH.send(ctx, cmd_name)
             return
         if self.__parent.match.status not in self.__status:
-            await disp.MATCH_NO_COMMAND.send(ctx, ctx.command.name)
+            await disp.MATCH_NO_COMMAND.send(ctx, cmd_name)
             return
         if self.__has_status:
             if (len(args) == 0 and not ctx.message.mentions) or (len(args) == 1 and (args[0] == "help" or args[0] == "h")):
                 try:
-                    await getattr(self.__parent.match, self.__has_status)(ctx)
+                    await self.__parent.match.get_process_attr(self.__has_status)(ctx)
                     return
                 except AttributeError:
                     # This should not happen
