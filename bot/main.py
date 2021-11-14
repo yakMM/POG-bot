@@ -119,11 +119,6 @@ def _add_main_handlers(client):
             await disp.UNKNOWN_ERROR.send(ctx, type(original).__name__)
         raise error
 
-    # Reaction update handler (for rule acceptance)
-    @client.event
-    # Has to be on_raw cause the message already exists when the bot starts
-
-
     @client.event
     async def on_member_join(member):
         player = Player.get(member.id)
@@ -176,10 +171,11 @@ def _add_init_handlers(client):
         # fetch rule message, remove all reaction but the bot's
         channel = client.get_channel(cfg.channels["rules"])
         msg = await channel.fetch_message(channel.last_message_id)
-        ctx = _interactions_handler.get_new_context(msg)
         if msg.author.id == client.user.id:
+            ctx = _interactions_handler.get_new_context(msg)
             await disp.RULES.edit(ctx)
         else:
+            ctx = _interactions_handler.get_new_context(channel)
             await disp.RULES.send(ctx)
 
         # Update all players roles
