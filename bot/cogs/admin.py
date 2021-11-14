@@ -156,7 +156,7 @@ class AdminCog(commands.Cog, name='admin'):
                 try:
                     p_id = mention.id
                     player = Player.get(int(p_id))
-                    if player and not lobby.is_lobby_stuck() and player.is_registered:
+                    if player and not lobby.is_lobby_stuck() and player.is_registered and not player.is_lobbied:
                         lobby.add_to_lobby(player)
                 except ValueError:
                     pass

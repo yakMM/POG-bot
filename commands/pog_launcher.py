@@ -22,7 +22,7 @@ class ProcessGroup:
     def kill_discord(self):
         if self.discord_process:
             logging.info("Sending soft exit signal to discord bot!")
-            os.killpg(os.getpgid(self.discord_process.pid), signal.SIGKILL)
+            os.killpg(os.getpgid(self.discord_process.pid), signal.SIGINT)
             self.discord_process = None
 
     def restart_ts3(self):

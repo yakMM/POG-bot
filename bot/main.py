@@ -181,6 +181,8 @@ def _add_init_handlers(client):
         Match.init_channels(client, cfg.channels["matches"])
 
         modules.roles.init(client)
+        # Init signal handler
+        modules.signal.init()
 
         # fetch rule message, remove all reaction but the bot's
         await modules.roles.update_rule_msg()
@@ -327,9 +329,6 @@ def main(launch_str=""):
 
     # Init lobby
     modules.lobby.init(Match, client)
-
-    # Init signal handler
-    modules.signal.init()
 
     # Init stat processor
     modules.stat_processor.init()

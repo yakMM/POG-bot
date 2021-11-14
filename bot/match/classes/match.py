@@ -59,6 +59,7 @@ class Match:
 
     def bind(self, channel):
         self.__objects = MatchObjects(self, self.__data, channel)
+        self.__objects.delayed_init()
 
     # TODO: dev, remove
     @property
@@ -223,8 +224,11 @@ class MatchObjects:
         self.check_validated = True
         self.players_with_account = list()
         self.command_factory = CommandFactory(self)
-        self.plugin_manager = PluginManager(self.proxy)
+        self.plugin_manager = None
         self.clean_channel.start(display=False)
+
+    def delayed_init(self):
+        self.plugin_manager = PluginManager(self.proxy)
 
     @property
     def status(self):
