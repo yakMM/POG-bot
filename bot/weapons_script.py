@@ -65,9 +65,9 @@ we_cats = {
 # Discrimination per category
 ignored_categories = []  # [104,211,144,157,126,208,209,210,139] Switched this to banned
 banned_categories = [21, 20, 22, 9, 23, 10, 18, 14, 4, 104, 211, 144, 157, 126, 208, 209, 210, 139]
-allowed_categories = [24, 12, 147]
+allowed_categories = [24, 12]
 detailed = [2, 3, 5, 6, 7, 8, 11, 17, 19, 13]
-no_point = [13, 17]
+no_point = [13, 17, 147]
 
 
 def get_banned_per_category(cat: int, w_id: int) -> bool:
@@ -91,7 +91,6 @@ def get_banned_per_category(cat: int, w_id: int) -> bool:
             1082: "MAX Punch",
             1083: "MAX Punch",
             1084: "MAX Punch",
-            804795: "NSX Amaterasu",
             6005451: "Lumine Edge AE",
             6005452: "Ripper AE",
             6005453: "Carver AE",
@@ -120,7 +119,10 @@ def get_banned_per_category(cat: int, w_id: int) -> bool:
             6004714: "Soldier Soaker",
             6004995: "Ectoblaster",
             6005969: "NSX-A Yawara",
-            6009652: 'NS-357 "Endeavor" Underboss'
+            6009652: 'NS-357 "Endeavor" Underboss',
+            6009902: "U-100 Lastly",
+            6009903: "U-150 Recall",
+            6009904: "U-200 Harbinger"
         }
     # SMG
     elif cat == 5:
@@ -155,7 +157,19 @@ def get_banned_per_category(cat: int, w_id: int) -> bool:
         d = {
             1904: "T1A Unity",
             1909: "Darkstar",
-            77822: "Gauss Prime"
+            77822: "Gauss Prime",
+            6009864: "AR-100",
+            6009891: "AR-101",
+            6009892: "AR-N203",
+            6009893: "CB-100",
+            6009894: "CB-X75",
+            6009895: "CB-200",
+            6009896: "PMG-100",
+            6009897: "PMG-200",
+            6009898: "PMG-3XB",
+            6009899: "XMG-100",
+            6009900: "XMG-155",
+            6009901: "XMG-200"
         }
     # Carbine
     elif cat == 8:
@@ -173,24 +187,11 @@ def get_banned_per_category(cat: int, w_id: int) -> bool:
         d = {
             1969: "The Moonshot",
             1974: "Bighorn .50M",
-            1979: "Parsec VX3-A",
-            802771: "NS-AM7 Archer",
-            802910: "NS-AM7B Archer",
-            802921: "NS-AM7G Archer",
-            6002918: "NS-AM7 VS/AE Archer",
-            6002930: "NS-AM7 AE/TR Archer",
-            6002943: "NS-AM7 AE/NC Archer",
-            6004294: "AM7-XOXO",
-            6004992: "NS-AM8 Shortbow",
-            6006850: "SR-200",
-            6008496: "PSA-01 Hammerhead AMR"
+            1979: "Parsec VX3-A"
         }
     # Grenades
     elif cat == 17:
         d = {
-            880: "Sticky Grenade",
-            881: "Sticky Grenade",
-            882: "Sticky Grenade",
             6050: "Decoy Grenade",
             6003418: "NSX Fujin",
             6004742: "Water Balloon",
@@ -313,7 +314,7 @@ def push_all_weapons(push_db=False):
     else:
         print("DB not updated! Use arg 'push_db=True' to update")
 
-push_all_weapons()
+
 def display_weapons_from_category(cat):
     url = f'http://census.daybreakgames.com/s:{cfg.general["api_key"]}/get/ps2:v2/item/' \
           f'?item_type_id=26&is_vehicle_weapon=0&item_category_id={cat}' \
