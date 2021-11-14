@@ -1,21 +1,23 @@
 import signal
-import sys
 import asyncio
 from display import AllStrings as disp, ContextWrapper
 import modules.config as cfg
 import modules.lobby as lobby
 import modules.database as db
+from logging import getLogger
 
-# This doesn't work
+log = getLogger("pog_bot")
 
 
-def save_state():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(disp.STOP.send(ContextWrapper.channel(cfg.channels["spam"])))
+async def save_state(sig, frame):
+    await disp.STOP.send(ContextWrapper.channel(cfg.channels["spam"]))
     lb = lobby.get_all_ids_in_lobby()
-    db.set_field("restart_data", 0, {"last_lobby": lb})
-    sys.exit(0)
+    await db.async_db_call(db.set_field, "restart_data", 0, {"last_lobby": lb})
 
 
 def init():
-    signal.signal(signal.SIGINT, save_state)
+    loop = asyncio.get_event_loop()
+    try:
+        loop.add_signal_handler(signal.SIGINT, save_state)
+    except NotImplementedError:
+        log.debug("Ignoring exception in 'Signal' module: probably running on windows")
