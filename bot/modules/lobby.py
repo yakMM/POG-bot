@@ -30,8 +30,9 @@ def init(m_cls, client):
 
 
 def _remove_from_warned(p):
-    _warned_players[p].clean()
-    del _warned_players[p]
+    if p in _warned_players:
+        _warned_players[p].clean()
+        del _warned_players[p]
 
 
 def _clear_warned():
