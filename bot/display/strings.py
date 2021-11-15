@@ -24,8 +24,11 @@ class AllStrings(Enum):
     REG_UPDATE_NOA = Message("You successfully removed your Jaeger characters from your profile.")
     REG_WITH_CHARS = Message("You successfully registered with the following Jaeger characters: `{}`, `{}`, `{}`")
     REG_FROZEN = Message("You can't register while you're playing a match!")
-    REG_RULES = Message("{} You have accepted the rules, you may now register", embed=embeds.register_help)
-    REG_RULES_ALREADY = Message("You have already accepted the rules")
+    REG_RULES = Message("{} You have accepted the rules, you may now register.", embed=embeds.register_help)
+    REG_RULES_ALREADY = Message("You have already accepted the rules!")
+
+    AWAY_BACK = Message("{} Welcome back!")
+    AWAY_GONE = Message("Roles removed for {}", ping=False)
 
     LB_ALREADY_IN = Message("You are already in queue!")
     LB_IN_MATCH = Message("You are already in a match!")

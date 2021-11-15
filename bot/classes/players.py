@@ -94,6 +94,7 @@ class Player:
         self.__ig_names = ["N/A", "N/A", "N/A"]
         self.__ig_ids = [0, 0, 0]
         self.__notify = False
+        self.__away = False
         self.__timeout = 0
         self.__is_registered = False
         self.__has_own_account = False
@@ -120,6 +121,8 @@ class Player:
             obj.__ig_ids = [0, 0, 0]
         if "timeout" in data:
             obj.__timeout = data["timeout"]
+        if "away" in data:
+            obj.__away = data["away"]
         return obj
 
     def get_data(self):  # get data for database push
@@ -129,11 +132,15 @@ class Player:
             data["ig_ids"] = self.__ig_ids
         if self.__timeout != 0:
             data["timeout"] = self.__timeout
+        if self.__away:
+            data["away"] = self.__away
         return data
 
     async def db_update(self, arg):
         if arg == "notify":
             await db.async_db_call(db.set_field, "users", self.id, {"notify": self.__notify})
+        elif arg == "away":
+            await db.async_db_call(db.set_field, "users", self.id, {"away": self.__away})
         elif arg == "register":
             doc = {"is_registered": self.__is_registered}
             await db.async_db_call(db.set_field, "users", self.id, doc)
@@ -186,10 +193,17 @@ class Player:
     def is_notify(self):
         return self.__notify
 
+    @property
+    def is_away(self):
+        return self.__away
+
+    @is_away.setter
+    def is_away(self, value):
+        self.__away = value
+
     @is_notify.setter
     def is_notify(self, value):
         self.__notify = value
-        self.update_role()
 
     @property
     def is_lobbied(self):

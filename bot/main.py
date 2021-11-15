@@ -154,6 +154,11 @@ def _add_init_handlers(client):
             await modules.database.async_db_call(modules.database.set_element, "users", p.id, p.get_data())
             await disp.REG_RULES.send(ContextWrapper.channel(cfg.channels["register"]),
                                       user.mention)
+        elif p.is_away:
+            p.is_away = False
+            await modules.roles.role_update(p)
+            await p.db_update("away")
+            await disp.AWAY_BACK.send(ContextWrapper.channel(cfg.channels["register"]), p.mention)
         else:
             i_ctx = InteractionContext(interaction)
             await disp.REG_RULES_ALREADY.send(i_ctx)

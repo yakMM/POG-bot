@@ -29,6 +29,10 @@ def register_help(ctx):
                           f'When subscribed to Notify, you can be mentioned with <@&{cfg.roles["notify"]}> '
                           'when the queue is almost full',
                     inline=False)
+    embed.add_field(name='Quit command',
+                    value='`=quit` - To temporarily leave the channels\n'
+                          f'You will be removed from the active POG channels. Accept the rules in <#{cfg.channels["rules"]}> to come back.',
+                    inline=False)
     if is_admin(ctx.author):
         embed.add_field(name="Staff commands",
                         value='`=rename @player New Name` - Change the player name within the system\n'

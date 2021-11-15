@@ -1,3 +1,9 @@
+# v3.6:
+### (Work In Progress)
+
+- Added =quit command to leave the channels
+- Added ephemeral responses for rules and lobby interactions
+
 # v3.5:
 Now using discord components instead of the reaction system:
 - Refactored ContextWrapper system and display classes

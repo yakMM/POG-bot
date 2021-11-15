@@ -33,8 +33,6 @@ async def remove_roles(p_id):
     memb = _guild.get_member(p_id)
     if memb is None:
         return
-    # if _roles_dict["info"] not in memb.roles:
-    #     await memb.add_roles(_roles_dict["info"])
     if _roles_dict["registered"] in memb.roles:
         await memb.remove_roles(_roles_dict["registered"])
     if _roles_dict["notify"] in memb.roles:
@@ -43,6 +41,9 @@ async def remove_roles(p_id):
 
 async def role_update(player):
     if player.is_timeout:
+        await remove_roles(player.id)
+        return
+    if player.is_away:
         await remove_roles(player.id)
         return
     await perms_muted(False, player.id)
@@ -59,8 +60,6 @@ async def role_update(player):
             await memb.add_roles(_roles_dict["registered"])
         if _roles_dict["notify"] in memb.roles:
             await memb.remove_roles(_roles_dict["notify"])
-    # if _roles_dict["info"] in memb.roles:
-    #     await memb.remove_roles(_roles_dict["info"])
 
 
 async def perms_muted(value, p_id):

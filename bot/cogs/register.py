@@ -13,6 +13,7 @@ from display.strings import AllStrings as display
 from modules.tools import is_al_num
 from modules.tools import UnexpectedError
 from modules.asynchttp import ApiNotReachable
+from modules.roles import role_update
 
 log = getLogger("pog_bot")
 
@@ -60,7 +61,20 @@ class RegisterCog(commands.Cog, name='register'):
         else:
             player.is_notify = True
             await display.NOTIFY_ADDED.send(ctx)
+        await role_update(player)
         await player.db_update("notify")
+
+    @commands.command()
+    @commands.guild_only()
+    async def quit(self, ctx):
+        player = classes.Player.get(ctx.author.id)
+        if not player:
+            await display.NO_RULE.send(ctx, f"={ctx.command.name}", cfg.channels["rules"])
+            return
+        player.is_away = True
+        await display.AWAY_GONE.send(ctx, player.mention)
+        await role_update(player)
+        await player.db_update("away")
 
 
 def setup(client):
