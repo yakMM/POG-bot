@@ -21,8 +21,7 @@ from time import gmtime
 from modules.tools import UnexpectedError
 
 # Display
-from display.strings import AllStrings as disp, views
-from display.classes import ContextWrapper
+from display import AllStrings as disp, views, ContextWrapper, InteractionContext
 
 # Custom modules
 import modules.config as cfg
@@ -156,7 +155,8 @@ def _add_init_handlers(client):
             await disp.REG_RULES.send(ContextWrapper.channel(cfg.channels["register"]),
                                       user.mention)
         else:
-            await modules.roles.role_update(p)
+            i_ctx = InteractionContext(interaction)
+            await disp.REG_RULES_ALREADY.send(i_ctx)
             await modules.roles.role_update(p)
 
     @client.event

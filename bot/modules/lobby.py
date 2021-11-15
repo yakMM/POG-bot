@@ -1,5 +1,5 @@
 import modules.config as cfg
-from display import AllStrings as disp, ContextWrapper, views
+from display import AllStrings as disp, ContextWrapper, views, InteractionContext
 
 from lib.tasks import Loop, loop
 from logging import getLogger
@@ -51,6 +51,8 @@ def _add_ih_callback(ih, player):
             reset_timeout(player)
             await disp.LB_REFRESHED.send(ctx)
         else:
+            i_ctx = InteractionContext(interaction)
+            await disp.LB_REFRESH_NO.send(i_ctx)
             raise interactions.InteractionNotAllowed
 
 

@@ -25,6 +25,7 @@ class AllStrings(Enum):
     REG_WITH_CHARS = Message("You successfully registered with the following Jaeger characters: `{}`, `{}`, `{}`")
     REG_FROZEN = Message("You can't register while you're playing a match!")
     REG_RULES = Message("{} You have accepted the rules, you may now register", embed=embeds.register_help)
+    REG_RULES_ALREADY = Message("You have already accepted the rules")
 
     LB_ALREADY_IN = Message("You are already in queue!")
     LB_IN_MATCH = Message("You are already in a match!")
@@ -45,6 +46,7 @@ class AllStrings(Enum):
     LB_GET = Message("Restore the lobby with `=lobby restore {}`")
     LB_SAVE = Message("Lobby status saved, will be restored on next restart!")
     LB_REFRESHED = Message("You have reset your queue timeout!")
+    LB_REFRESH_NO = Message("You can't do that!")
 
     PK_OVER = Message("The teams are already made. You can't pick!")
     PK_NO_LOBBIED = Message("You must first queue and wait for a match to begin. Check <#{}>")
