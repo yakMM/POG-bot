@@ -120,10 +120,10 @@ class ContextWrapper:
         self.message = message
         self.interaction_payload = None
 
-    async def send(self, kwargs):
+    async def send(self, **kwargs):
         return await self._do_send('send', kwargs)
 
-    async def edit(self, kwargs):
+    async def edit(self, **kwargs):
         return await self._do_send('edit', kwargs)
 
     async def _do_send(self, command, kwargs):
@@ -134,7 +134,7 @@ class ContextWrapper:
                     await asyncio.sleep(backoff.delay())
                 msg = await getattr(self.original_ctx, command)(**kwargs)
                 if self.interaction_payload:
-                    self.interaction_payload.message_callback(msg)
+                    self.interaction_payload.message_callback(msg, kwargs)
                 return msg
             except ClientError as e:
                 log.warning(f"ContextWrapper: Network error when sending message on try {i}!"
@@ -153,7 +153,7 @@ class InteractionContext(ContextWrapper):
         self.ephemeral = ephemeral
         super().__init__(author, cmd_name, channel_id, message, ctx)
 
-    async def send(self, kwargs):
+    async def send(self, **kwargs):
         if self.ephemeral:
             kwargs['ephemeral'] = True
         return await self._do_send('send_message', kwargs)

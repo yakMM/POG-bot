@@ -281,7 +281,7 @@ class AllStrings(Enum):
         if not isinstance(ctx, ContextWrapper):
             ctx = ContextWrapper.wrap(ctx)
         kwargs = self.value.get_elements(ctx, string_args=args, ui_kwargs=kwargs)
-        return await ctx.send(kwargs)
+        return await ctx.send(**kwargs)
 
     async def edit(self, msg, *args, **kwargs):
         """
@@ -295,12 +295,12 @@ class AllStrings(Enum):
         if not isinstance(msg, ContextWrapper):
             msg = ContextWrapper.wrap(msg)
         kwargs = self.value.get_elements(msg, string_args=args, ui_kwargs=kwargs)
-        return await msg.edit(kwargs)
+        return await msg.edit(**kwargs)
 
     async def image_send(self, ctx, image_path, *args):
         if not isinstance(ctx, ContextWrapper):
             ctx = ContextWrapper.wrap(ctx)
         kwargs = self.value.get_elements(ctx, string_args=args, image_path=image_path)
-        return await ctx.send(kwargs)
+        return await ctx.send(**kwargs)
 
 

@@ -9,7 +9,7 @@ __last_requests = dict()
 log = getLogger("pog_bot")
 
 
-async def is_spam(author, channel):
+async def is_spam(author, channel, ctx=None):
     a_id = author.id
     if a_id in __spam_list and __spam_list[a_id] > 0:
         if a_id in __last_requests and __last_requests[a_id] < tools.timestamp_now() - 30:
@@ -23,7 +23,8 @@ async def is_spam(author, channel):
     if __spam_list[a_id] == 1:
         return False
     if __spam_list[a_id] % __SPAM_MSG_FREQUENCY == 0:
-        ctx = ContextWrapper.wrap(channel, author=author)
+        if not ctx:
+            ctx = ContextWrapper.wrap(channel, author=author)
         await disp.STOP_SPAM.send(ctx)
     return True
 

@@ -4,7 +4,7 @@ from logging import getLogger
 from inspect import iscoroutinefunction as is_coroutine
 from discord.errors import NotFound
 from lib.tasks import Loop
-from display import ContextWrapper
+from display import ContextWrapper, InteractionContext
 from modules.roles import is_admin
 
 log = getLogger("pog_bot")
@@ -37,6 +37,7 @@ class InteractionHandler:
         self.__f_dict = dict()
         self.__callback = single_callback
         self.__msg = None
+        self.__view = None
         self.__locked = False
         self.__payload = InteractionPayload(self, owner, view)
 
@@ -48,10 +49,10 @@ class InteractionHandler:
         ctx.interaction_payload = self.__payload
         return ctx
 
-    def message_callback(self, msg):
-        if self.__msg:
-            self.clean()
+    def message_callback(self, msg, kwargs):
+        self.clean()
         self.__msg = msg
+        self.__view = kwargs['view']
         self.__locked = False
 
     async def run_player_check(self, interaction):
@@ -68,7 +69,7 @@ class InteractionHandler:
         user = interaction.user
         player = None
 
-        if await is_spam(user, interaction.message.channel):
+        if await is_spam(user, interaction.message.channel, ctx=InteractionContext(interaction)):
             return
 
         self.__locked = True
@@ -115,11 +116,14 @@ class InteractionHandler:
     def clean(self):
         self.__locked = True
         if self.__msg:
+            self.__view.stop()
             Loop(coro=self._remove_msg, count=1).start(self.__msg)
         self.__msg = None
+        self.__view = None
 
     async def _remove_msg(self, msg):
         try:
-            await msg.edit(view=None)
+            ctx = ContextWrapper.wrap(msg)
+            await ctx.edit(view=None)
         except NotFound:
-            pass
+            log.warning("NotFound exception when trying to remove message!")
