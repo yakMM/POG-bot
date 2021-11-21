@@ -86,7 +86,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             self.players[new_player.id] = new_player
             # Clean subbed one and send message
             subbed.on_player_clean()
-            await disp.SUB_OKAY.send(ctx, new_player.mention, subbed.mention, match=self.match)
+            await disp.SUB_OKAY.send(ctx, new_player.mention, subbed.mention, match=self.match.proxy)
             return
 
     @Process.public
