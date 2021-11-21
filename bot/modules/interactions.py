@@ -116,14 +116,15 @@ class InteractionHandler:
     def clean(self):
         self.__locked = True
         if self.__msg:
+            self.__view.clear_items()
             self.__view.stop()
-            Loop(coro=self._remove_msg, count=1).start(self.__msg)
+            Loop(coro=self._remove_msg, count=1).start(self.__msg, self.__view)
         self.__msg = None
         self.__view = None
 
-    async def _remove_msg(self, msg):
+    async def _remove_msg(self, msg, view):
         try:
             ctx = ContextWrapper.wrap(msg)
-            await ctx.edit(view=None)
+            await ctx.edit(view=view)
         except NotFound:
             log.warning("NotFound exception when trying to remove message!")
