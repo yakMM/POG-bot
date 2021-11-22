@@ -118,13 +118,17 @@ class InteractionHandler:
         if self.__msg:
             self.__view.clear_items()
             self.__view.stop()
-            Loop(coro=self._remove_msg, count=1).start(self.__msg, self.__view)
+            lp = Loop(coro=self._remove_msg, count=1)
+            log.info(f"Interaction: removing from {self.__msg.id} (loop {id(lp)}), {self.__f_dict.keys()}")
+            lp.start(self.__msg, self.__view, lp)
         self.__msg = None
         self.__view = None
 
-    async def _remove_msg(self, msg, view):
+    async def _remove_msg(self, msg, view, lp):
+        log.info(f"Interaction: {msg.id} (loop {id(lp)}) begining")
         try:
             ctx = ContextWrapper.wrap(msg)
             await ctx.edit(view=view)
+            log.info(f"Interaction: {msg.id} (loop {id(lp)}) removed")
         except NotFound:
             log.warning("NotFound exception when trying to remove message!")
