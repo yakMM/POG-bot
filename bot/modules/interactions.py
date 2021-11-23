@@ -116,19 +116,18 @@ class InteractionHandler:
     def clean(self):
         self.__locked = True
         if self.__msg:
-            self.__view.clear_items()
+            for child in self.__view.children:
+                child.disabled = True
+                # Fix for https://github.com/discord/discord-api-docs/issues/4148
+                # TODO: Just empty the view when the issue is fixed
             self.__view.stop()
-            lp = Loop(coro=self._remove_msg, count=1)
-            log.info(f"Interaction: removing from {self.__msg.id} (loop {id(lp)}), {self.__f_dict.keys()}")
-            lp.start(self.__msg, self.__view, lp)
+            Loop(coro=self._remove_msg, count=1).start(self.__msg, self.__view)
         self.__msg = None
         self.__view = None
 
-    async def _remove_msg(self, msg, view, lp):
-        log.info(f"Interaction: {msg.id} (loop {id(lp)}) begining")
+    async def _remove_msg(self, msg, view):
         try:
             ctx = ContextWrapper.wrap(msg)
             await ctx.edit(view=view)
-            log.info(f"Interaction: {msg.id} (loop {id(lp)}) removed")
         except NotFound:
             log.warning("NotFound exception when trying to remove message!")
