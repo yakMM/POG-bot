@@ -256,10 +256,7 @@ def _define_log(launch_str):
             file_handler = logging.StreamHandler(sys.stdout)
         else:
             # Print info
-            if logger_name == "discord":
-                level = logging.DEBUG
-            else:
-                level = logging.INFO
+            level = logging.INFO
             # Print to file, change file everyday at 12:00 UTC
             date = dt(2020, 1, 1, 12)
             file_handler = logging.handlers.TimedRotatingFileHandler(f'../../POG-data/logging/{logger_name}', when='midnight', atTime=date, utc=True)
