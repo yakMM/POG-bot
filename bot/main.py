@@ -227,29 +227,13 @@ def _define_log(launch_str):
         os.makedirs('../../POG-data/logging')
     except FileExistsError:
         pass
-    log_filename = '../../POG-data/logging/bot_log'
     logging.Formatter.converter = gmtime
-    formatter = logging.Formatter('%(asctime)s | %(levelname)s %(message)s', "%Y-%m-%d %H:%M:%S UTC")
-    # If test mode
-    if launch_str == "_test":
-        # Print debug
-        level = logging.DEBUG
-        # Print logging to console
-        file_handler = logging.StreamHandler(sys.stdout)
-    else:
-        # Print info
-        level = logging.INFO
-        # Print to file, change file everyday at 12:00 UTC
-        date = dt(2020, 1, 1, 12)
-        file_handler = logging.handlers.TimedRotatingFileHandler(log_filename, when='midnight', atTime=date, utc=True)
-    log.setLevel(level)
-    file_handler.setLevel(level)
-    file_handler.setFormatter(formatter)
 
     class StreamToLogger(object):
         """
         Fake file-like stream object that redirects writes to a logger instance.
         """
+
         def __init__(self, logger, log_level=logging.INFO):
             self.logger = logger
             self.log_level = log_level
@@ -257,16 +241,35 @@ def _define_log(launch_str):
 
         def write(self, buf):
             for line in buf.rstrip().splitlines():
-                  self.logger.log(self.log_level, line.rstrip())
+                self.logger.log(self.log_level, line.rstrip())
 
         def flush(self):
             pass
 
+    for logger_name in ("pog_bot", "discord"):
+        formatter = logging.Formatter('%(asctime)s | %(levelname)s %(message)s', "%Y-%m-%d %H:%M:%S UTC")
+        # If test mode
+        if launch_str == "_test":
+            # Print debug
+            level = logging.DEBUG
+            # Print logging to console
+            file_handler = logging.StreamHandler(sys.stdout)
+        else:
+            # Print info
+            level = logging.INFO
+            # Print to file, change file everyday at 12:00 UTC
+            date = dt(2020, 1, 1, 12)
+            file_handler = logging.handlers.TimedRotatingFileHandler(f'../../POG-data/logging/{logger_name}', when='midnight', atTime=date, utc=True)
+        temp_log = logging.getLogger(logger_name)
+        temp_log.setLevel(level)
+        file_handler.setLevel(level)
+        file_handler.setFormatter(formatter)
+        temp_log.setLevel(level)
+        temp_log.addHandler(file_handler)
+
     # Redirect stdout and stderr to log:
     sys.stdout = StreamToLogger(log, logging.INFO)
     sys.stderr = StreamToLogger(log, logging.ERROR)
-
-    log.addHandler(file_handler)
 
 
 def main(launch_str=""):
