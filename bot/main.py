@@ -269,7 +269,9 @@ def _define_log(launch_str):
     log.addHandler(file_handler)
 
     # Adding discord logs
-    logging.getLogger("discord").addHandler(file_handler)
+    discord_logger = logging.getLogger("discord")
+    discord_logger.setLevel(logging.INFO)
+    discord_logger.addHandler(file_handler)
 
 
 def main(launch_str=""):
