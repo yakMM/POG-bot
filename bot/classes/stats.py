@@ -11,6 +11,8 @@ class PlayerStat:
         if data:
             self.matches = data["matches"]
             self.time_played = data["time_played"]
+            self.times_captain = data["times_captain"]
+            self.pick_order = tools.AutoDict(data["pick_order"])
             self.loadouts = dict()
             for l_data in data["loadouts"]:
                 l_id = l_data["id"]
@@ -18,6 +20,8 @@ class PlayerStat:
         else:
             self.matches = list()
             self.time_played = 0
+            self.times_captain = 0
+            self.pick_order = tools.AutoDict()
             self.loadouts = dict()
 
     @property
@@ -33,6 +37,12 @@ class PlayerStat:
         if self.time_played == 0:
             return 0
         return self.kills / self.time_played
+
+    @property
+    def cpm(self):
+        if self.nb_matches_played < 10:
+            return 0
+        return self.times_captain / self.nb_matches_played
 
     @property
     def score(self):
@@ -88,21 +98,25 @@ class PlayerStat:
         dta = await db.async_db_call(db.get_element, "player_stats", p_id)
         return cls(p_id, name=name, data=dta)
 
-    def add_data(self, match_id, time_played, dta):
+    def add_data(self, match_id, time_played, player_score):
         self.matches.append(match_id)
         self.time_played += time_played
-        for l_data in dta["loadouts"]:
-            l_id = l_data["loadout_id"]
+        self.times_captain += int(player_score.is_captain)
+        self.pick_order.auto_add(str(player_score.pick_index), 1)
+        for l_id in player_score.loadouts.keys():
+            loadout = player_score.loadouts[l_id]
             if l_id in self.loadouts:
-                self.loadouts[l_id].add_data(l_data)
+                self.loadouts[l_id].add_data(loadout)
             else:
-                self.loadouts[l_id] = LoadoutStats(l_id, l_data)
+                self.loadouts[l_id] = LoadoutStats(l_id, loadout.get_data())
 
     def get_data(self):
         dta = dict()
         dta["_id"] = self.id
         dta["matches"] = self.matches
         dta["time_played"] = self.time_played
+        dta["times_captain"] = self.times_captain
+        dta["pick_order"] = self.pick_order
         dta["loadouts"] = [loadout.get_data() for loadout in self.loadouts.values()]
         return dta
 
@@ -123,12 +137,12 @@ class LoadoutStats:
             self.net = 0
             self.score = 0
 
-    def add_data(self, dta):
-        self.weight += dta["weight"]
-        self.kills += dta["kills"]
-        self.deaths += dta["deaths"]
-        self.net += dta["net"]
-        self.score += dta["score"]
+    def add_data(self, loadout):
+        self.weight += loadout.weight
+        self.kills += loadout.kills
+        self.deaths += loadout.deaths
+        self.net += loadout.net
+        self.score += loadout.score
 
     def get_data(self):
         data = {"id": self.id,

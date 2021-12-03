@@ -240,7 +240,8 @@ class PlayerScore:
         return [load.name for load in sorted_loadouts]
 
     def update_stats(self):
-        self.stats.add_data(self.team.match.id, self.team.match.round_length*2, self.get_data())
+        nb_rounds_played = self.__rounds.count(True)
+        self.stats.add_data(self.team.match.id, self.team.match.round_length * nb_rounds_played, self)
 
     async def db_update_stats(self):
         self.update_stats()
@@ -301,6 +302,14 @@ class PlayerScore:
     @property
     def headshots(self):
         return self.__headshots
+
+    @property
+    def is_captain(self):
+        return self.__team.players[0] is self
+
+    @property
+    def pick_index(self):
+        return self.__team.players.index(self) * 2 + self.__team.id
 
     @property
     def hsr(self):

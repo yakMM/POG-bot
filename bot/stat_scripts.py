@@ -40,6 +40,18 @@ def get_all_stats():
     for s in sorted_stats[:5]:
         print(f"id: [{s.id}], name: [{s.name}], value: [{s.nb_matches_played}]")
 
+    print("Highest Number of times captain, top 5:")
+    key = operator.attrgetter("times_captain")
+    sorted_stats = sorted(all_stats, key=key, reverse=True)
+    for s in sorted_stats[:5]:
+        print(f"id: [{s.id}], name: [{s.name}], value: [{s.times_captain}]")
+
+    print("Highest ratio of captain / match, top 10:")
+    key = operator.attrgetter("cpm")
+    sorted_stats = sorted(all_stats, key=key, reverse=True)
+    for s in sorted_stats[:10]:
+        print(f"id: [{s.id}], name: [{s.name}], value: [{s.cpm}]")
+
 
 _all_db_matches = list()
 
@@ -137,4 +149,4 @@ def get_best_net():
         print(f"Player {s.player.name} [{s.player.id}, in match {s.match}, kills: {s.net}]")
 
 
-l = get_best_net()
+get_all_stats()

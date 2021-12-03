@@ -509,6 +509,7 @@ def player_stats(ctx, stats, recent_stats):
                     value=f"Matches played: {recent_stats.nb_matches_played}\n"
                           f"Play time: {'{:.1f}'.format(recent_stats.time_played / 60)} hours\n"
                           f"Score: {recent_stats.score}\n"
+                          f"Times captain: {recent_stats.times_captain}\n"
                           f"Kills per match: {'{:.1f}'.format(recent_stats.kills_per_match)}\n"
                           f"Most played class: {recent_stats.most_played_loadout}",
                     inline=False)
@@ -516,6 +517,7 @@ def player_stats(ctx, stats, recent_stats):
                     value=f"Matches played: {stats.nb_matches_played}\n"
                           f"Play time: {'{:.1f}'.format(stats.time_played / 60)} hours\n"
                           f"Total score: {stats.score}\n"
+                          f"Times captain: {stats.times_captain}\n"
                           f"Kills per match: {'{:.1f}'.format(stats.kills_per_match)}\n"
                           f"Most played class: {stats.most_played_loadout}",
                     inline=False)

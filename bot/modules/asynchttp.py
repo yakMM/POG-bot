@@ -76,6 +76,8 @@ async def api_request_and_retry(url: str, retries: int = 3) -> dict:
             log.warning(f"API request: {e} on try {i} for {url}")
             # Try again
             continue
+        except UnexpectedError:
+            break
         if "returned" in j_data:
             # If something returned
             return j_data

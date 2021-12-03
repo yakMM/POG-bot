@@ -10,6 +10,7 @@ import os
 import modules.database as db
 import modules.accounts_handler as accounts
 from classes import PlayerStat
+from match.classes import Match
 
 if os.path.isfile("test"):
     LAUNCHSTR = "_test"
@@ -115,13 +116,18 @@ def fill_player_stats():
     all_players = dict()
     db.get_all_elements(DbMatch.new_from_data, "matches")
     for m in _all_db_matches:
-        for tm in m.data["teams"]:
-            for p in tm["players"]:
-                if p["discord_id"] not in all_players:
-                    all_players[p["discord_id"]] = PlayerStat(p["discord_id"], "N/A")
-                all_players[p["discord_id"]].add_data(m.id, m.data["round_length"] * 2, p)
+        match = Match(m.data).data
+        for tm in match.teams:
+            for p in tm.players:
+                if p.id not in all_players:
+                    all_players[p.id] = PlayerStat(p.id, "N/A")
+                p.stats = all_players[p.id]
+                p.update_stats()
     la = list()
     for x in all_players.values():
         print(f"add {x.id}")
         la.append(x.get_data())
     db.force_update("player_stats", la)
+
+if __name__ == "__main__":
+    fill_player_stats()
