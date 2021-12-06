@@ -10,6 +10,8 @@ class PlayerStat:
         self.name = name
         if data:
             self.matches = data["matches"]
+            self.matches_won = data["match_stats"]["nb_won"]
+            self.matches_lost = data["match_stats"]["nb_lost"]
             self.time_played = data["time_played"]
             self.times_captain = data["times_captain"]
             self.pick_order = tools.AutoDict(data["pick_order"])
@@ -19,6 +21,8 @@ class PlayerStat:
                 self.loadouts[l_id] = LoadoutStats(l_id, l_data)
         else:
             self.matches = list()
+            self.matches_won = 0
+            self.matches_lost = 0
             self.time_played = 0
             self.times_captain = 0
             self.pick_order = tools.AutoDict()
@@ -99,10 +103,11 @@ class PlayerStat:
         return cls(p_id, name=name, data=dta)
 
     def add_data(self, match_id: int, time_played, player_score):
-        self.matches.append({
-            'id': match_id,
-            'won': player_score.team.won_match,
-        })
+        self.matches.append(match_id)
+        if player_score.team.won_match:
+            self.matches_won += 1
+        else:
+            self.matches_lost += 1
         self.time_played += time_played
         self.times_captain += int(player_score.is_captain)
         self.pick_order.auto_add(str(player_score.pick_index), 1)
@@ -117,6 +122,10 @@ class PlayerStat:
         dta = dict()
         dta["_id"] = self.id
         dta["matches"] = self.matches
+        dta["match_stats"] = {
+            "nb_won": self.matches_won,
+            "nb_lost": self.matches_lost,
+        }
         dta["time_played"] = self.time_played
         dta["times_captain"] = self.times_captain
         dta["pick_order"] = self.pick_order
