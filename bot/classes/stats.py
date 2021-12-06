@@ -98,8 +98,11 @@ class PlayerStat:
         dta = await db.async_db_call(db.get_element, "player_stats", p_id)
         return cls(p_id, name=name, data=dta)
 
-    def add_data(self, match_id, time_played, player_score):
-        self.matches.append(match_id)
+    def add_data(self, match_id: int, time_played, player_score):
+        self.matches.append({
+            'id': match_id,
+            'won': player_score.team.won_match,
+        })
         self.time_played += time_played
         self.times_captain += int(player_score.is_captain)
         self.pick_order.auto_add(str(player_score.pick_index), 1)

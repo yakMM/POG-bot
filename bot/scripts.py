@@ -117,6 +117,13 @@ def fill_player_stats():
     db.get_all_elements(DbMatch.new_from_data, "matches")
     for m in _all_db_matches:
         match = Match(m.data).data
+        if match.teams[0].score == match.teams[1].score:
+            match.teams[0].set_winner()
+            match.teams[1].set_winner()
+        elif match.teams[0].score > match.teams[1].score:
+            match.teams[0].set_winner()
+        else:
+            match.teams[1].set_winner()
         for tm in match.teams:
             for p in tm.players:
                 if p.id not in all_players:

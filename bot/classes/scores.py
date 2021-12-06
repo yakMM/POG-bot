@@ -29,7 +29,6 @@ def get_ill_weapons_doc(ill_weapons):
     return data
 
 
-
 class TeamScore:
     def __init__(self, t_id, match, name, faction):
         self.__id = t_id
@@ -43,6 +42,11 @@ class TeamScore:
         self.__cap = 0
         self.__headshots = 0
         self.__players = list()
+        self.__won_match = False
+
+    @property
+    def won_match(self):
+        return self.__won_match
 
     @property
     def id(self):
@@ -156,6 +160,9 @@ class TeamScore:
 
     def add_one_death(self):
         self.__deaths += 1
+
+    def set_winner(self):
+        self.__won_match = True
 
 
 class PlayerScore:

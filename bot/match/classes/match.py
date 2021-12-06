@@ -200,6 +200,13 @@ class MatchData:
     async def push_db(self):
         await db.async_db_call(db.set_element, "matches", self.id, self.get_data())
         stat_processor.add_match(self)
+        if self.teams[0].score == self.teams[1].score:
+            self.teams[0].set_winner()
+            self.teams[1].set_winner()
+        elif self.teams[0].score > self.teams[1].score:
+            self.teams[0].set_winner()
+        else:
+            self.teams[1].set_winner()
         for tm in self.teams:
             for p in tm.players:
                 await p.db_update_stats()

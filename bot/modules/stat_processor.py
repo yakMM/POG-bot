@@ -26,7 +26,8 @@ def add_match(match_data):
 
 def get_matches_in_time(player, time):
     matches_to_query = list()
-    for m_id in player.matches[::-1]:
+    for match in player.matches[::-1]:
+        m_id = match['id']
         try:
             if _match_stamps[m_id] >= time:
                 matches_to_query.append(m_id)
@@ -76,7 +77,8 @@ class PsbWeekUsage:
 
     def get_num_matches(self, player):
         num = 0
-        for m_id in player.matches[::-1]:
+        for match in player.matches[::-1]:
+            m_id = match['id']
             try:
                 if _match_stamps[m_id] > self.end_stamp:
                     pass
