@@ -1,3 +1,8 @@
+class PluginDisabled(Exception):
+    def __init__(self, reason):
+        super().__init__(reason)
+
+
 class Plugin:
     def __init__(self, match):
         self.match = match

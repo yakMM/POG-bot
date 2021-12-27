@@ -150,10 +150,10 @@ roles = {
 
 #: Contains discord emojis IDs.
 emojis = {
-    "VS": "",
-    "TR": "",
-    "NC": "",
-    "info": ""
+    "VS": ":vs:",
+    "TR": ":tr:",
+    "NC": ":nc:",
+    "info": ":info:"
 }
 
 #: Contains scoring parameters.
@@ -207,7 +207,7 @@ def get_config(launch_str: str):
     if not os.path.isfile(file):
         raise ConfigError(f"{file} not found!")
 
-    config = ConfigParser()
+    config = ConfigParser(inline_comment_prefixes="#")
     try:
         config.read(file)
     except ParsingError as e:
@@ -237,26 +237,29 @@ def get_config(launch_str: str):
     #             f"Incorrect api key: {general['api_key']} in '{file}'")
 
     # Teamspeak section
-    _check_section(config, "Teamspeak", file)
-
-    for key in ts:
-        try:
-            if key == "matches":
-                tmp = config['Teamspeak'][key].split(',')
-                ts[key].clear()
-                for m in tmp:
-                    ts[key].append(list())
-                    c_id = m.split('/')
-                    for val in c_id:
-                        ts[key][-1].append(int(val))
-            elif isinstance(ts[key], int):
-                ts[key] = int(config['Teamspeak'][key])
-            else:
-                ts[key] = config['Teamspeak'][key]
-        except KeyError:
-            _error_missing(key, 'Teamspeak', file)
-        except ValueError:
-            _error_incorrect(key, 'Teamspeak', file)
+    try:
+        _check_section(config, "Teamspeak", file)
+    except ConfigError:
+        pass
+    else:
+        for key in ts:
+            try:
+                if key == "matches":
+                    tmp = config['Teamspeak'][key].split(',')
+                    ts[key].clear()
+                    for m in tmp:
+                        ts[key].append(list())
+                        c_id = m.split('/')
+                        for val in c_id:
+                            ts[key][-1].append(int(val))
+                elif isinstance(ts[key], int):
+                    ts[key] = int(config['Teamspeak'][key])
+                else:
+                    ts[key] = config['Teamspeak'][key]
+            except KeyError:
+                _error_missing(key, 'Teamspeak', file)
+            except ValueError:
+                _error_incorrect(key, 'Teamspeak', file)
 
 
     # Channels section

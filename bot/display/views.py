@@ -71,7 +71,14 @@ def faction_buttons(ctx):
     picked_faction = ctx.interaction_payload.owner.get_picked_faction()
     for faction in ['VS', 'TR', 'NC']:
         if cfg.i_factions[faction] != picked_faction:
-            buttons.append(ui.Button(label=faction, style=ButtonStyle.grey, custom_id=faction, emoji=cfg.emojis[faction]))
+            kwargs = {
+                'label': faction,
+                'style': ButtonStyle.grey,
+                'custom_id': faction,
+            }
+            if cfg.emojis[faction]:
+                kwargs['emoji'] = cfg.emojis[faction]
+            buttons.append(ui.Button(**kwargs))
     return buttons
 
 

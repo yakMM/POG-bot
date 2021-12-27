@@ -7,7 +7,7 @@ from lib.tasks import loop, Loop
 from asyncio import sleep
 from logging import getLogger
 
-from .plugin import Plugin
+from .plugin import Plugin, PluginDisabled
 
 log = getLogger("pog_bot")
 
@@ -22,6 +22,8 @@ class SquittalInterface(Plugin):
         self.available = True
         self.operation_queue = queue.Queue()
         self.initialized = False
+        if not cfg.general['squittal']:
+            raise PluginDisabled("Empty squittal URL in config file!")
 
     def on_match_launching(self):
         global _ongoing_match

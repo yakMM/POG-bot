@@ -5,7 +5,7 @@ from lib.tasks import loop, Loop
 from asyncio import sleep
 from logging import getLogger
 
-from .plugin import Plugin
+from .plugin import Plugin, PluginDisabled
 
 log = getLogger("pog_bot")
 
@@ -19,6 +19,8 @@ class AudioBot(Plugin):
         super().__init__(match)
         self.num = cfg.channels["matches"].index(match.channel.id) + 1
         self.lobby = False
+        if not cfg.ts['url']:
+            raise PluginDisabled("Empty URL in config file!")
 
     def on_match_launching(self):
         Loop(coro=configure, count=1).start(self.num)

@@ -1,5 +1,6 @@
 from .logger import SimpleLogger
 from .ts3_interface import AudioBot
+from .plugin import PluginDisabled
 from logging import getLogger
 import modules.config as cfg
 
@@ -19,11 +20,15 @@ class VirtualAttribute:
 
 class PluginManager:
     def __init__(self, match):
+        plugins_enabled = cfg.LAUNCH_STR != "_test"
         self.match = match
         self.plugins = list()
-        if cfg.LAUNCH_STR != "_test":
+        if plugins_enabled:
             for Plug in _plugins:
-                self.plugins.append(Plug(self.match))
+                try:
+                    self.plugins.append(Plug(self.match))
+                except PluginDisabled as e:
+                    log.warning(f"Could not start plugin '{Plug.__name__}'\n{e}")
 
     def on_event(self, event, *args, **kwargs):
         for p in self.plugins:

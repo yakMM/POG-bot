@@ -433,7 +433,8 @@ def join_ts(ctx):
     embed = Embed(colour=Color.blue(), title="Teamspeak server",
                   description="Join the Teamspeak server for the duration of the match! "
                               "The address is `JaegerEvents` (no password)")
-    embed.set_image(url=cfg.ts["config_help"])
+    if cfg.ts["config_help"]:
+        embed.set_image(url=cfg.ts["config_help"])
     return embed
 
 
