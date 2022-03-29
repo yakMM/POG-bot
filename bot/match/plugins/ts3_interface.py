@@ -42,9 +42,7 @@ class AudioBot(Plugin):
             _TaskAudio(self).task_audio.start("select_base")
 
     def on_base_selected(self, base):
-        _TaskAudio(self).task_audio.start("base_selected", wait=0)
-        _TaskAudio(self).task_audio.start(f'base_{cfg.id_to_base[base.id]}', wait=1)
-        _TaskAudio(self).task_audio.start("type_ready", wait=2)
+        _TaskAudio(self).task_audio.start(["base_selected", f'base_{cfg.id_to_base[base.id]}', "type_ready"], wait=0)
 
     def on_team_ready(self, team):
         audio_string = f"team_{team.id + 1}_ready"
@@ -57,10 +55,11 @@ class AudioBot(Plugin):
         _TaskAudio(self).task_audio.start("5s", wait=25)
 
     def on_round_over(self):
-        _TaskAudio(self).task_audio.start("round_over")
+        audio_strings = ["round_over"]
         if self.match.round_no == 1:
-            _TaskAudio(self).task_audio.start("switch_sides", wait=0)
-            _TaskAudio(self).task_audio.start("type_ready", wait=1)
+            audio_strings.append("switch_sides")
+            audio_strings.append("type_ready")
+        _TaskAudio(self).task_audio.start(audio_strings)
 
     def on_clean(self):
         self.lobby = False
@@ -72,11 +71,14 @@ class _TaskAudio:
         self.bot = bot
 
     @loop(count=1)
-    async def task_audio(self, string, lobby=False, wait=-1):
+    async def task_audio(self, strings, lobby=False, wait=-1):
+        if not isinstance(strings, list):
+            strings = [strings]
         if wait >= 0:
             await sleep(wait)
         await self.__lobby(lobby)
-        url = f'{cfg.ts["url"]}/api/bot/template/{self.bot.num}(/xecute(/add/{string}.mp3)(/play))'
+        file_queue = "".join([f"(/add/{string}.mp3)" for string in strings])
+        url = f'{cfg.ts["url"]}/api/bot/template/{self.bot.num}(/xecute{file_queue}(/play))'
         await _send_url(url)
 
     async def __lobby(self, bl):
