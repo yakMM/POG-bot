@@ -16,3 +16,4 @@ commands/running
 .idea/
 doc/build/
 *.diff
+.python-version
