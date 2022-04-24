@@ -169,4 +169,8 @@ class InteractionFollowup(ContextWrapper):
         self.ephemeral = ephemeral
         super().__init__(author, cmd_name, channel_id, message, ctx)
 
+    async def send(self, **kwargs):
+        if self.ephemeral:
+            kwargs['ephemeral'] = True
+        return await self._do_send('send', kwargs)
 
