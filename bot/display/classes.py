@@ -159,4 +159,14 @@ class InteractionContext(ContextWrapper):
         return await self._do_send('send_message', kwargs)
 
 
+class InteractionFollowup(ContextWrapper):
+    def __init__(self, interaction, ephemeral=True):
+        cmd_name = "?"
+        channel_id = interaction.channel_id
+        author = interaction.user
+        message = interaction.message
+        ctx = interaction.followup
+        self.ephemeral = ephemeral
+        super().__init__(author, cmd_name, channel_id, message, ctx)
+
 
