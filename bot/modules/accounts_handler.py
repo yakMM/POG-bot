@@ -150,7 +150,7 @@ async def send_account(channel: discord.TextChannel, a_player: classes.ActivePla
     """
     msg = None
     # Try 3 times to send a DM:
-    ctx = a_player.account.get_new_context(ContextWrapper.user(a_player.id))
+    ctx = a_player.account.get_new_context(await ContextWrapper.user(a_player.id))
     for j in range(3):
         try:
             msg = await disp.ACC_UPDATE.send(ctx, account=a_player.account)
@@ -183,7 +183,7 @@ async def terminate_account(a_player: classes.ActivePlayer):
 
     # If account was validated, ask the player to log off:
     if acc.is_validated and acc.message.channel.id != cfg.channels["staff"]:
-        await disp.ACC_OVER.send(ContextWrapper.user(acc.a_player.id))
+        await disp.ACC_OVER.send(await ContextWrapper.user(acc.a_player.id))
 
     # If account was validated, update the db with usage
     if acc.is_validated:

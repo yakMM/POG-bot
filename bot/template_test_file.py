@@ -99,7 +99,7 @@ async def launch(ctx, id_list, tier):
     while match.status is not MatchStatus.IS_PICKING:
         await asyncio.sleep(1)
 
-    picked = ContextWrapper.user(players[2].id)
+    picked = await ContextWrapper.user(players[2].id)
     cap_1_ctx.message.mentions.clear()
     cap_1_ctx.message.mentions.append(picked.author)
 

@@ -103,8 +103,10 @@ class ContextWrapper:
         return cls(author, cmd_name, channel_id, message, ctx)
 
     @classmethod
-    def user(cls, user_id):
+    async def user(cls, user_id):
         user = cls.client.get_user(user_id)
+        if not user:
+            user = await cls.client.fetch_user(user_id)
         return cls(user, "?", user_id, None, user)
 
     @classmethod
