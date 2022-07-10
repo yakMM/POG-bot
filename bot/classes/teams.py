@@ -63,9 +63,16 @@ class Team:
             return [f"- {'~~' if p.is_benched else ''}{p.mention} ({p.name}){'~~' if p.is_benched else ''}" for p in self.__players[1:]]
 
     @property
-    def all_pings(self):
-        # All players with captain
-        pings = [p.mention for p in self.__players]
+    def all_playing_pings(self):
+        """
+        Get the list of mentions of players actually playing in the team
+        (So without benched players)
+        :return: list containing the mentions of players
+        """
+        pings = list()
+        for p in self.__players:
+            if not p.is_benched:
+                pings.append(p.mention)
         return pings
 
     @property

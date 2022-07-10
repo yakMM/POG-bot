@@ -53,7 +53,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         await sleep(10)
         await disp.MATCH_STARTING_2.send(self.match.channel, self.match.round_no, "10")
         await sleep(10)
-        player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
+        player_pings = [" ".join(tm.all_playing_pings) for tm in self.match.teams]
         await disp.MATCH_STARTED.send(self.match.channel, *player_pings, self.match.round_no)
         self.match.plugin_manager.on_match_started()
         self.match.round_stamps.append(tools.timestamp_now())
@@ -85,7 +85,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         return int(time_delta.total_seconds())
 
     async def on_match_over(self):
-        player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
+        player_pings = [" ".join(tm.all_playing_pings) for tm in self.match.teams]
         self.auto_info_loop.cancel()
         self.ih.clean()
         self.match.plugin_manager.on_round_over()
@@ -115,7 +115,7 @@ class MatchPlaying(Process, status=MatchStatus.IS_STARTING):
         self.auto_info_loop.cancel()
         self.match_loop.cancel()
         self.ih.clean()
-        player_pings = [" ".join(tm.all_pings) for tm in self.match.teams]
+        player_pings = [" ".join(tm.all_playing_pings) for tm in self.match.teams]
         self.match.clean_critical()
         self.match.plugin_manager.on_round_over()
         await disp.MATCH_ROUND_OVER.send(self.match.channel, *player_pings, self.match.round_no)

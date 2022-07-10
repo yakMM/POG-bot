@@ -129,16 +129,16 @@ async def launch(ctx, id_list, tier):
     # We assume tester is an admin
     await match.command.base(ctx, ["ceres"])
 
-    if tier == 5:
-        return
-
-    print("TIER 6")
-
     while match.status is not MatchStatus.IS_WAITING:
         await asyncio.sleep(1)
 
     match.change_check("online")
     match.change_check("account")
+
+    if tier == 5:
+        return
+
+    print("TIER 6")
 
     await match.command.ready(cap_1_ctx)
     await match.command.ready(cap_2_ctx)
