@@ -66,6 +66,21 @@ class RegisterCog(commands.Cog, name='register'):
 
     @commands.command()
     @commands.guild_only()
+    async def dm(self, ctx):
+        player = classes.Player.get(ctx.author.id)
+        if not player:
+            await display.NO_RULE.send(ctx, f"={ctx.command.name}", cfg.channels["rules"])
+            return
+        if player.is_dm:
+            player.is_dm = False
+            await display.DM_REMOVED.send(ctx)
+        else:
+            player.is_dm = True
+            await display.DM_ADDED.send(ctx)
+        await player.db_update("dm")
+
+    @commands.command()
+    @commands.guild_only()
     async def quit(self, ctx):
         player = classes.Player.get(ctx.author.id)
         if not player:

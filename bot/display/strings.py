@@ -149,7 +149,7 @@ class AllStrings(Enum):
     CAP_NEW = Message("{} is the new captain for {}!", ping=False)
     CAP_NOT_OK = Message("Can't make {} a captain!", ping=False)
 
-    MATCH_DM_PING = Message("POG match {} is starting! Please join `{}` channel in the Jaeger Events discord!", ping=False)
+    MATCH_DM_PING = Message("POG match {} is starting! Please join `{}` channel in the Jaeger Events discord!\n{}", ping=False)
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
     MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ping=False)
     MATCH_BASE_AUTO = Message("Match will be on **{}**", ping=False)
@@ -213,6 +213,9 @@ class AllStrings(Enum):
 
     NOTIFY_REMOVED = Message("You left Notify!")
     NOTIFY_ADDED = Message("You joined Notify!")
+
+    DM_REMOVED = Message("You will no longer receive a DM when a match is starting")
+    DM_ADDED = Message("You will now receive a DM when a match is starting!")
 
     NOT_CODED = Message("The rest is not yet coded, work in progress. Clearing match...")
 

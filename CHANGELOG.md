@@ -5,6 +5,7 @@
 - Added ephemeral responses for rules and lobby interactions
 - Benched players are no longer mentioned when match is starting/ending
 - Timeout message no longer appears twice in some occasions
+- Added =dm to receive a direct message when a match is starting
 
 # v3.5:
 Now using discord components instead of the reaction system:

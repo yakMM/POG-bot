@@ -73,12 +73,6 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         for p in self.p_list:
             self.players[p.id] = p
             await p.on_match_selected(self.match.proxy)
-            # print(f"{p.name}, matches: {p.stats.nb_matches_played}")
-            # ctx = ContextWrapper.user(p.id)
-            # try:
-            #     await disp.MATCH_DM_PING.send(ctx, match.id, match.channel.name)
-            # except discord.errors.Forbidden:
-            #     log.warning(f"Player id:[{p.id}], name:[{p.name}] is refusing DMs")
 
         # Open match channel
         await roles.modify_match_channel(self.match.channel, view=True)
@@ -91,7 +85,17 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
         self.match.teams[0] = Team(0, f"Team 1", self.match.proxy)
         self.match.teams[1] = Team(1, f"Team 2", self.match.proxy)
 
-        await self.info()
+        init_msg = await self.info()
+
+        for p in self.p_list:
+            if p.is_dm:
+                ctx = await ContextWrapper.user(p.id)
+                try:
+                    await disp.MATCH_DM_PING.send(ctx, self.match.id,
+                                                  self.match.channel.name,
+                                                  init_msg.jump_url)
+                except discord.errors.Forbidden:
+                    log.warning(f"Player id:[{p.id}], name:[{p.name}] is refusing DMs")
 
         self.auto_captain.start()
         await disp.CAP_AUTO_ANNOUNCE.send(self.match.channel)
@@ -110,7 +114,7 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
     @Process.public
     async def info(self, ctx=None):
         ctx = self.volunteer_ih.get_new_context(self.match.channel)
-        await disp.CAP_WAITING.send(ctx, match=self.match.proxy)
+        return await disp.CAP_WAITING.send(ctx, match=self.match.proxy)
 
     @Process.public
     async def on_volunteer(self, player):

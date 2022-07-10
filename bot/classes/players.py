@@ -94,6 +94,7 @@ class Player:
         self.__ig_names = ["N/A", "N/A", "N/A"]
         self.__ig_ids = [0, 0, 0]
         self.__notify = False
+        self.__dm = False
         self.__away = False
         self.__timeout = 0
         self.__is_registered = False
@@ -123,6 +124,8 @@ class Player:
             obj.__timeout = data["timeout"]
         if "away" in data:
             obj.__away = data["away"]
+        if "dm" in data:
+            obj.__dm = data["dm"]
         return obj
 
     def get_data(self):  # get data for database push
@@ -134,6 +137,8 @@ class Player:
             data["timeout"] = self.__timeout
         if self.__away:
             data["away"] = self.__away
+        if self.__dm:
+            data["dm"] = self.__dm
         return data
 
     async def db_update(self, arg):
@@ -141,6 +146,8 @@ class Player:
             await db.async_db_call(db.set_field, "users", self.id, {"notify": self.__notify})
         elif arg == "away":
             await db.async_db_call(db.set_field, "users", self.id, {"away": self.__away})
+        elif arg == "dm":
+            await db.async_db_call(db.set_field, "users", self.id, {"dm": self.__dm})
         elif arg == "register":
             doc = {"is_registered": self.__is_registered}
             await db.async_db_call(db.set_field, "users", self.id, doc)
@@ -194,6 +201,10 @@ class Player:
         return self.__notify
 
     @property
+    def is_dm(self):
+        return self.__dm
+
+    @property
     def is_away(self):
         return self.__away
 
@@ -204,6 +215,10 @@ class Player:
     @is_notify.setter
     def is_notify(self, value):
         self.__notify = value
+
+    @is_dm.setter
+    def is_dm(self, value):
+        self.__dm = value
 
     @property
     def is_lobbied(self):

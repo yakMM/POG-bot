@@ -79,11 +79,12 @@ async def ping_sub_in_lobby(match, new_player, was_lobbied):
     if was_lobbied:
         await disp.SUB_LOBBY.send(ContextWrapper.channel(cfg.channels["lobby"]), new_player.mention, match.channel.id,
                                   names_in_lobby=get_all_names_in_lobby())
-    # ctx = ContextWrapper.user(new_player.id)
-    # try:
-    #     await disp.MATCH_DM_PING.send(ctx, match.id, match.channel.name)
-    # except discord.errors.Forbidden:
-    #     log.warning(f"Player id:[{new_player.id}], name:[{new_player.name}] is refusing DMs")
+    if new_player.is_dm:
+        ctx = await ContextWrapper.user(new_player.id)
+        try:
+            await disp.MATCH_DM_PING.send(ctx, match.id, match.channel.name, "")
+        except discord.errors.Forbidden:
+            log.warning(f"Player id:[{new_player.id}], name:[{new_player.name}] is refusing DMs")
 
 
 async def after_pick_sub(match, subbed, force_player, ctx=None, clean_subbed=True):
