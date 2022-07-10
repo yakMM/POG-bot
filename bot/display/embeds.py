@@ -29,6 +29,9 @@ def register_help(ctx):
                           f'When subscribed to Notify, you can be mentioned with <@&{cfg.roles["notify"]}> '
                           'when the queue is almost full',
                     inline=False)
+    embed.add_field(name='DM command',
+                    value='`=dm` - To receive a direct message when a match is starting',
+                    inline=False)
     embed.add_field(name='Quit command',
                     value='`=quit` - To temporarily leave the channels\n'
                           f'You will be removed from the active POG channels. Accept the rules in <#{cfg.channels["rules"]}> to come back.',
