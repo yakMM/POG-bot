@@ -134,7 +134,7 @@ def setup(client):
 async def check_time(ctx, args):
     if args:
         arg = " ".join(args)
-        time = tools.time_calculator(arg)
+        time = tools.time_calculator(arg, default="minutes")
         if time == 0:
             await disp.LB_TIME_INVALID.send(ctx, arg)
             return -1

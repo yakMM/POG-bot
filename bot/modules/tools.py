@@ -28,7 +28,7 @@ MIN_KW = ["minutes", "minute", "mins", "min", "m"]
 SEC_KW = ["seconds", "second", "secs", "sec", "s"]
 ALL_KW = [keywords for keywords in (*MONTH_KW, *WEEK_KW, *DAY_KW, *HOUR_KW, *MIN_KW, *SEC_KW)]
 ALL_KW.sort(key=len, reverse=True)
-RE_DURATION = re.compile(rf"([0-9]+)\s*({'|'.join(ALL_KW)})\s*([0-9]*)")
+RE_DURATION = re.compile(rf"([0-9]+)\s*({'|'.join(ALL_KW)})?\s*([0-9]*)")
 
 
 class UnexpectedError(Exception):
@@ -97,13 +97,15 @@ def time_diff(timestamp, now=timestamp_now()):
         return lead_str
 
 
-def time_calculator(arg: str):
+def time_calculator(arg: str, default=None):
     lookup = RE_DURATION.match(arg)
     time = 0
     if not lookup:
         return time
     leading = int(lookup.group(1))
     keyword = lookup.group(2)
+    if default and not keyword:
+        keyword = default
     try:
         trailing = int(lookup.group(3))
     except ValueError:
