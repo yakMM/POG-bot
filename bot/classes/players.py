@@ -100,6 +100,8 @@ class Player:
         self.__is_registered = False
         self.__has_own_account = False
         self.__lobby_stamp = 0
+        self.__lobby_expiration = 0
+        self.__last_lobby_timeout = 0
         self.__active = None
         self.__match = None
         self.__stats = None
@@ -229,6 +231,45 @@ class Player:
         return self.__lobby_stamp
 
     @property
+    def lobby_expiration(self):
+        return self.__lobby_expiration
+
+    @lobby_expiration.setter
+    def lobby_expiration(self, value):
+        self.__lobby_expiration = tools.timestamp_now() + value
+        self.__last_lobby_timeout = value
+
+    @property
+    def should_be_warned(self):
+        # If last timeout set is more than 1h30 (5400)
+        if self.__last_lobby_timeout >= 5400:
+            # And expiration is less than 10 minutes away (600)
+            return tools.timestamp_now() + 600 >= self.__lobby_expiration
+        return False
+
+    @property
+    def is_lobby_expired(self):
+        return tools.timestamp_now() >= self.__lobby_expiration
+
+    @property
+    def lobby_remaining(self):
+        diff_sec = self.__lobby_expiration - tools.timestamp_now()
+        if diff_sec < 60:
+            return "1min"
+        diff_min = diff_sec // 60
+        if diff_sec % 60 > 30:
+            diff_min += 1
+        diff_hours = diff_min // 60
+        if diff_hours != 0:
+            diff_min = diff_min - (diff_hours * 60)
+            if diff_min:
+                return f"{diff_hours}h{diff_min:02d}"
+            else:
+                return f"{diff_hours}h"
+        else:
+            return f"{diff_min}min"
+
+    @property
     def stats(self):
         return self.__stats
 
@@ -282,13 +323,19 @@ class Player:
 
     def on_lobby_leave(self):
         self.__lobby_stamp = 0
+        self.__lobby_expiration = 0
+        self.__last_lobby_timeout = 0
         self.update_role()
 
-    def reset_lobby_timestamp(self):
-        self.__lobby_stamp = tools.timestamp_now()
+    def reset_lobby_expiration(self):
+        self.lobby_expiration = 7200
 
-    def on_lobby_add(self):
+    def on_lobby_add(self, expiration=0):
         self.__lobby_stamp = tools.timestamp_now()
+        if expiration == 0:
+            expiration = 7200
+        self.__lobby_expiration = self.__lobby_stamp + expiration
+        self.__last_lobby_timeout = expiration
         self.update_role()
 
     def on_player_clean(self):
@@ -306,6 +353,8 @@ class Player:
     async def on_match_selected(self, m):
         self.__match = m
         self.__lobby_stamp = 0
+        self.__lobby_expiration = 0
+        self.__last_lobby_timeout = 0
         self.__stats = await PlayerStat.get_from_database(self.__id, self.__name)
 
     def copy_ig_info(self, player):

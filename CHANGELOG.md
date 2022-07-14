@@ -6,6 +6,7 @@
 - Benched players are no longer mentioned when match is starting/ending
 - Timeout message no longer appears twice in some occasions
 - Added =dm to receive a direct message when a match is starting
+- Players can now specify a leave timeout when joining/leaving the lobby
 
 # v3.5:
 Now using discord components instead of the reaction system:

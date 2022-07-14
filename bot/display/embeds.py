@@ -56,6 +56,11 @@ def lobby_help(ctx):
                           '`=reset` (`=rst`)  - Reset your queue timeout\n'
                           '`=info` (`=i`)  - Display the global information prompt',
                     inline=False)
+    embed.add_field(name='Lobby timeout',
+                    value='You can specify a duration when using the `join` or `leave` commands:\n'
+                          '`=join 30 minutes` (`=j 30m`) will automatically remove you from the queue after 30 minutes\n'
+                          '`=leave 1 hour 20` (`=l 1h20`) will automatically remove you from the queue after 1 hour 20',
+                    inline=False)
     if is_admin(ctx.author):
         embed.add_field(name="Staff commands",
                         value='`=clear` - Clear the lobby\n'

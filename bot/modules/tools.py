@@ -4,6 +4,7 @@ import pytz
 from dateutil import parser
 from dateutil import tz
 from logging import getLogger
+import re
 
 log = getLogger("pog_bot")
 
@@ -18,6 +19,16 @@ TZ_OFFSETS = {
     "AEST": +36000,
     "CST": +28800
 }
+
+MONTH_KW = ["months", "month"]
+WEEK_KW = ["weeks", "week", "w"]
+DAY_KW = ["days", "day", "d"]
+HOUR_KW = ["hours", "hour", "h"]
+MIN_KW = ["minutes", "minute", "mins", "min", "m"]
+SEC_KW = ["seconds", "second", "secs", "sec", "s"]
+ALL_KW = [keywords for keywords in (*MONTH_KW, *WEEK_KW, *DAY_KW, *HOUR_KW, *MIN_KW, *SEC_KW)]
+ALL_KW.sort(key=len, reverse=True)
+RE_DURATION = re.compile(rf"([0-9]+)\s*({'|'.join(ALL_KW)})\s*([0-9]*)")
 
 
 class UnexpectedError(Exception):
@@ -61,8 +72,8 @@ def timestamp_now():
     return int(dt.timestamp(dt.now()))
 
 
-def time_diff(timestamp):
-    lead = timestamp_now() - timestamp
+def time_diff(timestamp, now=timestamp_now()):
+    lead = now - timestamp
     if lead < 60:
         lead_str = f"{lead} second"
     elif lead < 3600:
@@ -87,33 +98,31 @@ def time_diff(timestamp):
 
 
 def time_calculator(arg: str):
-    if arg.endswith(('m', 'month', 'months')):
-        time = 2419200
-    elif arg.endswith(('w', 'week', 'weeks')):
-        time = 604800
-    elif arg.endswith(('d', 'day', 'days')):
-        time = 86400
-    elif arg.endswith(('h', 'hour', 'hours')):
-        time = 3600
-    elif arg.endswith(('min', 'mins', 'minute', 'minutes')):
-        time = 60
-    else:
-        return 0
-
-    num = ""
-    for c in arg:
-        if ord('0') <= ord(c) <= ord('9'):
-            num += c
-        else:
-            break
-
+    lookup = RE_DURATION.match(arg)
+    time = 0
+    if not lookup:
+        return time
+    leading = int(lookup.group(1))
+    keyword = lookup.group(2)
     try:
-        time *= int(num)
-        if time == 0:
-            return 0
+        trailing = int(lookup.group(3))
     except ValueError:
-        return 0
-
+        trailing = 0
+    if keyword in MONTH_KW:
+        time = 2419200 * leading
+        time += 604800 * trailing
+    elif keyword in WEEK_KW:
+        time = 604800 * leading
+        time += 86400 * trailing
+    elif keyword in DAY_KW:
+        time = 86400 * leading
+        time += 3600 * trailing
+    elif keyword in HOUR_KW:
+        time = 3600 * leading
+        time += 60 * trailing
+    elif keyword in MIN_KW:
+        time = 60 * leading
+        time += trailing
     return time
 
 

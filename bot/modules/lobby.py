@@ -18,7 +18,7 @@ _warned_players = dict()
 
 def reset_timeout(player):
     _remove_from_warned(player)
-    player.reset_lobby_timestamp()
+    player.reset_lobby_expiration()
 
 
 def init(m_cls, client):
@@ -49,7 +49,7 @@ def _add_ih_callback(ih, player):
             ctx = ContextWrapper.channel(cfg.channels["lobby"])
             ctx.author = user
             reset_timeout(player)
-            await disp.LB_REFRESHED.send(ctx)
+            await disp.LB_REFRESHED.send(ctx, names_in_lobby=get_all_names_in_lobby())
         else:
             i_ctx = InteractionContext(interaction)
             await disp.LB_REFRESH_NO.send(i_ctx)
@@ -65,22 +65,20 @@ def _set_lobby_stuck(bl):
     _lobby_stuck = bl
 
 
-# 7800, 7200
-@loop(minutes=5)
+@loop(minutes=1)
 async def _lobby_loop():
     for p in _lobby_list:
-        now = tools.timestamp_now()
-        if p.lobby_stamp < (now - 7800):
+        if p.is_lobby_expired:
             remove_from_lobby(p)
-            await disp.LB_TOO_LONG.send(ContextWrapper.channel(cfg.channels["lobby"]), p.mention,
+            await disp.LB_TOO_LONG.send(ContextWrapper.channel(cfg.channels["lobby"]),
+                                        p.mention,
                                         names_in_lobby=get_all_names_in_lobby())
-        elif p.lobby_stamp < (now - 7200):
-            if p not in _warned_players:
-                ih = interactions.InteractionHandler(p, views.reset_button)
-                _warned_players[p] = ih
-                _add_ih_callback(ih, p)
-                ctx = ih.get_new_context(ContextWrapper.channel(cfg.channels["lobby"]))
-                await disp.LB_WARNING.send(ctx, p.mention)
+        elif p.should_be_warned and p not in _warned_players:
+            ih = interactions.InteractionHandler(p, views.reset_button)
+            _warned_players[p] = ih
+            _add_ih_callback(ih, p)
+            ctx = ih.get_new_context(ContextWrapper.channel(cfg.channels["lobby"]))
+            await disp.LB_WARNING.send(ctx, p.mention)
 
 
 def _auto_ping_threshold():
@@ -108,10 +106,10 @@ def get_sub(player):
     return player
 
 
-def add_to_lobby(player):
+def add_to_lobby(player, expiration=0):
     _lobby_list.append(player)
+    player.on_lobby_add(expiration)
     all_names = get_all_names_in_lobby()
-    player.on_lobby_add()
     if len(_lobby_list) == cfg.general["lobby_size"]:
         _start_match_from_full_lobby()
     elif len(_lobby_list) >= _auto_ping_threshold():
@@ -137,7 +135,7 @@ def get_lobby_len():
 
 
 def get_all_names_in_lobby():
-    names = [f"{p.mention} ({p.name})" for p in _lobby_list]
+    names = [f"{p.mention} ({p.name}) (auto leave in {p.lobby_remaining})" for p in _lobby_list]
     return names
 
 
