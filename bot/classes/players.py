@@ -409,7 +409,7 @@ class Player:
                     await self.db_update("register")
                 else:
                     try:
-                        await self.__match.try_remove_account(self.active, update=True)
+                        await self.__match.try_remove_account(self.active, self.__match.objects, update=True)
                     except AttributeError:
                         pass
                 # If updated
