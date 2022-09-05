@@ -41,16 +41,15 @@ class InteractionHandler:
         self.__locked = False
         self.__payload = InteractionPayload(self, owner, view)
 
-    def get_new_context(self, ctx):
+    def get_new_context(self, ctx, do_clean=True):
         self.__locked = True
-        if self.__msg:
+        if self.__msg and do_clean:
             self.clean()
         ctx = ContextWrapper.wrap(ctx)
         ctx.interaction_payload = self.__payload
         return ctx
 
     def message_callback(self, msg, kwargs):
-        self.clean()
         self.__msg = msg
         self.__view = kwargs['view']
         self.__locked = False

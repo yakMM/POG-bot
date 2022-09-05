@@ -9,6 +9,7 @@ The application should be launched from this file
 # discord.py
 from discord.ext import commands
 from discord import Intents
+from lib.tasks import loop
 
 # Other modules
 from asyncio import sleep
@@ -138,6 +139,19 @@ def _add_main_handlers(client):
         await modules.roles.role_update(player)
 
 
+@loop(hours=12)
+async def _update_rules_message(client):
+    # fetch rule message, update it
+    channel = client.get_channel(cfg.channels["rules"])
+    msg = await channel.fetch_message(channel.last_message_id)
+    if msg.author.id == client.user.id:
+        ctx = _interactions_handler.get_new_context(msg, False)
+        await disp.RULES.edit(ctx)
+    else:
+        ctx = _interactions_handler.get_new_context(channel)
+        await disp.RULES.send(ctx)
+
+
 def _add_init_handlers(client):
 
     @_interactions_handler.callback('accept')
@@ -173,15 +187,7 @@ def _add_init_handlers(client):
         # Init signal handler
         modules.signal.init()
 
-        # fetch rule message, remove all reaction but the bot's
-        channel = client.get_channel(cfg.channels["rules"])
-        msg = await channel.fetch_message(channel.last_message_id)
-        if msg.author.id == client.user.id:
-            ctx = _interactions_handler.get_new_context(msg)
-            await disp.RULES.edit(ctx)
-        else:
-            ctx = _interactions_handler.get_new_context(channel)
-            await disp.RULES.send(ctx)
+        _update_rules_message.start(client)
 
         # Update all players roles
         for p in Player.get_all_players_list():
