@@ -37,9 +37,13 @@ def get_matches_in_time(player, time):
     return matches_to_query
 
 
-def get_previous_week(date):
+def get_week(date, initial=False):
+    # Date from sunday to sunday
     iso_date = date.isocalendar()
-    end = dt.combine(dt_date.fromisocalendar(iso_date[0], iso_date[1], 1), dt_time(tzinfo=tz.utc))
+    end = dt.combine(dt_date.fromisocalendar(iso_date[0], iso_date[1], 7), dt_time(tzinfo=tz.utc))
+    if initial and date >= end:
+        # For the case current date is sunday
+        end = end + dt_delta(weeks=1)
     start = end - dt_delta(weeks=1)
     return start, end
 
@@ -94,7 +98,7 @@ class PsbWeekUsage:
 
     @property
     def end_str(self):
-        return self.end.strftime("%b %d")
+        return (self.end - dt_delta(days=1)).strftime("%b %d")
 
 
 def format_for_psb(player, args):
@@ -106,13 +110,12 @@ def format_for_psb(player, args):
         date = dt.now(tz.utc)
     req_date = date.strftime("%Y-%m-%d")
 
-    date = date + dt_delta(weeks=1)
-    start, end = get_previous_week(date)
+    start, end = get_week(date, True)
     all_weeks.append(PsbWeekUsage(player, 0, start, end))
     date = start
 
     for i in range(8):
-        start, end = get_previous_week(date)
+        start, end = get_week(date)
         all_weeks.append(PsbWeekUsage(player, i+1, start, end))
         date = start
 
