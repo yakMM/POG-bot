@@ -137,4 +137,6 @@ def fill_player_stats():
     db.force_update("player_stats", la)
 
 if __name__ == "__main__":
-    fill_player_stats()
+    push_accounts_to_usage()
+    #push_accounts_to_users()
+    #get_all_bases_from_api()

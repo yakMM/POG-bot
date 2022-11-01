@@ -22,8 +22,9 @@ def get_ids():
     # Enter here a list of discord IDS of accounts you wish to use for the testing
     # For example:
     # return [0000, 0000, 0000, 0000]
-    from test import ids
-    return ids
+    return [0]
+    #from test import ids
+    #return ids
 
 
 def test_hand(client):

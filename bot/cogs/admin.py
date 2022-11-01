@@ -18,6 +18,7 @@ import modules.tools as tools
 import modules.accounts_handler as accounts_sheet
 import modules.spam_checker as spam_checker
 import asyncio
+from lib.tasks import loop, Loop
 
 from match.classes.match import Match
 
@@ -49,6 +50,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.guild_only()
     @commands.max_concurrency(number=1, wait=True)
     async def clear(self, ctx):
+        _log_command(ctx)
         if ctx.channel.id == cfg.channels["lobby"]:  # clear lobby
             if lobby.clear_lobby():
                 await disp.LB_CLEARED.send(ctx, names_in_lobby=lobby.get_all_names_in_lobby())
@@ -65,6 +67,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def unregister(self, ctx):
+        _log_command(ctx)
         if not await _check_channels(ctx, cfg.channels["register"]):
             return
         player = await get_check_player(ctx)
@@ -88,6 +91,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def rename(self, ctx, *args):
+        _log_command(ctx)
         if not _check_channels(ctx, cfg.channels["register"]):
             return
         player = await get_check_player(ctx)
@@ -105,6 +109,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def check(self, ctx, *args):
+        _log_command(ctx)
         if not await _check_channels(ctx, cfg.channels["matches"]):
             return
         match = Match.get(ctx.channel.id)
@@ -122,6 +127,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def spam(self, ctx, *args):
+        _log_command(ctx)
         if len(args) == 1:
             arg = args[0]
         else:
@@ -148,6 +154,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def lobby(self, ctx, *args):
+        _log_command(ctx)
         if ctx.channel.id != cfg.channels["lobby"]:
             await disp.WRONG_CHANNEL.send(ctx, ctx.command.name, f'<#{cfg.channels["lobby"]}>')
             return
@@ -176,6 +183,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def timeout(self, ctx, *args):
+        _log_command(ctx)
         if len(args) == 1 and args[0] == "help":
             await disp.RM_TIMEOUT_HELP.send(ctx)
             return
@@ -230,6 +238,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def pog(self, ctx, *args):
+        _log_command(ctx)
         if len(args) == 0:
             await disp.BOT_VERSION.send(ctx, cfg.VERSION, loader.is_all_locked())
             return
@@ -256,6 +265,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def channel(self, ctx, *args):
+        _log_command(ctx)
         if ctx.channel.id not in [cfg.channels["register"], cfg.channels["lobby"], *cfg.channels["matches"]]:
             await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
             return
@@ -274,6 +284,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def reload(self, ctx, *args):
+        _log_command(ctx)
         if len(args) == 1:
             arg = args[0]
             loop = asyncio.get_event_loop()
@@ -302,6 +313,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command(aliases=['rm'])
     @commands.guild_only()
     async def remove(self, ctx):
+        _log_command(ctx)
         if ctx.channel.id == cfg.channels["lobby"]:
             player = await get_check_player(ctx)
             if not player:
@@ -324,6 +336,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def captain(self, ctx):
+        _log_command(ctx)
         if not await _check_channels(ctx, cfg.channels["matches"]):
             return
         match = Match.get(ctx.channel.id)
@@ -342,6 +355,11 @@ class AdminCog(commands.Cog, name='admin'):
 def setup(client):
     client.add_cog(AdminCog(client))
 
+def _log_command(ctx):
+    Loop(coro=_log_admin_command_impl, count=1).start(ctx)
+
+async def _log_admin_command_impl(ctx):
+    await disp.ADMIN_MSG_LOG.send(ContextWrapper.channel(cfg.channels["staff"]), ctx.author.name, ctx.author.id, ctx.message.content, ctx.channel.id)
 
 async def _check_channels(ctx, channels):
     if not isinstance(channels, list):
@@ -350,7 +368,6 @@ async def _check_channels(ctx, channels):
         await disp.WRONG_CHANNEL.send(ctx, ctx.command.name, ", ".join(f"<#{c_id}>" for c_id in channels))
         return False
     return True
-
 
 async def get_check_player(ctx):
     if len(ctx.message.mentions) != 1:
