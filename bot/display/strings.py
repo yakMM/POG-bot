@@ -276,7 +276,7 @@ class AllStrings(Enum):
     BENCH_NOT = Message("Player is not benched!", ping=False)
     BENCH_ALL = Message("Can't bench {}, no active player left in the team!", ping=False)
 
-    ADMIN_MSG_LOG = Message("{}/{} used '{}' in <#{}>", ping=False)
+    ADMIN_MSG_LOG = Message("{}/{} used `{}` in <#{}>", ping=False)
 
     async def send(self, ctx, *args, **kwargs):
         """
