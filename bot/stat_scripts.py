@@ -21,36 +21,45 @@ db.init(cfg.database)
 
 db.get_all_elements(Player.new_from_data, "users")
 
+
 def get_all_stats():
     all_stats = list()
-    for p in Player.get_all_players_list():
-        loop = asyncio.get_event_loop()
-        stat_player = loop.run_until_complete(PlayerStat.get_from_database(p.id, p.name))
-        all_stats.append(stat_player)
+
+    def from_data(dta):
+        p = Player.get(dta["_id"])
+        if p:
+            name = p.name
+        else:
+            name = "N/A"
+        stat_p = PlayerStat(dta["_id"], name=name, data=dta)
+        if stat_p.nb_matches_played > 1:
+            all_stats.append(stat_p)
+
+    db.get_all_elements(from_data, "player_stats")
 
     print("Highest Kills per match:")
     key = operator.attrgetter("kpm")
     sorted_stats = sorted(all_stats, key=key, reverse=True)
     for s in sorted_stats[:5]:
-        print(f"id: [{s.id}], name: [{s.name}], nb_match: [{s.nb_matches_played}], value: [{s.kpm}]")
+        print(f"id: [{s.id}], name: [{s.name}], nb_matches: [{s.nb_matches_played}], value: [{s.kpm}]")
 
     print("Highest Number of matches played, top 5:")
     key = operator.attrgetter("nb_matches_played")
     sorted_stats = sorted(all_stats, key=key, reverse=True)
     for s in sorted_stats[:5]:
-        print(f"id: [{s.id}], name: [{s.name}], value: [{s.nb_matches_played}]")
+        print(f"id: [{s.id}], name: [{s.name}], nb_matches: [{s.nb_matches_played}], value: [{s.nb_matches_played}]")
 
     print("Highest Number of times captain, top 5:")
     key = operator.attrgetter("times_captain")
     sorted_stats = sorted(all_stats, key=key, reverse=True)
     for s in sorted_stats[:5]:
-        print(f"id: [{s.id}], name: [{s.name}], value: [{s.times_captain}]")
+        print(f"id: [{s.id}], name: [{s.name}], nb_matches: [{s.nb_matches_played}], value: [{s.times_captain}]")
 
     print("Highest ratio of captain / match, top 10:")
     key = operator.attrgetter("cpm")
     sorted_stats = sorted(all_stats, key=key, reverse=True)
     for s in sorted_stats[:10]:
-        print(f"id: [{s.id}], name: [{s.name}], value: [{s.cpm}]")
+        print(f"id: [{s.id}], name: [{s.name}], nb_matches: [{s.nb_matches_played}], value: [{s.cpm}]")
 
 
 _all_db_matches = list()
@@ -93,6 +102,7 @@ def get_match_stats():
     print(teams_scores)
     print(win_nb)
 
+
 def get_match_logs():
     db.get_all_elements(DbMatch.new_from_data, "match_logs")
     average = list()
@@ -107,14 +117,16 @@ def get_match_logs():
     print(statistics.quantiles(average))
     print(std)
 
+
 class NetScore:
-    def __init__(self, id, net, match_id):
+    def __init__(self, id, value, match_id):
         self.player = Player.get(id)
-        self.net = net
+        self.value = value
         self.match = match_id
 
+
 def get_best_net():
-    players = dict()
+    players = list()
     db.get_all_elements(DbMatch.new_from_data, "matches")
     for m in _all_db_matches:
         if m.match.data.round_length > 10:
@@ -132,21 +144,21 @@ def get_best_net():
         if invalid:
             continue
 
-        if abs(m.match.data.teams[0].score - m.match.data.teams[1].score) > 30:
-            continue
+        # if abs(m.match.data.teams[0].score - m.match.data.teams[1].score) > 30:
+        #     continue
 
         for tm in m.match.data.teams:
             for p in tm.players:
                 n = NetScore(p.id, p.kills, m.match.id)
-                if p.id not in players:
-                    players[p.id] = n
-                elif p.kills > players[p.id].net:
-                    players[p.id] = n
+                players.append(n)
+                # if p.id not in players:
+                #     players[p.id] = n
+                # elif p.kills > players[p.id].value:
+                #     players[p.id] = n
 
-    p_list = list(players.values())
-    srt = sorted(p_list, key=operator.attrgetter("net"), reverse=True)
-    for s in srt[:15]:
-        print(f"Player {s.player.name} [{s.player.id}, in match {s.match}, kills: {s.net}]")
+    srt = sorted(players, key=operator.attrgetter("value"), reverse=True)
+    for s in srt[:50]:
+        print(f"Player {s.player.name} [{s.player.id}, in match {s.match}, `value`: {s.value}]")
 
 
-get_all_stats()
+get_best_net()
