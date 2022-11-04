@@ -37,7 +37,7 @@ class AdminCog(commands.Cog, name='admin'):
 
     async def cog_check(self, ctx):
         can_use = roles.is_admin(ctx.author)
-        if (can_use == True):
+        if can_use:
             _log_command(ctx)
         return can_use
 
