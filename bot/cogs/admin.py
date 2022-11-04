@@ -18,6 +18,7 @@ import modules.tools as tools
 import modules.accounts_handler as accounts_sheet
 import modules.spam_checker as spam_checker
 import asyncio
+from lib.tasks import loop, Loop
 
 from match.classes.match import Match
 
@@ -35,7 +36,10 @@ class AdminCog(commands.Cog, name='admin'):
         self.client = client
 
     async def cog_check(self, ctx):
-        return roles.is_admin(ctx.author)
+        can_use = roles.is_admin(ctx.author)
+        if (can_use == True):
+            _log_command(ctx)
+        return can_use
 
     """
     Admin commands
@@ -342,6 +346,11 @@ class AdminCog(commands.Cog, name='admin'):
 def setup(client):
     client.add_cog(AdminCog(client))
 
+def _log_command(ctx):
+    Loop(coro=_log_admin_command_impl, count=1).start(ctx)
+
+async def _log_admin_command_impl(ctx):
+    await disp.ADMIN_MSG_LOG.send(ContextWrapper.channel(cfg.channels["spam"]), ctx.author.name, ctx.author.id, ctx.message.content, ctx.channel.id)
 
 async def _check_channels(ctx, channels):
     if not isinstance(channels, list):
@@ -350,7 +359,6 @@ async def _check_channels(ctx, channels):
         await disp.WRONG_CHANNEL.send(ctx, ctx.command.name, ", ".join(f"<#{c_id}>" for c_id in channels))
         return False
     return True
-
 
 async def get_check_player(ctx):
     if len(ctx.message.mentions) != 1:

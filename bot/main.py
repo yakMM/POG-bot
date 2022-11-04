@@ -200,14 +200,16 @@ def _add_init_handlers(client):
             except KeyError:
                 pass
             else:
-                for p_id in last_lobby:
-                    try:
-                        player = Player.get(int(p_id))
-                        if player and not modules.lobby.is_lobby_stuck() and player.is_registered:
-                            modules.lobby.add_to_lobby(player)
-                    except ValueError:
-                        pass
-                modules.database.set_field("restart_data", 0, {"last_lobby": list()})
+                if last_lobby:
+                    for p_id in last_lobby:
+                        try:
+                            player = Player.get(int(p_id))
+                            if player and not modules.lobby.is_lobby_stuck() and player.is_registered:
+                                modules.lobby.add_to_lobby(player)
+                        except ValueError:
+                            pass
+                    modules.database.set_field("restart_data", 0, {"last_lobby": list()})
+
             names = modules.lobby.get_all_names_in_lobby()
             if names:
                 await disp.LB_QUEUE.send(ContextWrapper.channel(cfg.channels["lobby"]),
