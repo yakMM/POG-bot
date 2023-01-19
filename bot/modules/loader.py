@@ -7,22 +7,22 @@ standard_cogs = ["cogs.register", "cogs.matches", "cogs.lobby", "cogs.muted", "c
 __is_global_locked = True  # Lock the bot from getting messages
 
 
-def init(client):
+async def init(client):
     for cog in main_cogs:
-        client.load_extension(cog)
+        await client.load_extension(cog)
 
 
-def lock_all(client):
+async def lock_all(client):
     for cog in standard_cogs:
-        client.unload_extension(cog)
+        await client.unload_extension(cog)
     global __is_global_locked
     __is_global_locked = True
 
 
-def unlock_all(client):
+async def unlock_all(client):
     for cog in standard_cogs:
         try:
-            client.load_extension(cog)
+            await client.load_extension(cog)
         except ExtensionAlreadyLoaded:
             pass
     global __is_global_locked

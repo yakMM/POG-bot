@@ -36,5 +36,5 @@ class MatchesCog(commands.Cog, name='common'):
         await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
 
 
-def setup(client):
-    client.add_cog(MatchesCog(client))
+async def setup(client):
+    await client.add_cog(MatchesCog(client))

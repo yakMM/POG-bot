@@ -43,5 +43,5 @@ class MutedCog(commands.Cog, name='muted'):
         await perms_muted(False, player.id)
 
 
-def setup(client):
-    client.add_cog(MutedCog(client))
+async def setup(client):
+    await client.add_cog(MutedCog(client))

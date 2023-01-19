@@ -92,8 +92,8 @@ class RegisterCog(commands.Cog, name='register'):
         await player.db_update("away")
 
 
-def setup(client):
-    client.add_cog(RegisterCog(client))
+async def setup(client):
+    await client.add_cog(RegisterCog(client))
 
 
 async def _register(player, ctx, args):

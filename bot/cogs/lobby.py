@@ -127,8 +127,8 @@ class LobbyCog(commands.Cog, name='lobby'):
         await disp.LB_QUEUE.send(ctx, names_in_lobby=lobby.get_all_names_in_lobby())
 
 
-def setup(client):
-    client.add_cog(LobbyCog(client))
+async def setup(client):
+    await client.add_cog(LobbyCog(client))
 
 
 async def check_time(ctx, args):

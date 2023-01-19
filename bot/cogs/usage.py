@@ -107,5 +107,5 @@ class RegisterCog(commands.Cog, name='usage'):
         await disp.PSB_USAGE.send(ctx, stat_player.mention, req_date, player=stat_player, usages=usages)
 
 
-def setup(client):
-    client.add_cog(RegisterCog(client))
+async def setup(client):
+    await client.add_cog(RegisterCog(client))

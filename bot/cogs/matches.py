@@ -93,6 +93,6 @@ class MatchesCog(commands.Cog, name='matches'):
         await match.command.squittal(ctx)
 
 
-def setup(client):
-    client.add_cog(MatchesCog(client))
+async def setup(client):
+    await client.add_cog(MatchesCog(client))
 

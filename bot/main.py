@@ -180,6 +180,9 @@ def _add_init_handlers(client):
 
     @client.event
     async def on_ready():
+        # Add all cogs
+        await modules.loader.init(client)
+
         # Initialise matches channels
         Match.init_channels(client, cfg.channels["matches"])
 
@@ -214,7 +217,7 @@ def _add_init_handlers(client):
             if names:
                 await disp.LB_QUEUE.send(ContextWrapper.channel(cfg.channels["lobby"]),
                                          names_in_lobby=modules.lobby.get_all_names_in_lobby())
-        modules.loader.unlock_all(client)
+        await modules.loader.unlock_all(client)
         log.info('Client is ready!')
         await disp.RDY.send(ContextWrapper.channel(cfg.channels["spam"]), cfg.VERSION)
 
@@ -297,22 +300,9 @@ def main(launch_str=""):
     intents = Intents.none()
     intents.guilds = True
     intents.members = True
-    intents.bans = False
-    intents.emojis = False
-    intents.integrations = False
-    intents.webhooks = False
-    intents.invites = False
-    intents.voice_states = False
     intents.presences = True
     intents.messages = True
-    # intents.guild_messages Activated by the previous one
-    # intents.dm_messages Activated by the previous one
-    intents.reactions = False
-    # intents.guild_reactions
-    # intents.dm_reactions
-    intents.typing = False
-    intents.guild_typing = False
-    intents.dm_typing = False
+    intents.message_content = True
     client = commands.Bot(command_prefix=cfg.general["command_prefix"], intents=intents)
 
     # Remove default help
@@ -345,11 +335,9 @@ def main(launch_str=""):
     if launch_str == "_test":
         _test(client)
 
-    # Add all cogs
-    modules.loader.init(client)
-
     # Run server
-    client.run(cfg.general["token"])
+    # We are using our own logging system: no need for discord.py log handler
+    client.run(cfg.general["token"], log_handler=None)
 
 
 if __name__ == "__main__":
