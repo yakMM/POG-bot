@@ -39,8 +39,8 @@ class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
         @self.volunteer_ih.callback('volunteer')
         async def volunteer(player, interaction_id, interaction, interaction_values):
+            i_ctx = InteractionContext(interaction)
             if player.active:
-                i_ctx = InteractionContext(interaction)
                 await disp.CAP_ALREADY.send(i_ctx)
                 raise interactions.InteractionNotAllowed
             if player not in self.p_list:

@@ -1,7 +1,8 @@
 import modules.config as cfg
 from display import AllStrings as disp, ContextWrapper, views, InteractionContext
 
-from lib.tasks import Loop, loop
+from lib.tasks import Loop
+from discord.ext.tasks import loop
 from logging import getLogger
 
 import modules.tools as tools
@@ -46,8 +47,7 @@ def _add_ih_callback(ih, player):
     async def on_user_react(p, interaction_id, interaction, interaction_values):
         user = interaction.user
         if user.id == player.id:
-            ctx = ContextWrapper.channel(cfg.channels["lobby"])
-            ctx.author = user
+            ctx = InteractionContext(interaction, ephemeral=False)
             reset_timeout(player)
             await disp.LB_REFRESHED.send(ctx, names_in_lobby=get_all_names_in_lobby())
         else:
@@ -119,7 +119,7 @@ def add_to_lobby(player, expiration=0):
     return all_names
 
 
-@loop(minutes=3, delay=1, count=2)
+@loop(minutes=3, count=2)
 async def _auto_ping():
     if _MatchClass.find_empty() is None:
         return

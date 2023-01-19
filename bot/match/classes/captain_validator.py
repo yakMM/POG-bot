@@ -18,26 +18,25 @@ class CaptainValidator:
     def add_callbacks(self, ih):
         @self.ih.callback('accept')
         async def accept(captain, interaction_id, interaction, values):
+            i_ctx = InteractionContext(interaction)
             if captain is not self.expected:
-                i_ctx = InteractionContext(interaction)
                 await disp.CONFIRM_NOT_CAPTAIN.send(i_ctx, self.expected.mention)
                 raise InteractionNotAllowed
             elif self.confirm_func:
-                ctx = ContextWrapper.wrap(self.match.channel, author=interaction.user)
                 kwargs = self.kwargs
                 self.clean()
-                await self.confirm_func(ctx, **kwargs)
+                await self.confirm_func(i_ctx, **kwargs)
             else:
                 raise InteractionInvalid("no confirm function!")
 
         @self.ih.callback('decline')
         async def decline(captain, interaction_id, interaction, values):
-            ctx = ContextWrapper.wrap(self.match.channel, author=interaction.user)
+            i_ctx = InteractionContext(interaction)
             self.clean()
             if captain is self.expected:
-                await disp.CONFIRM_DECLINE.send(ctx)
+                await disp.CONFIRM_DECLINE.send(i_ctx)
             else:
-                await disp.CONFIRM_CANCELED.send(ctx)
+                await disp.CONFIRM_CANCELED.send(i_ctx)
 
     def is_captain(self, captain):
         if not captain.is_captain:

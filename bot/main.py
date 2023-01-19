@@ -180,6 +180,9 @@ def _add_init_handlers(client):
 
     @client.event
     async def on_ready():
+        # Init lobby
+        modules.lobby.init(Match, client)
+
         # Add all cogs
         await modules.loader.init(client)
 
@@ -323,8 +326,6 @@ def main(launch_str=""):
     # Initialise display module
     ContextWrapper.init(client)
 
-    # Init lobby
-    modules.lobby.init(Match, client)
 
     # Init stat processor
     modules.stat_processor.init()
