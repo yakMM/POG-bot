@@ -1,0 +1,38 @@
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "YakMM", email = "yak.mayam@gmail.com"},
+]
+dependencies = [
+    "discord.py==2.1.0",
+    "requests==2.28.2",
+    "numpy==1.24.1",
+    "pytz==2022.7.1",
+    "aiohttp==3.8.3",
+    "pymongo==4.3.3",
+    "gspread==5.7.2",
+    "python-dateutil==2.8.2",
+    "schedule==1.1.0",
+    "Pillow==9.4.0"
+]
+requires-python = ">=3.8"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+[[tool.pdm.source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "sphinx==4.5.0",
+    "sphinx-rtd-theme==1.0.0",
+]
+
+[build-system]
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"

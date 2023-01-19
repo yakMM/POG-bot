@@ -17,3 +17,5 @@ commands/running
 doc/build/
 *.diff
 .python-version
+.pdm.toml
+__pypackages__
