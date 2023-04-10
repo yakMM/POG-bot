@@ -9,6 +9,7 @@ import classes
 
 # Custom modules
 import modules.config as cfg
+import modules.lobby as lobby
 from display.strings import AllStrings as display
 from modules.tools import is_al_num
 from modules.tools import UnexpectedError
@@ -86,6 +87,11 @@ class RegisterCog(commands.Cog, name='register'):
         if not player:
             await display.NO_RULE.send(ctx, f"={ctx.command.name}", cfg.channels["rules"])
             return
+        if player.active:
+            await display.AWAY_BLOCKED.send(ctx, ping=True)
+            return
+        if player.is_lobbied:
+            lobby.remove_from_lobby(player)
         player.is_away = True
         await display.AWAY_GONE.send(ctx, player.mention)
         await role_update(player)
