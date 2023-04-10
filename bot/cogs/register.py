@@ -88,7 +88,7 @@ class RegisterCog(commands.Cog, name='register'):
             await display.NO_RULE.send(ctx, f"={ctx.command.name}", cfg.channels["rules"])
             return
         if player.active:
-            await display.AWAY_BLOCKED.send(ctx, ping=True)
+            await display.AWAY_BLOCKED.send(ctx)
             return
         if player.is_lobbied:
             lobby.remove_from_lobby(player)
