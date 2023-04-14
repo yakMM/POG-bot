@@ -10,7 +10,7 @@ import classes
 # Custom modules
 import modules.config as cfg
 import modules.lobby as lobby
-from display.strings import AllStrings as display
+from display.strings import AllStrings as display, ContextWrapper
 from modules.tools import is_al_num
 from modules.tools import UnexpectedError
 from modules.asynchttp import ApiNotReachable
@@ -92,6 +92,9 @@ class RegisterCog(commands.Cog, name='register'):
             return
         if player.is_lobbied:
             lobby.remove_from_lobby(player)
+            await display.RM_QUIT.send(ContextWrapper.channel(cfg.channels["lobby"]),
+                                       player.mention,
+                                       names_in_lobby=lobby.get_all_names_in_lobby())
         player.is_away = True
         await display.AWAY_GONE.send(ctx, player.mention)
         await role_update(player)

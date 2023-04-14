@@ -229,6 +229,7 @@ class AllStrings(Enum):
     RM_OK = Message("Player successfully removed from the system!")
     RM_IN_MATCH = Message("Can't remove a player who is in match!")
     RM_LOBBY = Message("{} have been removed by staff!", embed=embeds.lobby_list)
+    RM_QUIT = Message("{} have been removed for quitting!", embed=embeds.lobby_list)
     RM_NOT_LOBBIED = Message("This player is not in queue!")
     RM_TIMEOUT = Message("{} will be muted from POG until {}!", ping=False)
     RM_TIMEOUT_FREE = Message("{} is no longer muted!", ping=False)
