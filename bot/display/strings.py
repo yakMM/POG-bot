@@ -29,6 +29,7 @@ class AllStrings(Enum):
 
     AWAY_BACK = Message("{} Welcome back!")
     AWAY_GONE = Message("Roles removed for {}", ping=False)
+    AWAY_BLOCKED = Message("You can't quit while you're playing a match!")
 
     LB_ALREADY_IN = Message("You are already in queue!")
     LB_IN_MATCH = Message("You are already in a match!")
