@@ -7,6 +7,7 @@ import numpy as np
 import modules.tools as tools
 from match.classes import Match
 from classes import Player
+from datetime import datetime as dt
 
 import modules.config as cfg
 import modules.database as db
@@ -16,7 +17,8 @@ if os.path.isfile("test"):
     LAUNCHSTR = "_test"
 else:
     LAUNCHSTR = ""
-cfg.get_config(LAUNCHSTR)
+
+cfg.get_config("")
 db.init(cfg.database)
 
 db.get_all_elements(Player.new_from_data, "users")
@@ -149,7 +151,7 @@ def get_best_net():
 
         for tm in m.match.data.teams:
             for p in tm.players:
-                n = NetScore(p.id, p.kills, m.match.id)
+                n = NetScore(p.id, p.net, m.match.id)
                 players.append(n)
                 # if p.id not in players:
                 #     players[p.id] = n
@@ -157,8 +159,26 @@ def get_best_net():
                 #     players[p.id] = n
 
     srt = sorted(players, key=operator.attrgetter("value"), reverse=True)
-    for s in srt[:50]:
-        print(f"Player {s.player.name} [{s.player.id}, in match {s.match}, `value`: {s.value}]")
+    for i, s in enumerate(srt[:50]):
+        print(f"{i}: Player `{s.player.name}` [`{s.player.id}`, in match `{s.match}`, NET: `{s.value}`]")
 
 
+def get_match_stats_2(begin, end):
+    db.get_all_elements(DbMatch.new_from_data, "matches")
+    matches = list()
+    players = tools.AutoDict()
+    for m in _all_db_matches:
+        mdta = m.match.data
+        if begin.timestamp() <= mdta.round_stamps[0] <= end.timestamp():
+            matches.append(mdta)
+            for team in mdta.teams:
+                for player in team.players:
+                    players.auto_add(player.id, 1)
+    players = {k: v for k, v in sorted(players.items(), key=lambda item: item[1])}
+    for k, v in players.items():
+        print(f"Id `{k}` name `{Player.get(k).name}` => {v} matches")
+
+
+
+# get_match_stats_2(begin=dt(year=2022, month=7, day=9), end=dt(year=2022, month=11, day=10))
 get_best_net()
