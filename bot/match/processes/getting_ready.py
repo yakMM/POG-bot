@@ -118,6 +118,7 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
                                                             " ".join(p.mention for p in not_validated_players))
                     return
             if self.match.check_offline:
+                await disp.MATCH_GETTING_READY.send(ctx, captain.team.name)
                 try:
                     offline_players = await census.get_offline_players(captain.team)
                     if len(offline_players) != 0:

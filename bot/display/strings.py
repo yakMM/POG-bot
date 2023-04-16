@@ -171,6 +171,7 @@ class AllStrings(Enum):
     MATCH_NO_COMMAND_READY = Message("Can't use command `={}: your team is ready!")
     MATCH_CLEARED = Message("Successfully cleared!")
     MATCH_PLAYERS_NOT_READY = Message("Can't get {} ready, {} did not accept their Jaeger accounts", ping=False)
+    MATCH_GETTING_READY = Message("{} getting ready: checking for players...", ping=False)
     MATCH_PLAYERS_OFFLINE = Message("Can't get {} ready, {} {} not online in game!", ping=False,
                                     embed=embeds.offline_list)
     MATCH_CLEAR = Message("Clearing match...", ping=False)
