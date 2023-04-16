@@ -36,6 +36,7 @@ import modules.accounts_handler
 import modules.signal
 import modules.stat_processor
 import modules.interactions
+import modules.asynchttp
 
 # Classes
 from match.classes.match import Match
@@ -187,6 +188,9 @@ def _add_init_handlers(client):
         # Init signal handler
         modules.signal.init()
 
+        # Init http
+        await modules.asynchttp.init_http()
+
         _update_rules_message.start(client)
 
         # Update all players roles
@@ -282,6 +286,19 @@ def _define_log(launch_str):
     discord_logger.addHandler(file_handler)
 
 
+class PogClient(commands.Bot):
+    def __init__(self, intents):
+        super().__init__(command_prefix=cfg.general["command_prefix"], intents=intents)
+
+    async def close(self) -> None:
+        await modules.asynchttp.close_http()
+        await super().close()
+
+    async def start(self, *args, **kwargs) -> None:
+        await super().start(*args, **kwargs)
+        await modules.asynchttp.init_http()
+
+
 def main(launch_str=""):
 
     _define_log(launch_str)
@@ -313,7 +330,7 @@ def main(launch_str=""):
     intents.typing = False
     intents.guild_typing = False
     intents.dm_typing = False
-    client = commands.Bot(command_prefix=cfg.general["command_prefix"], intents=intents)
+    client = PogClient(intents)
 
     # Remove default help
     client.remove_command('help')

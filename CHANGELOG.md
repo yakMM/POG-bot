@@ -9,6 +9,7 @@
 - Players can now specify a leave timeout when joining/leaving the lobby
 - Fix for "Accept Rules" button sometimes greying out.
 - Speculative fix for "Accept Rules" button sometimes leading to "Interaction Failed" error message.
+- Improved performance when querying census API.
 
 # v3.5:
 Now using discord components instead of the reaction system:

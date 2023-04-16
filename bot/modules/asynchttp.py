@@ -3,9 +3,8 @@
 | Request to PS2 api: use :meth:`api_request_and_retry`.
 | Standard HTTP request: use :meth:`request_code`.
 """
-
+import aiohttp
 # External imports
-from aiohttp import ClientSession, TCPConnector
 from aiohttp.client_exceptions import ClientError
 from json import loads
 from json.decoder import JSONDecodeError
@@ -18,6 +17,20 @@ import modules.config as cfg
 from modules.tools import UnexpectedError
 
 log = getLogger("pog_bot")
+
+client = None
+
+
+async def init_http():
+    global client
+    client = aiohttp.ClientSession()
+
+
+async def close_http():
+    await client.close()
+    # Sleep for a bit to allow the session to close properly
+    # https://docs.aiohttp.org/en/stable/client_advanced.html#graceful-shutdown
+    await asyncio.sleep(0.250)
 
 
 class ApiNotReachable(Exception):
@@ -40,21 +53,17 @@ async def request_code(url: str) -> int:
     :param url: URL to get.
     :return: HTTP code returned.
     """
-    async with ClientSession() as client:
-        result = await _fetch_code(client, url)
-        return result
+    result = await _fetch_code(url)
+    return result
 
 
 async def post_request(url, data=None):
-    # async with ClientSession(connector=TCPConnector(verify_ssl=False)) as client:
-    ssl = cfg.LAUNCH_STR != "_test"
-    async with ClientSession(connector=TCPConnector(verify_ssl=ssl)) as client:
-        if data:
-            kwargs = {"data": f'{data}', "headers": {'content-type': 'application/json'}}
-        else:
-            kwargs = dict()
-        async with client.post(url, **kwargs) as response:
-            log.debug(f"POST call at {url} returned: {response}")
+    if data:
+        kwargs = {"data": f'{data}', "headers": {'content-type': 'application/json'}}
+    else:
+        kwargs = dict()
+    async with client.post(url, **kwargs) as response:
+        log.debug(f"POST call at {url} returned: {response}")
 
 
 async def api_request_and_retry(url: str, retries: int = 3) -> dict:
@@ -96,16 +105,14 @@ async def _request(url: str) -> dict:
     :param url: URL to get.
     :return: Json dictionary of the result.
     """
-    async with ClientSession() as client:
-        result = await _fetch(client, url)
-        return loads(result)
+    result = await _fetch(url)
+    return loads(result)
 
 
-async def _fetch(client: ClientSession, url: str) -> str:
+async def _fetch(url: str) -> str:
     """
     HTTP request.
 
-    :param client: Asynchttp ClientSession object.
     :param url: URL to get.
     :return: result of the request as text.
     :raise: UnexpectedError if OK is not returned by the request.
@@ -117,11 +124,10 @@ async def _fetch(client: ClientSession, url: str) -> str:
         return await resp.text()
 
 
-async def _fetch_code(client, url):
+async def _fetch_code(url):
     """
     HTTP request.
 
-    :param client: Asynchttp ClientSession object.
     :param url: URL to get.
     :return: Code returned by the HTTP request.
     """
