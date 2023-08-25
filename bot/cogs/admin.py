@@ -228,8 +228,10 @@ class AdminCog(commands.Cog, name='admin'):
         await player.db_update("timeout")
         await roles.perms_muted(True, player.id)
         if ctx.channel.id != cfg.channels['muted']:
-            await disp.RM_TIMEOUT.send(ctx, player.mention, dt.utcfromtimestamp(end_time).strftime("%Y-%m-%d %H:%M UTC"))
-        await disp.RM_TIMEOUT.send(ContextWrapper.channel(cfg.channels['muted']), player.mention, dt.utcfromtimestamp(end_time).strftime("%Y-%m-%d %H:%M UTC"))
+            await disp.RM_TIMEOUT.send(ctx, player.mention,
+                                       dt.utcfromtimestamp(end_time).strftime("%Y-%m-%d %H:%M UTC"))
+        await disp.RM_TIMEOUT.send(ContextWrapper.channel(cfg.channels['muted']), player.mention,
+                                   dt.utcfromtimestamp(end_time).strftime("%Y-%m-%d %H:%M UTC"))
 
     @commands.command()
     @commands.guild_only()
@@ -254,6 +256,38 @@ class AdminCog(commands.Cog, name='admin'):
                 return
             loader.unlock_all(self.client)
             await disp.BOT_UNLOCKED.send(ctx)
+            return
+        await disp.WRONG_USAGE.send(ctx, ctx.command.name)
+
+    @commands.command()
+    @commands.guild_only()
+    async def accounts(self, ctx, *args):
+        if len(args) == 0:
+            await disp.ACC_ALL_HANDOUT.send(ctx, "enabled" if lobby.accounts_enabled() else "disabled")
+            return
+        arg = args[0]
+        if arg == "unlock":
+            if lobby.accounts_enabled():
+                await disp.ACC_ALL_HANDOUT.send(ctx, "already enabled")
+                return
+            lobby.set_lobby_accounts_enabled(False)
+            await disp.ACC_ALL_HANDOUT.send(ctx, "enabled")
+            return
+        if arg == "lock":
+            if not lobby.accounts_enabled():
+                await disp.ACC_ALL_HANDOUT.send(ctx, "already disabled")
+                return
+            lobby.set_lobby_accounts_enabled(True)
+            removed = []
+            for p_id in lobby.get_all_ids_in_lobby():
+                player = Player.get(p_id)
+                if player and not player.has_own_account():
+                    lobby.remove_from_lobby(player)
+                    removed.append(player.mention)
+            await disp.RM_LOBBY_ACC.send(ContextWrapper.channel(cfg.channels["lobby"]),
+                                         ' '.join([p.mention for p in removed]),
+                                         names_in_lobby=lobby.get_all_names_in_lobby())
+            await disp.ACC_ALL_HANDOUT.send(ctx, "disabled")
             return
         await disp.WRONG_USAGE.send(ctx, ctx.command.name)
 
@@ -346,11 +380,15 @@ class AdminCog(commands.Cog, name='admin'):
 def setup(client):
     client.add_cog(AdminCog(client))
 
+
 def _log_command(ctx):
     Loop(coro=_log_admin_command_impl, count=1).start(ctx)
 
+
 async def _log_admin_command_impl(ctx):
-    await disp.ADMIN_MSG_LOG.send(ContextWrapper.channel(cfg.channels["spam"]), ctx.author.name, ctx.author.id, ctx.message.content, ctx.channel.id)
+    await disp.ADMIN_MSG_LOG.send(ContextWrapper.channel(cfg.channels["spam"]), ctx.author.name, ctx.author.id,
+                                  ctx.message.content, ctx.channel.id)
+
 
 async def _check_channels(ctx, channels):
     if not isinstance(channels, list):
@@ -359,6 +397,7 @@ async def _check_channels(ctx, channels):
         await disp.WRONG_CHANNEL.send(ctx, ctx.command.name, ", ".join(f"<#{c_id}>" for c_id in channels))
         return False
     return True
+
 
 async def get_check_player(ctx):
     if len(ctx.message.mentions) != 1:

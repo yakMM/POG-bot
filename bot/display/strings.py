@@ -211,6 +211,10 @@ class AllStrings(Enum):
                          "account to staff instead.")
     ACC_LOG = Message("Player [name:{}], [id:{}] will receive {}")
     ACC_GIVING = Message("Sent a Jaeger account for {}!", ping=False)
+    ACC_ALL_HANDOUT = Message("POG Account Handout {}!")
+    ACC_ALL_DISABLED = Message("POG Account Handout is currently disabled, you must be registered with a personal "
+                               "Jaeger account to join the lobby!")
+
 
     NO_DATA = Message("No data for this id!")
     ACCOUNT_USAGE = Message("Here is the POG account usage for this user:", embed=embeds.usage)
@@ -230,6 +234,8 @@ class AllStrings(Enum):
     RM_OK = Message("Player successfully removed from the system!")
     RM_IN_MATCH = Message("Can't remove a player who is in match!")
     RM_LOBBY = Message("{} have been removed by staff!", embed=embeds.lobby_list)
+    RM_LOBBY_ACC = Message("POG Account usage has been disabled, the following player(s) without a registered Jaeger "
+                           "Account have been removed: {}", embed=embeds.lobby_list)
     RM_QUIT = Message("{} have been removed for quitting!", embed=embeds.lobby_list)
     RM_NOT_LOBBIED = Message("This player is not in queue!")
     RM_TIMEOUT = Message("{} will be muted from POG until {}!", ping=False)

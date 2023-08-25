@@ -57,6 +57,9 @@ class LobbyCog(commands.Cog, name='lobby'):
         if player.match:
             await disp.LB_IN_MATCH.send(ctx)
             return
+        if not lobby.accounts_enabled() and not player.has_own_account():
+            await disp.ACC_ALL_DISABLED.send(ctx)
+            return
 
         time = await check_time(ctx, args)
         if time < 0:
