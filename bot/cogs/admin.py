@@ -228,10 +228,8 @@ class AdminCog(commands.Cog, name='admin'):
         await player.db_update("timeout")
         await roles.perms_muted(True, player.id)
         if ctx.channel.id != cfg.channels['muted']:
-            await disp.RM_TIMEOUT.send(ctx, player.mention,
-                                       dt.utcfromtimestamp(end_time).strftime("%Y-%m-%d %H:%M UTC"))
-        await disp.RM_TIMEOUT.send(ContextWrapper.channel(cfg.channels['muted']), player.mention,
-                                   dt.utcfromtimestamp(end_time).strftime("%Y-%m-%d %H:%M UTC"))
+            await disp.RM_TIMEOUT.send(ctx, player.mention, dt.utcfromtimestamp(end_time).strftime("%Y-%m-%d %H:%M UTC"))
+        await disp.RM_TIMEOUT.send(ContextWrapper.channel(cfg.channels['muted']), player.mention, dt.utcfromtimestamp(end_time).strftime("%Y-%m-%d %H:%M UTC"))
 
     @commands.command()
     @commands.guild_only()
@@ -380,15 +378,11 @@ class AdminCog(commands.Cog, name='admin'):
 def setup(client):
     client.add_cog(AdminCog(client))
 
-
 def _log_command(ctx):
     Loop(coro=_log_admin_command_impl, count=1).start(ctx)
 
-
 async def _log_admin_command_impl(ctx):
-    await disp.ADMIN_MSG_LOG.send(ContextWrapper.channel(cfg.channels["spam"]), ctx.author.name, ctx.author.id,
-                                  ctx.message.content, ctx.channel.id)
-
+    await disp.ADMIN_MSG_LOG.send(ContextWrapper.channel(cfg.channels["spam"]), ctx.author.name, ctx.author.id, ctx.message.content, ctx.channel.id)
 
 async def _check_channels(ctx, channels):
     if not isinstance(channels, list):
@@ -397,7 +391,6 @@ async def _check_channels(ctx, channels):
         await disp.WRONG_CHANNEL.send(ctx, ctx.command.name, ", ".join(f"<#{c_id}>" for c_id in channels))
         return False
     return True
-
 
 async def get_check_player(ctx):
     if len(ctx.message.mentions) != 1:
