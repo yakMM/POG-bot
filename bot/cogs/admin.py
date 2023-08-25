@@ -283,7 +283,7 @@ class AdminCog(commands.Cog, name='admin'):
                     lobby.remove_from_lobby(player)
                     removed.append(player.mention)
             await disp.RM_LOBBY_ACC.send(ContextWrapper.channel(cfg.channels["lobby"]),
-                                         ' '.join([p.mention for p in removed]),
+                                         ' '.join(removed),
                                          names_in_lobby=lobby.get_all_names_in_lobby())
             await disp.ACC_ALL_HANDOUT.send(ctx, "disabled")
             return
