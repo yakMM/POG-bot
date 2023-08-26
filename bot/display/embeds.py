@@ -79,6 +79,7 @@ def admin_help(ctx):
                     value='`=channel (un)freeze` - Prevent users from typing in a channel\n'
                           '`=pog version` - Display current version and lock status\n'
                           '`=pog (un)lock` - Prevent users from interacting with the bot (but admins still can)\n'
+                          '`=accounts (un)lock` - Prevent the usage of POG Account block\n'
                           '`=reload accounts`/`bases`/`weapons`/`config` - Reload specified element from the database\n'
                           '`=spam clear` - Clear the spam filter\n',
                     inline=False)

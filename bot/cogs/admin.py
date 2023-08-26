@@ -259,6 +259,37 @@ class AdminCog(commands.Cog, name='admin'):
 
     @commands.command()
     @commands.guild_only()
+    async def accounts(self, ctx, *args):
+        if len(args) == 0:
+            await disp.ACC_ALL_HANDOUT.send(ctx, "enabled" if lobby.accounts_enabled() else "disabled")
+            return
+        arg = args[0]
+        if arg == "unlock":
+            if lobby.accounts_enabled():
+                await disp.ACC_ALL_HANDOUT.send(ctx, "already enabled")
+                return
+            lobby.set_lobby_accounts_enabled(True)
+            await disp.ACC_ALL_HANDOUT.send(ctx, "enabled")
+            return
+        if arg == "lock":
+            if not lobby.accounts_enabled():
+                await disp.ACC_ALL_HANDOUT.send(ctx, "already disabled")
+                return
+            lobby.set_lobby_accounts_enabled(False)
+            removed = []
+            for p in lobby.get_all_in_lobby():
+                if not p.has_own_account():
+                    lobby.remove_from_lobby(p)
+                    removed.append(p.mention)
+            await disp.RM_LOBBY_ACC.send(ContextWrapper.channel(cfg.channels["lobby"]),
+                                         ' '.join(removed),
+                                         names_in_lobby=lobby.get_all_names_in_lobby())
+            await disp.ACC_ALL_HANDOUT.send(ctx, "disabled")
+            return
+        await disp.WRONG_USAGE.send(ctx, ctx.command.name)
+
+    @commands.command()
+    @commands.guild_only()
     async def channel(self, ctx, *args):
         if ctx.channel.id not in [cfg.channels["register"], cfg.channels["lobby"], *cfg.channels["matches"]]:
             await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")

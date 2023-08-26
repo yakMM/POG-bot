@@ -11,6 +11,7 @@ log = getLogger("pog_bot")
 
 _lobby_list = list()
 _lobby_stuck = False
+_lobby_accounts_enabled = True
 _MatchClass = None
 _client = None
 _warned_players = dict()
@@ -55,6 +56,13 @@ def _add_ih_callback(ih, player):
             await disp.LB_REFRESH_NO.send(i_ctx)
             raise interactions.InteractionNotAllowed
 
+
+def accounts_enabled():
+    return _lobby_accounts_enabled
+
+def set_lobby_accounts_enabled(bl):
+    global _lobby_accounts_enabled
+    _lobby_accounts_enabled = bl
 
 def is_lobby_stuck():
     return _lobby_stuck
@@ -142,6 +150,9 @@ def get_all_names_in_lobby():
 def get_all_ids_in_lobby():
     ids = [p.id for p in _lobby_list]
     return ids
+
+def get_all_in_lobby():
+    return _lobby_list.copy()
 
 
 def remove_from_lobby(player):
