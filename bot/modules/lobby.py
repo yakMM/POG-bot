@@ -151,6 +151,9 @@ def get_all_ids_in_lobby():
     ids = [p.id for p in _lobby_list]
     return ids
 
+def get_all_in_lobby():
+    return _lobby_list.copy()
+
 
 def remove_from_lobby(player):
     _remove_from_warned(player)

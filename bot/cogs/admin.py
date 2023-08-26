@@ -277,11 +277,10 @@ class AdminCog(commands.Cog, name='admin'):
                 return
             lobby.set_lobby_accounts_enabled(False)
             removed = []
-            for p_id in lobby.get_all_ids_in_lobby():
-                player = Player.get(p_id)
-                if player and not player.has_own_account():
-                    lobby.remove_from_lobby(player)
-                    removed.append(player.mention)
+            for p in lobby.get_all_in_lobby():
+                if not p.has_own_account():
+                    lobby.remove_from_lobby(p)
+                    removed.append(p.mention)
             await disp.RM_LOBBY_ACC.send(ContextWrapper.channel(cfg.channels["lobby"]),
                                          ' '.join(removed),
                                          names_in_lobby=lobby.get_all_names_in_lobby())
