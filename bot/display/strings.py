@@ -174,6 +174,7 @@ class AllStrings(Enum):
     MATCH_GETTING_READY = Message("{} getting ready: checking for players...", ping=False)
     MATCH_PLAYERS_OFFLINE = Message("Can't get {} ready, {} {} not online in game!", ping=False,
                                     embed=embeds.offline_list)
+    MATCH_GETTING_READY_DELAY = Message("Already getting ready! Wait a bit or try again later...")
     MATCH_CLEAR = Message("Clearing match...", ping=False)
     MATCH_ROUND_OVER = Message("{}\n{}\nRound {} is over!")
     MATCH_OVER = Message("The match is over!\nClearing...")

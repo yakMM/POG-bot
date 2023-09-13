@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 
 from match import MatchStatus
@@ -31,6 +33,8 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
         self.match.teams[1].on_team_ready(False)
         self.match.teams[0].captain.is_turn = True
         self.match.teams[0].on_team_ready(False)
+
+        self.getting_ready = [False, False]
 
         self.ih = interactions.CaptainInteractionHandler(self.match, views.ready_button, check_turn=False,
                                                          disable_after_use=False)
@@ -118,18 +122,29 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
                                                             " ".join(p.mention for p in not_validated_players))
                     return
             if self.match.check_offline:
+                if self.getting_ready[captain.team.id]:
+                    await disp.MATCH_GETTING_READY_DELAY.send(ctx)
+                    return
                 await disp.MATCH_GETTING_READY.send(ctx, captain.team.name)
+                self.getting_ready[captain.team.id] = True
                 try:
-                    offline_players = await census.get_offline_players(captain.team)
-                    if len(offline_players) != 0:
-                        await disp.MATCH_PLAYERS_OFFLINE.send(ctx, captain.team.name,
-                                                              " ".join(p.mention for p in offline_players),
-                                                              "are" if len(offline_players) > 1 else "is",
-                                                              p_list=offline_players)
-                        return
+                    async with asyncio.timeout(15):
+                        await asyncio.sleep(20)
+                        offline_players = await census.get_offline_players(captain.team)
+                        if len(offline_players) != 0:
+                            await disp.MATCH_PLAYERS_OFFLINE.send(ctx, captain.team.name,
+                                                                  " ".join(p.mention for p in offline_players),
+                                                                  "are" if len(offline_players) > 1 else "is",
+                                                                  p_list=offline_players)
+                            return
                 except ApiNotReachable as e:
                     log.error(f"ApiNotReachable caught when checking online players: {e.url}")
                     await disp.API_READY_ERROR.send(ctx)
+                except asyncio.TimeoutError:
+                    log.error("TimeoutError caught when checking online players!")
+                    await disp.API_READY_ERROR.send(ctx)
+                finally:
+                    self.getting_ready[captain.team.id] = False
             self.on_team_ready(captain.team, True)
             is_over = self.ready_check(captain.team)
             if not is_over:
