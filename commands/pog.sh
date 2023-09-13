@@ -88,7 +88,7 @@ function my_update
 
   chmod a+x commands/*
   cp ../POG-data/secret/* bot/
-  pdm install --prod
+  python3.11 -m pdm install --prod
 }
 
 function my_discord_log
