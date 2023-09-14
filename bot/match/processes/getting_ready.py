@@ -129,7 +129,6 @@ class GettingReady(Process, status=MatchStatus.IS_WAITING):
                 self.getting_ready[captain.team.id] = True
                 try:
                     async with asyncio.timeout(15):
-                        await asyncio.sleep(20)
                         offline_players = await census.get_offline_players(captain.team)
                         if len(offline_players) != 0:
                             await disp.MATCH_PLAYERS_OFFLINE.send(ctx, captain.team.name,
