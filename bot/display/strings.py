@@ -53,7 +53,7 @@ class AllStrings(Enum):
     LB_REFRESH_NO = Message("You can't do that!")
     LB_TIME_INVALID = Message("Could not interpret `{}` as a valid duration!")
     LB_TIME_TOO_SHORT = Message("Minimum timeout is 5 minutes!")
-    LB_TIME_TOO_LONG = Message("Maximum timeout is 2 hours!")
+    LB_TIME_TOO_LONG = Message("Maximum timeout is 1 hour!")
     LB_TIMEOUT_OK = Message("Lobby timeout updated!", embed=embeds.lobby_list)
 
     PK_OVER = Message("The teams are already made. You can't pick!")

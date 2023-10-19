@@ -144,7 +144,7 @@ async def check_time(ctx, args):
         if time < 300:
             await disp.LB_TIME_TOO_SHORT.send(ctx)
             return -1
-        if time > 7200:
+        if time > 3600:
             await disp.LB_TIME_TOO_LONG.send(ctx)
             return -1
         return time

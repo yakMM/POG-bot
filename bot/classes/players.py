@@ -241,10 +241,10 @@ class Player:
 
     @property
     def should_be_warned(self):
-        # If last timeout set is more than 1h30 (5400)
-        if self.__last_lobby_timeout >= 5400:
-            # And expiration is less than 10 minutes away (600)
-            return tools.timestamp_now() + 600 >= self.__lobby_expiration
+        # If last timeout set is more than 45min (2700)
+        if self.__last_lobby_timeout >= 2700:
+            # And expiration is less than 5 minutes away (300)
+            return tools.timestamp_now() + 300 >= self.__lobby_expiration
         return False
 
     @property
@@ -328,14 +328,14 @@ class Player:
         self.update_role()
 
     def reset_lobby_expiration(self):
-        self.lobby_expiration = 7200
+        self.lobby_expiration = 3600  # 1 hour
 
     def on_lobby_add(self, expiration=0):
         self.__lobby_stamp = tools.timestamp_now()
         if expiration == 0:
-            expiration = 7200
-        self.__lobby_expiration = self.__lobby_stamp + expiration
-        self.__last_lobby_timeout = expiration
+            self.reset_lobby_expiration()
+        else:
+            self.lobby_expiration = expiration
         self.update_role()
 
     def on_player_clean(self):
