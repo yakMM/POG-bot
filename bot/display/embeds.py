@@ -2,6 +2,7 @@ from discord import Embed, Color
 import modules.config as cfg
 from datetime import datetime as dt
 from datetime import timezone as tz
+import operator
 
 from modules.roles import is_admin
 import modules.tools as tools
@@ -481,7 +482,8 @@ def usage(ctx, data):
                         value="\n".join(f'POG account {a_id}' for a_id in data["unique_usages"]),
                         inline=False)
 
-    for use in data["usages"][19::-1]:
+    usages = sorted(data["usages"], key=operator.itemgetter("time_stop"), reverse=True)[0:20]
+    for use in usages:
         if is_account:
             name = f'User: <@{use["id"]}>'
         else:
