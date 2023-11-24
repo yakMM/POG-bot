@@ -16,8 +16,8 @@ Work in progress: [Github Pages](https://yakmm.github.io/POG-bot/)
 - Finally, to initialize the application, [scripts functions](#populating-the-collections) are provided.
 
 ### Python dependencies:
-- Python 3.8 or above is required to run the project.
-- We recommend using [pdm](https://pdm.fming.dev/latest/#installation) to set up the project environment. Pipenv will install automatically install the required dependencies from the `pdm.lock` file provided with the project.
+- Python 3.11 or above is required to run the project.
+- We recommend using [pdm](https://pdm.fming.dev/latest/#installation) to set up the project environment. It will install automatically install the required dependencies from the `pdm.lock` file provided with the project.
 - Alternatively, the dependencies are also listed in the `pyproject.toml` file.
 
 ### Notes for the developer:
