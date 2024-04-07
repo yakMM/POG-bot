@@ -22,6 +22,11 @@ def init(secret_file):
 def get_booked_bases(base_class, booked_bases_list):  # runs on class init, saves a list of booked bases at the time of init to self.booked
     index_start = index_end = None
     gc = service_account(filename=_secret_file)
+
+    if (cfg.database["jaeger_cal"] is None or cfg.database["jaeger_cal"] == ""):
+        log.info("config value 'jaeger_cal' is not set, skipping booked bases check")
+        return
+
     sh = gc.open_by_key(cfg.database["jaeger_cal"])
     ws = sh.worksheet("Current")
     cal_export = np_array(ws.get_all_values())
