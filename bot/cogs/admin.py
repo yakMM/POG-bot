@@ -264,7 +264,7 @@ class AdminCog(commands.Cog, name='admin'):
             await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
             return
 
-        if (lobby.get_lobby_len() == 0): # don't allow starting with 0 players
+        if lobby.get_lobby_len() == 0: # don't allow starting with 0 players
             await disp.LB_FORCE_START_ZERO_PLAYERS.send(ctx)
             return
 
