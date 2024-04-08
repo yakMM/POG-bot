@@ -23,7 +23,7 @@ def get_booked_bases(base_class, booked_bases_list):  # runs on class init, save
     index_start = index_end = None
     gc = service_account(filename=_secret_file)
 
-    if (cfg.database["jaeger_cal"] is None or cfg.database["jaeger_cal"] == ""):
+    if cfg.database["jaeger_cal"] is None or cfg.database["jaeger_cal"] == "":
         log.info("config value 'jaeger_cal' is not set, skipping booked bases check")
         return
 
