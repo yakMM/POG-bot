@@ -269,7 +269,7 @@ class AdminCog(commands.Cog, name='admin'):
             return
 
         # TODO: is this check needed? can you successfully have a 5v6 lobby?
-        if (lobby.get_lobby_len() % 2 != 0):
+        if lobby.get_lobby_len() % 2 != 0:
             await disp.LB_FORCE_START_NOT_EVEN.send(ctx)
             return
 
