@@ -53,7 +53,7 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             and ask them to start picking players.
         """
 
-        if (len(self.players) == 0):
+        if not self.players:
             log.debug(f"there are 0 players, meaning this is a 2 person lobby with 2 captains already!")
             self.pick_check(None) # normally passing None here is an error, but cause there will be 0 players, it's fine!
         else:
