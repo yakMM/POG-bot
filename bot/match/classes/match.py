@@ -134,7 +134,7 @@ class Match:
     def spin_up(self, p_list):
         if not self.__objects:
             raise AttributeError("Match instance is not bound, no attribute 'spin_up'")
-        if (Match._last_match_id == None): # if there was no last match, make sure it exists
+        if Match._last_match_id is None: # if there was no last match, make sure it exists
             Match._last_match_id = 0
             db.set_element("restart_data", 0, {"_id": 0, "last_match_id": Match._last_match_id})
         Match._last_match_id += 1
