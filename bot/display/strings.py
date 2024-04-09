@@ -55,9 +55,6 @@ class AllStrings(Enum):
     LB_TIME_TOO_SHORT = Message("Minimum timeout is 5 minutes!")
     LB_TIME_TOO_LONG = Message("Maximum timeout is 1 hour!")
     LB_TIMEOUT_OK = Message("Lobby timeout updated!", embed=embeds.lobby_list)
-    LB_FORCE_START = Message("Lobby force started by {}")
-    LB_FORCE_START_ZERO_PLAYERS = Message("There are 0 players in lobby, cannot force start")
-    LB_FORCE_START_NOT_EVEN = Message("There are not an even number of players in lobby")
 
     PK_OVER = Message("The teams are already made. You can't pick!")
     PK_NO_LOBBIED = Message("You must first queue and wait for a match to begin. Check <#{}>")

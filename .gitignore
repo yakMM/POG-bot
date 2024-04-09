@@ -20,4 +20,3 @@ doc/build/
 .pdm.toml
 __pypackages__
 .pdm-python
-pdm.py

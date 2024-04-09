@@ -18,6 +18,7 @@ import match.classes.interactions as interactions
 
 log = getLogger("pog_bot")
 
+
 class CaptainSelection(Process, status=MatchStatus.IS_CAPTAIN):
 
     def __init__(self, match, p_list):
