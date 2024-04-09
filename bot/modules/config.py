@@ -77,7 +77,7 @@ loadout_id = {
     21: "max"
 }
 
-# http://census.daybreakgames.com/get/ps2/base_region/?c:limit=400&c:show=facility_id,facility_name,zone_id,facility_type_id
+# http://census.daybreakgames.com/get/ps2:v2/map_region/?c:limit=4000&c:show=facility_id,facility_name,zone_id,facility_type_id
 #: Dictionary to retrieve base id from name.
 base_to_id = {
     "acan": 302030,
@@ -92,7 +92,8 @@ base_to_id = {
     "kessel": 266000,
     "nettlemire": 283000,
     "bridgewater": 272000,
-    "rime": 244610
+    "rime": 244610,
+    "veridad_pass": 400404
 }
 
 #: Dictionary to retrieve base name from id.

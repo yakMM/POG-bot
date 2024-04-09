@@ -259,6 +259,26 @@ class AdminCog(commands.Cog, name='admin'):
 
     @commands.command()
     @commands.guild_only()
+    async def fstart(self, ctx, *args):
+        if ctx.channel.id != cfg.channels["lobby"]: # only allowed in lobby channel
+            await disp.WRONG_CHANNEL_2.send(ctx, ctx.command.name, f"<#{ctx.channel.id}>")
+            return
+
+        if lobby.get_lobby_len() == 0: # don't allow starting with 0 players
+            await disp.LB_FORCE_START_ZERO_PLAYERS.send(ctx)
+            return
+
+        # TODO: is this check needed? can you successfully have a 5v6 lobby?
+        if lobby.get_lobby_len() % 2 != 0:
+            await disp.LB_FORCE_START_NOT_EVEN.send(ctx)
+            return
+
+        # start the match!
+        lobby._start_match_from_full_lobby()
+        await disp.LB_FORCE_START.send(ctx, f"<@{ctx.author.id}>")
+
+    @commands.command()
+    @commands.guild_only()
     async def accounts(self, ctx, *args):
         if len(args) == 0:
             await disp.ACC_ALL_HANDOUT.send(ctx, "enabled" if lobby.accounts_enabled() else "disabled")

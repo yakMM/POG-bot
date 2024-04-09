@@ -10,6 +10,8 @@ from match.classes import BaseSelector
 
 import match.classes.interactions as interactions
 
+from logging import getLogger
+log = getLogger("pog_bot")
 
 class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
 
@@ -50,10 +52,15 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
         """ Init the match channel, ping players, find two captains \
             and ask them to start picking players.
         """
-        # Ready for players to pick
-        ctx = self.interaction_handler.get_new_context(self.match.channel)
-        await disp.MATCH_SHOW_PICKS.send(ctx, self.match.teams[0].captain.mention,
-                                         match=self.match.proxy)
+
+        if not self.players:
+            log.debug(f"there are 0 players, meaning this is a 2 person lobby with 2 captains already!")
+            self.pick_check(None) # normally passing None here is an error, but cause there will be 0 players, it's fine!
+        else:
+            # Ready for players to pick
+            ctx = self.interaction_handler.get_new_context(self.match.channel)
+            await disp.MATCH_SHOW_PICKS.send(ctx, self.match.teams[0].captain.mention,
+                                            match=self.match.proxy)
 
     @property
     def picking_captain(self):

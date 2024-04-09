@@ -121,7 +121,7 @@ def push_element(collection: str, e_id: int, doc: dict):
     if _collections[collection].count_documents({"_id": e_id}) != 0:
         _collections[collection].update_one({"_id": e_id}, {"$push": doc})
     else:
-        raise DatabaseError(f"set_field: Element {e_id} doesn't exist in collection {collection}")
+        raise DatabaseError(f"push_element: Element {e_id} doesn't exist in collection {collection}")
 
 
 def get_element(collection: str, item_id: int) -> (dict, None):
