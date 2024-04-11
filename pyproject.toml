@@ -8,13 +8,13 @@ authors = [
 dependencies = [
     "discord.py @ git+https://github.com/yakMM/discord.py@1.x",
     "requests==2.31.0",
-    "numpy==1.25.2",
-    "pytz==2023.3.post1",
+    "numpy==1.26.4",
+    "pytz==2024.1",
     "aiohttp==3.7.4.post0",
-    "pymongo==4.5.0",
-    "gspread==5.11.1",
+    "pymongo==4.6.3",
+    "gspread==6.1.0",
     "python-dateutil==2.8.2",
-    "schedule==1.2.0",
+    "schedule==1.2.1",
     "Pillow==9.5.0"
 ]
 requires-python = "==3.11.*"
