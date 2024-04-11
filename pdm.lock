@@ -131,11 +131,11 @@ files = [
 
 [[package]]
 name = "discord-py"
-version = "2.0.0a3576"
+version = "2.0.0a3577"
 requires_python = ">=3.8.0"
 git = "https://github.com/yakMM/discord.py"
 ref = "1.x"
-revision = "116a968175eafd4bc9f83520b9f6dec105f7fd61"
+revision = "beda92dfa1d60a8ad7d2b17cb2fca85ace5c6602"
 summary = "A Python wrapper for the Discord API"
 dependencies = [
     "aiohttp<3.8.0,>=3.6.0",
