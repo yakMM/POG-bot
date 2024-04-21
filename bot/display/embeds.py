@@ -1,4 +1,5 @@
 from discord import Embed, Color
+from discord.utils import escape_markdown
 import modules.config as cfg
 from datetime import datetime as dt
 from datetime import timezone as tz
@@ -293,7 +294,7 @@ def auto_help(ctx, is_dm=False):
 def lobby_list(ctx, names_in_lobby):
     """ Returns the lobby list """
     embed = Embed(colour=Color.blue())
-    list_of_names = "\n".join(names_in_lobby)
+    list_of_names = escape_markdown("\n".join(names_in_lobby))
     if list_of_names == "":
         list_of_names = "Queue is empty"
     embed.add_field(name=f'Lobby: {len(names_in_lobby)} / {cfg.general["lobby_size"]}', value=list_of_names,
@@ -374,7 +375,7 @@ def team_update(ctx, match):
         if tm.captain:
             value = ""
             name = ""
-            cap_mention = f"{tm.captain.mention} ({tm.captain.name})"
+            cap_mention = escape_markdown(f"{tm.captain.mention} ({tm.captain.name})")
             if match.next_status in (MatchStatus.IS_WAITING, MatchStatus.IS_STARTING, MatchStatus.IS_PLAYING):
                 cap_mention += f" [{tm.captain.ig_name}]"
             if match.next_status in (MatchStatus.IS_FACTION, MatchStatus.IS_PICKING) and tm.captain.is_turn:
@@ -404,7 +405,7 @@ def team_update(ctx, match):
     if match.next_status is MatchStatus.IS_CAPTAIN:
         name = "Players"
     if name:
-        players_string = "\n".join([f"- {p.mention} ({p.name})" for p in match.get_left_players()])
+        players_string = escape_markdown("\n".join([f"- {p.mention} ({p.name})" for p in match.get_left_players()]))
         embed.add_field(name=name, value=players_string, inline=False)
     return embed
 
@@ -451,7 +452,7 @@ def join_ts(ctx):
 def direct_message(ctx, player, msg):
     description = f"Received a DM"
     if player:
-        description += f"\nHandle: {player.mention}\nName: {player.name}\nID: `{player.id}`\n"
+        description += escape_markdown("\nHandle: {player.mention}\nName: {player.name}\nID: `{player.id}`\n")
     else:
         description += f" from unregistered user {msg.author.mention} (id: {msg.author.id})\n"
     embed = Embed(colour=Color.dark_grey(), title="Direct Message",
@@ -502,7 +503,7 @@ def psb_usage(ctx, player, usages):
     embed = Embed(
         colour=Color.blue(),
         title='POG participation',
-        description=f"Handle: {player.mention}\nName: {player.name}\nID: `{player.id}`\n"
+        description=escape_markdown(f"Handle: {player.mention}\nName: {player.name}\nID: `{player.id}`\n")
     )
     for use in usages:
         bef = "✅" if use.num else "❌"
@@ -516,7 +517,7 @@ def psb_usage(ctx, player, usages):
     return embed
 
 def player_stats(ctx, stats, recent_stats):
-    embed = Embed(title=f"{stats.name}'s Stats:", colour=Color.blue())
+    embed = Embed(title=escape_markdown(f"{stats.name}'s Stats:"), colour=Color.blue())
     embed.add_field(name="Recent (last 2 weeks)",
                     value=f"Matches played: {recent_stats.nb_matches_played}\n"
                           f"Play time: {'{:.1f}'.format(recent_stats.time_played / 60)} hours\n"
