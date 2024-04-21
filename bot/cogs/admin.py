@@ -92,7 +92,7 @@ class AdminCog(commands.Cog, name='admin'):
     @commands.command()
     @commands.guild_only()
     async def rename(self, ctx, *args):
-        if not _check_channels(ctx, cfg.channels["register"]):
+        if not await _check_channels(ctx, cfg.channels["register"]):
             return
         player = await get_check_player(ctx)
         if not player:
