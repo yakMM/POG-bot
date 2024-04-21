@@ -12,11 +12,11 @@ from discord import Intents
 from lib.tasks import loop
 
 # Other modules
-from asyncio import sleep
-from random import seed
 from datetime import datetime as dt
 import logging, logging.handlers, sys, os
 from time import gmtime
+
+import random
 
 # General Enum and Exceptions
 from modules.tools import UnexpectedError
@@ -306,6 +306,8 @@ def main(launch_str=""):
     # Init order MATTERS
 
     log.info("Starting init...")
+
+    random.seed()
 
     # Get data from the config file
     cfg.get_config(launch_str)

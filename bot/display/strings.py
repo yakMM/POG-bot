@@ -159,6 +159,9 @@ class AllStrings(Enum):
 
     MATCH_DM_PING = Message("POG match {} is starting! Please join `{}` channel in the Jaeger Events discord!\n{}", ping=False)
     MATCH_INIT = Message("{}\nMatch is ready, starting team selection...")
+    MATCH_COINFLIP = Message("Flipping coin for first pick, {} is HEADS, {} is TAILS...")
+    MATCH_COIN_FLIPPED_0 = Message("Result is HEADS!")
+    MATCH_COIN_FLIPPED_1 = Message("Result is TAILS!")
     MATCH_SHOW_PICKS = Message("Captains have been selected, {} choose a player", embed=embeds.team_update, ping=False)
     MATCH_BASE_AUTO = Message("Match will be on **{}**", ping=False)
     MATCH_CONFIRM = Message("{} {} Type `=ready` when your team is inside their sunderer, ready to start",

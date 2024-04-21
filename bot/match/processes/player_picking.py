@@ -7,6 +7,7 @@ from match.common import get_substitute, after_pick_sub, switch_turn
 from match import MatchStatus
 from .process import Process
 from match.classes import BaseSelector
+import random
 
 import match.classes.interactions as interactions
 
@@ -27,9 +28,6 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             disable_after_use=False,
             single_callback=self.interaction_callback
         )
-
-        self.match.teams[0].captain.is_turn = True
-        self.match.teams[1].captain.is_turn = False
 
         for p in p_list:
             self.players[p.id] = p
@@ -58,8 +56,14 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             self.pick_check(None) # normally passing None here is an error, but cause there will be 0 players, it's fine!
         else:
             # Ready for players to pick
+            await disp.MATCH_COINFLIP.send(self.match.channel, self.match.teams[0].name, self.match.teams[1].name)
+            result = random.randint(0, 1)
+            self.match.teams[result].captain.is_turn = True
+            self.match.teams[result - 1].captain.is_turn = False
+            msg = disp.MATCH_COIN_FLIPPED_0 if result == 0 else disp.MATCH_COIN_FLIPPED_1
+            await msg.send(self.match.channel)
             ctx = self.interaction_handler.get_new_context(self.match.channel)
-            await disp.MATCH_SHOW_PICKS.send(ctx, self.match.teams[0].captain.mention,
+            await disp.MATCH_SHOW_PICKS.send(ctx, self.match.teams[result].captain.mention,
                                             match=self.match.proxy)
 
     @property
