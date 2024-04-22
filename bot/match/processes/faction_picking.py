@@ -23,9 +23,6 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
                                                                           disable_after_use=False)
         self.add_callbacks(self.interaction_handler)
 
-        self.match.teams[1].captain.is_turn = True
-        self.match.teams[0].captain.is_turn = False
-
         super().__init__(match)
 
     @Process.init_loop
@@ -87,6 +84,7 @@ class FactionPicking(Process, status=MatchStatus.IS_FACTION):
         # Check if the other team already picked it
         if other.faction == faction:
             await disp.PK_FACTION_OTHER.send(ctx)
+            return
 
         # If not, select the faction and give turn to other team
         team.faction = faction

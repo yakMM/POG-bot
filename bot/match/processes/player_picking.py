@@ -216,6 +216,8 @@ class PlayerPicking(Process, status=MatchStatus.IS_PICKING):
             self.ping_last_player.start(other, p)
         # If no player left, trigger the next step
         elif len(self.players) == 0:
+            # Switch turn one last time for faction picking
+            switch_turn(self.match, other)
             # Start next step
             self.match.ready_next_process()
             self.interaction_handler.clean()
