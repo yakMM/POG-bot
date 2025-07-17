@@ -4,7 +4,7 @@ permissions.txt
 bot/test*.py
 bot/test
 bot/config_test*.cfg
-bot/config.cfg
+bot/config_prod.cfg
 bot/google_api_secret_test*.json
 bot/google_api_secret.json
 secret/
